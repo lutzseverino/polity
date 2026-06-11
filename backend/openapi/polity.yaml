@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: Polity API
+  version: 0.1.0
+  description: Constitutional government for friend groups.
+servers:
+  - url: /api/v1
+tags:
+  - name: Polities
+  - name: Members
+  - name: Motions
+  - name: Official Record
+paths:
+  /polities:
+    get:
+      tags: [Polities]
+      operationId: listPolities
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Polities, content: { application/json: { schema: { $ref: "#/components/schemas/PolitiesResponse" } } } }
+    post:
+      tags: [Polities]
+      operationId: createPolity
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePolityRequest" } } } }
+      responses:
+        "201": { description: Polity created, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /polities/{polityId}:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Polities]
+      operationId: getPolity
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Polity, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/members:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Members]
+      operationId: listPolityMembers
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Members, content: { application/json: { schema: { $ref: "#/components/schemas/MembersResponse" } } } }
+    post:
+      tags: [Members]
+      operationId: admitPolityMember
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberRequest" } } } }
+      responses:
+        "201": { description: Member admitted, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /polities/{polityId}/motions:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Motions]
+      operationId: listPolityMotions
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Motions, content: { application/json: { schema: { $ref: "#/components/schemas/MotionsResponse" } } } }
+    post:
+      tags: [Motions]
+      operationId: createPolityMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionRequest" } } } }
+      responses:
+        "201": { description: Motion introduced and opened for voting, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /polities/{polityId}/motions/{motionId}:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
+    get:
+      tags: [Motions]
+      operationId: getPolityMotion
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Motion, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/motions/{motionId}/votes:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
+    put:
+      tags: [Motions]
+      operationId: castPolityMotionVote
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastVoteRequest" } } } }
+      responses:
+        "200": { description: Vote recorded, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /polities/{polityId}/motions/{motionId}/certification:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
+    post:
+      tags: [Motions]
+      operationId: certifyPolityMotion
+      security: [{ bearerAuth: [] }]
+      responses:
+        "201": { description: Result certified and effect applied when passed, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /polities/{polityId}/record:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Official Record]
+      operationId: listPolityOfficialRecord
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Official record, content: { application/json: { schema: { $ref: "#/components/schemas/OfficialRecordResponse" } } } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    PolityId: { name: polityId, in: path, required: true, schema: { type: string, format: uuid } }
+    MotionId: { name: motionId, in: path, required: true, schema: { type: string, format: uuid } }
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
+    NotFound:
+      description: Resource not found.
+      content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
+    Conflict:
+      description: Resource conflicts with current state.
+      content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
+  schemas:
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error: { $ref: "#/components/schemas/ApiErrorBody" }
+    ApiErrorBody:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+    CreatePolityRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    AdmitMemberRequest:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+    CreateMotionRequest:
+      type: object
+      required: [title, body]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        body: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CastVoteRequest:
+      type: object
+      required: [choice]
+      properties:
+        choice: { $ref: "#/components/schemas/VoteChoice" }
+    VoteChoice: { type: string, enum: [yes, no, abstain] }
+    PolityResponse:
+      type: object
+      required: [id, name, constitutionVersion, jurisdictionName, institutionName, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        constitutionVersion: { type: integer }
+        jurisdictionName: { type: string }
+        institutionName: { type: string }
+        createdAt: { type: string, format: date-time }
+    PolitiesResponse: { type: object, required: [polities], properties: { polities: { type: array, items: { $ref: "#/components/schemas/PolityResponse" } } } }
+    MemberResponse:
+      type: object
+      required: [id, userId, name, email, status, admittedAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        status: { type: string, enum: [active] }
+        admittedAt: { type: string, format: date-time }
+    MembersResponse: { type: object, required: [members], properties: { members: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } }
+    VoteTallyResponse:
+      type: object
+      required: ["yes", "no", abstain, eligible, quorumRequired, quorumMet]
+      properties:
+        "yes": { type: integer }
+        "no": { type: integer }
+        abstain: { type: integer }
+        eligible: { type: integer }
+        quorumRequired: { type: integer }
+        quorumMet: { type: boolean }
+    CertificationResponse:
+      type: object
+      required: [passed, explanation, certifiedAt]
+      properties:
+        passed: { type: boolean }
+        explanation: { type: string }
+        certifiedAt: { type: string, format: date-time }
+    MotionResponse:
+      type: object
+      required: [id, title, body, status, effectType, constitutionVersion, procedureName, introducedByName, openedAt, tally]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+        status: { type: string, enum: [voting, enacted, rejected] }
+        effectType: { type: string, enum: [adopt_resolution] }
+        constitutionVersion: { type: integer }
+        procedureName: { type: string }
+        introducedByName: { type: string }
+        openedAt: { type: string, format: date-time }
+        tally: { $ref: "#/components/schemas/VoteTallyResponse" }
+        certification: { $ref: "#/components/schemas/CertificationResponse" }
+    MotionsResponse: { type: object, required: [motions], properties: { motions: { type: array, items: { $ref: "#/components/schemas/MotionResponse" } } } }
+    OfficialRecordEntryResponse:
+      type: object
+      required: [id, type, title, body, actorName, constitutionVersion, occurredAt]
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string }
+        title: { type: string }
+        body: { type: string }
+        actorName: { type: string }
+        constitutionVersion: { type: integer }
+        sourceId: { type: string, format: uuid }
+        occurredAt: { type: string, format: date-time }
+    OfficialRecordResponse: { type: object, required: [entries], properties: { entries: { type: array, items: { $ref: "#/components/schemas/OfficialRecordEntryResponse" } } } }

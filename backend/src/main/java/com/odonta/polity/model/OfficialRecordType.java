@@ -1,0 +1,12 @@
+package com.odonta.polity.model;
+
+public enum OfficialRecordType {
+  POLITY_FOUNDED,
+  CONSTITUTION_RATIFIED,
+  MEMBER_ADMITTED,
+  MOTION_INTRODUCED,
+  VOTE_CAST,
+  MOTION_CERTIFIED,
+  RESOLUTION_ADOPTED,
+  MOTION_REJECTED
+}

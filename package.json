@@ -1,0 +1,16 @@
+{
+  "name": "polity",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "build": "pnpm --dir web build",
+    "dev": "pnpm --dir web dev",
+    "generate:api": "pnpm --dir web generate:api",
+    "typecheck": "pnpm --dir web typecheck"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

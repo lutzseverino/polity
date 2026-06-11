@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: odonta-polity
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/odonta}
+    username: ${SPRING_DATASOURCE_USERNAME:odonta}
+    password: ${SPRING_DATASOURCE_PASSWORD:odonta}
+  flyway:
+    table: flyway_schema_history_polity
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration,classpath:db/authorization/publications
+    placeholders:
+      authorizationSchema: polity_events
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  modulith:
+    events:
+      jdbc:
+        schema: polity_events
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:${odonta.polity.keycloak.base-url}/realms/${odonta.polity.keycloak.realm}}
+odonta:
+  api:
+    base-path: /api/v1
+  polity:
+    keycloak:
+      base-url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
+      realm: ${KEYCLOAK_REALM:odonta}
+      client-id: ${KEYCLOAK_POLITY_CLIENT_ID:polity}
+      client-secret: ${KEYCLOAK_POLITY_CLIENT_SECRET:polity-secret}
+  identity:
+    client:
+      base-url: ${IDENTITY_BASE_URL:http://localhost:8081/api/v1}
+server:
+  port: ${POLITY_PORT:8084}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+springdoc:
+  api-docs:
+    path: /openapi.json
+  swagger-ui:
+    path: /docs
