@@ -6,12 +6,12 @@ import com.odonta.common.api.ApiException;
 import com.odonta.identity.client.IdentityUser;
 import com.odonta.identity.client.IdentityUsersClient;
 import com.odonta.identity.client.ProvisionalUser;
+import com.odonta.polity.api.model.AdmitMemberInput;
+import com.odonta.polity.api.model.CreatePolityInput;
 import com.odonta.polity.authorization.PolityGrantPlanner;
-import com.odonta.polity.model.AdmitMemberCommand;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
-import com.odonta.polity.model.CreatePolityCommand;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.InstitutionKind;
@@ -67,13 +67,13 @@ public class PolityService {
   private final ProcedureRepository procedures;
 
   @Transactional
-  public PolityDetails create(AuthenticatedUser founder, @Valid CreatePolityCommand command) {
+  public PolityDetails create(AuthenticatedUser founder, @Valid CreatePolityInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     IdentityUser identity = identityUsers.get(founder.id());
-    Polity polity = polities.saveAndFlush(new Polity(command.name(), founder.id()));
+    Polity polity = polities.saveAndFlush(new Polity(input.getName(), founder.id()));
     Jurisdiction jurisdiction =
         jurisdictions.saveAndFlush(
-            new Jurisdiction(polity.getId(), command.name(), JurisdictionKind.ROOT));
+            new Jurisdiction(polity.getId(), input.getName(), JurisdictionKind.ROOT));
     ConstitutionVersion constitution =
         constitutions.saveAndFlush(
             new ConstitutionVersion(
@@ -116,7 +116,7 @@ public class PolityService {
         membership.getId(),
         OfficialRecordType.POLITY_FOUNDED,
         polity.getId(),
-        command.name() + " was founded",
+        input.getName() + " was founded",
         "The polity was founded with a root jurisdiction and citizens' assembly.",
         now);
     record.append(
@@ -152,13 +152,12 @@ public class PolityService {
   }
 
   @Transactional
-  public Membership admit(
-      UUID polityId, AuthenticatedUser actor, @Valid AdmitMemberCommand command) {
+  public Membership admit(UUID polityId, AuthenticatedUser actor, @Valid AdmitMemberInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     Membership admittingMember = membershipReader.active(polityId, actor.id());
     ConstitutionVersion constitution = constitution(polityId);
     authority.require(admittingMember, constitution, PowerCode.ADMIT_MEMBER);
-    ProvisionalUser identity = identityUsers.createProvisional(command.email());
+    ProvisionalUser identity = identityUsers.createProvisional(input.getEmail());
     if (memberships.existsByPolityIdAndUserId(polityId, identity.id())) {
       throw ApiException.conflict("member_exists", "This user is already a member.");
     }
@@ -168,8 +167,8 @@ public class PolityService {
                 polityId,
                 identity.id(),
                 identity.authorizationSubject(),
-                command.email(),
-                command.email(),
+                input.getEmail(),
+                input.getEmail(),
                 now,
                 admittingMember.getId()));
     grants.stage(grantPlanner.membership(identity.authorizationSubject(), polityId));

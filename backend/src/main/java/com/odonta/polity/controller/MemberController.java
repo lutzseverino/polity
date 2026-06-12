@@ -2,11 +2,10 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MembersApi;
-import com.odonta.polity.api.model.AdmitMemberRequest;
+import com.odonta.polity.api.model.AdmitMemberInput;
 import com.odonta.polity.api.model.MemberResponse;
 import com.odonta.polity.api.model.MembersResponse;
 import com.odonta.polity.mapper.PolityMapper;
-import com.odonta.polity.model.AdmitMemberCommand;
 import com.odonta.polity.service.PolityService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -32,11 +31,8 @@ public class MemberController implements MembersApi {
 
   @Override
   public ResponseEntity<MemberResponse> admitPolityMember(
-      UUID polityId, @Valid AdmitMemberRequest request) {
+      UUID polityId, @Valid AdmitMemberInput input) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            mapper.toResponse(
-                polities.admit(
-                    polityId, users.currentUser(), new AdmitMemberCommand(request.getEmail()))));
+        .body(mapper.toResponse(polities.admit(polityId, users.currentUser(), input)));
   }
 }

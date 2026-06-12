@@ -163,18 +163,18 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        CreatePolityRequest: {
+        CreatePolityInput: {
             name: string;
         };
-        AdmitMemberRequest: {
+        AdmitMemberInput: {
             /** Format: email */
             email: string;
         };
-        CreateMotionRequest: {
+        CreateMotionInput: {
             title: string;
             body: string;
         };
-        CastVoteRequest: {
+        CastVoteInput: {
             choice: components["schemas"]["VoteChoice"];
         };
         /** @enum {string} */
@@ -327,7 +327,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreatePolityRequest"];
+                "application/json": components["schemas"]["CreatePolityInput"];
             };
         };
         responses: {
@@ -399,7 +399,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AdmitMemberRequest"];
+                "application/json": components["schemas"]["AdmitMemberInput"];
             };
         };
         responses: {
@@ -449,7 +449,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateMotionRequest"];
+                "application/json": components["schemas"]["CreateMotionInput"];
             };
         };
         responses: {
@@ -501,7 +501,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CastVoteRequest"];
+                "application/json": components["schemas"]["CastVoteInput"];
             };
         };
         responses: {

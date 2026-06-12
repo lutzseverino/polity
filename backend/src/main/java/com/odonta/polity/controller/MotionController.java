@@ -2,13 +2,11 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MotionsApi;
-import com.odonta.polity.api.model.CastVoteRequest;
-import com.odonta.polity.api.model.CreateMotionRequest;
+import com.odonta.polity.api.model.CastVoteInput;
+import com.odonta.polity.api.model.CreateMotionInput;
 import com.odonta.polity.api.model.MotionResponse;
 import com.odonta.polity.api.model.MotionsResponse;
 import com.odonta.polity.mapper.MotionMapper;
-import com.odonta.polity.model.CreateMotionCommand;
-import com.odonta.polity.model.VoteChoice;
 import com.odonta.polity.service.MotionService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -28,14 +26,9 @@ public class MotionController implements MotionsApi {
 
   @Override
   public ResponseEntity<MotionResponse> createPolityMotion(
-      UUID polityId, @Valid CreateMotionRequest request) {
+      UUID polityId, @Valid CreateMotionInput input) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            mapper.toResponse(
-                motions.create(
-                    polityId,
-                    users.currentUser(),
-                    new CreateMotionCommand(request.getTitle(), request.getBody()))));
+        .body(mapper.toResponse(motions.create(polityId, users.currentUser(), input)));
   }
 
   @Override
@@ -51,14 +44,9 @@ public class MotionController implements MotionsApi {
 
   @Override
   public ResponseEntity<MotionResponse> castPolityMotionVote(
-      UUID polityId, UUID motionId, @Valid CastVoteRequest request) {
+      UUID polityId, UUID motionId, @Valid CastVoteInput input) {
     return ResponseEntity.ok(
-        mapper.toResponse(
-            motions.vote(
-                polityId,
-                motionId,
-                users.currentUser(),
-                VoteChoice.valueOf(request.getChoice().getValue().toUpperCase()))));
+        mapper.toResponse(motions.vote(polityId, motionId, users.currentUser(), input)));
   }
 
   @Override

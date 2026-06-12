@@ -2,11 +2,10 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.PolitiesApi;
-import com.odonta.polity.api.model.CreatePolityRequest;
+import com.odonta.polity.api.model.CreatePolityInput;
 import com.odonta.polity.api.model.PolitiesResponse;
 import com.odonta.polity.api.model.PolityResponse;
 import com.odonta.polity.mapper.PolityMapper;
-import com.odonta.polity.model.CreatePolityCommand;
 import com.odonta.polity.service.PolityService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -25,11 +24,9 @@ public class PolityController implements PolitiesApi {
   private final AuthenticatedUserReader users;
 
   @Override
-  public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityRequest request) {
+  public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityInput input) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            mapper.toResponse(
-                polities.create(users.currentUser(), new CreatePolityCommand(request.getName()))));
+        .body(mapper.toResponse(polities.create(users.currentUser(), input)));
   }
 
   @Override

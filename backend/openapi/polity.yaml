@@ -22,7 +22,7 @@ paths:
       tags: [Polities]
       operationId: createPolity
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePolityRequest" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePolityInput" } } } }
       responses:
         "201": { description: Polity created, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -47,7 +47,7 @@ paths:
       tags: [Members]
       operationId: admitPolityMember
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberRequest" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberInput" } } } }
       responses:
         "201": { description: Member admitted, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -64,7 +64,7 @@ paths:
       tags: [Motions]
       operationId: createPolityMotion
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionRequest" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionInput" } } } }
       responses:
         "201": { description: Motion introduced and opened for voting, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -83,7 +83,7 @@ paths:
       tags: [Motions]
       operationId: castPolityMotionVote
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastVoteRequest" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastVoteInput" } } } }
       responses:
         "200": { description: Vote recorded, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "409": { $ref: "#/components/responses/Conflict" }
@@ -133,23 +133,23 @@ components:
         code: { type: string }
         message: { type: string }
         details: { type: object, additionalProperties: true }
-    CreatePolityRequest:
+    CreatePolityInput:
       type: object
       required: [name]
       properties:
         name: { type: string, minLength: 1, maxLength: 120, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    AdmitMemberRequest:
+    AdmitMemberInput:
       type: object
       required: [email]
       properties:
-        email: { type: string, format: email }
-    CreateMotionRequest:
+        email: { type: string, format: email, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CreateMotionInput:
       type: object
       required: [title, body]
       properties:
         title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
         body: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    CastVoteRequest:
+    CastVoteInput:
       type: object
       required: [choice]
       properties:

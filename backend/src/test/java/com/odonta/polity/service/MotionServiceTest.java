@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.api.model.CastVoteInput;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
@@ -94,7 +95,7 @@ class MotionServiceTest {
                     polityId,
                     motionId,
                     new AuthenticatedUser(userId, "subject", "Late Member"),
-                    VoteChoice.YES))
+                    new CastVoteInput(VoteChoice.YES)))
         .isInstanceOf(ApiException.class)
         .hasMessage("This member was not eligible when voting opened.");
   }

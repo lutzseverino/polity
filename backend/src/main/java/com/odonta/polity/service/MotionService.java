@@ -2,9 +2,10 @@ package com.odonta.polity.service;
 
 import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.api.model.CastVoteInput;
+import com.odonta.polity.api.model.CreateMotionInput;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.CreateMotionCommand;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.Jurisdiction;
@@ -60,7 +61,7 @@ public class MotionService {
 
   @Transactional
   public MotionDetails create(
-      UUID polityId, AuthenticatedUser actor, @Valid CreateMotionCommand command) {
+      UUID polityId, AuthenticatedUser actor, @Valid CreateMotionInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     Membership introducer = membershipReader.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
@@ -77,8 +78,8 @@ public class MotionService {
                 constitution.getId(),
                 procedure.getId(),
                 introducer.getId(),
-                command.title(),
-                command.body(),
+                input.getTitle(),
+                input.getBody(),
                 EffectType.ADOPT_RESOLUTION,
                 now));
     List<Membership> eligible =
@@ -94,7 +95,7 @@ public class MotionService {
         introducer.getId(),
         OfficialRecordType.MOTION_INTRODUCED,
         motion.getId(),
-        command.title(),
+        input.getTitle(),
         "%s introduced a resolution for the %s under Constitution v%d. Voting opened with %d eligible citizens."
             .formatted(
                 introducer.getDisplayName(),
@@ -117,8 +118,9 @@ public class MotionService {
 
   @Transactional
   public MotionDetails vote(
-      UUID polityId, UUID motionId, AuthenticatedUser actor, VoteChoice choice) {
+      UUID polityId, UUID motionId, AuthenticatedUser actor, @Valid CastVoteInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
+    VoteChoice choice = input.getChoice();
     Membership voter = membershipReader.active(polityId, actor.id());
     Motion motion = motion(polityId, motionId);
     requireVoting(motion);

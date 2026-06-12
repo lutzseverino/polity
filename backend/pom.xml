@@ -63,6 +63,9 @@
               <generatorName>spring</generatorName>
               <apiPackage>com.odonta.polity.api</apiPackage>
               <modelPackage>com.odonta.polity.api.model</modelPackage>
+              <schemaMappings>
+                <schemaMapping>VoteChoice=com.odonta.polity.model.VoteChoice</schemaMapping>
+              </schemaMappings>
               <generateApiDocumentation>false</generateApiDocumentation>
               <generateModelDocumentation>false</generateModelDocumentation>
               <generateSupportingFiles>false</generateSupportingFiles>
