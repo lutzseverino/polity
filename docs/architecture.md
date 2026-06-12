@@ -8,12 +8,6 @@ The backend depends on stable Odonta artifacts for common web behavior, authoriz
 Identity client. Product code should consume those published contracts instead of copying platform
 types or generated HTTP clients into this repository.
 
-Authorization is currently consumed as one embedded library because it is not a remote service.
-That is acceptable while the dependency remains coherent. If the authorization artifact begins to
-pull materially unused persistence, Keycloak administration, or Spring infrastructure into Polity,
-split it into smaller responsibility-based libraries. Do not introduce an `authorization-client`
-unless authorization itself becomes a remotely called service.
-
 ## Constitutional boundary
 
 Product authorization controls whether a caller may access or attempt an operation. Constitutional
