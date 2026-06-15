@@ -1,0 +1,12 @@
+package com.odonta.polity.model;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+public record PolityResult(
+    UUID id,
+    String name,
+    int constitutionVersion,
+    String jurisdictionName,
+    String institutionName,
+    OffsetDateTime createdAt) {}

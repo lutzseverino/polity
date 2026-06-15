@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "procedures")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Procedure extends AuditedEntity {
+public class Procedure extends AuditedEntity implements VotingProcedure {
   public static final String ORDINARY_RESOLUTION = "ordinary-resolution";
 
   @Id @GeneratedValue private UUID id;

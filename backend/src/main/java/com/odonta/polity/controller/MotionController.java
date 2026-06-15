@@ -2,13 +2,13 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MotionsApi;
-import com.odonta.polity.api.model.CastVoteInput;
-import com.odonta.polity.api.model.CreateMotionInput;
+import com.odonta.polity.api.model.CastVoteRequest;
+import com.odonta.polity.api.model.CreateMotionRequest;
 import com.odonta.polity.api.model.MotionResponse;
-import com.odonta.polity.api.model.MotionsResponse;
-import com.odonta.polity.mapper.MotionMapper;
+import com.odonta.polity.mapper.MotionTransportMapper;
 import com.odonta.polity.service.MotionService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,19 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MotionController implements MotionsApi {
   private final MotionService motions;
-  private final MotionMapper mapper;
+  private final MotionTransportMapper mapper;
   private final AuthenticatedUserReader users;
 
   @Override
   public ResponseEntity<MotionResponse> createPolityMotion(
-      UUID polityId, @Valid CreateMotionInput input) {
+      UUID polityId, @Valid CreateMotionRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(mapper.toResponse(motions.create(polityId, users.currentUser(), input)));
+        .body(
+            mapper.toResponse(
+                motions.create(polityId, users.currentUser(), mapper.toInput(request))));
   }
 
   @Override
-  public ResponseEntity<MotionsResponse> listPolityMotions(UUID polityId) {
-    return ResponseEntity.ok(mapper.toResponse(motions.list(polityId, users.currentUser().id())));
+  public ResponseEntity<List<MotionResponse>> listPolityMotions(UUID polityId) {
+    return ResponseEntity.ok(mapper.toResponses(motions.list(polityId, users.currentUser().id())));
   }
 
   @Override
@@ -44,9 +46,10 @@ public class MotionController implements MotionsApi {
 
   @Override
   public ResponseEntity<MotionResponse> castPolityMotionVote(
-      UUID polityId, UUID motionId, @Valid CastVoteInput input) {
+      UUID polityId, UUID motionId, @Valid CastVoteRequest request) {
     return ResponseEntity.ok(
-        mapper.toResponse(motions.vote(polityId, motionId, users.currentUser(), input)));
+        mapper.toResponse(
+            motions.vote(polityId, motionId, users.currentUser(), mapper.toInput(request))));
   }
 
   @Override

@@ -2,12 +2,12 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.PolitiesApi;
-import com.odonta.polity.api.model.CreatePolityInput;
-import com.odonta.polity.api.model.PolitiesResponse;
+import com.odonta.polity.api.model.CreatePolityRequest;
 import com.odonta.polity.api.model.PolityResponse;
-import com.odonta.polity.mapper.PolityMapper;
+import com.odonta.polity.mapper.PolityTransportMapper;
 import com.odonta.polity.service.PolityService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,18 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PolityController implements PolitiesApi {
   private final PolityService polities;
-  private final PolityMapper mapper;
+  private final PolityTransportMapper mapper;
   private final AuthenticatedUserReader users;
 
   @Override
-  public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityInput input) {
+  public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(mapper.toResponse(polities.create(users.currentUser(), input)));
+        .body(mapper.toResponse(polities.create(users.currentUser(), mapper.toInput(request))));
   }
 
   @Override
-  public ResponseEntity<PolitiesResponse> listPolities() {
-    return ResponseEntity.ok(mapper.toPolitiesResponse(polities.list(users.currentUser().id())));
+  public ResponseEntity<List<PolityResponse>> listPolities() {
+    return ResponseEntity.ok(mapper.toResponses(polities.list(users.currentUser().id())));
   }
 
   @Override

@@ -163,18 +163,18 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        CreatePolityInput: {
+        CreatePolityRequest: {
             name: string;
         };
-        AdmitMemberInput: {
+        AdmitMemberRequest: {
             /** Format: email */
             email: string;
         };
-        CreateMotionInput: {
+        CreateMotionRequest: {
             title: string;
             body: string;
         };
-        CastVoteInput: {
+        CastVoteRequest: {
             choice: components["schemas"]["VoteChoice"];
         };
         /** @enum {string} */
@@ -189,9 +189,6 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
-        PolitiesResponse: {
-            polities: components["schemas"]["PolityResponse"][];
-        };
         MemberResponse: {
             /** Format: uuid */
             id: string;
@@ -204,9 +201,6 @@ export interface components {
             status: "active";
             /** Format: date-time */
             admittedAt: string;
-        };
-        MembersResponse: {
-            members: components["schemas"]["MemberResponse"][];
         };
         VoteTallyResponse: {
             yes: number;
@@ -239,9 +233,6 @@ export interface components {
             tally: components["schemas"]["VoteTallyResponse"];
             certification?: components["schemas"]["CertificationResponse"];
         };
-        MotionsResponse: {
-            motions: components["schemas"]["MotionResponse"][];
-        };
         OfficialRecordEntryResponse: {
             /** Format: uuid */
             id: string;
@@ -254,9 +245,6 @@ export interface components {
             sourceId?: string;
             /** Format: date-time */
             occurredAt: string;
-        };
-        OfficialRecordResponse: {
-            entries: components["schemas"]["OfficialRecordEntryResponse"][];
         };
     };
     responses: {
@@ -313,7 +301,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PolitiesResponse"];
+                    "application/json": components["schemas"]["PolityResponse"][];
                 };
             };
         };
@@ -327,7 +315,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreatePolityInput"];
+                "application/json": components["schemas"]["CreatePolityRequest"];
             };
         };
         responses: {
@@ -383,7 +371,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MembersResponse"];
+                    "application/json": components["schemas"]["MemberResponse"][];
                 };
             };
         };
@@ -399,7 +387,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AdmitMemberInput"];
+                "application/json": components["schemas"]["AdmitMemberRequest"];
             };
         };
         responses: {
@@ -433,7 +421,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MotionsResponse"];
+                    "application/json": components["schemas"]["MotionResponse"][];
                 };
             };
         };
@@ -449,7 +437,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateMotionInput"];
+                "application/json": components["schemas"]["CreateMotionRequest"];
             };
         };
         responses: {
@@ -501,7 +489,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CastVoteInput"];
+                "application/json": components["schemas"]["CastVoteRequest"];
             };
         };
         responses: {
@@ -558,7 +546,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfficialRecordResponse"];
+                    "application/json": components["schemas"]["OfficialRecordEntryResponse"][];
                 };
             };
         };

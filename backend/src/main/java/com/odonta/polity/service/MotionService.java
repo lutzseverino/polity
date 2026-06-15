@@ -2,18 +2,19 @@ package com.odonta.polity.service;
 
 import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
-import com.odonta.polity.api.model.CastVoteInput;
-import com.odonta.polity.api.model.CreateMotionInput;
+import com.odonta.polity.mapper.MotionApplicationMapper;
+import com.odonta.polity.model.CastVoteInput;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.ConstitutionVersion;
+import com.odonta.polity.model.CreateMotionInput;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.Motion;
-import com.odonta.polity.model.MotionDetails;
 import com.odonta.polity.model.MotionElector;
+import com.odonta.polity.model.MotionResult;
 import com.odonta.polity.model.MotionStatus;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.PowerCode;
@@ -26,6 +27,7 @@ import com.odonta.polity.repository.CertificationRepository;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
+import com.odonta.polity.repository.MotionProjection;
 import com.odonta.polity.repository.MotionRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.ResolutionRepository;
@@ -51,6 +53,7 @@ public class MotionService {
   private final MotionElectorRepository electors;
   private final MembershipReader membershipReader;
   private final MembershipRepository memberships;
+  private final MotionApplicationMapper mapper;
   private final MotionRepository motions;
   private final OfficialRecordWriter record;
   private final PolityService polities;
@@ -60,7 +63,7 @@ public class MotionService {
   private final VotingEvaluator voting;
 
   @Transactional
-  public MotionDetails create(
+  public MotionResult create(
       UUID polityId, AuthenticatedUser actor, @Valid CreateMotionInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     Membership introducer = membershipReader.active(polityId, actor.id());
@@ -78,8 +81,8 @@ public class MotionService {
                 constitution.getId(),
                 procedure.getId(),
                 introducer.getId(),
-                input.getTitle(),
-                input.getBody(),
+                input.title(),
+                input.body(),
                 EffectType.ADOPT_RESOLUTION,
                 now));
     List<Membership> eligible =
@@ -95,7 +98,7 @@ public class MotionService {
         introducer.getId(),
         OfficialRecordType.MOTION_INTRODUCED,
         motion.getId(),
-        input.getTitle(),
+        input.title(),
         "%s introduced a resolution for the %s under Constitution v%d. Voting opened with %d eligible citizens."
             .formatted(
                 introducer.getDisplayName(),
@@ -103,24 +106,24 @@ public class MotionService {
                 constitution.getVersion(),
                 eligible.size()),
         now);
-    return details(motion);
+    return result(motion);
   }
 
-  public List<MotionDetails> list(UUID polityId, UUID userId) {
+  public List<MotionResult> list(UUID polityId, UUID userId) {
     membershipReader.active(polityId, userId);
-    return motions.findByPolityIdOrderByOpenedAtDesc(polityId).stream().map(this::details).toList();
+    return motions.findProjectionsByPolityId(polityId).stream().map(this::result).toList();
   }
 
-  public MotionDetails get(UUID polityId, UUID motionId, UUID userId) {
+  public MotionResult get(UUID polityId, UUID motionId, UUID userId) {
     membershipReader.active(polityId, userId);
-    return details(motion(polityId, motionId));
+    return result(projection(polityId, motionId));
   }
 
   @Transactional
-  public MotionDetails vote(
+  public MotionResult vote(
       UUID polityId, UUID motionId, AuthenticatedUser actor, @Valid CastVoteInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
-    VoteChoice choice = input.getChoice();
+    VoteChoice choice = input.choice();
     Membership voter = membershipReader.active(polityId, actor.id());
     Motion motion = motion(polityId, motionId);
     requireVoting(motion);
@@ -148,11 +151,11 @@ public class MotionService {
         "Vote recorded on " + motion.getTitle(),
         voter.getDisplayName() + " cast or updated a ballot while voting was open.",
         now);
-    return details(motion);
+    return result(motion);
   }
 
   @Transactional
-  public MotionDetails certify(UUID polityId, UUID motionId, AuthenticatedUser actor) {
+  public MotionResult certify(UUID polityId, UUID motionId, AuthenticatedUser actor) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     Membership requester = membershipReader.active(polityId, actor.id());
     Motion motion = motion(polityId, motionId);
@@ -168,15 +171,15 @@ public class MotionService {
             .findById(motion.getProcedureId())
             .orElseThrow(
                 () -> ApiException.notFound("procedure_not_found", "Procedure not found."));
-    VotingResult result =
+    VotingResult outcome =
         voting.evaluate(
             procedure,
             Math.toIntExact(electors.countByMotionId(motionId)),
             votes.findByMotionId(motionId));
     Certification certification =
         certifications.saveAndFlush(
-            new Certification(polityId, motionId, requester.getId(), result, now));
-    motion.certify(result.passed(), now);
+            new Certification(polityId, motionId, requester.getId(), outcome, now));
+    motion.certify(outcome.passed(), now);
     motions.saveAndFlush(motion);
     record.append(
         polityId,
@@ -186,9 +189,9 @@ public class MotionService {
         OfficialRecordType.MOTION_CERTIFIED,
         certification.getId(),
         "Result certified: " + motion.getTitle(),
-        result.explanation(),
+        outcome.explanation(),
         now);
-    if (result.passed()) {
+    if (outcome.passed()) {
       applyResolution(motion, requester, constitution, now);
     } else {
       record.append(
@@ -202,7 +205,7 @@ public class MotionService {
           "The certified result did not authorize the proposed effect.",
           now);
     }
-    return details(motion);
+    return result(motion);
   }
 
   private void applyResolution(
@@ -226,33 +229,24 @@ public class MotionService {
         now);
   }
 
-  private MotionDetails details(Motion motion) {
-    Procedure procedure =
-        procedures
-            .findById(motion.getProcedureId())
-            .orElseThrow(
-                () -> ApiException.notFound("procedure_not_found", "Procedure not found."));
-    ConstitutionVersion constitution =
-        constitutions
-            .findById(motion.getConstitutionVersionId())
-            .orElseThrow(
-                () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
-    Membership introducer =
-        memberships
-            .findById(motion.getIntroducedBy())
-            .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+  private MotionResult result(Motion motion) {
+    return result(projection(motion.getPolityId(), motion.getId()));
+  }
+
+  private MotionResult result(MotionProjection motion) {
     VotingResult tally =
         voting.evaluate(
-            procedure,
+            motion,
             Math.toIntExact(electors.countByMotionId(motion.getId())),
             votes.findByMotionId(motion.getId()));
-    return new MotionDetails(
-        motion,
-        procedure,
-        constitution,
-        introducer,
-        tally,
-        certifications.findByMotionId(motion.getId()).orElse(null));
+    return mapper.toResult(
+        motion, tally, certifications.findByMotionId(motion.getId()).orElse(null));
+  }
+
+  private MotionProjection projection(UUID polityId, UUID motionId) {
+    return motions
+        .findProjectedByIdAndPolityId(motionId, polityId)
+        .orElseThrow(() -> ApiException.notFound("motion_not_found", "Motion not found."));
   }
 
   private Motion motion(UUID polityId, UUID motionId) {

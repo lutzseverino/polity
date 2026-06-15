@@ -16,7 +16,10 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
   List<Membership> findByPolityIdAndStatusOrderByAdmittedAtAsc(
       UUID polityId, MembershipStatus status);
 
-  List<Membership> findByUserIdAndStatus(UUID userId, MembershipStatus status);
+  List<MembershipProjection> findProjectionsByPolityIdAndStatusOrderByAdmittedAtAsc(
+      UUID polityId, MembershipStatus status);
+
+  Optional<MembershipProjection> findProjectedById(UUID id);
 
   long countByPolityIdAndStatus(UUID polityId, MembershipStatus status);
 }

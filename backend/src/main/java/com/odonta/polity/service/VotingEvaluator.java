@@ -1,15 +1,15 @@
 package com.odonta.polity.service;
 
-import com.odonta.polity.model.Procedure;
 import com.odonta.polity.model.Vote;
 import com.odonta.polity.model.VoteChoice;
+import com.odonta.polity.model.VotingProcedure;
 import com.odonta.polity.model.VotingResult;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VotingEvaluator {
-  public VotingResult evaluate(Procedure procedure, int eligible, List<Vote> votes) {
+  public VotingResult evaluate(VotingProcedure procedure, int eligible, List<Vote> votes) {
     int yes = count(votes, VoteChoice.YES);
     int no = count(votes, VoteChoice.NO);
     int abstain = count(votes, VoteChoice.ABSTAIN);

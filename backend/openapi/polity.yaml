@@ -17,12 +17,12 @@ paths:
       operationId: listPolities
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Polities, content: { application/json: { schema: { $ref: "#/components/schemas/PolitiesResponse" } } } }
+        "200": { description: Polities, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PolityResponse" } } } } }
     post:
       tags: [Polities]
       operationId: createPolity
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePolityInput" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreatePolityRequest" } } } }
       responses:
         "201": { description: Polity created, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -42,12 +42,12 @@ paths:
       operationId: listPolityMembers
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Members, content: { application/json: { schema: { $ref: "#/components/schemas/MembersResponse" } } } }
+        "200": { description: Members, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } } }
     post:
       tags: [Members]
       operationId: admitPolityMember
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberInput" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberRequest" } } } }
       responses:
         "201": { description: Member admitted, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -59,12 +59,12 @@ paths:
       operationId: listPolityMotions
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Motions, content: { application/json: { schema: { $ref: "#/components/schemas/MotionsResponse" } } } }
+        "200": { description: Motions, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MotionResponse" } } } } }
     post:
       tags: [Motions]
       operationId: createPolityMotion
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionInput" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionRequest" } } } }
       responses:
         "201": { description: Motion introduced and opened for voting, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -83,7 +83,7 @@ paths:
       tags: [Motions]
       operationId: castPolityMotionVote
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastVoteInput" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastVoteRequest" } } } }
       responses:
         "200": { description: Vote recorded, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "409": { $ref: "#/components/responses/Conflict" }
@@ -103,7 +103,7 @@ paths:
       operationId: listPolityOfficialRecord
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Official record, content: { application/json: { schema: { $ref: "#/components/schemas/OfficialRecordResponse" } } } }
+        "200": { description: Official record, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficialRecordEntryResponse" } } } } }
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
@@ -133,28 +133,28 @@ components:
         code: { type: string }
         message: { type: string }
         details: { type: object, additionalProperties: true }
-    CreatePolityInput:
+    CreatePolityRequest:
       type: object
       required: [name]
       properties:
         name: { type: string, minLength: 1, maxLength: 120, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    AdmitMemberInput:
+    AdmitMemberRequest:
       type: object
       required: [email]
       properties:
         email: { type: string, format: email, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    CreateMotionInput:
+    CreateMotionRequest:
       type: object
       required: [title, body]
       properties:
         title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
         body: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    CastVoteInput:
+    CastVoteRequest:
       type: object
       required: [choice]
       properties:
         choice: { $ref: "#/components/schemas/VoteChoice" }
-    VoteChoice: { type: string, enum: [yes, no, abstain] }
+    VoteChoice: { type: string, enum: ["yes", "no", abstain] }
     PolityResponse:
       type: object
       required: [id, name, constitutionVersion, jurisdictionName, institutionName, createdAt]
@@ -165,7 +165,6 @@ components:
         jurisdictionName: { type: string }
         institutionName: { type: string }
         createdAt: { type: string, format: date-time }
-    PolitiesResponse: { type: object, required: [polities], properties: { polities: { type: array, items: { $ref: "#/components/schemas/PolityResponse" } } } }
     MemberResponse:
       type: object
       required: [id, userId, name, email, status, admittedAt]
@@ -176,7 +175,6 @@ components:
         email: { type: string, format: email }
         status: { type: string, enum: [active] }
         admittedAt: { type: string, format: date-time }
-    MembersResponse: { type: object, required: [members], properties: { members: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } }
     VoteTallyResponse:
       type: object
       required: ["yes", "no", abstain, eligible, quorumRequired, quorumMet]
@@ -209,7 +207,6 @@ components:
         openedAt: { type: string, format: date-time }
         tally: { $ref: "#/components/schemas/VoteTallyResponse" }
         certification: { $ref: "#/components/schemas/CertificationResponse" }
-    MotionsResponse: { type: object, required: [motions], properties: { motions: { type: array, items: { $ref: "#/components/schemas/MotionResponse" } } } }
     OfficialRecordEntryResponse:
       type: object
       required: [id, type, title, body, actorName, constitutionVersion, occurredAt]
@@ -222,4 +219,3 @@ components:
         constitutionVersion: { type: integer }
         sourceId: { type: string, format: uuid }
         occurredAt: { type: string, format: date-time }
-    OfficialRecordResponse: { type: object, required: [entries], properties: { entries: { type: array, items: { $ref: "#/components/schemas/OfficialRecordEntryResponse" } } } }

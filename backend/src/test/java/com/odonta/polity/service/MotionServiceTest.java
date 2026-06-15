@@ -9,7 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
-import com.odonta.polity.api.model.CastVoteInput;
+import com.odonta.polity.mapper.MotionApplicationMapper;
+import com.odonta.polity.model.CastVoteInput;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
@@ -25,6 +26,7 @@ import com.odonta.polity.repository.CertificationRepository;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
+import com.odonta.polity.repository.MotionProjection;
 import com.odonta.polity.repository.MotionRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.ResolutionRepository;
@@ -38,6 +40,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class MotionServiceTest {
@@ -69,6 +72,7 @@ class MotionServiceTest {
             electors,
             membershipReader,
             memberships,
+            Mappers.getMapper(MotionApplicationMapper.class),
             motions,
             record,
             polities,
@@ -136,12 +140,14 @@ class MotionServiceTest {
                       NOW);
               return Optional.of(certification);
             });
+    when(motions.findProjectedByIdAndPolityId(motionId, polityId))
+        .thenAnswer(invocation -> Optional.of(projection(motion, procedure)));
 
     var result =
         service.certify(
             polityId, motionId, new AuthenticatedUser(requesterUserId, "subject", "Requester"));
 
-    assertThat(result.motion().getStatus()).isEqualTo(MotionStatus.ENACTED);
+    assertThat(result.status()).isEqualTo(MotionStatus.ENACTED);
     assertThat(result.tally().eligible()).isEqualTo(3);
     assertThat(result.tally().passed()).isTrue();
     verify(resolutions).saveAndFlush(any(Resolution.class));
@@ -199,5 +205,64 @@ class MotionServiceTest {
 
   private Vote vote(UUID polityId, UUID motionId, UUID membershipId, VoteChoice choice) {
     return new Vote(polityId, motionId, membershipId, choice, NOW.minusMinutes(10));
+  }
+
+  private MotionProjection projection(Motion motion, Procedure procedure) {
+    return new MotionProjection() {
+      @Override
+      public UUID getId() {
+        return motion.getId();
+      }
+
+      @Override
+      public String getTitle() {
+        return motion.getTitle();
+      }
+
+      @Override
+      public String getBody() {
+        return motion.getBody();
+      }
+
+      @Override
+      public MotionStatus getStatus() {
+        return motion.getStatus();
+      }
+
+      @Override
+      public EffectType getEffectType() {
+        return motion.getEffectType();
+      }
+
+      @Override
+      public int getConstitutionVersion() {
+        return 1;
+      }
+
+      @Override
+      public String getProcedureName() {
+        return procedure.getName();
+      }
+
+      @Override
+      public String getIntroducedByName() {
+        return "Friend";
+      }
+
+      @Override
+      public OffsetDateTime getOpenedAt() {
+        return motion.getOpenedAt();
+      }
+
+      @Override
+      public int getQuorumNumerator() {
+        return procedure.getQuorumNumerator();
+      }
+
+      @Override
+      public int getQuorumDenominator() {
+        return procedure.getQuorumDenominator();
+      }
+    };
   }
 }
