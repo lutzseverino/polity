@@ -8,6 +8,17 @@ The backend depends on stable Odonta artifacts for common web behavior, authoriz
 Identity client. Product code should consume those published contracts instead of copying platform
 types or generated HTTP clients into this repository.
 
+## Application boundary
+
+Generated requests and responses belong to the HTTP transport. Polity application services expose
+product-owned inputs and results, while repository projections remain persistence-owned query
+shapes.
+
+Controllers cross the transport boundary through `...TransportMapper` interfaces. Services cross
+the persistence-to-application boundary through `...ApplicationMapper` interfaces. Mapper
+interfaces contain declarative mappings, while product-specific enum and value conversions live in
+dedicated mapper helpers.
+
 ## Constitutional boundary
 
 Product authorization controls whether a caller may access or attempt an operation. Constitutional

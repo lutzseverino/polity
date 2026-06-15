@@ -18,30 +18,16 @@ The repository contains an empty Vite and Tailwind frontend shell and the Polity
 Shared identity, authorization, invitation, and future billing capabilities remain provided by the
 Odonta platform.
 
-## Use
+## Workspace
 
-Install frontend dependencies and start Vite:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Validate the backend:
-
-```bash
-cd backend
-mvn test
-```
-
-Until Odonta platform artifacts are published, install the required platform modules into your
-local Maven repository before building the backend.
+- `backend/` contains the Polity Spring service and OpenAPI contract.
+- `web/` contains the Vite application and generated TypeScript API client.
+- `docs/` contains durable product architecture documentation.
+- Shared platform capabilities are consumed as Odonta Maven artifacts.
 
 ## Documentation
 
-Use documentation for durable knowledge. Use GitHub issues and pull requests for active plans,
-status, and release history.
+Product documentation is indexed by the area that owns it.
 
 - [Architecture](docs/architecture.md)
 - [Backend](backend/README.md)
-
