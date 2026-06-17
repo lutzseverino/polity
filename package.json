@@ -4,13 +4,21 @@
   "version": "0.1.0",
   "packageManager": "pnpm@9.12.0",
   "scripts": {
-    "build": "pnpm --dir web build",
-    "dev": "pnpm --dir web dev",
-    "generate:api": "pnpm --dir web generate:api",
-    "typecheck": "pnpm --dir web typecheck"
+    "build": "pnpm --dir apps/landing build",
+    "build:landing": "pnpm --dir apps/landing build",
+    "check": "biome check . && pnpm --dir apps/landing check:theme && pnpm typecheck",
+    "dev": "pnpm dev:mobile",
+    "dev:landing": "pnpm --dir apps/landing dev",
+    "dev:mobile": "pnpm --dir apps/mobile start",
+    "format": "biome check . --write",
+    "generate:api": "pnpm --dir apps/landing generate:api",
+    "lint": "biome check .",
+    "typecheck": "pnpm --dir packages/design typecheck && pnpm --dir apps/landing typecheck && pnpm --dir apps/mobile typecheck"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.0"
   }
 }
-

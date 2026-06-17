@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+@import "@fontsource/anton";
+@import "./design/tokens/shadcn-theme.css";
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-feature-settings:
+      "ss01" 1,
+      "cv01" 1;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@layer components {
+  /* Heavy poster display — Anton, set uppercase with tight tracking. */
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+  }
+
+  .type-mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* Printer's halftone dot field, scaled by --dot. */
+  .texture-halftone {
+    --dot: 7px;
+    background-image: radial-gradient(
+      currentColor calc(var(--dot) * 0.28),
+      transparent calc(var(--dot) * 0.32)
+    );
+    background-size: var(--dot) var(--dot);
+    background-position: 0 0;
+  }
+
+  /* Fine paper grain laid over the page for printed-stock texture. */
+  .texture-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  /* Outlined poster numerals (the "020" treatment). */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px currentColor;
+  }
+}

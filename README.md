@@ -3,7 +3,8 @@
     <p>A product workspace for constitutional government software.</p>
     <p>
         <img alt="workspace" src="https://img.shields.io/badge/workspace-product-0f172a">
-        <img alt="frontend" src="https://img.shields.io/badge/frontend-vite-111827">
+        <img alt="landing" src="https://img.shields.io/badge/landing-vite-111827">
+        <img alt="mobile" src="https://img.shields.io/badge/mobile-expo-111827">
         <img alt="backend" src="https://img.shields.io/badge/backend-spring_boot-1f2937">
     </p>
 </div>
@@ -14,14 +15,17 @@ Polity is a friend-group government platform built around an explicit constituti
 It owns membership, versioned constitutions, institutions, powers, procedures, motions, voting,
 certification, typed effects, and the official record.
 
-The repository contains an empty Vite and Tailwind frontend shell and the Polity Spring backend.
+The repository contains a Vite landing app, an Expo mobile app, shared design tokens, and the
+Polity Spring backend.
 Shared identity, authorization, invitation, and future billing capabilities remain provided by the
 Odonta platform.
 
 ## Workspace
 
 - `backend/` contains the Polity Spring service and OpenAPI contract.
-- `web/` contains the Vite application and generated TypeScript API client.
+- `apps/landing/` contains the public Vite landing and onboarding front door.
+- `apps/mobile/` contains the phone-first Expo product app.
+- `packages/design/` contains shared cross-platform design tokens.
 - `docs/` contains durable product architecture documentation.
 - Shared platform capabilities are consumed as Odonta Maven artifacts.
 

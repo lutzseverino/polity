@@ -1,0 +1,67 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.0/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "package.json",
+      "pnpm-workspace.yaml",
+      "apps/landing/components.json",
+      "apps/landing/index.html",
+      "apps/landing/package.json",
+      "apps/landing/scripts/**/*.mjs",
+      "apps/landing/src/**/*.json",
+      "apps/landing/src/**/*.css",
+      "apps/landing/src/**/*.ts",
+      "apps/landing/src/**/*.tsx",
+      "apps/landing/tsconfig*.json",
+      "apps/landing/vite.config.ts",
+      "apps/mobile/app.json",
+      "apps/mobile/eslint.config.js",
+      "apps/mobile/package.json",
+      "apps/mobile/src/**/*.ts",
+      "apps/mobile/src/**/*.tsx",
+      "apps/mobile/tsconfig.json",
+      "packages/*/package.json",
+      "packages/*/src/**/*.json",
+      "packages/*/src/**/*.ts",
+      "packages/*/tsconfig.json",
+      "!apps/landing/src/api/generated"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}
