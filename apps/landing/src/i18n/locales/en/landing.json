@@ -121,7 +121,7 @@
       "label": "Person to invite",
       "placeholder": "mira@example.com",
       "enrol": "Invite",
-      "finish": "Finish",
+      "finish": "Found",
       "empty": "No invitations queued yet."
     },
     "ready": {

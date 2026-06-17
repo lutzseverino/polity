@@ -121,7 +121,7 @@
       "label": "Persona a invitar",
       "placeholder": "mira@example.com",
       "enrol": "Invitar",
-      "finish": "Terminar",
+      "finish": "Fundar",
       "empty": "Aún no hay invitaciones pendientes."
     },
     "ready": {
