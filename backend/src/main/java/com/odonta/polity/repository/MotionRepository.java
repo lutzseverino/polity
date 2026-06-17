@@ -22,8 +22,12 @@ public interface MotionRepository extends JpaRepository<Motion, UUID> {
         p.name as procedureName,
         p.quorumNumerator as quorumNumerator,
         p.quorumDenominator as quorumDenominator,
+        p.threshold as threshold,
         introducer.displayName as introducedByName,
-        m.openedAt as openedAt
+        m.openedAt as openedAt,
+        m.votingOpensAt as votingOpensAt,
+        m.votingClosesAt as votingClosesAt,
+        m.certificationOpensAt as certificationOpensAt
       from Motion m
       join ConstitutionVersion c on c.id = m.constitutionVersionId
       join Procedure p on p.id = m.procedureId
@@ -45,8 +49,12 @@ public interface MotionRepository extends JpaRepository<Motion, UUID> {
         p.name as procedureName,
         p.quorumNumerator as quorumNumerator,
         p.quorumDenominator as quorumDenominator,
+        p.threshold as threshold,
         introducer.displayName as introducedByName,
-        m.openedAt as openedAt
+        m.openedAt as openedAt,
+        m.votingOpensAt as votingOpensAt,
+        m.votingClosesAt as votingClosesAt,
+        m.certificationOpensAt as certificationOpensAt
       from Motion m
       join ConstitutionVersion c on c.id = m.constitutionVersionId
       join Procedure p on p.id = m.procedureId

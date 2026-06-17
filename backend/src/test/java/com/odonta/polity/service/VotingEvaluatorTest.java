@@ -53,7 +53,42 @@ class VotingEvaluatorTest {
     assertThat(result.explanation()).contains("quorum was not satisfied");
   }
 
+  @Test
+  void majorityOfEligibleRequiresMoreThanHalfOfAllEligibleMembers() {
+    var result =
+        evaluator.evaluate(
+            procedure(VotingThreshold.MAJORITY_OF_ELIGIBLE),
+            5,
+            List.of(vote(VoteChoice.YES), vote(VoteChoice.YES), vote(VoteChoice.NO)));
+
+    assertThat(result.quorumMet()).isTrue();
+    assertThat(result.thresholdMet()).isFalse();
+    assertThat(result.passed()).isFalse();
+  }
+
+  @Test
+  void twoThirdsEligibleRequiresTwoThirdsOfAllEligibleMembers() {
+    var result =
+        evaluator.evaluate(
+            procedure(VotingThreshold.TWO_THIRDS_ELIGIBLE),
+            6,
+            List.of(
+                vote(VoteChoice.YES),
+                vote(VoteChoice.YES),
+                vote(VoteChoice.YES),
+                vote(VoteChoice.NO),
+                vote(VoteChoice.ABSTAIN)));
+
+    assertThat(result.quorumMet()).isTrue();
+    assertThat(result.thresholdMet()).isFalse();
+    assertThat(result.passed()).isFalse();
+  }
+
   private Procedure procedure() {
+    return procedure(VotingThreshold.SIMPLE_MAJORITY_CAST);
+  }
+
+  private Procedure procedure(VotingThreshold threshold) {
     return new Procedure(
         UUID.randomUUID(),
         UUID.randomUUID(),
@@ -62,7 +97,9 @@ class VotingEvaluatorTest {
         "Ordinary resolution",
         1,
         2,
-        VotingThreshold.SIMPLE_MAJORITY,
+        threshold,
+        0,
+        24,
         EffectType.ADOPT_RESOLUTION);
   }
 

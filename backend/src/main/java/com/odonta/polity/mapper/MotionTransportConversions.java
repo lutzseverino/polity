@@ -1,11 +1,10 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.VoteChoice;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PolityTransportConversions {
+public class MotionTransportConversions {
 
   public VoteChoice toDomain(com.odonta.polity.api.model.VoteChoice choice) {
     if (choice == null) {
@@ -16,9 +15,5 @@ public class PolityTransportConversions {
       case NO -> VoteChoice.NO;
       case ABSTAIN -> VoteChoice.ABSTAIN;
     };
-  }
-
-  public String toTransport(OfficialRecordType type) {
-    return type == null ? null : type.wireValue();
   }
 }

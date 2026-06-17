@@ -49,4 +49,11 @@ public class ConstitutionVersion extends AuditedEntity {
     this.status = ConstitutionStatus.RATIFIED;
     this.ratifiedAt = ratifiedAt;
   }
+
+  public void supersede() {
+    if (status != ConstitutionStatus.RATIFIED) {
+      throw new IllegalStateException("Only ratified constitutions can be superseded");
+    }
+    this.status = ConstitutionStatus.SUPERSEDED;
+  }
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 public record PolityResult(
     UUID id,
     String name,
+    PolityVisibility visibility,
     int constitutionVersion,
     String jurisdictionName,
     String institutionName,

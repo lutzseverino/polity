@@ -15,7 +15,8 @@ public interface MotionApplicationMapper {
   @Mapping(target = "id", source = "motion.id")
   @Mapping(target = "tally", source = "tally")
   @Mapping(target = "certification", source = "certification")
-  @BeanMapping(ignoreUnmappedSourceProperties = {"quorumNumerator", "quorumDenominator"})
+  @BeanMapping(
+      ignoreUnmappedSourceProperties = {"quorumNumerator", "quorumDenominator", "threshold"})
   MotionResult toResult(MotionProjection motion, VotingResult tally, Certification certification);
 
   @BeanMapping(

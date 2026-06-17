@@ -5,15 +5,13 @@ import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
 import com.odonta.identity.client.IdentityUser;
 import com.odonta.identity.client.IdentityUsersClient;
-import com.odonta.identity.client.ProvisionalUser;
+import com.odonta.polity.PolityPermissions;
+import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.authorization.PolityGrantPlanner;
 import com.odonta.polity.mapper.PolityApplicationMapper;
-import com.odonta.polity.model.AdmitMemberInput;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.CreatePolityInput;
-import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.Jurisdiction;
@@ -21,26 +19,26 @@ import com.odonta.polity.model.JurisdictionKind;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipResult;
 import com.odonta.polity.model.MembershipStatus;
+import com.odonta.polity.model.Office;
+import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.Polity;
 import com.odonta.polity.model.PolityResult;
-import com.odonta.polity.model.PowerCode;
-import com.odonta.polity.model.PowerHolderScope;
-import com.odonta.polity.model.Procedure;
-import com.odonta.polity.model.VotingThreshold;
+import com.odonta.polity.model.PolityVisibility;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
-import com.odonta.polity.repository.ConstitutionalPowerRepository;
 import com.odonta.polity.repository.InstitutionRepository;
 import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
+import com.odonta.polity.repository.OfficeRepository;
+import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityRepository;
-import com.odonta.polity.repository.ProcedureRepository;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -49,58 +47,41 @@ import org.springframework.validation.annotation.Validated;
 @Service
 @RequiredArgsConstructor
 public class PolityService {
-  private static final String STARTER_CONSTITUTION =
-      "All active citizens may admit citizens, introduce ordinary resolutions, vote, and request certification. "
-          + "Ordinary resolutions require participation by at least half of the eligible electorate and pass when yes votes exceed no votes. Abstentions count toward quorum.";
-
   private final Clock clock;
-  private final ConstitutionalAuthority authority;
+  private final PolityAccessPolicy access;
+  private final ConstitutionTemplateService templates;
   private final ConstitutionVersionRepository constitutions;
-  private final ConstitutionalPowerRepository powers;
   private final Grants grants;
   private final IdentityUsersClient identityUsers;
   private final InstitutionRepository institutions;
   private final JurisdictionRepository jurisdictions;
   private final MembershipReader membershipReader;
   private final MembershipRepository memberships;
+  private final OfficeRepository offices;
+  private final OfficeTermRepository officeTerms;
   private final OfficialRecordWriter record;
   private final PolityApplicationMapper mapper;
   private final PolityGrantPlanner grantPlanner;
   private final PolityRepository polities;
-  private final ProcedureRepository procedures;
 
   @Transactional
   public PolityResult create(AuthenticatedUser founder, @Valid CreatePolityInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     IdentityUser identity = identityUsers.get(founder.id());
-    Polity polity = polities.saveAndFlush(new Polity(input.name(), founder.id()));
+    Polity polity =
+        polities.saveAndFlush(new Polity(input.name(), input.visibility(), founder.id()));
     Jurisdiction jurisdiction =
         jurisdictions.saveAndFlush(
             new Jurisdiction(polity.getId(), input.name(), JurisdictionKind.ROOT));
     ConstitutionVersion constitution =
         constitutions.saveAndFlush(
             new ConstitutionVersion(
-                polity.getId(), 1, "Starter Constitution", STARTER_CONSTITUTION, now));
-    Institution institution =
-        institutions.saveAndFlush(
-            new Institution(
                 polity.getId(),
-                jurisdiction.getId(),
-                constitution.getId(),
-                "Citizens' Assembly",
-                InstitutionKind.ASSEMBLY));
-    procedures.saveAndFlush(
-        new Procedure(
-            polity.getId(),
-            constitution.getId(),
-            institution.getId(),
-            Procedure.ORDINARY_RESOLUTION,
-            "Ordinary resolution",
-            1,
-            2,
-            VotingThreshold.SIMPLE_MAJORITY,
-            EffectType.ADOPT_RESOLUTION));
-    seedPowers(polity.getId(), constitution.getId());
+                1,
+                "Starter Constitution",
+                ConstitutionTemplateService.STARTER_CONSTITUTION,
+                now));
+    templates.establishStarterRepublic(jurisdiction, constitution);
     Membership membership =
         memberships.saveAndFlush(
             new Membership(
@@ -111,6 +92,19 @@ public class PolityService {
                 displayName(identity),
                 now,
                 null));
+    Office steward =
+        offices
+            .findByConstitutionVersionIdAndCode(constitution.getId(), Office.STEWARD)
+            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+    OfficeTerm stewardTerm =
+        officeTerms.saveAndFlush(
+            new OfficeTerm(
+                polity.getId(),
+                steward.getId(),
+                steward.getCode(),
+                membership.getId(),
+                now,
+                now.plusDays(steward.getTermLengthDays())));
     grants.stage(grantPlanner.founder(founder.authorizationSubject(), polity.getId()));
     record.append(
         polity.getId(),
@@ -127,97 +121,47 @@ public class PolityService {
         jurisdiction.getId(),
         constitution.getId(),
         membership.getId(),
+        OfficialRecordType.OFFICE_ASSIGNED,
+        stewardTerm.getId(),
+        membership.getDisplayName() + " assigned as " + steward.getName(),
+        "The founding citizen received the initial Steward term under the Starter Constitution.",
+        now);
+    record.append(
+        polity.getId(),
+        jurisdiction.getId(),
+        constitution.getId(),
+        membership.getId(),
         OfficialRecordType.CONSTITUTION_RATIFIED,
         constitution.getId(),
         "Starter Constitution ratified",
-        STARTER_CONSTITUTION,
+        ConstitutionTemplateService.STARTER_CONSTITUTION,
         now);
     return getProjection(polity.getId());
   }
 
   public List<PolityResult> list(UUID userId) {
     return mapper.toResults(
-        polities.findProjectionsByMember(
+        polities.findAccessibleProjections(
             userId,
             MembershipStatus.ACTIVE,
+            PolityVisibility.PUBLIC,
             ConstitutionStatus.RATIFIED,
             JurisdictionKind.ROOT,
             InstitutionKind.ASSEMBLY));
   }
 
+  @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
   public PolityResult get(UUID polityId, UUID userId) {
-    membershipReader.active(polityId, userId);
+    access.requireReadable(polityId, userId);
     return getProjection(polityId);
   }
 
+  @PreAuthorize(PolityPermissions.HAS_POLITY_READ)
   public List<MembershipResult> members(UUID polityId, UUID userId) {
     membershipReader.active(polityId, userId);
     return mapper.toMemberResults(
         memberships.findProjectionsByPolityIdAndStatusOrderByAdmittedAtAsc(
             polityId, MembershipStatus.ACTIVE));
-  }
-
-  @Transactional
-  public MembershipResult admit(
-      UUID polityId, AuthenticatedUser actor, @Valid AdmitMemberInput input) {
-    OffsetDateTime now = OffsetDateTime.now(clock);
-    Membership admittingMember = membershipReader.active(polityId, actor.id());
-    ConstitutionVersion constitution = constitution(polityId);
-    authority.require(admittingMember, constitution, PowerCode.ADMIT_MEMBER);
-    ProvisionalUser identity = identityUsers.createProvisional(input.email());
-    if (memberships.existsByPolityIdAndUserId(polityId, identity.id())) {
-      throw ApiException.conflict("member_exists", "This user is already a member.");
-    }
-    Membership admitted =
-        memberships.saveAndFlush(
-            new Membership(
-                polityId,
-                identity.id(),
-                identity.authorizationSubject(),
-                input.email(),
-                input.email(),
-                now,
-                admittingMember.getId()));
-    grants.stage(grantPlanner.membership(identity.authorizationSubject(), polityId));
-    Jurisdiction jurisdiction = jurisdiction(polityId);
-    record.append(
-        polityId,
-        jurisdiction.getId(),
-        constitution.getId(),
-        admittingMember.getId(),
-        OfficialRecordType.MEMBER_ADMITTED,
-        admitted.getId(),
-        admitted.getDisplayName() + " was admitted",
-        "%s admitted %s as an active citizen under the Starter Constitution."
-            .formatted(admittingMember.getDisplayName(), admitted.getDisplayName()),
-        now);
-    return mapper.toResult(
-        memberships
-            .findProjectedById(admitted.getId())
-            .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found.")));
-  }
-
-  private void seedPowers(UUID polityId, UUID constitutionId) {
-    powers.saveAllAndFlush(
-        List.of(
-            new ConstitutionalPower(
-                polityId,
-                constitutionId,
-                PowerCode.ADMIT_MEMBER,
-                "Admit citizens",
-                PowerHolderScope.ACTIVE_MEMBER),
-            new ConstitutionalPower(
-                polityId,
-                constitutionId,
-                PowerCode.INTRODUCE_MOTION,
-                "Introduce resolutions",
-                PowerHolderScope.ACTIVE_MEMBER),
-            new ConstitutionalPower(
-                polityId,
-                constitutionId,
-                PowerCode.REQUEST_CERTIFICATION,
-                "Request certification",
-                PowerHolderScope.ACTIVE_MEMBER)));
   }
 
   private String displayName(IdentityUser user) {
@@ -250,8 +194,13 @@ public class PolityService {
   }
 
   Institution institution(UUID polityId) {
+    return institution(polityId, constitution(polityId));
+  }
+
+  Institution institution(UUID polityId, ConstitutionVersion constitution) {
     return institutions
-        .findByPolityIdAndKind(polityId, InstitutionKind.ASSEMBLY)
+        .findByPolityIdAndConstitutionVersionIdAndKind(
+            polityId, constitution.getId(), InstitutionKind.ASSEMBLY)
         .orElseThrow(
             () -> ApiException.notFound("institution_not_found", "Institution not found."));
   }

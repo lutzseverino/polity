@@ -24,4 +24,10 @@ public interface MotionProjection extends VotingProcedure {
   String getIntroducedByName();
 
   OffsetDateTime getOpenedAt();
+
+  OffsetDateTime getVotingOpensAt();
+
+  OffsetDateTime getVotingClosesAt();
+
+  OffsetDateTime getCertificationOpensAt();
 }

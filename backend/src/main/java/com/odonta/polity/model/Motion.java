@@ -58,6 +58,15 @@ public class Motion extends AuditedEntity {
   @Column(name = "opened_at", nullable = false)
   private OffsetDateTime openedAt;
 
+  @Column(name = "voting_opens_at", nullable = false)
+  private OffsetDateTime votingOpensAt;
+
+  @Column(name = "voting_closes_at", nullable = false)
+  private OffsetDateTime votingClosesAt;
+
+  @Column(name = "certification_opens_at", nullable = false)
+  private OffsetDateTime certificationOpensAt;
+
   @Column(name = "certified_at")
   private OffsetDateTime certifiedAt;
 
@@ -71,7 +80,10 @@ public class Motion extends AuditedEntity {
       String title,
       String body,
       EffectType effectType,
-      OffsetDateTime openedAt) {
+      OffsetDateTime openedAt,
+      OffsetDateTime votingOpensAt,
+      OffsetDateTime votingClosesAt,
+      OffsetDateTime certificationOpensAt) {
     this.polityId = polityId;
     this.jurisdictionId = jurisdictionId;
     this.institutionId = institutionId;
@@ -83,6 +95,9 @@ public class Motion extends AuditedEntity {
     this.effectType = effectType;
     this.status = MotionStatus.VOTING;
     this.openedAt = openedAt;
+    this.votingOpensAt = votingOpensAt;
+    this.votingClosesAt = votingClosesAt;
+    this.certificationOpensAt = certificationOpensAt;
   }
 
   public void certify(boolean passed, OffsetDateTime certifiedAt) {

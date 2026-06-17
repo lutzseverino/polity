@@ -8,10 +8,7 @@ public final class PolityResources {
       AuthorizationResourceType.of(
           PolityPermissions.CLIENT_ID,
           "polity",
-          List.of(
-              PolityPermissions.READ,
-              PolityPermissions.PARTICIPATE,
-              PolityPermissions.MANAGE_MEMBERS));
+          List.of(PolityPermissions.READ, PolityPermissions.PARTICIPATE));
 
   private PolityResources() {}
 }

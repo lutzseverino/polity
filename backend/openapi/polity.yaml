@@ -8,7 +8,10 @@ servers:
 tags:
   - name: Polities
   - name: Members
+  - name: Invitations
   - name: Motions
+  - name: Offices
+  - name: Justice
   - name: Official Record
 paths:
   /polities:
@@ -43,14 +46,39 @@ paths:
       security: [{ bearerAuth: [] }]
       responses:
         "200": { description: Members, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } } }
-    post:
-      tags: [Members]
-      operationId: admitPolityMember
+  /polities/{polityId}/invitations:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Invitations]
+      operationId: listPolityInvitations
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/AdmitMemberRequest" } } } }
       responses:
-        "201": { description: Member admitted, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
+        "200": { description: Membership invitations, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } } } } }
+    post:
+      tags: [Invitations]
+      operationId: createPolityInvitation
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMemberInvitationRequest" } } } }
+      responses:
+        "201": { description: Membership invitation created, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /invitations:
+    get:
+      tags: [Invitations]
+      operationId: listCurrentUserInvitations
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Pending invitations for the current user, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } } } } }
+  /invitations/{invitationId}/accept:
+    parameters: [{ $ref: "#/components/parameters/InvitationId" }]
+    post:
+      tags: [Invitations]
+      operationId: acceptInvitation
+      security: [{ bearerAuth: [] }]
+      responses:
+        "201": { description: Invitation accepted and membership created, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
   /polities/{polityId}/motions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
@@ -67,6 +95,49 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMotionRequest" } } } }
       responses:
         "201": { description: Motion introduced and opened for voting, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /polities/{polityId}/motions/office-assignments:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolityOfficeAssignmentMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateOfficeAssignmentMotionRequest" } } } }
+      responses:
+        "201": { description: Office assignment motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/motions/sanctions:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolitySanctionMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateSanctionMotionRequest" } } } }
+      responses:
+        "201": { description: Sanction motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/motions/appeals:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolityAppealMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateAppealMotionRequest" } } } }
+      responses:
+        "201": { description: Appeal motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/motions/constitution-amendments:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolityConstitutionAmendmentMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateConstitutionAmendmentMotionRequest" } } } }
+      responses:
+        "201": { description: Constitution amendment motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
   /polities/{polityId}/motions/{motionId}:
     parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
@@ -96,6 +167,38 @@ paths:
       responses:
         "201": { description: Result certified and effect applied when passed, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "409": { $ref: "#/components/responses/Conflict" }
+  /polities/{polityId}/offices:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Offices]
+      operationId: listPolityOffices
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Offices, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeResponse" } } } } }
+  /polities/{polityId}/office-terms:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Offices]
+      operationId: listPolityOfficeTerms
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Office terms, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeTermResponse" } } } } }
+  /polities/{polityId}/sanctions:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Justice]
+      operationId: listPolitySanctions
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Sanctions, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/SanctionResponse" } } } } }
+  /polities/{polityId}/appeals:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Justice]
+      operationId: listPolityAppeals
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Appeals, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/AppealResponse" } } } } }
   /polities/{polityId}/record:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -110,6 +213,7 @@ components:
   parameters:
     PolityId: { name: polityId, in: path, required: true, schema: { type: string, format: uuid } }
     MotionId: { name: motionId, in: path, required: true, schema: { type: string, format: uuid } }
+    InvitationId: { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
   responses:
     BadRequest:
       description: Invalid request.
@@ -135,10 +239,11 @@ components:
         details: { type: object, additionalProperties: true }
     CreatePolityRequest:
       type: object
-      required: [name]
+      required: [name, visibility]
       properties:
         name: { type: string, minLength: 1, maxLength: 120, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-    AdmitMemberRequest:
+        visibility: { $ref: "#/components/schemas/PolityVisibility" }
+    CreateMemberInvitationRequest:
       type: object
       required: [email]
       properties:
@@ -149,18 +254,94 @@ components:
       properties:
         title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
         body: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CreateOfficeAssignmentMotionRequest:
+      type: object
+      required: [officeId, nomineeMembershipId]
+      properties:
+        officeId: { type: string, format: uuid }
+        nomineeMembershipId: { type: string, format: uuid }
+    CreateSanctionMotionRequest:
+      type: object
+      required: [targetMembershipId, type, reason, durationDays]
+      properties:
+        targetMembershipId: { type: string, format: uuid }
+        type: { $ref: "#/components/schemas/SanctionType" }
+        reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        durationDays: { type: integer, minimum: 1 }
+    CreateAppealMotionRequest:
+      type: object
+      required: [sanctionId, reason]
+      properties:
+        sanctionId: { type: string, format: uuid }
+        reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CreateConstitutionAmendmentMotionRequest:
+      type: object
+      required: [title, body, procedureChanges]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        body: { type: string, minLength: 1, maxLength: 10000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        procedureChanges:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items: { $ref: "#/components/schemas/CreateProcedureChangeRequest" }
+    CreateProcedureChangeRequest:
+      type: object
+      required: [procedureCode]
+      properties:
+        procedureCode: { type: string, minLength: 1, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        quorumNumerator: { type: integer, minimum: 1 }
+        quorumDenominator: { type: integer, minimum: 1 }
+        threshold: { $ref: "#/components/schemas/VotingThreshold" }
+        minimumNoticeHours: { type: integer, minimum: 0 }
+        votingPeriodHours: { type: integer, minimum: 1 }
     CastVoteRequest:
       type: object
       required: [choice]
       properties:
         choice: { $ref: "#/components/schemas/VoteChoice" }
     VoteChoice: { type: string, enum: ["yes", "no", abstain] }
+    PolityVisibility: { type: string, enum: [public, private] }
+    InvitationStatus: { type: string, enum: [pending, accepted] }
+    VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible] }
+    SanctionType: { type: string, enum: [warning, suspension] }
+    SanctionStatus: { type: string, enum: [active, vacated, expired] }
+    AppealStatus: { type: string, enum: [granted] }
+    OfficeTermStatus: { type: string, enum: [active, ended] }
+    OfficialRecordType:
+      type: string
+      enum:
+        - polity_founded
+        - constitution_ratified
+        - member_invited
+        - member_admitted
+        - motion_introduced
+        - vote_cast
+        - motion_certified
+        - resolution_adopted
+        - office_assigned
+        - sanction_applied
+        - appeal_granted
+        - constitution_amended
+        - motion_rejected
+    EffectType: { type: string, enum: [adopt_resolution, assign_office, apply_sanction, grant_appeal, amend_constitution] }
+    PowerCode:
+      type: string
+      enum:
+        - admit_member
+        - introduce_motion
+        - introduce_office_assignment
+        - introduce_sanction
+        - introduce_appeal
+        - introduce_amendment
+        - request_certification
     PolityResponse:
       type: object
-      required: [id, name, constitutionVersion, jurisdictionName, institutionName, createdAt]
+      required: [id, name, visibility, constitutionVersion, jurisdictionName, institutionName, createdAt]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
+        visibility: { $ref: "#/components/schemas/PolityVisibility" }
         constitutionVersion: { type: integer }
         jurisdictionName: { type: string }
         institutionName: { type: string }
@@ -175,6 +356,18 @@ components:
         email: { type: string, format: email }
         status: { type: string, enum: [active] }
         admittedAt: { type: string, format: date-time }
+    MemberInvitationResponse:
+      type: object
+      required: [id, polityId, polityName, email, invitedByName, status, invitedAt]
+      properties:
+        id: { type: string, format: uuid }
+        polityId: { type: string, format: uuid }
+        polityName: { type: string }
+        email: { type: string, format: email }
+        invitedByName: { type: string }
+        status: { $ref: "#/components/schemas/InvitationStatus" }
+        invitedAt: { type: string, format: date-time }
+        respondedAt: { type: string, format: date-time }
     VoteTallyResponse:
       type: object
       required: ["yes", "no", abstain, eligible, quorumRequired, quorumMet]
@@ -194,28 +387,83 @@ components:
         certifiedAt: { type: string, format: date-time }
     MotionResponse:
       type: object
-      required: [id, title, body, status, effectType, constitutionVersion, procedureName, introducedByName, openedAt, tally]
+      required: [id, title, body, status, effectType, constitutionVersion, procedureName, introducedByName, openedAt, votingOpensAt, votingClosesAt, certificationOpensAt, tally]
       properties:
         id: { type: string, format: uuid }
         title: { type: string }
         body: { type: string }
         status: { type: string, enum: [voting, enacted, rejected] }
-        effectType: { type: string, enum: [adopt_resolution] }
+        effectType: { $ref: "#/components/schemas/EffectType" }
         constitutionVersion: { type: integer }
         procedureName: { type: string }
         introducedByName: { type: string }
         openedAt: { type: string, format: date-time }
+        votingOpensAt: { type: string, format: date-time }
+        votingClosesAt: { type: string, format: date-time }
+        certificationOpensAt: { type: string, format: date-time }
         tally: { $ref: "#/components/schemas/VoteTallyResponse" }
         certification: { $ref: "#/components/schemas/CertificationResponse" }
-    OfficialRecordEntryResponse:
+    OfficeResponse:
       type: object
-      required: [id, type, title, body, actorName, constitutionVersion, occurredAt]
+      required: [id, code, name, description, termLengthDays]
       properties:
         id: { type: string, format: uuid }
-        type: { type: string }
+        code: { type: string }
+        name: { type: string }
+        description: { type: string }
+        termLengthDays: { type: integer }
+    OfficeTermResponse:
+      type: object
+      required: [id, officeId, officeName, membershipId, memberName, status, startedAt, endsAt]
+      properties:
+        id: { type: string, format: uuid }
+        officeId: { type: string, format: uuid }
+        officeName: { type: string }
+        membershipId: { type: string, format: uuid }
+        memberName: { type: string }
+        status: { $ref: "#/components/schemas/OfficeTermStatus" }
+        startedAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+    SanctionResponse:
+      type: object
+      required: [id, targetMembershipId, targetName, type, status, reason, startedAt, endsAt]
+      properties:
+        id: { type: string, format: uuid }
+        targetMembershipId: { type: string, format: uuid }
+        targetName: { type: string }
+        type: { $ref: "#/components/schemas/SanctionType" }
+        status: { $ref: "#/components/schemas/SanctionStatus" }
+        reason: { type: string }
+        startedAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+    AppealResponse:
+      type: object
+      required: [id, sanctionId, appellantMembershipId, appellantName, status, reason, decidedAt]
+      properties:
+        id: { type: string, format: uuid }
+        sanctionId: { type: string, format: uuid }
+        appellantMembershipId: { type: string, format: uuid }
+        appellantName: { type: string }
+        status: { $ref: "#/components/schemas/AppealStatus" }
+        reason: { type: string }
+        decidedAt: { type: string, format: date-time }
+    OfficialRecordEntryResponse:
+      type: object
+      required: [id, entryNumber, type, title, body, actorName, constitutionVersion, occurredAt]
+      properties:
+        id: { type: string, format: uuid }
+        entryNumber: { type: integer, minimum: 1 }
+        type: { $ref: "#/components/schemas/OfficialRecordType" }
         title: { type: string }
         body: { type: string }
         actorName: { type: string }
         constitutionVersion: { type: integer }
         sourceId: { type: string, format: uuid }
+        motionId: { type: string, format: uuid }
+        procedureId: { type: string, format: uuid }
+        institutionId: { type: string, format: uuid }
+        powerCode: { $ref: "#/components/schemas/PowerCode" }
+        certificationId: { type: string, format: uuid }
+        effectType: { $ref: "#/components/schemas/EffectType" }
+        outcome: { type: string }
         occurredAt: { type: string, format: date-time }

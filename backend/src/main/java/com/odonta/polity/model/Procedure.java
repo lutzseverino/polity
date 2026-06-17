@@ -19,6 +19,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Procedure extends AuditedEntity implements VotingProcedure {
   public static final String ORDINARY_RESOLUTION = "ordinary-resolution";
+  public static final String OFFICE_ASSIGNMENT = "office-assignment";
+  public static final String SANCTION = "sanction";
+  public static final String APPEAL = "appeal";
+  public static final String CONSTITUTION_AMENDMENT = "constitution-amendment";
 
   @Id @GeneratedValue private UUID id;
 
@@ -47,6 +51,12 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
   @Column(nullable = false)
   private VotingThreshold threshold;
 
+  @Column(name = "minimum_notice_hours", nullable = false)
+  private int minimumNoticeHours;
+
+  @Column(name = "voting_period_hours", nullable = false)
+  private int votingPeriodHours;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "effect_type", nullable = false)
   private EffectType effectType;
@@ -60,6 +70,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
       int quorumNumerator,
       int quorumDenominator,
       VotingThreshold threshold,
+      int minimumNoticeHours,
+      int votingPeriodHours,
       EffectType effectType) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
@@ -69,6 +81,41 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
     this.quorumNumerator = quorumNumerator;
     this.quorumDenominator = quorumDenominator;
     this.threshold = threshold;
+    this.minimumNoticeHours = minimumNoticeHours;
+    this.votingPeriodHours = votingPeriodHours;
     this.effectType = effectType;
+  }
+
+  public Procedure copyTo(UUID constitutionVersionId, UUID institutionId) {
+    return copyWithRules(
+        constitutionVersionId,
+        institutionId,
+        quorumNumerator,
+        quorumDenominator,
+        threshold,
+        minimumNoticeHours,
+        votingPeriodHours);
+  }
+
+  public Procedure copyWithRules(
+      UUID constitutionVersionId,
+      UUID institutionId,
+      int quorumNumerator,
+      int quorumDenominator,
+      VotingThreshold threshold,
+      int minimumNoticeHours,
+      int votingPeriodHours) {
+    return new Procedure(
+        polityId,
+        constitutionVersionId,
+        institutionId,
+        code,
+        name,
+        quorumNumerator,
+        quorumDenominator,
+        threshold,
+        minimumNoticeHours,
+        votingPeriodHours,
+        effectType);
   }
 }

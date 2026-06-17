@@ -48,4 +48,8 @@ public class Institution extends AuditedEntity {
     this.name = name;
     this.kind = kind;
   }
+
+  public Institution copyTo(UUID constitutionVersionId) {
+    return new Institution(polityId, jurisdictionId, constitutionVersionId, name, kind);
+  }
 }

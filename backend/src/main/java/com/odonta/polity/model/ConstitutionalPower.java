@@ -37,6 +37,9 @@ public class ConstitutionalPower extends AuditedEntity {
   @Column(name = "holder_scope", nullable = false)
   private PowerHolderScope holderScope;
 
+  @Column(name = "holder_office_code")
+  private String holderOfficeCode;
+
   public ConstitutionalPower(
       UUID polityId,
       UUID constitutionVersionId,
@@ -48,5 +51,26 @@ public class ConstitutionalPower extends AuditedEntity {
     this.code = code;
     this.name = name;
     this.holderScope = holderScope;
+  }
+
+  public ConstitutionalPower(
+      UUID polityId,
+      UUID constitutionVersionId,
+      PowerCode code,
+      String name,
+      String holderOfficeCode) {
+    this.polityId = polityId;
+    this.constitutionVersionId = constitutionVersionId;
+    this.code = code;
+    this.name = name;
+    this.holderScope = PowerHolderScope.OFFICE;
+    this.holderOfficeCode = holderOfficeCode;
+  }
+
+  public ConstitutionalPower copyTo(UUID constitutionVersionId) {
+    if (holderScope == PowerHolderScope.OFFICE) {
+      return new ConstitutionalPower(polityId, constitutionVersionId, code, name, holderOfficeCode);
+    }
+    return new ConstitutionalPower(polityId, constitutionVersionId, code, name, holderScope);
   }
 }

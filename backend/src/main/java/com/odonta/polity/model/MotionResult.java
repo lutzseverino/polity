@@ -13,5 +13,8 @@ public record MotionResult(
     String procedureName,
     String introducedByName,
     OffsetDateTime openedAt,
+    OffsetDateTime votingOpensAt,
+    OffsetDateTime votingClosesAt,
+    OffsetDateTime certificationOpensAt,
     VotingResult tally,
     CertificationResult certification) {}

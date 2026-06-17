@@ -3,7 +3,11 @@ package com.odonta.polity.controller;
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MotionsApi;
 import com.odonta.polity.api.model.CastVoteRequest;
+import com.odonta.polity.api.model.CreateAppealMotionRequest;
+import com.odonta.polity.api.model.CreateConstitutionAmendmentMotionRequest;
 import com.odonta.polity.api.model.CreateMotionRequest;
+import com.odonta.polity.api.model.CreateOfficeAssignmentMotionRequest;
+import com.odonta.polity.api.model.CreateSanctionMotionRequest;
 import com.odonta.polity.api.model.MotionResponse;
 import com.odonta.polity.mapper.MotionTransportMapper;
 import com.odonta.polity.service.MotionService;
@@ -31,6 +35,43 @@ public class MotionController implements MotionsApi {
         .body(
             mapper.toResponse(
                 motions.create(polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolityOfficeAssignmentMotion(
+      UUID polityId, @Valid CreateOfficeAssignmentMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createOfficeAssignment(
+                    polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolitySanctionMotion(
+      UUID polityId, @Valid CreateSanctionMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createSanction(polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolityAppealMotion(
+      UUID polityId, @Valid CreateAppealMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createAppeal(polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolityConstitutionAmendmentMotion(
+      UUID polityId, @Valid CreateConstitutionAmendmentMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createAmendment(polityId, users.currentUser(), mapper.toInput(request))));
   }
 
   @Override

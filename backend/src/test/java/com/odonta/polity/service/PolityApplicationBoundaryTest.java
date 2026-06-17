@@ -12,7 +12,15 @@ class PolityApplicationBoundaryTest {
   @Test
   void serviceContractsExcludeTransportAndPersistenceTypes() {
     assertApplicationBoundary(
-        PolityService.class, MotionService.class, OfficialRecordService.class);
+        ConstitutionTemplateService.class,
+        EffectApplicationService.class,
+        InvitationService.class,
+        JusticeService.class,
+        MemberStandingService.class,
+        MotionService.class,
+        OfficeService.class,
+        OfficialRecordService.class,
+        PolityService.class);
   }
 
   private void assertApplicationBoundary(Class<?>... services) {

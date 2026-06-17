@@ -5,4 +5,6 @@ public interface VotingProcedure {
   int getQuorumNumerator();
 
   int getQuorumDenominator();
+
+  VotingThreshold getThreshold();
 }

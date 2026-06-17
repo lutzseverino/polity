@@ -1,11 +1,15 @@
 package com.odonta.polity.repository;
 
+import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.OfficialRecordType;
+import com.odonta.polity.model.PowerCode;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public interface OfficialRecordProjection {
   UUID getId();
+
+  int getEntryNumber();
 
   OfficialRecordType getType();
 
@@ -18,6 +22,20 @@ public interface OfficialRecordProjection {
   int getConstitutionVersion();
 
   UUID getSourceId();
+
+  UUID getMotionId();
+
+  UUID getProcedureId();
+
+  UUID getInstitutionId();
+
+  PowerCode getPowerCode();
+
+  UUID getCertificationId();
+
+  EffectType getEffectType();
+
+  String getOutcome();
 
   OffsetDateTime getOccurredAt();
 }

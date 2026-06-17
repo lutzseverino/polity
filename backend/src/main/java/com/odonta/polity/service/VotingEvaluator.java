@@ -18,7 +18,7 @@ public class VotingEvaluator {
         (eligible * procedure.getQuorumNumerator() + procedure.getQuorumDenominator() - 1)
             / procedure.getQuorumDenominator();
     boolean quorumMet = participation >= quorumRequired;
-    boolean thresholdMet = yes > no;
+    boolean thresholdMet = thresholdMet(procedure.getThreshold(), eligible, yes, no);
     boolean passed = quorumMet && thresholdMet;
     String explanation =
         "%d of %d eligible members participated; quorum required %d. The vote was %d yes, %d no, and %d abstain. %s"
@@ -30,12 +30,23 @@ public class VotingEvaluator {
                 no,
                 abstain,
                 passed
-                    ? "Quorum and simple majority were satisfied."
+                    ? "Quorum and the required threshold were satisfied."
                     : !quorumMet
                         ? "The motion failed because quorum was not satisfied."
-                        : "The motion failed because yes votes did not exceed no votes.");
+                        : "The motion failed because the required threshold was not satisfied.");
     return new VotingResult(
         eligible, yes, no, abstain, quorumRequired, quorumMet, thresholdMet, passed, explanation);
+  }
+
+  private boolean thresholdMet(
+      com.odonta.polity.model.VotingThreshold threshold, int eligible, int yes, int no) {
+    int cast = yes + no;
+    return switch (threshold) {
+      case SIMPLE_MAJORITY_CAST -> yes > no;
+      case MAJORITY_OF_ELIGIBLE -> yes > eligible / 2;
+      case TWO_THIRDS_CAST -> cast > 0 && yes * 3 >= cast * 2;
+      case TWO_THIRDS_ELIGIBLE -> yes * 3 >= eligible * 2;
+    };
   }
 
   private int count(List<Vote> votes, VoteChoice choice) {
