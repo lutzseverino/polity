@@ -484,19 +484,6 @@ function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
             type="single"
             value={onboarding.visibility}
           >
-            <AppToggleGroupItem treatment="choice" value="private">
-              <span className="grid gap-1">
-                <span className="font-display text-lg">
-                  {t("onboarding.visibility.options.private.label")}
-                </span>
-                <span
-                  className="text-xs leading-5 text-muted-foreground"
-                  data-slot="choice-copy"
-                >
-                  {t("onboarding.visibility.options.private.copy")}
-                </span>
-              </span>
-            </AppToggleGroupItem>
             <AppToggleGroupItem treatment="choice" value="public">
               <span className="grid gap-1">
                 <span className="font-display text-lg">
@@ -507,6 +494,19 @@ function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
                   data-slot="choice-copy"
                 >
                   {t("onboarding.visibility.options.public.copy")}
+                </span>
+              </span>
+            </AppToggleGroupItem>
+            <AppToggleGroupItem treatment="choice" value="private">
+              <span className="grid gap-1">
+                <span className="font-display text-lg">
+                  {t("onboarding.visibility.options.private.label")}
+                </span>
+                <span
+                  className="text-xs leading-5 text-muted-foreground"
+                  data-slot="choice-copy"
+                >
+                  {t("onboarding.visibility.options.private.copy")}
                 </span>
               </span>
             </AppToggleGroupItem>

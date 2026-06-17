@@ -102,15 +102,15 @@
       "description": "Public appears in discovery. Private stays out of discovery.",
       "label": "Access",
       "options": {
-        "private": {
-          "label": "Private",
-          "copy": "Hidden from discovery.",
-          "description": "Keeps activity visible to members."
-        },
         "public": {
           "label": "Public",
           "copy": "Visible in discovery.",
           "description": "Lets people find and read what is happening."
+        },
+        "private": {
+          "label": "Private",
+          "copy": "Hidden from discovery.",
+          "description": "Keeps activity visible to members."
         }
       },
       "continue": "Continue"

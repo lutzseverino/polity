@@ -14,7 +14,7 @@ function isVisibility(value: string): value is Visibility {
 export function useLandingOnboarding() {
   const { t } = useTranslation("landing");
   const [polityName, setPolityName] = useState("");
-  const [visibility, setVisibility] = useState<Visibility>("private");
+  const [visibility, setVisibility] = useState<Visibility>("public");
   const [step, setStep] = useState<OnboardingStep | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invites, setInvites] = useState<string[]>([]);

@@ -102,15 +102,15 @@
       "description": "Pública aparece en descubrimiento. Privada queda fuera.",
       "label": "Acceso",
       "options": {
-        "private": {
-          "label": "Privada",
-          "copy": "Oculta del descubrimiento.",
-          "description": "Mantiene su actividad visible para miembros."
-        },
         "public": {
           "label": "Pública",
           "copy": "Visible en descubrimiento.",
           "description": "Permite encontrarla y leer lo que ocurre."
+        },
+        "private": {
+          "label": "Privada",
+          "copy": "Oculta del descubrimiento.",
+          "description": "Mantiene su actividad visible para miembros."
         }
       },
       "continue": "Continuar"
