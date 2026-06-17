@@ -4,7 +4,7 @@ Polity owns product and constitutional behavior. Odonta supplies shared platform
 
 ## Platform boundary
 
-The backend depends on stable Odonta artifacts for common web behavior, authorization, and the
+The service depends on stable Odonta artifacts for common web behavior, authorization, and the
 Identity client. Product code should consume those published contracts instead of copying platform
 types or generated HTTP clients into this repository.
 

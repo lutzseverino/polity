@@ -1,5 +1,5 @@
 <div align="center">
-    <h1 align="center">Polity Backend</h1>
+    <h1 align="center">Polity Service</h1>
     <p>The product service for constitutional government.</p>
 </div>
 
@@ -13,13 +13,22 @@ domain state and is evaluated synchronously by Polity application services.
 
 ## Development
 
+From the repository root:
+
 ```bash
-cd backend
+pnpm test:service
+pnpm compile:service
+```
+
+Or from this service directory:
+
+```bash
+cd services/polity
 mvn test
 ```
 
-The backend consumes Odonta platform artifacts through the local or configured Maven repository.
+The service consumes Odonta platform artifacts through the local or configured Maven repository.
 
 ## Documentation
 
-Durable backend architecture is documented in [Architecture](../docs/architecture.md).
+Durable service architecture is documented in [Architecture](../../docs/architecture.md).

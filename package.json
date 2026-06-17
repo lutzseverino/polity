@@ -4,15 +4,19 @@
   "version": "0.1.0",
   "packageManager": "pnpm@9.12.0",
   "scripts": {
-    "build": "pnpm --dir apps/landing build",
+    "build": "pnpm build:landing",
     "build:landing": "pnpm --dir apps/landing build",
-    "check": "biome check . && pnpm --dir apps/landing check:theme && pnpm typecheck",
+    "check": "pnpm check:js && pnpm check:service",
+    "check:js": "biome check . && pnpm --dir apps/landing check:theme && pnpm typecheck",
+    "check:service": "pnpm test:service",
+    "compile:service": "mvn -f services/polity/pom.xml compile",
     "dev": "pnpm dev:mobile",
     "dev:landing": "pnpm --dir apps/landing dev",
     "dev:mobile": "pnpm --dir apps/mobile start",
     "format": "biome check . --write",
     "generate:api": "pnpm --dir apps/landing generate:api",
     "lint": "biome check .",
+    "test:service": "mvn -f services/polity/pom.xml test",
     "typecheck": "pnpm --dir packages/design typecheck && pnpm --dir apps/landing typecheck && pnpm --dir apps/mobile typecheck"
   },
   "engines": {

@@ -7,7 +7,7 @@
     "build": "tsc -b && vite build",
     "check:theme": "node scripts/build-shadcn-theme.mjs --check",
     "dev": "vite",
-    "generate:api": "openapi-typescript ../../backend/openapi/polity.yaml -o src/api/generated/polity.ts",
+    "generate:api": "openapi-typescript ../../services/polity/openapi/polity.yaml -o src/api/generated/polity.ts",
     "generate:theme": "node scripts/build-shadcn-theme.mjs",
     "typecheck": "tsc -b"
   },
