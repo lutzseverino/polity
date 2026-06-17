@@ -27,7 +27,12 @@ public interface SanctionRepository extends JpaRepository<Sanction, UUID> {
         target.id as targetMembershipId,
         target.displayName as targetName,
         sanction.type as type,
-        sanction.status as status,
+        case
+          when sanction.status = com.odonta.polity.model.SanctionStatus.ACTIVE
+            and sanction.endsAt <= :now
+          then com.odonta.polity.model.SanctionStatus.EXPIRED
+          else sanction.status
+        end as status,
         sanction.reason as reason,
         sanction.startedAt as startedAt,
         sanction.endsAt as endsAt
@@ -36,5 +41,5 @@ public interface SanctionRepository extends JpaRepository<Sanction, UUID> {
       where sanction.polityId = :polityId
       order by sanction.startedAt desc
       """)
-  List<SanctionProjection> findProjectionsByPolityId(UUID polityId);
+  List<SanctionProjection> findProjectionsByPolityId(UUID polityId, OffsetDateTime now);
 }

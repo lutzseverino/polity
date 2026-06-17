@@ -5,9 +5,7 @@ import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.mapper.JusticeApplicationMapper;
 import com.odonta.polity.model.AppealResult;
 import com.odonta.polity.model.SanctionResult;
-import com.odonta.polity.model.SanctionStatus;
 import com.odonta.polity.repository.AppealRepository;
-import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
 import java.time.Clock;
 import java.time.OffsetDateTime;
@@ -30,33 +28,12 @@ public class JusticeService {
   public List<SanctionResult> sanctions(UUID polityId, UUID userId) {
     access.requireReadable(polityId, userId);
     OffsetDateTime now = OffsetDateTime.now(clock);
-    return sanctions.findProjectionsByPolityId(polityId).stream()
-        .map(projection -> toResult(projection, now))
-        .toList();
+    return mapper.toSanctionResults(sanctions.findProjectionsByPolityId(polityId, now));
   }
 
   @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
   public List<AppealResult> appeals(UUID polityId, UUID userId) {
     access.requireReadable(polityId, userId);
     return mapper.toAppealResults(appeals.findProjectionsByPolityId(polityId));
-  }
-
-  private SanctionStatus statusAt(SanctionProjection projection, OffsetDateTime now) {
-    if (projection.getStatus() == SanctionStatus.ACTIVE && !projection.getEndsAt().isAfter(now)) {
-      return SanctionStatus.EXPIRED;
-    }
-    return projection.getStatus();
-  }
-
-  private SanctionResult toResult(SanctionProjection projection, OffsetDateTime now) {
-    return new SanctionResult(
-        projection.getId(),
-        projection.getTargetMembershipId(),
-        projection.getTargetName(),
-        projection.getType(),
-        statusAt(projection, now),
-        projection.getReason(),
-        projection.getStartedAt(),
-        projection.getEndsAt());
   }
 }
