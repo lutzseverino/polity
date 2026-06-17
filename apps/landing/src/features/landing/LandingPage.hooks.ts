@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { OnboardingStep, Visibility } from "./LandingPage.types";
@@ -24,9 +24,8 @@ export function useLandingOnboarding() {
   const displayName = trimmedName || t("onboarding.defaultPolityName");
   const canStart = trimmedName.length > 0;
 
-  const visibilityCopy = useMemo(
-    () => t(`onboarding.visibility.options.${visibility}.description`),
-    [t, visibility],
+  const visibilityCopy = t(
+    `onboarding.visibility.options.${visibility}.description`,
   );
 
   const updateVisibility = useCallback((value: string) => {
