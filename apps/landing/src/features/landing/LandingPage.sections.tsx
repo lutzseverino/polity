@@ -1,6 +1,12 @@
 import { ArrowDown, ArrowRight, Check, Plus, Users } from "lucide-react";
 import type { ComponentProps, FormEvent, ReactNode } from "react";
-
+import { useTranslation } from "react-i18next";
+import { AppButton } from "@/components/app/app-button";
+import { AppInput } from "@/components/app/app-input";
+import {
+  AppToggleGroup,
+  AppToggleGroupItem,
+} from "@/components/app/app-toggle-group";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -10,53 +16,21 @@ import {
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
-import { ToggleGroup } from "@/components/ui/toggle-group";
-import {
-  ChoiceToggleGroupItem,
-  PosterButton,
-  PosterInput,
-} from "@/design/components";
 import { cn } from "@/lib/utils";
 
 import type { LandingOnboarding } from "./LandingPage";
 import { Emblem, Shards, Starburst } from "./LandingPage.motifs";
 
-const flowSteps = [
-  { key: "founding", label: "Name" },
-  { key: "visibility", label: "Access" },
-  { key: "invites", label: "People" },
-] as const;
+type Article = {
+  body: string;
+  no: string;
+  title: string;
+};
 
-const articles = [
-  {
-    body: "A room with a name has a different gravity. Convene where it counts.",
-    no: "01",
-    title: "A place",
-  },
-  {
-    body: "Not a vibe check. A decision the group can return to and cite.",
-    no: "02",
-    title: "A record",
-  },
-  {
-    body: "Roles, votes, and amendments stay visible enough to matter.",
-    no: "03",
-    title: "A memory",
-  },
-  {
-    body: "Friends stay unserious without making every choice disposable.",
-    no: "04",
-    title: "A ritual",
-  },
-] as const;
-
-const register = [
-  { detail: "Polity founded", entry: "001" },
-  { detail: "Constitution ratified · 7 in favour", entry: "002" },
-  { detail: "Office of the Treasurer assigned", entry: "014" },
-  { detail: "Motion enacted · quorum 6–1", entry: "027" },
-  { detail: "Constitution amended · two members admitted", entry: "041" },
-] as const;
+type RegisterEntry = {
+  detail: string;
+  entry: string;
+};
 
 export function Eyebrow({
   children,
@@ -81,6 +55,7 @@ export function Eyebrow({
 
 export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
   const isFounding = onboarding.step === "founding";
+  const { t } = useTranslation("landing");
 
   return (
     <section className="relative isolate overflow-hidden border-b" data-hero>
@@ -95,16 +70,19 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
                 : "pointer-events-none -translate-y-2 max-h-0 overflow-hidden opacity-0",
             )}
           >
-            <Eyebrow data-hero-fade>Article I — The Founding</Eyebrow>
+            <Eyebrow data-hero-fade>{t("hero.eyebrow")}</Eyebrow>
             <h1 className="font-display text-[clamp(2.75rem,7vw,5.25rem)] leading-[0.92]">
               <span className="block overflow-hidden pb-[0.06em]">
                 <span className="block" data-hero-line>
-                  Every group
+                  {t("hero.titleLine1")}
                 </span>
-              </span>
+              </span>{" "}
               <span className="block overflow-hidden pb-[0.06em]">
                 <span className="block" data-hero-line>
-                  deserves a <span className="text-primary">constitution.</span>
+                  {t("hero.titleLine2")}{" "}
+                  <span className="text-primary">
+                    {t("hero.titleEmphasis")}
+                  </span>
                 </span>
               </span>
             </h1>
@@ -112,8 +90,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
               className="max-w-prose text-base leading-7 text-muted-foreground md:text-lg"
               data-hero-fade
             >
-              decreos turns a group chat into a polity — votes, offices,
-              invitations, and an official record that outlives the feed.
+              {t("hero.body")}
             </p>
           </div>
 
@@ -123,7 +100,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
 
           {isFounding ? (
             <Button
-              aria-label="See how it governs"
+              aria-label={t("hero.cta")}
               asChild
               className="w-fit gap-2 font-mono text-[0.7rem] leading-none tracking-[0.2em] uppercase"
               data-hero-fade
@@ -131,7 +108,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
               variant="ghost"
             >
               <a href="#instrument">
-                How it governs
+                {t("hero.cta")}
                 <ArrowDown aria-hidden="true" data-bob />
               </a>
             </Button>
@@ -157,9 +134,9 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
             data-hero-plate
           >
             <figcaption className="flex items-center justify-between border-b border-secondary-foreground/20 px-3 py-2 font-mono text-[0.58rem] leading-none tracking-[0.24em] text-secondary-foreground/85 uppercase">
-              <span data-hero-mark>Official</span>
-              <span data-hero-mark>No. 001</span>
-              <span data-hero-mark>Record</span>
+              <span data-hero-mark>{t("hero.plate.official")}</span>
+              <span data-hero-mark>{t("hero.plate.number")}</span>
+              <span data-hero-mark>{t("hero.plate.record")}</span>
             </figcaption>
             <div className="relative aspect-[16/9] overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,color-mix(in_oklch,var(--secondary-foreground)_34%,transparent),transparent_68%)]" />
@@ -170,7 +147,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
               className="border-t border-secondary-foreground/20 px-3 py-2 text-center font-mono text-[0.58rem] leading-none tracking-[0.34em] text-secondary-foreground/85 uppercase"
               data-hero-mark
             >
-              Polity Founded
+              {t("hero.plate.founded")}
             </div>
           </figure>
         </div>
@@ -180,22 +157,26 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
 }
 
 export function MethodSection() {
+  const { t } = useTranslation("landing");
+  const articles = t("method.articles", {
+    returnObjects: true,
+  }) as Article[];
+
   return (
     <section
       className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28"
       id="instrument"
     >
       <div className="flex flex-col gap-5 border-b pb-10" data-reveal>
-        <Eyebrow>Why a polity</Eyebrow>
+        <Eyebrow>{t("method.eyebrow")}</Eyebrow>
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <h2 className="font-display text-[clamp(2.25rem,5vw,4.25rem)] leading-[0.88]">
-            Found it
+            {t("method.titleLine1")}
             <br />
-            like a place.
+            {t("method.titleLine2")}
           </h2>
           <p className="max-w-sm leading-7 text-muted-foreground md:text-right">
-            Less explanation. More gravity. Four reasons a friend group earns
-            the weight of an institution.
+            {t("method.body")}
           </p>
         </div>
       </div>
@@ -210,7 +191,7 @@ export function MethodSection() {
         >
           <span className="block size-3 bg-primary" />
           <h3 className="font-display text-[clamp(2rem,3.6vw,3.25rem)] leading-[0.9]">
-            Civic weight for group-chat life.
+            {t("method.featureTitle")}
           </h3>
         </article>
 
@@ -221,7 +202,7 @@ export function MethodSection() {
           <Shards className="absolute top-0 right-0 size-56 text-primary-foreground/15" />
           <span className="relative block size-3 bg-primary-foreground" />
           <p className="relative max-w-[16ch] font-display text-[clamp(2rem,3.6vw,3.25rem)] leading-[0.9]">
-            The decision gets a place to stand.
+            {t("method.featureBody")}
           </p>
         </article>
 
@@ -248,6 +229,11 @@ export function MethodSection() {
 }
 
 export function RecordSection() {
+  const { t } = useTranslation("landing");
+  const register = t("record.entries", {
+    returnObjects: true,
+  }) as RegisterEntry[];
+
   return (
     <section
       className="border-y bg-secondary text-secondary-foreground"
@@ -261,20 +247,19 @@ export function RecordSection() {
             inner={0.7}
           />
           <Eyebrow className="relative text-secondary-foreground" data-reveal>
-            The official record
+            {t("record.eyebrow")}
           </Eyebrow>
           <h2
             className="relative max-w-[14ch] font-display text-[clamp(2.25rem,5vw,4.5rem)] leading-[0.86]"
             data-reveal
           >
-            Social media forgets. The record does not.
+            {t("record.title")}
           </h2>
           <p
             className="relative max-w-prose leading-7 text-secondary-foreground/70"
             data-reveal
           >
-            Every motion, office, and amendment is entered, numbered, and kept.
-            Some things should survive the feed.
+            {t("record.body")}
           </p>
         </div>
 
@@ -286,7 +271,7 @@ export function RecordSection() {
             className="mb-3 px-1 font-mono text-[0.7rem] leading-none tracking-[0.28em] text-secondary-foreground/60 uppercase"
             data-reveal-item
           >
-            Selected entries
+            {t("record.selectedEntries")}
           </p>
           {register.map(({ detail, entry }) => (
             <div
@@ -305,6 +290,8 @@ export function RecordSection() {
 }
 
 export function Colophon() {
+  const { t } = useTranslation("landing");
+
   return (
     <footer className="mx-auto max-w-7xl px-4 py-14 md:px-8">
       <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
@@ -313,21 +300,29 @@ export function Colophon() {
           <div className="flex flex-col gap-1">
             <span className="font-display text-2xl leading-none">decreos</span>
             <span className="max-w-[26ch] font-mono text-[0.7rem] tracking-[0.16em] text-muted-foreground uppercase">
-              Constitutional software for friend-group government
+              {t("colophon.tagline")}
             </span>
           </div>
         </div>
         <dl className="grid grid-cols-2 gap-x-10 gap-y-3 font-mono text-xs text-muted-foreground uppercase sm:grid-cols-3">
           <div className="flex flex-col gap-1">
-            <dt className="tracking-[0.2em] opacity-60">Edition</dt>
-            <dd className="text-foreground">No. 001</dd>
+            <dt className="tracking-[0.2em] opacity-60">
+              {t("colophon.edition")}
+            </dt>
+            <dd className="text-foreground">{t("colophon.editionValue")}</dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="tracking-[0.2em] opacity-60">Established</dt>
-            <dd className="text-foreground">MMXXVI</dd>
+            <dt className="tracking-[0.2em] opacity-60">
+              {t("colophon.established")}
+            </dt>
+            <dd className="text-foreground">
+              {t("colophon.establishedValue")}
+            </dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="tracking-[0.2em] opacity-60">Source</dt>
+            <dt className="tracking-[0.2em] opacity-60">
+              {t("colophon.source")}
+            </dt>
             <dd>
               <a
                 className="text-foreground underline-offset-4 hover:text-primary hover:underline"
@@ -335,7 +330,7 @@ export function Colophon() {
                 rel="noreferrer"
                 target="_blank"
               >
-                Drafted in the open
+                {t("colophon.sourceLink")}
               </a>
             </dd>
           </div>
@@ -346,6 +341,8 @@ export function Colophon() {
 }
 
 function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
+  const { t } = useTranslation("landing");
+
   return (
     <div
       className={cn(
@@ -361,10 +358,10 @@ function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
         <div className="border bg-card text-left">
           <div className="flex items-center justify-between border-b bg-secondary px-4 py-2.5 text-secondary-foreground">
             <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] uppercase">
-              Act of Foundation
+              {t("onboarding.panel.title")}
             </span>
             <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] text-secondary-foreground/60 uppercase">
-              No. 001
+              {t("onboarding.panel.number")}
             </span>
           </div>
           <div className="grid gap-5 p-5">
@@ -386,6 +383,12 @@ function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
 }
 
 function FlowStepper({ step }: { step: LandingOnboarding["step"] }) {
+  const { t } = useTranslation("landing");
+  const flowSteps = [
+    { key: "founding", label: t("onboarding.flow.founding") },
+    { key: "visibility", label: t("onboarding.flow.visibility") },
+    { key: "invites", label: t("onboarding.flow.invites") },
+  ] as const;
   const currentIndex =
     step === "founding"
       ? 0
@@ -425,6 +428,8 @@ function FlowStepper({ step }: { step: LandingOnboarding["step"] }) {
 }
 
 function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
+  const { t } = useTranslation("landing");
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onboarding.startGovernment();
@@ -435,25 +440,27 @@ function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
       <FieldGroup>
         <Field data-invalid={onboarding.nameError ? true : undefined}>
           <FieldLabel className="type-mono-label" htmlFor="polity-name">
-            Name your polity
+            {t("onboarding.name.label")}
           </FieldLabel>
           <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-            <PosterInput
+            <AppInput
               aria-invalid={onboarding.nameError ? true : undefined}
               autoComplete="organization"
               id="polity-name"
               maxLength={120}
               onChange={(event) => onboarding.setPolityName(event.target.value)}
-              placeholder="The Thursday Assembly"
+              placeholder={t("onboarding.name.placeholder")}
               value={onboarding.polityName}
             />
-            <PosterButton disabled={!onboarding.canStart} type="submit">
-              {onboarding.isStarting ? "Founding…" : "Found"}
+            <AppButton disabled={!onboarding.canStart} type="submit">
+              {onboarding.isStarting
+                ? t("onboarding.name.submitting")
+                : t("onboarding.name.submit")}
               <ArrowRight data-icon="inline-end" />
-            </PosterButton>
+            </AppButton>
           </div>
           <FieldDescription className="font-mono text-[0.7rem] tracking-[0.1em]">
-            This opens the official record.
+            {t("onboarding.name.description")}
           </FieldDescription>
           {onboarding.nameError ? (
             <FieldError>{onboarding.nameError}</FieldError>
@@ -465,63 +472,73 @@ function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
 }
 
 function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
+  const { t } = useTranslation("landing");
+
   return (
     <div className="grid gap-5">
       <div className="flex flex-col gap-1">
-        <h2 className="font-display text-2xl">Choose the door.</h2>
+        <h2 className="font-display text-2xl">
+          {t("onboarding.visibility.title")}
+        </h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          Public is discoverable. Private is invitation-only.
+          {t("onboarding.visibility.description")}
         </p>
       </div>
 
       <FieldGroup>
         <Field>
           <FieldTitle className="type-mono-label" id="visibility-label">
-            Access
+            {t("onboarding.visibility.label")}
           </FieldTitle>
-          <ToggleGroup
+          <AppToggleGroup
             aria-labelledby="visibility-label"
             className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2"
             onValueChange={onboarding.updateVisibility}
             type="single"
             value={onboarding.visibility}
           >
-            <ChoiceToggleGroupItem value="private">
+            <AppToggleGroupItem treatment="choice" value="private">
               <span className="grid gap-1">
-                <span className="font-display text-lg">Private</span>
+                <span className="font-display text-lg">
+                  {t("onboarding.visibility.options.private.label")}
+                </span>
                 <span
                   className="text-xs leading-5 text-muted-foreground"
                   data-slot="choice-copy"
                 >
-                  Hidden until invited.
+                  {t("onboarding.visibility.options.private.copy")}
                 </span>
               </span>
-            </ChoiceToggleGroupItem>
-            <ChoiceToggleGroupItem value="public">
+            </AppToggleGroupItem>
+            <AppToggleGroupItem treatment="choice" value="public">
               <span className="grid gap-1">
-                <span className="font-display text-lg">Public</span>
+                <span className="font-display text-lg">
+                  {t("onboarding.visibility.options.public.label")}
+                </span>
                 <span
                   className="text-xs leading-5 text-muted-foreground"
                   data-slot="choice-copy"
                 >
-                  Visible before joining.
+                  {t("onboarding.visibility.options.public.copy")}
                 </span>
               </span>
-            </ChoiceToggleGroupItem>
-          </ToggleGroup>
+            </AppToggleGroupItem>
+          </AppToggleGroup>
           <FieldDescription>{onboarding.visibilityCopy}</FieldDescription>
         </Field>
       </FieldGroup>
 
-      <PosterButton onClick={onboarding.continueToInvites} type="button">
-        Continue
+      <AppButton onClick={onboarding.continueToInvites} type="button">
+        {t("onboarding.visibility.continue")}
         <ArrowRight data-icon="inline-end" />
-      </PosterButton>
+      </AppButton>
     </div>
   );
 }
 
 function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
+  const { t } = useTranslation("landing");
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onboarding.addInvite();
@@ -530,9 +547,11 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
   return (
     <div className="grid gap-5">
       <div className="flex flex-col gap-1">
-        <h2 className="font-display text-2xl">Bring the first people.</h2>
+        <h2 className="font-display text-2xl">
+          {t("onboarding.invites.title")}
+        </h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          One or two is enough to begin.
+          {t("onboarding.invites.description")}
         </p>
       </div>
 
@@ -540,9 +559,9 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
         <FieldGroup>
           <Field data-invalid={onboarding.inviteError ? true : undefined}>
             <FieldLabel className="type-mono-label" htmlFor="invite-email">
-              Founding member
+              {t("onboarding.invites.label")}
             </FieldLabel>
-            <PosterInput
+            <AppInput
               aria-invalid={onboarding.inviteError ? true : undefined}
               autoComplete="email"
               id="invite-email"
@@ -550,7 +569,7 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
               onChange={(event) =>
                 onboarding.setInviteEmail(event.target.value)
               }
-              placeholder="mira@example.com"
+              placeholder={t("onboarding.invites.placeholder")}
               type="email"
               value={onboarding.inviteEmail}
             />
@@ -561,14 +580,14 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
         </FieldGroup>
 
         <div className="grid grid-cols-2 gap-2">
-          <PosterButton type="submit" variant="secondary">
+          <AppButton type="submit" variant="secondary">
             <Plus data-icon="inline-start" />
-            Enrol
-          </PosterButton>
-          <PosterButton onClick={onboarding.finishSetup} type="button">
-            Finish
+            {t("onboarding.invites.enrol")}
+          </AppButton>
+          <AppButton onClick={onboarding.finishSetup} type="button">
+            {t("onboarding.invites.finish")}
             <ArrowRight data-icon="inline-end" />
-          </PosterButton>
+          </AppButton>
         </div>
       </form>
 
@@ -585,7 +604,7 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
           ))
         ) : (
           <p className="font-mono text-xs text-muted-foreground">
-            No members enrolled yet.
+            {t("onboarding.invites.empty")}
           </p>
         )}
       </div>
@@ -594,6 +613,8 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
 }
 
 function ReadyStep({ onboarding }: { onboarding: LandingOnboarding }) {
+  const { t } = useTranslation("landing");
+
   return (
     <div className="grid gap-5">
       <div className="flex flex-col gap-3">
@@ -601,29 +622,34 @@ function ReadyStep({ onboarding }: { onboarding: LandingOnboarding }) {
           <Check aria-hidden="true" className="size-5" />
         </span>
         <h2 className="font-display text-2xl leading-[0.95]">
-          {onboarding.displayName} is founded.
+          {t("onboarding.ready.title", { name: onboarding.displayName })}
         </h2>
         <p className="text-sm leading-6 text-muted-foreground">
-          The founding room is waiting. Enter and convene.
+          {t("onboarding.ready.description")}
         </p>
       </div>
 
       <div className="grid gap-px border bg-border">
-        <SummaryRow label="Access" value={onboarding.visibility} />
         <SummaryRow
-          label="Members"
+          label={t("onboarding.ready.access")}
+          value={t(
+            `onboarding.visibility.options.${onboarding.visibility}.label`,
+          )}
+        />
+        <SummaryRow
+          label={t("onboarding.ready.members")}
           value={
             onboarding.invites.length
               ? onboarding.invites.join(", ")
-              : "Enrol later"
+              : t("onboarding.ready.enrolLater")
           }
         />
       </div>
 
-      <PosterButton type="button">
-        Enter the chamber
+      <AppButton type="button">
+        {t("onboarding.ready.enter")}
         <ArrowRight data-icon="inline-end" />
-      </PosterButton>
+      </AppButton>
     </div>
   );
 }
@@ -634,7 +660,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <span className="font-mono text-[0.7rem] leading-none tracking-[0.16em] text-muted-foreground uppercase">
         {label}
       </span>
-      <span className="truncate font-medium capitalize">{value}</span>
+      <span className="truncate font-medium">{value}</span>
     </div>
   );
 }

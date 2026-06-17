@@ -1,22 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { OnboardingStep, Visibility } from "./LandingPage.types";
 
 const startTransitionMs = 1050;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+type NameError = "nameRequired";
+type InviteError = "emailRequired" | "emailInvalid" | "emailDuplicate";
 
 function isVisibility(value: string): value is Visibility {
   return value === "public" || value === "private";
 }
 
 export function useLandingOnboarding() {
+  const { t } = useTranslation("landing");
   const [polityName, setPolityName] = useState("");
   const [visibility, setVisibility] = useState<Visibility>("private");
   const [step, setStep] = useState<OnboardingStep>("founding");
   const [inviteEmail, setInviteEmail] = useState("");
   const [invites, setInvites] = useState<string[]>([]);
-  const [nameError, setNameError] = useState("");
-  const [inviteError, setInviteError] = useState("");
+  const [nameError, setNameError] = useState<NameError | null>(null);
+  const [inviteError, setInviteError] = useState<InviteError | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const startTimer = useRef<number | undefined>(undefined);
 
@@ -29,16 +33,13 @@ export function useLandingOnboarding() {
   }, []);
 
   const trimmedName = polityName.trim();
-  const displayName = trimmedName || "Your first polity";
+  const displayName = trimmedName || t("onboarding.defaultPolityName");
   const canStart = trimmedName.length > 0 && !isStarting;
   const hasNamedPolity = step !== "founding";
 
   const visibilityCopy = useMemo(
-    () =>
-      visibility === "private"
-        ? "Private keeps the room closed to invited members."
-        : "Public lets people find the charter before joining.",
-    [visibility],
+    () => t(`onboarding.visibility.options.${visibility}.description`),
+    [t, visibility],
   );
 
   const updateVisibility = useCallback((value: string) => {
@@ -48,10 +49,10 @@ export function useLandingOnboarding() {
   }, []);
 
   const startGovernment = useCallback(() => {
-    setNameError("");
+    setNameError(null);
 
     if (!trimmedName) {
-      setNameError("Name your polity before continuing.");
+      setNameError("nameRequired");
       return;
     }
 
@@ -68,20 +69,20 @@ export function useLandingOnboarding() {
 
   const addInvite = useCallback(() => {
     const email = inviteEmail.trim().toLowerCase();
-    setInviteError("");
+    setInviteError(null);
 
     if (!email) {
-      setInviteError("Enter an email address.");
+      setInviteError("emailRequired");
       return;
     }
 
     if (!emailPattern.test(email)) {
-      setInviteError("Use a valid email address.");
+      setInviteError("emailInvalid");
       return;
     }
 
     if (invites.includes(email)) {
-      setInviteError("That person is already on the list.");
+      setInviteError("emailDuplicate");
       return;
     }
 
@@ -102,10 +103,10 @@ export function useLandingOnboarding() {
     polityName,
     hasNamedPolity,
     inviteEmail,
-    inviteError,
+    inviteError: inviteError ? t(`onboarding.errors.${inviteError}`) : "",
     invites,
     isStarting,
-    nameError,
+    nameError: nameError ? t(`onboarding.errors.${nameError}`) : "",
     setPolityName,
     setInviteEmail,
     startGovernment,
