@@ -3,6 +3,7 @@ import type { ComponentProps, FormEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { AppButton } from "@/components/app/app-button";
 import { AppInput } from "@/components/app/app-input";
+import { AppLink } from "@/components/app/app-link";
 import {
   AppToggleGroup,
   AppToggleGroupItem,
@@ -324,14 +325,13 @@ export function Colophon() {
               {t("colophon.source")}
             </dt>
             <dd>
-              <a
-                className="text-foreground underline-offset-4 hover:text-primary hover:underline"
+              <AppLink
                 href="https://github.com/lutzseverino/polity"
                 rel="noreferrer"
                 target="_blank"
               >
                 {t("colophon.sourceLink")}
-              </a>
+              </AppLink>
             </dd>
           </div>
         </dl>
