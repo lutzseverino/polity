@@ -1,0 +1,143 @@
+{
+  "hero": {
+    "eyebrow": "Official Record - Entry 001",
+    "titleLine1": "Every group",
+    "titleLine2": "deserves a",
+    "titleEmphasis": "constitution.",
+    "body": "decreos turns a group chat into a polity - votes, offices, invitations, and an official record that outlives the feed.",
+    "cta": "How it governs",
+    "plate": {
+      "official": "Official",
+      "number": "No. 001",
+      "record": "Entry",
+      "founded": "Polity Founded"
+    }
+  },
+  "method": {
+    "eyebrow": "Why a polity",
+    "titleLine1": "Found it",
+    "titleLine2": "like a place.",
+    "body": "Less explanation. More gravity. Four reasons a friend group earns the weight of an institution.",
+    "featureTitle": "Civic weight for group-chat life.",
+    "featureBody": "The decision gets a place to stand.",
+    "articles": [
+      {
+        "no": "01",
+        "title": "A place",
+        "body": "A room with a name has a different gravity. Convene where it counts."
+      },
+      {
+        "no": "02",
+        "title": "An official record",
+        "body": "Not a vibe check. An entry the group can return to and cite."
+      },
+      {
+        "no": "03",
+        "title": "A memory",
+        "body": "Offices, votes, and amendments stay visible enough to matter."
+      },
+      {
+        "no": "04",
+        "title": "A ritual",
+        "body": "Friends stay unserious without making every choice disposable."
+      }
+    ]
+  },
+  "record": {
+    "eyebrow": "The official record",
+    "title": "Social media forgets. The record does not.",
+    "body": "Motions, votes, offices, invitations, admissions, and amendments are entered, numbered, and kept. Some things should survive the feed.",
+    "selectedEntries": "Selected entries",
+    "entries": [
+      {
+        "entry": "001",
+        "detail": "Polity founded"
+      },
+      {
+        "entry": "002",
+        "detail": "Steward office assigned"
+      },
+      {
+        "entry": "003",
+        "detail": "Starter Constitution ratified"
+      },
+      {
+        "entry": "027",
+        "detail": "Motion certified - quorum met"
+      },
+      {
+        "entry": "041",
+        "detail": "Constitution amended"
+      }
+    ]
+  },
+  "colophon": {
+    "tagline": "Constitutional software for friend-group government",
+    "edition": "Edition",
+    "editionValue": "No. 001",
+    "established": "Established",
+    "establishedValue": "MMXXVI",
+    "source": "Source",
+    "sourceLink": "Drafted in the open"
+  },
+  "onboarding": {
+    "defaultPolityName": "Your first polity",
+    "flow": {
+      "founding": "Name",
+      "visibility": "Access",
+      "invites": "People"
+    },
+    "panel": {
+      "title": "Founding Entry",
+      "number": "No. 001"
+    },
+    "name": {
+      "label": "Name your polity",
+      "placeholder": "The Thursday Assembly",
+      "submit": "Found",
+      "submitting": "Founding...",
+      "description": "This opens the official record."
+    },
+    "visibility": {
+      "title": "Choose the door.",
+      "description": "Public appears in discovery. Private stays out of discovery.",
+      "label": "Access",
+      "options": {
+        "private": {
+          "label": "Private",
+          "copy": "Hidden from discovery.",
+          "description": "Keeps activity visible to members."
+        },
+        "public": {
+          "label": "Public",
+          "copy": "Visible in discovery.",
+          "description": "Lets people find and read what is happening."
+        }
+      },
+      "continue": "Continue"
+    },
+    "invites": {
+      "title": "Invite the first people.",
+      "description": "One or two invitations is enough to begin.",
+      "label": "Person to invite",
+      "placeholder": "mira@example.com",
+      "enrol": "Invite",
+      "finish": "Finish",
+      "empty": "No invitations queued yet."
+    },
+    "ready": {
+      "title": "{{name}} is founded.",
+      "description": "The founding room is waiting. Enter and convene.",
+      "access": "Access",
+      "members": "Invites",
+      "enrolLater": "Invite later",
+      "enter": "Enter the chamber"
+    },
+    "errors": {
+      "nameRequired": "Name your polity before continuing.",
+      "emailRequired": "Enter an email address.",
+      "emailInvalid": "Use a valid email address.",
+      "emailDuplicate": "That person is already on the list."
+    }
+  }
+}

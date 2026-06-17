@@ -1,0 +1,143 @@
+{
+  "hero": {
+    "eyebrow": "Registro oficial - Entrada 001",
+    "titleLine1": "Todo grupo",
+    "titleLine2": "merece una",
+    "titleEmphasis": "constitución.",
+    "body": "decreos convierte un chat de grupo en una politeia: votos, cargos, invitaciones y un registro oficial que sobrevive al feed.",
+    "cta": "Cómo gobierna",
+    "plate": {
+      "official": "Oficial",
+      "number": "No. 001",
+      "record": "Entrada",
+      "founded": "Politeia fundada"
+    }
+  },
+  "method": {
+    "eyebrow": "Por qué una politeia",
+    "titleLine1": "Fúndala",
+    "titleLine2": "como un lugar.",
+    "body": "Menos explicación. Más gravedad. Cuatro razones por las que un grupo de amigos merece el peso de una institución.",
+    "featureTitle": "Peso cívico para la vida de chat.",
+    "featureBody": "La decisión consigue un lugar donde sostenerse.",
+    "articles": [
+      {
+        "no": "01",
+        "title": "Un lugar",
+        "body": "Una sala con nombre tiene otra gravedad. Reúnete donde cuenta."
+      },
+      {
+        "no": "02",
+        "title": "Un registro oficial",
+        "body": "No es medir el ambiente. Es una entrada que el grupo puede citar."
+      },
+      {
+        "no": "03",
+        "title": "Una memoria",
+        "body": "Cargos, votos y enmiendas quedan lo bastante visibles para importar."
+      },
+      {
+        "no": "04",
+        "title": "Un ritual",
+        "body": "La amistad puede seguir siendo ligera sin volver desechable cada decisión."
+      }
+    ]
+  },
+  "record": {
+    "eyebrow": "El registro oficial",
+    "title": "Las redes olvidan. El registro no.",
+    "body": "Mociones, votos, cargos, invitaciones, admisiones y enmiendas se inscriben, se numeran y se conservan. Algunas cosas deberían sobrevivir al feed.",
+    "selectedEntries": "Entradas seleccionadas",
+    "entries": [
+      {
+        "entry": "001",
+        "detail": "Politeia fundada"
+      },
+      {
+        "entry": "002",
+        "detail": "Cargo de Steward asignado"
+      },
+      {
+        "entry": "003",
+        "detail": "Constitución inicial ratificada"
+      },
+      {
+        "entry": "027",
+        "detail": "Moción certificada - quórum alcanzado"
+      },
+      {
+        "entry": "041",
+        "detail": "Constitución enmendada"
+      }
+    ]
+  },
+  "colophon": {
+    "tagline": "Software constitucional para gobiernos de grupos de amigos",
+    "edition": "Edición",
+    "editionValue": "No. 001",
+    "established": "Fundación",
+    "establishedValue": "MMXXVI",
+    "source": "Código",
+    "sourceLink": "Redactado en abierto"
+  },
+  "onboarding": {
+    "defaultPolityName": "Tu primera politeia",
+    "flow": {
+      "founding": "Nombre",
+      "visibility": "Acceso",
+      "invites": "Personas"
+    },
+    "panel": {
+      "title": "Entrada fundacional",
+      "number": "No. 001"
+    },
+    "name": {
+      "label": "Nombra tu politeia",
+      "placeholder": "La Asamblea del Jueves",
+      "submit": "Fundar",
+      "submitting": "Fundando...",
+      "description": "Esto abre el registro oficial."
+    },
+    "visibility": {
+      "title": "Elige la puerta.",
+      "description": "Pública aparece en descubrimiento. Privada queda fuera.",
+      "label": "Acceso",
+      "options": {
+        "private": {
+          "label": "Privada",
+          "copy": "Oculta del descubrimiento.",
+          "description": "Mantiene su actividad visible para miembros."
+        },
+        "public": {
+          "label": "Pública",
+          "copy": "Visible en descubrimiento.",
+          "description": "Permite encontrarla y leer lo que ocurre."
+        }
+      },
+      "continue": "Continuar"
+    },
+    "invites": {
+      "title": "Invita a las primeras personas.",
+      "description": "Una o dos invitaciones bastan para empezar.",
+      "label": "Persona a invitar",
+      "placeholder": "mira@example.com",
+      "enrol": "Invitar",
+      "finish": "Terminar",
+      "empty": "Aún no hay invitaciones pendientes."
+    },
+    "ready": {
+      "title": "{{name}} está fundada.",
+      "description": "La sala fundacional espera. Entra y convoca.",
+      "access": "Acceso",
+      "members": "Invitaciones",
+      "enrolLater": "Invitar después",
+      "enter": "Entrar en la cámara"
+    },
+    "errors": {
+      "nameRequired": "Nombra tu politeia antes de continuar.",
+      "emailRequired": "Introduce un email.",
+      "emailInvalid": "Usa un email válido.",
+      "emailDuplicate": "Esa persona ya está en la lista."
+    }
+  }
+}
