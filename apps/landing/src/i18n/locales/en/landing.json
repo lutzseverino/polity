@@ -83,7 +83,7 @@
   "onboarding": {
     "defaultPolityName": "Your first polity",
     "flow": {
-      "founding": "Name",
+      "name": "Name",
       "visibility": "Access",
       "invites": "People"
     },
@@ -95,7 +95,6 @@
       "label": "Name your polity",
       "placeholder": "The Thursday Assembly",
       "submit": "Found",
-      "submitting": "Founding...",
       "description": "This opens the official record."
     },
     "visibility": {

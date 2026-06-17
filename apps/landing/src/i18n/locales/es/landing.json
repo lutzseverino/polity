@@ -83,7 +83,7 @@
   "onboarding": {
     "defaultPolityName": "Tu primera politeia",
     "flow": {
-      "founding": "Nombre",
+      "name": "Nombre",
       "visibility": "Acceso",
       "invites": "Personas"
     },
@@ -95,7 +95,6 @@
       "label": "Nombra tu politeia",
       "placeholder": "La Asamblea del Jueves",
       "submit": "Fundar",
-      "submitting": "Fundando...",
       "description": "Esto abre el registro oficial."
     },
     "visibility": {

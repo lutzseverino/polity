@@ -55,7 +55,7 @@ export function Eyebrow({
 }
 
 export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
-  const isFounding = onboarding.step === "founding";
+  const isNaming = onboarding.step === null;
   const { t } = useTranslation("landing");
 
   return (
@@ -66,7 +66,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
           <div
             className={cn(
               "flex flex-col gap-6 transition-all duration-500 ease-out motion-reduce:transition-none",
-              isFounding
+              isNaming
                 ? "max-h-[44rem] opacity-100"
                 : "pointer-events-none -translate-y-2 max-h-0 overflow-hidden opacity-0",
             )}
@@ -99,7 +99,7 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
             <FoundingFlow onboarding={onboarding} />
           </div>
 
-          {isFounding ? (
+          {isNaming ? (
             <Button
               aria-label={t("hero.cta")}
               asChild
@@ -345,14 +345,9 @@ function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
 
   return (
     <div
-      className={cn(
-        "w-full max-w-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
-        onboarding.isStarting
-          ? "translate-y-3 opacity-0"
-          : "translate-y-0 opacity-100",
-      )}
+      className="w-full max-w-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
     >
-      {onboarding.step === "founding" ? (
+      {onboarding.step === null ? (
         <NameStep onboarding={onboarding} />
       ) : (
         <div className="border bg-card text-left">
@@ -382,21 +377,15 @@ function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
   );
 }
 
-function FlowStepper({ step }: { step: LandingOnboarding["step"] }) {
+function FlowStepper({ step }: { step: NonNullable<LandingOnboarding["step"]> }) {
   const { t } = useTranslation("landing");
   const flowSteps = [
-    { key: "founding", label: t("onboarding.flow.founding") },
+    { key: "name", label: t("onboarding.flow.name") },
     { key: "visibility", label: t("onboarding.flow.visibility") },
     { key: "invites", label: t("onboarding.flow.invites") },
   ] as const;
   const currentIndex =
-    step === "founding"
-      ? 0
-      : step === "visibility"
-        ? 1
-        : step === "invites"
-          ? 2
-          : 3;
+    step === "visibility" ? 1 : step === "invites" ? 2 : 3;
 
   return (
     <ol className="grid grid-cols-3 gap-2">
@@ -453,9 +442,7 @@ function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
               value={onboarding.polityName}
             />
             <AppButton disabled={!onboarding.canStart} type="submit">
-              {onboarding.isStarting
-                ? t("onboarding.name.submitting")
-                : t("onboarding.name.submit")}
+              {t("onboarding.name.submit")}
               <ArrowRight data-icon="inline-end" />
             </AppButton>
           </div>

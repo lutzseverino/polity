@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { OnboardingStep, Visibility } from "./LandingPage.types";
 
-const startTransitionMs = 1050;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type NameError = "nameRequired";
 type InviteError = "emailRequired" | "emailInvalid" | "emailDuplicate";
@@ -16,26 +15,14 @@ export function useLandingOnboarding() {
   const { t } = useTranslation("landing");
   const [polityName, setPolityName] = useState("");
   const [visibility, setVisibility] = useState<Visibility>("private");
-  const [step, setStep] = useState<OnboardingStep>("founding");
+  const [step, setStep] = useState<OnboardingStep | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invites, setInvites] = useState<string[]>([]);
   const [nameError, setNameError] = useState<NameError | null>(null);
   const [inviteError, setInviteError] = useState<InviteError | null>(null);
-  const [isStarting, setIsStarting] = useState(false);
-  const startTimer = useRef<number | undefined>(undefined);
-
-  useEffect(() => {
-    return () => {
-      if (startTimer.current !== undefined) {
-        window.clearTimeout(startTimer.current);
-      }
-    };
-  }, []);
-
   const trimmedName = polityName.trim();
   const displayName = trimmedName || t("onboarding.defaultPolityName");
-  const canStart = trimmedName.length > 0 && !isStarting;
-  const hasNamedPolity = step !== "founding";
+  const canStart = trimmedName.length > 0;
 
   const visibilityCopy = useMemo(
     () => t(`onboarding.visibility.options.${visibility}.description`),
@@ -56,11 +43,7 @@ export function useLandingOnboarding() {
       return;
     }
 
-    setIsStarting(true);
-    startTimer.current = window.setTimeout(() => {
-      setStep("visibility");
-      setIsStarting(false);
-    }, startTransitionMs);
+    setStep("visibility");
   }, [trimmedName]);
 
   const continueToInvites = useCallback(() => {
@@ -101,11 +84,9 @@ export function useLandingOnboarding() {
     displayName,
     finishSetup,
     polityName,
-    hasNamedPolity,
     inviteEmail,
     inviteError: inviteError ? t(`onboarding.errors.${inviteError}`) : "",
     invites,
-    isStarting,
     nameError: nameError ? t(`onboarding.errors.${nameError}`) : "",
     setPolityName,
     setInviteEmail,
