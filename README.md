@@ -31,10 +31,13 @@ Odonta platform.
 
 ## Getting Started
 
-This repository uses pnpm workspaces. Install dependencies from the workspace root:
+This repository supports both pnpm and npm workspaces. Install dependencies from the workspace root
+with the package manager you want to use:
 
 ```bash
 pnpm install
+# or
+npm install
 ```
 
 Then run the thing you are working on from the root:
@@ -43,11 +46,15 @@ Then run the thing you are working on from the root:
 pnpm dev:landing
 pnpm dev:mobile
 pnpm test:service
+
+npm run dev:landing
+npm run dev:mobile
+npm run test:service
 ```
 
-The install unit is the workspace, even when you only work on one app. Do not run `npm install`
-inside `apps/landing`; the landing app depends on `@polity/design` through the workspace protocol,
-which is resolved from the pnpm workspace root.
+The install unit is the workspace, even when you only work on one app. Run installs from the root so
+the local `@polity/design` package is linked consistently. Keep using the same package manager for
+an install unless you intentionally switch and reinstall.
 
 ## Quality Checks
 
@@ -56,10 +63,15 @@ pnpm check
 pnpm check:js
 pnpm check:service
 pnpm compile:service
+
+npm run check
+npm run check:js
+npm run check:service
+npm run compile:service
 ```
 
-`pnpm check` runs both the JS/TS workspace checks and the Polity service tests. Use the scoped
-commands when you only need feedback for one side of the workspace.
+`check` runs both the JS/TS workspace checks and the Polity service tests. Use the scoped commands
+when you only need feedback for one side of the workspace.
 
 ## Documentation
 

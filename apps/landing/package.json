@@ -16,7 +16,7 @@
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@fontsource/anton": "^5.2.7",
     "@gsap/react": "^2.1.2",
-    "@polity/design": "workspace:*",
+    "@polity/design": "file:../../packages/design",
     "@tailwindcss/vite": "^4.3.0",
     "@vitejs/plugin-react": "^6.0.2",
     "class-variance-authority": "^0.7.1",

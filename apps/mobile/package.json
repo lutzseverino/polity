@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "0.1.0",
   "dependencies": {
-    "@polity/design": "workspace:*",
+    "@polity/design": "file:../../packages/design",
     "expo": "~56.0.12",
     "expo-constants": "~56.0.18",
     "expo-font": "~56.0.7",

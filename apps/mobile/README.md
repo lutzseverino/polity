@@ -8,6 +8,7 @@ Run from the repository root:
 
 ```bash
 pnpm dev:mobile
+npm run dev:mobile
 ```
 
 Or run inside this package:
@@ -17,6 +18,11 @@ pnpm start
 pnpm ios
 pnpm android
 pnpm web
+
+npm run start
+npm run ios
+npm run android
+npm run web
 ```
 
 ## Structure

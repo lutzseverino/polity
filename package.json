@@ -3,21 +3,25 @@
   "private": true,
   "version": "0.1.0",
   "packageManager": "pnpm@9.12.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "build": "pnpm build:landing",
-    "build:landing": "pnpm --dir apps/landing build",
-    "check": "pnpm check:js && pnpm check:service",
-    "check:js": "biome check . && pnpm --dir apps/landing check:theme && pnpm typecheck",
-    "check:service": "pnpm test:service",
+    "build": "node scripts/run-package-script.mjs root build:landing",
+    "build:landing": "node scripts/run-package-script.mjs workspace apps/landing build",
+    "check": "node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service",
+    "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck",
+    "check:service": "node scripts/run-package-script.mjs root test:service",
     "compile:service": "mvn -f services/polity/pom.xml compile",
-    "dev": "pnpm dev:mobile",
-    "dev:landing": "pnpm --dir apps/landing dev",
-    "dev:mobile": "pnpm --dir apps/mobile start",
+    "dev": "node scripts/run-package-script.mjs root dev:mobile",
+    "dev:landing": "node scripts/run-package-script.mjs workspace apps/landing dev",
+    "dev:mobile": "node scripts/run-package-script.mjs workspace apps/mobile start",
     "format": "biome check . --write",
-    "generate:api": "pnpm --dir apps/landing generate:api",
+    "generate:api": "node scripts/run-package-script.mjs workspace apps/landing generate:api",
     "lint": "biome check .",
     "test:service": "mvn -f services/polity/pom.xml test",
-    "typecheck": "pnpm --dir packages/design typecheck && pnpm --dir apps/landing typecheck && pnpm --dir apps/mobile typecheck"
+    "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"
   },
   "engines": {
     "node": ">=20"
