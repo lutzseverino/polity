@@ -1,9 +1,4 @@
-<div align="center">
-    <h1 align="center">Polity Service</h1>
-    <p>The product service for constitutional government.</p>
-</div>
-
-## Overview
+# Polity Service
 
 Polity owns constitutional government behavior, including membership, versioned constitutions,
 procedures, motions, voting, certification, typed official effects, and the official record.
@@ -31,4 +26,7 @@ The service consumes Odonta platform artifacts through the local or configured M
 
 ## Documentation
 
-Durable service architecture is documented in [Architecture](../../docs/architecture.md).
+Durable service docs live in [docs](docs/README.md).
+
+- [Architecture](docs/explanation/architecture.md)
+- [OpenAPI contract](openapi/polity.yaml)
