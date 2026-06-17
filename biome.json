@@ -27,6 +27,7 @@
       "apps/mobile/src/**/*.tsx",
       "apps/mobile/tsconfig.json",
       "packages/*/package.json",
+      "packages/*/bin/**/*.mjs",
       "packages/*/src/**/*.json",
       "packages/*/src/**/*.ts",
       "packages/*/tsconfig.json",

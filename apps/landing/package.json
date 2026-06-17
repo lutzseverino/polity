@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b && vite build",
-    "check:theme": "node scripts/build-shadcn-theme.mjs --check",
+    "check:theme": "polity-design generate shadcn-theme --out src/design/tokens/shadcn-theme.css --check",
     "dev": "vite",
     "generate:api": "openapi-typescript ../../services/polity/openapi/polity.yaml -o src/api/generated/polity.ts",
-    "generate:theme": "node scripts/build-shadcn-theme.mjs",
+    "generate:theme": "polity-design generate shadcn-theme --out src/design/tokens/shadcn-theme.css",
     "typecheck": "tsc -b"
   },
   "dependencies": {

@@ -1,14 +1,56 @@
-import { readFileSync, writeFileSync } from "node:fs";
+#!/usr/bin/env node
+
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const landingRoot = path.resolve(dirname, "..");
-const repoRoot = path.resolve(landingRoot, "../..");
-const tokensPath = path.join(repoRoot, "packages/design/src/tokens.json");
-const outputPath = path.join(landingRoot, "src/design/tokens/shadcn-theme.css");
-const checkOnly = process.argv.includes("--check");
-const tokens = JSON.parse(readFileSync(tokensPath, "utf8"));
+const packageRoot = path.resolve(dirname, "..");
+const tokensPath = path.join(packageRoot, "src/tokens.json");
+
+function usage() {
+  return [
+    "Usage:",
+    "  polity-design generate shadcn-theme --out <path> [--check]",
+  ].join("\n");
+}
+
+function parseOptions(args) {
+  const options = { check: false, out: undefined };
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (arg === "--check") {
+      options.check = true;
+      continue;
+    }
+
+    if (arg === "--help" || arg === "-h") {
+      options.help = true;
+      continue;
+    }
+
+    if (arg === "--out") {
+      const value = args[index + 1];
+      if (!value || value.startsWith("-")) {
+        throw new Error("Missing value for --out.");
+      }
+
+      options.out = value;
+      index += 1;
+      continue;
+    }
+
+    throw new Error(`Unknown option: ${arg}`);
+  }
+
+  if (!options.help && !options.out) {
+    throw new Error("Missing required --out option.");
+  }
+
+  return options;
+}
 
 function cssToken(value) {
   return value.css;
@@ -20,7 +62,7 @@ function declarations(entries, indent = "  ") {
     .join("\n");
 }
 
-function shadcnMode(mode) {
+function shadcnMode(tokens, mode) {
   const colors = tokens.colorModes[mode];
   const border = mode === "light" ? "var(--ink)" : cssToken(colors.border);
   const input = mode === "light" ? "var(--ink)" : cssToken(colors.input);
@@ -62,7 +104,7 @@ function shadcnMode(mode) {
   ]);
 }
 
-function buildTheme() {
+function buildShadcnTheme(tokens) {
   const themeEntries = [
     ["font-display", tokens.fonts.display],
     ["font-heading", tokens.fonts.heading],
@@ -111,7 +153,7 @@ function buildTheme() {
   ];
 
   return `${[
-    "/* Generated from packages/design/src/tokens.json. */",
+    "/* Generated from @polity/design/src/tokens.json. */",
     "@custom-variant dark (&:is(.dark *));",
     "",
     "@theme inline {",
@@ -119,31 +161,65 @@ function buildTheme() {
     "}",
     "",
     ":root {",
-    `${shadcnMode("light")}\n  --radius: ${cssToken(tokens.radius.base)};`,
+    `${shadcnMode(tokens, "light")}\n  --radius: ${cssToken(tokens.radius.base)};`,
     "}",
     "",
     "@media (prefers-color-scheme: dark) {",
     "  :root:not(.light) {",
-    shadcnMode("dark").replace(/^/gm, "  "),
+    shadcnMode(tokens, "dark").replace(/^/gm, "  "),
     "  }",
     "}",
     "",
     ".dark {",
-    shadcnMode("dark"),
+    shadcnMode(tokens, "dark"),
     "}",
   ].join("\n")}\n`;
 }
 
-const next = buildTheme();
+function runGenerateShadcnTheme(args) {
+  const options = parseOptions(args);
+  if (options.help) {
+    console.log(usage());
+    return;
+  }
 
-if (checkOnly) {
-  const current = readFileSync(outputPath, "utf8");
-  if (current !== next) {
-    console.error(
-      "Generated shadcn theme is out of date. Run `pnpm --dir apps/landing generate:theme`.",
-    );
+  const outputPath = path.resolve(process.cwd(), options.out);
+  const tokens = JSON.parse(readFileSync(tokensPath, "utf8"));
+  const next = buildShadcnTheme(tokens);
+
+  if (options.check) {
+    const current = readFileSync(outputPath, "utf8");
+
+    if (current !== next) {
+      console.error(
+        "Generated shadcn theme is out of date. Run the generator without --check.",
+      );
+      process.exit(1);
+    }
+
+    return;
+  }
+
+  mkdirSync(path.dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, next);
+}
+
+const [command, target, ...args] = process.argv.slice(2);
+
+try {
+  if (command === "--help" || command === "-h") {
+    console.log(usage());
+    process.exit(0);
+  }
+
+  if (command === "generate" && target === "shadcn-theme") {
+    runGenerateShadcnTheme(args);
+  } else {
+    console.error(usage());
     process.exit(1);
   }
-} else {
-  writeFileSync(outputPath, next);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  console.error(usage());
+  process.exit(1);
 }

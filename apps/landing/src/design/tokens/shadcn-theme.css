@@ -1,4 +1,4 @@
-/* Generated from packages/design/src/tokens.json. */
+/* Generated from @polity/design/src/tokens.json. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
