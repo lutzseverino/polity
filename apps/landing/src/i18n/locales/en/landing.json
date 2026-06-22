@@ -81,9 +81,11 @@
     "sourceLink": "Drafted in the open"
   },
   "onboarding": {
+    "back": "Go back",
     "defaultPolityName": "Your first polity",
     "flow": {
       "name": "Name",
+      "government": "Government",
       "visibility": "Access",
       "invites": "People"
     },
@@ -94,8 +96,55 @@
     "name": {
       "label": "Name your polity",
       "placeholder": "The Thursday Assembly",
+      "examples": [
+        "The Group Chat Planning Commission",
+        "The Vibes and Logistics Council",
+        "The Friday Night Rules Committee",
+        "The Official Snack Motion Assembly",
+        "The Council for Very Minor Decisions",
+        "The Committee to Decide Where We Eat",
+        "The Side Quest Scheduling Office",
+        "The Soft Launch Republic",
+        "The Lore Preservation Society",
+        "The Emergency Hangout Senate"
+      ],
       "submit": "Found",
       "description": "This opens the official record."
+    },
+    "government": {
+      "title": "Start with the standard republic.",
+      "description": "A fast default government with elected offices, typed powers, and no permanent founder rule.",
+      "preset": {
+        "label": "Preset",
+        "options": {
+          "standardRepublic": {
+            "label": "Standard Republic",
+            "copy": "Assembly rule, elected offices, appeal rights, and a short bootstrap Steward.",
+            "description": "The recommended setup keeps the government moving with elections, appeals, and bounded bootstrap authority."
+          }
+        }
+      },
+      "pace": {
+        "label": "Pace",
+        "options": {
+          "fast": {
+            "label": "Fast",
+            "copy": "Short windows.",
+            "description": "A 7-day bootstrap and one-day ordinary votes for groups that meet often."
+          },
+          "standard": {
+            "label": "Standard",
+            "copy": "Recommended.",
+            "description": "A 14-day bootstrap with two-day ordinary votes that move quickly without surprising members."
+          },
+          "deliberate": {
+            "label": "Deliberate",
+            "copy": "More notice.",
+            "description": "A 30-day bootstrap and four-day ordinary votes for groups that need slower proceedings."
+          }
+        }
+      },
+      "continue": "Continue"
     },
     "visibility": {
       "title": "Choose the door.",
@@ -122,11 +171,14 @@
       "placeholder": "mira@example.com",
       "enrol": "Invite",
       "finish": "Found",
+      "remove": "Remove {{email}}",
       "empty": "No invitations queued yet."
     },
     "ready": {
-      "title": "{{name}} is founded.",
-      "description": "The founding room is waiting. Enter and convene.",
+      "title": "{{name}} is ready.",
+      "description": "The founding room is prepared. Enter and convene.",
+      "government": "Government",
+      "pace": "Pace",
       "access": "Access",
       "members": "Invites",
       "enrolLater": "Invite later",

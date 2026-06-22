@@ -7,17 +7,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function AppTooltipProvider(props: ComponentProps<typeof TooltipProvider>) {
+type AppTooltipProviderProps = Readonly<ComponentProps<typeof TooltipProvider>>;
+
+type AppTooltipProps = Readonly<{
+  children: ReactNode;
+  label: string;
+}>;
+
+function AppTooltipProvider(props: AppTooltipProviderProps) {
   return <TooltipProvider {...props} />;
 }
 
-function AppTooltip({
-  children,
-  label,
-}: {
-  children: ReactNode;
-  label: string;
-}) {
+function AppTooltip({ children, label }: AppTooltipProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>

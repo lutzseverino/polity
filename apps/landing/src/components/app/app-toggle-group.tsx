@@ -3,7 +3,14 @@ import type { ComponentProps } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
-export function AppToggleGroup(props: ComponentProps<typeof ToggleGroup>) {
+type AppToggleGroupProps = Readonly<ComponentProps<typeof ToggleGroup>>;
+type AppToggleGroupItemProps = Readonly<
+  ComponentProps<typeof ToggleGroupItem> & {
+    treatment?: "default" | "choice";
+  }
+>;
+
+export function AppToggleGroup(props: AppToggleGroupProps) {
   return <ToggleGroup {...props} />;
 }
 
@@ -12,9 +19,7 @@ export function AppToggleGroupItem({
   treatment = "default",
   variant,
   ...props
-}: ComponentProps<typeof ToggleGroupItem> & {
-  treatment?: "default" | "choice";
-}) {
+}: AppToggleGroupItemProps) {
   return (
     <ToggleGroupItem
       className={cn(

@@ -11,36 +11,41 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-function AppSelect(props: ComponentProps<typeof Select>) {
+type AppSelectProps = Readonly<ComponentProps<typeof Select>>;
+type AppSelectGroupProps = Readonly<ComponentProps<typeof SelectGroup>>;
+type AppSelectValueProps = Readonly<ComponentProps<typeof SelectValue>>;
+type AppSelectTriggerProps = Readonly<ComponentProps<typeof SelectTrigger>>;
+type AppSelectContentProps = Readonly<ComponentProps<typeof SelectContent>>;
+type AppSelectLabelProps = Readonly<ComponentProps<typeof SelectLabel>>;
+type AppSelectItemProps = Readonly<ComponentProps<typeof SelectItem>>;
+
+function AppSelect(props: AppSelectProps) {
   return <Select {...props} />;
 }
 
-function AppSelectGroup(props: ComponentProps<typeof SelectGroup>) {
+function AppSelectGroup(props: AppSelectGroupProps) {
   return <SelectGroup {...props} />;
 }
 
-function AppSelectValue(props: ComponentProps<typeof SelectValue>) {
+function AppSelectValue(props: AppSelectValueProps) {
   return <SelectValue {...props} />;
 }
 
-function AppSelectTrigger({
-  className,
-  ...props
-}: ComponentProps<typeof SelectTrigger>) {
+function AppSelectTrigger({ className, ...props }: AppSelectTriggerProps) {
   return (
     <SelectTrigger className={cn("bg-background/75", className)} {...props} />
   );
 }
 
-function AppSelectContent(props: ComponentProps<typeof SelectContent>) {
+function AppSelectContent(props: AppSelectContentProps) {
   return <SelectContent {...props} />;
 }
 
-function AppSelectLabel(props: ComponentProps<typeof SelectLabel>) {
+function AppSelectLabel(props: AppSelectLabelProps) {
   return <SelectLabel {...props} />;
 }
 
-function AppSelectItem(props: ComponentProps<typeof SelectItem>) {
+function AppSelectItem(props: AppSelectItemProps) {
   return <SelectItem {...props} />;
 }
 

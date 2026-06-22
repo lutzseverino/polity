@@ -81,9 +81,11 @@
     "sourceLink": "Redactado en abierto"
   },
   "onboarding": {
+    "back": "Volver",
     "defaultPolityName": "Tu primera politeia",
     "flow": {
       "name": "Nombre",
+      "government": "Gobierno",
       "visibility": "Acceso",
       "invites": "Personas"
     },
@@ -94,8 +96,55 @@
     "name": {
       "label": "Nombra tu politeia",
       "placeholder": "La Asamblea del Jueves",
+      "examples": [
+        "Comisión del Chat de Grupo",
+        "Consejo de Vibes y Logística",
+        "Comité de Reglas del Viernes",
+        "Asamblea Oficial de la Moción Snack",
+        "Consejo de Decisiones Muy Menores",
+        "Comité para Elegir Dónde Comemos",
+        "Oficina de Agendar Side Quests",
+        "República en Soft Launch",
+        "Sociedad para Conservar el Lore",
+        "Senado de Hangouts de Emergencia"
+      ],
       "submit": "Fundar",
       "description": "Esto abre el registro oficial."
+    },
+    "government": {
+      "title": "Empieza con la república estándar.",
+      "description": "Un gobierno rápido por defecto, con cargos electos, poderes tipados y sin mando permanente del fundador.",
+      "preset": {
+        "label": "Preset",
+        "options": {
+          "standardRepublic": {
+            "label": "República estándar",
+            "copy": "Asamblea, cargos electos, derecho de apelación y un Steward fundacional breve.",
+            "description": "La configuración recomendada mantiene el gobierno en marcha con elecciones, apelaciones y autoridad fundacional limitada."
+          }
+        }
+      },
+      "pace": {
+        "label": "Ritmo",
+        "options": {
+          "fast": {
+            "label": "Rápido",
+            "copy": "Plazos cortos.",
+            "description": "Un arranque de 7 días y votaciones ordinarias de un día para grupos que se reúnen a menudo."
+          },
+          "standard": {
+            "label": "Estándar",
+            "copy": "Recomendado.",
+            "description": "Un arranque de 14 días con votaciones ordinarias de dos días, ágiles sin pillar por sorpresa a los miembros."
+          },
+          "deliberate": {
+            "label": "Deliberado",
+            "copy": "Más aviso.",
+            "description": "Un arranque de 30 días y votaciones ordinarias de cuatro días para grupos que necesitan deliberar más."
+          }
+        }
+      },
+      "continue": "Continuar"
     },
     "visibility": {
       "title": "Elige la puerta.",
@@ -122,11 +171,14 @@
       "placeholder": "mira@example.com",
       "enrol": "Invitar",
       "finish": "Fundar",
+      "remove": "Quitar {{email}}",
       "empty": "Aún no hay invitaciones pendientes."
     },
     "ready": {
-      "title": "{{name}} está fundada.",
-      "description": "La sala fundacional espera. Entra y convoca.",
+      "title": "{{name}} está lista.",
+      "description": "La sala fundacional está preparada. Entra y convoca.",
+      "government": "Gobierno",
+      "pace": "Ritmo",
       "access": "Acceso",
       "members": "Invitaciones",
       "enrolLater": "Invitar después",

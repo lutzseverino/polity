@@ -1,9 +1,9 @@
 import { Code2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { LanguagePicker } from "@/components/app/language-picker";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { Button } from "@/components/ui/button";
-
-import { LandingHeaderControls } from "./LandingPage.controls";
 
 export function LandingNavbar() {
   const { t } = useTranslation("common");
@@ -25,7 +25,10 @@ export function LandingNavbar() {
           </span>
         </a>
         <div className="flex items-center gap-3 md:gap-5">
-          <LandingHeaderControls />
+          <div className="flex items-center gap-2">
+            <LanguagePicker />
+            <ThemeSwitcher />
+          </div>
           <span className="hidden font-mono text-[0.65rem] leading-none tracking-[0.22em] text-muted-foreground uppercase md:inline">
             {t("brand.established")}
           </span>

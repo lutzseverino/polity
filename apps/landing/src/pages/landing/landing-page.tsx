@@ -1,13 +1,13 @@
 import { useRef } from "react";
-import { useLandingMotion } from "./LandingPage.animations";
-import { useLandingOnboarding } from "./LandingPage.hooks";
-import { LandingNavbar } from "./LandingPage.navbar";
+import { useLandingMotion } from "./motion";
+import { LandingNavbar } from "./navbar";
+import { useLandingOnboarding } from "./onboarding";
 import {
   Colophon,
   LandingHero,
   MethodSection,
   RecordSection,
-} from "./LandingPage.sections";
+} from "./sections";
 
 export function LandingPage() {
   const onboarding = useLandingOnboarding();
@@ -17,7 +17,8 @@ export function LandingPage() {
 
   return (
     <main
-      className="relative min-h-[100dvh] bg-background text-foreground"
+      className="relative min-h-[100dvh] bg-background text-foreground [overflow-anchor:none]"
+      data-landing-page
       ref={scope}
     >
       <div
@@ -34,5 +35,3 @@ export function LandingPage() {
     </main>
   );
 }
-
-export type LandingOnboarding = ReturnType<typeof useLandingOnboarding>;

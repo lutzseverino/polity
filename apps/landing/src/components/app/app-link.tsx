@@ -2,7 +2,9 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
-export function AppLink({ className, ...props }: ComponentProps<"a">) {
+type AppLinkProps = Readonly<ComponentProps<"a">>;
+
+export function AppLink({ className, ...props }: AppLinkProps) {
   return (
     <a
       className={cn(

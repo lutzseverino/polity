@@ -1,7 +1,22 @@
-import { ArrowDown, ArrowRight, Check, Plus, Users } from "lucide-react";
-import type { ComponentProps, FormEvent, ReactNode } from "react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Landmark,
+  Plus,
+  Users,
+} from "lucide-react";
+import type { ComponentProps, FormEvent, MouseEvent, ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AppBadge, BadgeRemoveButton } from "@/components/app/app-badge";
 import { AppButton } from "@/components/app/app-button";
+import {
+  AppCard,
+  AppCardContent,
+  AppCardHeader,
+} from "@/components/app/app-card";
 import { AppInput } from "@/components/app/app-input";
 import { AppLink } from "@/components/app/app-link";
 import {
@@ -18,9 +33,11 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
-
-import type { LandingOnboarding } from "./LandingPage";
-import { Emblem, Shards, Starburst } from "./LandingPage.motifs";
+import { Emblem, Shards, Starburst } from "./motifs";
+import { useFoundingTransition, useStepTransition } from "./motion";
+import type { LandingOnboarding } from "./onboarding";
+import { OnboardingStepper, StepIntro, SummaryGrid } from "./onboarding-flow";
+import { OfficialRecordPlate } from "./record-plate";
 
 type Article = {
   body: string;
@@ -33,15 +50,29 @@ type RegisterEntry = {
   entry: string;
 };
 
-const visibilityChoices = ["public", "private"] as const;
+type EyebrowProps = Readonly<
+  ComponentProps<"span"> & {
+    children: ReactNode;
+  }
+>;
 
-export function Eyebrow({
-  children,
-  className,
-  ...props
-}: ComponentProps<"span"> & {
+type LandingHeroProps = Readonly<{
+  onboarding: LandingOnboarding;
+}>;
+
+type OnboardingStepProps = Readonly<{
+  onboarding: LandingOnboarding;
+}>;
+
+type StepActionsProps = Readonly<{
   children: ReactNode;
-}) {
+  onboarding: LandingOnboarding;
+}>;
+
+const visibilityChoices = ["public", "private"] as const;
+const paceChoices = ["fast", "standard", "deliberate"] as const;
+
+function Eyebrow({ children, className, ...props }: EyebrowProps) {
   return (
     <span
       className={cn(
@@ -56,23 +87,89 @@ export function Eyebrow({
   );
 }
 
-export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
+export function LandingHero({ onboarding }: LandingHeroProps) {
   const isNaming = onboarding.step === null;
   const { t } = useTranslation("landing");
+  const { sectionRef, capture } = useFoundingTransition(!isNaming);
+  const scrollToInstrument = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}`,
+    );
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    document.getElementById("instrument")?.scrollIntoView({
+      block: "start",
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  };
+
+  // Snapshot the poster geometry the instant before a boundary crossing so the
+  // section-level visual can animate from the layout the visitor was seeing.
+  const flow = useMemo<LandingOnboarding>(() => {
+    const crossFoundingBoundary = (transition: () => void) => {
+      capture();
+      transition();
+    };
+
+    return {
+      ...onboarding,
+      startGovernment: () => crossFoundingBoundary(onboarding.startGovernment),
+      goBack: () => {
+        if (onboarding.step === "government") {
+          crossFoundingBoundary(onboarding.goBack);
+          return;
+        }
+        onboarding.goBack();
+      },
+      goToStep: (step) => {
+        if (step === null) {
+          crossFoundingBoundary(() => onboarding.goToStep(step));
+          return;
+        }
+        onboarding.goToStep(step);
+      },
+    };
+  }, [onboarding, capture]);
 
   return (
-    <section className="relative isolate overflow-hidden border-b" data-hero>
-      <div className="mx-auto grid max-w-7xl gap-0 lg:min-h-[calc(100dvh-3.5rem)] lg:grid-cols-[1.05fr_0.95fr]">
-        {/* Left — the founding */}
-        <div className="flex flex-col justify-center gap-8 border-border px-4 py-16 md:px-8 md:py-20 lg:border-r lg:py-24">
-          <div
-            className={cn(
-              "flex flex-col gap-6 transition-all duration-500 ease-out motion-reduce:transition-none",
-              isNaming
-                ? "max-h-[44rem] opacity-100"
-                : "pointer-events-none -translate-y-2 max-h-0 overflow-hidden opacity-0",
-            )}
-          >
+    <section
+      className="relative isolate overflow-hidden border-b"
+      data-founding-state={isNaming ? "naming" : "founding"}
+      data-hero
+      ref={sectionRef}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 overflow-visible bg-secondary will-change-[clip-path]"
+        data-founding-visual
+      >
+        <div
+          className="absolute inset-0 z-[1] grid place-items-center overflow-visible will-change-transform"
+          data-hero-burst-shell
+        >
+          <Starburst
+            className="aspect-square h-[150%] w-auto lg:h-[130%]"
+            data-hero-burst
+          />
+        </div>
+      </div>
+
+      <div className="relative mx-auto grid max-w-7xl gap-0 lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[1.05fr_0.95fr] lg:overflow-hidden">
+        {/* Left — stays mounted under the poster, so the ground covers/reveals it. */}
+        <div
+          aria-hidden={isNaming ? undefined : true}
+          className={cn(
+            "relative z-0 col-start-1 row-start-1 flex flex-col justify-center gap-8 border-border px-4 py-16 md:px-8 md:py-20 lg:border-r lg:py-24",
+            !isNaming && "pointer-events-none",
+          )}
+          data-hero-title-layer
+          inert={isNaming ? undefined : true}
+        >
+          <div className="flex flex-col gap-6">
             <Eyebrow data-hero-fade>{t("hero.eyebrow")}</Eyebrow>
             <h1 className="font-display text-[clamp(2.75rem,7vw,5.25rem)] leading-[0.92]">
               <span className="block overflow-hidden pb-[0.06em]">
@@ -97,62 +194,55 @@ export function LandingHero({ onboarding }: { onboarding: LandingOnboarding }) {
             </p>
           </div>
 
-          <div data-hero-fade>
-            <FoundingFlow onboarding={onboarding} />
+          <div className="w-full max-w-md" data-hero-fade>
+            <NameStep onboarding={flow} />
           </div>
 
-          {isNaming ? (
-            <Button
-              aria-label={t("hero.cta")}
-              asChild
-              className="w-fit gap-2 font-mono text-[0.7rem] leading-none tracking-[0.2em] uppercase"
-              data-hero-fade
-              size="sm"
-              variant="ghost"
-            >
-              <a href="#instrument">
-                {t("hero.cta")}
-                <ArrowDown aria-hidden="true" data-bob />
-              </a>
-            </Button>
-          ) : null}
+          <Button
+            aria-label={t("hero.cta")}
+            className="w-fit gap-2 font-mono text-[0.7rem] leading-none tracking-[0.2em] uppercase"
+            data-hero-fade
+            onClick={scrollToInstrument}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            {t("hero.cta")}
+            <ArrowDown aria-hidden="true" data-bob />
+          </Button>
         </div>
 
-        {/* Right — the first entry in the official record */}
-        <div className="relative flex min-h-[26rem] items-center justify-center overflow-hidden bg-secondary px-6 py-16 text-secondary-foreground lg:min-h-0">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 grid place-items-center overflow-hidden"
-          >
-            <Starburst className="aspect-square w-[155%]" data-hero-burst />
-          </div>
-
+        {/* Right — the record stage; unfolds into the founding instrument */}
+        <div
+          className={cn(
+            "relative z-20 flex min-h-[26rem] items-center justify-center px-6 py-16 text-secondary-foreground lg:min-h-0",
+            isNaming ? "lg:py-16" : "lg:py-10",
+            isNaming
+              ? "lg:col-start-2 lg:row-start-1"
+              : "col-start-1 row-start-1 lg:col-span-2 lg:col-start-1 lg:row-start-1",
+          )}
+          data-hero-stage
+        >
           <Emblem
-            className="absolute top-6 right-6 size-20 text-secondary-foreground md:size-28"
+            className="absolute top-6 right-6 z-[2] size-20 text-secondary-foreground md:size-28"
             data-hero-stamp
           />
 
-          <figure
-            className="relative w-full max-w-[20rem] border-[3px] border-secondary bg-secondary text-secondary-foreground"
-            data-hero-plate
-          >
-            <figcaption className="flex items-center justify-between border-b border-secondary-foreground/20 px-3 py-2 font-mono text-[0.58rem] leading-none tracking-[0.24em] text-secondary-foreground/85 uppercase">
-              <span data-hero-mark>{t("hero.plate.official")}</span>
-              <span data-hero-mark>{t("hero.plate.number")}</span>
-              <span data-hero-mark>{t("hero.plate.record")}</span>
-            </figcaption>
-            <div className="relative aspect-[16/9] overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,color-mix(in_oklch,var(--secondary-foreground)_34%,transparent),transparent_68%)]" />
-              <div className="absolute inset-0 text-secondary-foreground opacity-70 texture-halftone [--dot:4px]" />
-              <div className="absolute inset-0 text-secondary-foreground opacity-25 texture-halftone [--dot:11px]" />
+          <div className="relative z-[2] grid w-full place-items-center">
+            <div
+              className="col-start-1 row-start-1 w-full max-w-[20rem]"
+              data-record-plate-surface
+            >
+              <OfficialRecordPlate />
             </div>
             <div
-              className="border-t border-secondary-foreground/20 px-3 py-2 text-center font-mono text-[0.58rem] leading-none tracking-[0.34em] text-secondary-foreground/85 uppercase"
-              data-hero-mark
+              aria-hidden={isNaming ? true : undefined}
+              className="absolute top-1/2 left-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2"
+              data-onboarding-surface
             >
-              {t("hero.plate.founded")}
+              <OnboardingPanel onboarding={flow} />
             </div>
-          </figure>
+          </div>
         </div>
       </div>
     </section>
@@ -342,84 +432,179 @@ export function Colophon() {
   );
 }
 
-function FoundingFlow({ onboarding }: { onboarding: LandingOnboarding }) {
+function useDisplayedOnboardingStep(step: LandingOnboarding["step"]) {
+  const [lastStep, setLastStep] = useState(step);
+
+  useEffect(() => {
+    if (step !== null) {
+      setLastStep(step);
+    }
+  }, [step]);
+
+  return step ?? lastStep;
+}
+
+function OnboardingPanel({ onboarding }: OnboardingStepProps) {
+  const { t } = useTranslation("landing");
+  const displayStep = useDisplayedOnboardingStep(onboarding.step);
+  const { stepRef } = useStepTransition(displayStep);
+
+  return (
+    <AppCard className="w-full bg-card text-left text-foreground">
+      <AppCardHeader className="flex flex-row items-center justify-between bg-secondary text-secondary-foreground">
+        <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] uppercase">
+          {t("onboarding.panel.title")}
+        </span>
+        <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] text-secondary-foreground/60 uppercase">
+          {t("onboarding.panel.number")}
+        </span>
+      </AppCardHeader>
+      <AppCardContent className="grid gap-5">
+        <OnboardingStepper
+          onStepSelect={onboarding.goToStep}
+          step={displayStep}
+        />
+        <div className="grid" data-onboarding-step={displayStep} ref={stepRef}>
+          {displayStep === "government" ? (
+            <GovernmentStep onboarding={onboarding} />
+          ) : null}
+          {displayStep === "visibility" ? (
+            <VisibilityStep onboarding={onboarding} />
+          ) : null}
+          {displayStep === "invites" ? (
+            <InviteStep onboarding={onboarding} />
+          ) : null}
+          {displayStep === "ready" ? (
+            <ReadyStep onboarding={onboarding} />
+          ) : null}
+        </div>
+      </AppCardContent>
+    </AppCard>
+  );
+}
+
+function GovernmentStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
 
   return (
-    <div
-      className="w-full max-w-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
-    >
-      {onboarding.step === null ? (
-        <NameStep onboarding={onboarding} />
-      ) : (
-        <div className="border bg-card text-left">
-          <div className="flex items-center justify-between border-b bg-secondary px-4 py-2.5 text-secondary-foreground">
-            <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] uppercase">
-              {t("onboarding.panel.title")}
-            </span>
-            <span className="font-mono text-[0.7rem] leading-none tracking-[0.24em] text-secondary-foreground/60 uppercase">
-              {t("onboarding.panel.number")}
-            </span>
+    <div className="grid gap-5">
+      <StepIntro
+        description={t("onboarding.government.description")}
+        title={t("onboarding.government.title")}
+      />
+
+      <FieldGroup>
+        <Field>
+          <FieldTitle className="type-mono-label" id="setup-label">
+            {t("onboarding.government.preset.label")}
+          </FieldTitle>
+          <div className="grid border-2 border-primary bg-primary p-4 text-primary-foreground">
+            <div className="flex items-start gap-3">
+              <Landmark
+                aria-hidden="true"
+                className="mt-0.5"
+                data-icon="inline-start"
+              />
+              <span className="grid gap-1">
+                <span className="font-display text-xl">
+                  {t(
+                    "onboarding.government.preset.options.standardRepublic.label",
+                  )}
+                </span>
+                <span className="text-xs leading-5 text-primary-foreground/82">
+                  {t(
+                    "onboarding.government.preset.options.standardRepublic.copy",
+                  )}
+                </span>
+              </span>
+            </div>
           </div>
-          <div className="grid gap-5 p-5">
-            <FlowStepper step={onboarding.step} />
-            {onboarding.step === "visibility" ? (
-              <VisibilityStep onboarding={onboarding} />
-            ) : null}
-            {onboarding.step === "invites" ? (
-              <InviteStep onboarding={onboarding} />
-            ) : null}
-            {onboarding.step === "ready" ? (
-              <ReadyStep onboarding={onboarding} />
-            ) : null}
-          </div>
-        </div>
-      )}
+          <FieldDescription>
+            {t(
+              "onboarding.government.preset.options.standardRepublic.description",
+            )}
+          </FieldDescription>
+        </Field>
+
+        <Field>
+          <FieldTitle className="type-mono-label" id="pace-label">
+            {t("onboarding.government.pace.label")}
+          </FieldTitle>
+          <AppToggleGroup
+            aria-labelledby="pace-label"
+            className="grid w-full grid-cols-3 gap-3"
+            onValueChange={onboarding.updatePace}
+            type="single"
+            value={onboarding.pace}
+          >
+            {paceChoices.map((choice) => (
+              <AppToggleGroupItem
+                className="justify-center text-center"
+                key={choice}
+                treatment="choice"
+                value={choice}
+              >
+                <span className="grid gap-1">
+                  <span className="font-display text-lg">
+                    {t(`onboarding.government.pace.options.${choice}.label`)}
+                  </span>
+                  <span
+                    className="text-xs leading-5 text-muted-foreground"
+                    data-slot="choice-copy"
+                  >
+                    {t(`onboarding.government.pace.options.${choice}.copy`)}
+                  </span>
+                </span>
+              </AppToggleGroupItem>
+            ))}
+          </AppToggleGroup>
+          <FieldDescription>{onboarding.paceCopy}</FieldDescription>
+        </Field>
+      </FieldGroup>
+
+      <StepActions onboarding={onboarding}>
+        <AppButton onClick={onboarding.continueToVisibility} type="button">
+          {t("onboarding.government.continue")}
+          <ArrowRight data-icon="inline-end" />
+        </AppButton>
+      </StepActions>
     </div>
   );
 }
 
-function FlowStepper({ step }: { step: NonNullable<LandingOnboarding["step"]> }) {
+function NameStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
-  const flowSteps = [
-    { key: "name", label: t("onboarding.flow.name") },
-    { key: "visibility", label: t("onboarding.flow.visibility") },
-    { key: "invites", label: t("onboarding.flow.invites") },
-  ] as const;
-  const currentIndex =
-    step === "visibility" ? 1 : step === "invites" ? 2 : 3;
+  const examples = useMemo(() => {
+    const translatedExamples: unknown = t("onboarding.name.examples", {
+      returnObjects: true,
+    });
 
-  return (
-    <ol className="grid grid-cols-3 gap-2">
-      {flowSteps.map(({ key, label }, index) => {
-        const isComplete = currentIndex > index;
-        const isCurrent = currentIndex === index;
+    return Array.isArray(translatedExamples)
+      ? translatedExamples.filter(
+          (item): item is string => typeof item === "string",
+        )
+      : [];
+  }, [t]);
+  const [exampleIndex, setExampleIndex] = useState(0);
+  const example =
+    examples.length > 0 ? examples[exampleIndex % examples.length] : "";
 
-        return (
-          <li className="flex flex-col gap-1.5" key={key}>
-            <div
-              className={cn(
-                "h-1 transition-colors",
-                isComplete || isCurrent ? "bg-primary" : "bg-muted",
-              )}
-            />
-            <span
-              className={cn(
-                "font-mono text-[0.65rem] leading-none tracking-[0.18em] uppercase",
-                isCurrent ? "text-foreground" : "text-muted-foreground",
-              )}
-            >
-              {`0${index + 1} · ${label}`}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
+  useEffect(() => {
+    if (examples.length < 2) {
+      return;
+    }
 
-function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
-  const { t } = useTranslation("landing");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduceMotion.matches) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setExampleIndex((current) => (current + 1) % examples.length);
+    }, 4800);
+
+    return () => window.clearInterval(interval);
+  }, [examples.length]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -435,6 +620,7 @@ function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
           </FieldLabel>
           <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
             <AppInput
+              animatedPlaceholder={example}
               aria-invalid={onboarding.nameError ? true : undefined}
               autoComplete="organization"
               id="polity-name"
@@ -460,19 +646,15 @@ function NameStep({ onboarding }: { onboarding: LandingOnboarding }) {
   );
 }
 
-function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
+function VisibilityStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
 
   return (
     <div className="grid gap-5">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-display text-2xl">
-          {t("onboarding.visibility.title")}
-        </h2>
-        <p className="text-sm leading-6 text-muted-foreground">
-          {t("onboarding.visibility.description")}
-        </p>
-      </div>
+      <StepIntro
+        description={t("onboarding.visibility.description")}
+        title={t("onboarding.visibility.title")}
+      />
 
       <FieldGroup>
         <Field>
@@ -481,7 +663,7 @@ function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
           </FieldTitle>
           <AppToggleGroup
             aria-labelledby="visibility-label"
-            className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2"
+            className="grid w-full grid-cols-2 gap-3"
             onValueChange={onboarding.updateVisibility}
             type="single"
             value={onboarding.visibility}
@@ -510,15 +692,17 @@ function VisibilityStep({ onboarding }: { onboarding: LandingOnboarding }) {
         </Field>
       </FieldGroup>
 
-      <AppButton onClick={onboarding.continueToInvites} type="button">
-        {t("onboarding.visibility.continue")}
-        <ArrowRight data-icon="inline-end" />
-      </AppButton>
+      <StepActions onboarding={onboarding}>
+        <AppButton onClick={onboarding.continueToInvites} type="button">
+          {t("onboarding.visibility.continue")}
+          <ArrowRight data-icon="inline-end" />
+        </AppButton>
+      </StepActions>
     </div>
   );
 }
 
-function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
+function InviteStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -528,14 +712,10 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
 
   return (
     <div className="grid gap-5">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-display text-2xl">
-          {t("onboarding.invites.title")}
-        </h2>
-        <p className="text-sm leading-6 text-muted-foreground">
-          {t("onboarding.invites.description")}
-        </p>
-      </div>
+      <StepIntro
+        description={t("onboarding.invites.description")}
+        title={t("onboarding.invites.title")}
+      />
 
       <form className="grid gap-4" onSubmit={submit}>
         <FieldGroup>
@@ -561,7 +741,8 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
           </Field>
         </FieldGroup>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-[auto_1fr_1fr] gap-2">
+          <BackStepButton onboarding={onboarding} />
           <AppButton type="submit" variant="secondary">
             <Plus data-icon="inline-start" />
             {t("onboarding.invites.enrol")}
@@ -573,16 +754,17 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
         </div>
       </form>
 
-      <div aria-live="polite" className="flex min-h-10 flex-wrap gap-2">
+      <div aria-live="polite" className="flex flex-wrap gap-2">
         {onboarding.invites.length ? (
           onboarding.invites.map((email) => (
-            <span
-              className="inline-flex h-8 items-center gap-1.5 border px-3 font-mono text-xs"
-              key={email}
-            >
-              <Users aria-hidden="true" className="size-3 text-primary" />
-              {email}
-            </span>
+            <AppBadge key={email} treatment="removable">
+              <Users aria-hidden="true" data-icon="inline-start" />
+              <span className="min-w-0 truncate">{email}</span>
+              <BadgeRemoveButton
+                aria-label={t("onboarding.invites.remove", { email })}
+                onClick={() => onboarding.removeInvite(email)}
+              />
+            </AppBadge>
           ))
         ) : (
           <p className="font-mono text-xs text-muted-foreground">
@@ -594,7 +776,32 @@ function InviteStep({ onboarding }: { onboarding: LandingOnboarding }) {
   );
 }
 
-function ReadyStep({ onboarding }: { onboarding: LandingOnboarding }) {
+function StepActions({ children, onboarding }: StepActionsProps) {
+  return (
+    <div className="grid grid-cols-[auto_1fr] gap-2">
+      <BackStepButton onboarding={onboarding} />
+      {children}
+    </div>
+  );
+}
+
+function BackStepButton({ onboarding }: OnboardingStepProps) {
+  const { t } = useTranslation("landing");
+
+  return (
+    <AppButton
+      aria-label={t("onboarding.back")}
+      className="w-11 px-0"
+      onClick={onboarding.goBack}
+      type="button"
+      variant="secondary"
+    >
+      <ArrowLeft aria-hidden="true" />
+    </AppButton>
+  );
+}
+
+function ReadyStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
 
   return (
@@ -611,38 +818,39 @@ function ReadyStep({ onboarding }: { onboarding: LandingOnboarding }) {
         </p>
       </div>
 
-      <div className="grid gap-px border bg-border">
-        <SummaryRow
-          label={t("onboarding.ready.access")}
-          value={t(
-            `onboarding.visibility.options.${onboarding.visibility}.label`,
-          )}
-        />
-        <SummaryRow
-          label={t("onboarding.ready.members")}
-          value={
-            onboarding.invites.length
+      <SummaryGrid
+        rows={[
+          {
+            label: t("onboarding.ready.government"),
+            value: t(
+              `onboarding.government.preset.options.${onboarding.setupPresetCopyKey}.label`,
+            ),
+          },
+          {
+            label: t("onboarding.ready.pace"),
+            value: t(
+              `onboarding.government.pace.options.${onboarding.pace}.label`,
+            ),
+          },
+          {
+            label: t("onboarding.ready.access"),
+            value: t(
+              `onboarding.visibility.options.${onboarding.visibility}.label`,
+            ),
+          },
+          {
+            label: t("onboarding.ready.members"),
+            value: onboarding.invites.length
               ? onboarding.invites.join(", ")
-              : t("onboarding.ready.enrolLater")
-          }
-        />
-      </div>
+              : t("onboarding.ready.enrolLater"),
+          },
+        ]}
+      />
 
       <AppButton type="button">
         {t("onboarding.ready.enter")}
         <ArrowRight data-icon="inline-end" />
       </AppButton>
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid grid-cols-[6rem_1fr] gap-3 bg-card px-4 py-3 text-sm">
-      <span className="font-mono text-[0.7rem] leading-none tracking-[0.16em] text-muted-foreground uppercase">
-        {label}
-      </span>
-      <span className="truncate font-medium">{value}</span>
     </div>
   );
 }

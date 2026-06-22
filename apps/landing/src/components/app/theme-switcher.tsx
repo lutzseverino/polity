@@ -12,7 +12,7 @@ const themeIcons = {
   system: Monitor,
 } satisfies Record<ThemeMode, typeof Sun>;
 
-export function AppThemeSwitcher() {
+export function ThemeSwitcher() {
   const { t } = useTranslation("common");
   const { setTheme, theme } = useTheme();
 

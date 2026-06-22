@@ -34,7 +34,7 @@ function getInitialLanguage() {
   return isLanguage(browserLanguage) ? browserLanguage : "en";
 }
 
-i18next.use(initReactI18next).init({
+void i18next.use(initReactI18next).init({
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
@@ -67,5 +67,3 @@ i18next.on("languageChanged", (language) => {
 if (typeof document !== "undefined") {
   document.documentElement.lang = i18next.language;
 }
-
-export { i18next };

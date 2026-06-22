@@ -2,6 +2,15 @@ import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
+type StarburstProps = Readonly<
+  ComponentProps<"svg"> & {
+    spikes?: number;
+    inner?: number;
+  }
+>;
+
+type SvgMotifProps = Readonly<ComponentProps<"svg">>;
+
 function starburstPoints(spikes: number, outer: number, inner: number) {
   const center = 100;
   const step = Math.PI / spikes;
@@ -28,10 +37,7 @@ export function Starburst({
   spikes = 12,
   inner = 0.52,
   ...props
-}: ComponentProps<"svg"> & {
-  spikes?: number;
-  inner?: number;
-}) {
+}: StarburstProps) {
   return (
     <svg
       aria-hidden="true"
@@ -48,7 +54,7 @@ export function Starburst({
 }
 
 /** Constructivist shards — three right triangles sharing one 45° diagonal. */
-export function Shards({ className, ...props }: ComponentProps<"svg">) {
+export function Shards({ className, ...props }: SvgMotifProps) {
   return (
     <svg
       aria-hidden="true"
@@ -67,7 +73,7 @@ export function Shards({ className, ...props }: ComponentProps<"svg">) {
 }
 
 /** Official seal — monogram emblem rendered in currentColor. */
-export function Emblem({ className, ...props }: ComponentProps<"svg">) {
+export function Emblem({ className, ...props }: SvgMotifProps) {
   return (
     <svg
       aria-hidden="true"

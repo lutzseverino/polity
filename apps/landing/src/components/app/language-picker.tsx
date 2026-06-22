@@ -12,7 +12,7 @@ import {
   AppSelectValue,
 } from "./app-select";
 
-export function AppLanguagePicker() {
+export function LanguagePicker() {
   const { i18n, t } = useTranslation("common");
   const currentLanguage = languages.includes(i18n.language as Language)
     ? (i18n.language as Language)
@@ -20,7 +20,7 @@ export function AppLanguagePicker() {
 
   function updateLanguage(value: string) {
     if (languages.includes(value as Language)) {
-      i18n.changeLanguage(value);
+      void i18n.changeLanguage(value);
     }
   }
 

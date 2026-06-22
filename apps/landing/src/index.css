@@ -19,10 +19,6 @@
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     font-feature-settings:
       "ss01" 1,
@@ -36,6 +32,36 @@
 }
 
 @layer components {
+  [data-hero][data-founding-state="naming"] [data-founding-visual] {
+    clip-path: inset(calc(100% - 26rem - 1px) 0 1px 0);
+  }
+
+  [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
+    transform: translateY(calc((100% - 26rem - 1px) / 2));
+  }
+
+  @media (min-width: 64rem) {
+    [data-hero][data-founding-state="naming"] [data-founding-visual] {
+      clip-path: inset(0 0 0 52.5%);
+    }
+
+    [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
+      transform: translateX(26.25%);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    [data-hero][data-founding-state="naming"] [data-founding-visual] {
+      clip-path: inset(
+        0 calc((100% - 80rem) / 2) 0 calc((100% - 80rem) / 2 + 42rem)
+      );
+    }
+
+    [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
+      transform: translateX(21rem);
+    }
+  }
+
   /* Heavy poster display — Anton, set uppercase with tight tracking. */
   .font-display {
     font-family: var(--font-display);

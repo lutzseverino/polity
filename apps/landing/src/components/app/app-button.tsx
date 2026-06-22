@@ -3,10 +3,9 @@ import type { ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function AppButton({
-  className,
-  ...props
-}: ComponentProps<typeof Button>) {
+type AppButtonProps = Readonly<ComponentProps<typeof Button>>;
+
+export function AppButton({ className, ...props }: AppButtonProps) {
   return (
     <Button
       className={cn(
