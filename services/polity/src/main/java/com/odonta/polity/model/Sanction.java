@@ -69,7 +69,7 @@ public class Sanction extends AuditedEntity {
   }
 
   public void vacate(OffsetDateTime vacatedAt) {
-    if (!isActiveAt(vacatedAt)) {
+    if (isInactiveAt(vacatedAt)) {
       throw new IllegalStateException("Only active sanctions can be vacated");
     }
     this.status = SanctionStatus.VACATED;
@@ -80,8 +80,15 @@ public class Sanction extends AuditedEntity {
     return status == SanctionStatus.ACTIVE && endsAt.isAfter(now);
   }
 
+  public boolean isInactiveAt(OffsetDateTime now) {
+    return status != SanctionStatus.ACTIVE || !endsAt.isAfter(now);
+  }
+
   public SanctionStatus statusAt(OffsetDateTime now) {
-    if (status == SanctionStatus.ACTIVE && !endsAt.isAfter(now)) {
+    if (isActiveAt(now)) {
+      return SanctionStatus.ACTIVE;
+    }
+    if (status == SanctionStatus.ACTIVE) {
       return SanctionStatus.EXPIRED;
     }
     return status;

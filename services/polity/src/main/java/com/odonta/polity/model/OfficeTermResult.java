@@ -7,6 +7,7 @@ public record OfficeTermResult(
     UUID id,
     UUID officeId,
     String officeName,
+    String officeNameKey,
     UUID membershipId,
     String memberName,
     OfficeTermStatus status,

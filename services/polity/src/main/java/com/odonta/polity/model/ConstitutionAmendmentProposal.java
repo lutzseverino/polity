@@ -31,23 +31,23 @@ public class ConstitutionAmendmentProposal extends AuditedEntity {
   @NotBlank @Column(nullable = false)
   private String body;
 
-  @Column(name = "procedure_change_summary", nullable = false)
-  private String procedureChangeSummary;
+  @Column(name = "change_summary", nullable = false)
+  private String changeSummary;
 
   public ConstitutionAmendmentProposal(UUID polityId, UUID motionId, String title, String body) {
     this.polityId = polityId;
     this.motionId = motionId;
     this.title = title;
     this.body = body;
-    this.procedureChangeSummary = "";
+    this.changeSummary = "";
   }
 
   public ConstitutionAmendmentProposal(
-      UUID polityId, UUID motionId, String title, String body, String procedureChangeSummary) {
+      UUID polityId, UUID motionId, String title, String body, String changeSummary) {
     this.polityId = polityId;
     this.motionId = motionId;
     this.title = title;
     this.body = body;
-    this.procedureChangeSummary = procedureChangeSummary;
+    this.changeSummary = changeSummary;
   }
 }

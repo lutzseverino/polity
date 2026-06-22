@@ -11,5 +11,9 @@ public interface OfficeProjection {
 
   String getDescription();
 
+  String getNameKey();
+
+  String getDescriptionKey();
+
   int getTermLengthDays();
 }

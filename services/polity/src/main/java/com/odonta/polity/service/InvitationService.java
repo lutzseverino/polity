@@ -7,9 +7,10 @@ import com.odonta.identity.client.IdentityUser;
 import com.odonta.identity.client.IdentityUsersClient;
 import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.PolityPermissions;
+import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
-import com.odonta.polity.mapper.InvitationApplicationMapper;
-import com.odonta.polity.mapper.PolityApplicationMapper;
+import com.odonta.polity.mapper.MembershipApplicationMapper;
+import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
 import com.odonta.polity.model.Jurisdiction;
@@ -17,8 +18,12 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.model.MembershipInvitationResult;
 import com.odonta.polity.model.MembershipResult;
+import com.odonta.polity.model.OfficialRecordContext;
+import com.odonta.polity.model.OfficialRecordTemplate;
+import com.odonta.polity.model.OfficialRecordTemplateKey;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.PowerCode;
+import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import jakarta.validation.Valid;
@@ -26,6 +31,7 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,24 +47,24 @@ public class InvitationService {
   private final ConstitutionalAuthority authority;
   private final Grants grants;
   private final IdentityUsersClient identityUsers;
-  private final InvitationApplicationMapper invitationMapper;
   private final MembershipInvitationRepository invitations;
-  private final MembershipReader membershipReader;
+  private final MembershipService membershipService;
   private final MembershipRepository memberships;
-  private final PolityApplicationMapper memberMapper;
+  private final MembershipApplicationMapper memberMapper;
   private final PolityGrantPlanner grantPlanner;
   private final PolityService polities;
-  private final OfficialRecordWriter record;
+  private final OfficialRecordService officialRecords;
 
   @Transactional
   @PreAuthorize(PolityPermissions.HAS_POLITY_PARTICIPATE)
   public MembershipInvitationResult create(
       UUID polityId, AuthenticatedUser actor, @Valid CreateMemberInvitationInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
+    polities.requireActive(polityId);
     String email = normalize(input.email());
-    Membership inviter = membershipReader.active(polityId, actor.id());
+    Membership inviter = membershipService.active(polityId, actor.id());
     var constitution = polities.constitution(polityId);
-    authority.require(inviter, constitution, PowerCode.ADMIT_MEMBER);
+    requireAdmissionAuthority(inviter, constitution);
     if (invitations.existsByPolityIdAndEmailIgnoreCaseAndStatus(
         polityId, email, InvitationStatus.PENDING)) {
       throw ApiException.conflict(
@@ -83,31 +89,37 @@ public class InvitationService {
                 inviter.getId(),
                 now));
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    record.append(
+    officialRecords.append(
         polityId,
         jurisdiction.getId(),
         constitution.getId(),
         inviter.getId(),
         OfficialRecordType.MEMBER_INVITED,
         invitation.getId(),
-        invitation.getEmail() + " was invited",
-        "%s invited %s to become a citizen."
-            .formatted(inviter.getDisplayName(), invitation.getEmail()),
+        OfficialRecordContext.none(),
+        OfficialRecordTemplate.of(
+            OfficialRecordTemplateKey.MEMBER_INVITED,
+            Map.of("inviterName", inviter.getDisplayName(), "inviteeEmail", invitation.getEmail())),
         now);
     return result(invitation.getId());
   }
 
   @PreAuthorize(PolityPermissions.HAS_POLITY_READ)
   public List<MembershipInvitationResult> listPolityInvitations(UUID polityId, UUID userId) {
-    membershipReader.active(polityId, userId);
-    return invitationMapper.toResults(invitations.findProjectionsByPolityId(polityId));
+    membershipService.active(polityId, userId);
+    return invitations.findProjectionsByPolityIdOrderByInvitedAtDesc(polityId).stream()
+        .map(this::result)
+        .toList();
   }
 
   public List<MembershipInvitationResult> listCurrentUserInvitations(AuthenticatedUser actor) {
     IdentityUser user = identityUsers.get(actor.id());
-    return invitationMapper.toResults(
-        invitations.findPendingProjectionsForInvitee(
-            user.id(), List.of(normalize(user.email())), InvitationStatus.PENDING));
+    return invitations
+        .findPendingProjectionsForInvitee(
+            user.id(), List.of(normalize(user.email())), InvitationStatus.PENDING)
+        .stream()
+        .map(this::result)
+        .toList();
   }
 
   @Transactional
@@ -120,6 +132,7 @@ public class InvitationService {
             .orElseThrow(
                 () ->
                     ApiException.notFound("invitation_not_found", "Pending invitation not found."));
+    polities.requireActive(invitation.getPolityId());
     requireInvitee(invitation, identity);
     if (memberships.existsByPolityIdAndUserId(invitation.getPolityId(), identity.id())) {
       throw ApiException.conflict("member_exists", "This user is already a member.");
@@ -138,18 +151,20 @@ public class InvitationService {
     invitations.saveAndFlush(invitation);
     grants.stage(
         grantPlanner.membership(identity.authorizationSubject(), invitation.getPolityId()));
+    polities.completeBootstrapIfReady(invitation.getPolityId(), now);
     var constitution = polities.constitution(invitation.getPolityId());
     Jurisdiction jurisdiction = polities.jurisdiction(invitation.getPolityId());
-    record.append(
+    officialRecords.append(
         invitation.getPolityId(),
         jurisdiction.getId(),
         constitution.getId(),
         admitted.getId(),
         OfficialRecordType.MEMBER_ADMITTED,
         admitted.getId(),
-        admitted.getDisplayName() + " accepted membership",
-        "%s accepted the pending invitation and became an active citizen."
-            .formatted(admitted.getDisplayName()),
+        OfficialRecordContext.none(),
+        OfficialRecordTemplate.of(
+            OfficialRecordTemplateKey.MEMBER_ADMITTED,
+            Map.of("memberName", admitted.getDisplayName())),
         now);
     return memberMapper.toResult(
         memberships
@@ -158,11 +173,34 @@ public class InvitationService {
   }
 
   private MembershipInvitationResult result(UUID invitationId) {
-    return invitationMapper.toResult(
+    return result(
         invitations
             .findProjectedById(invitationId)
             .orElseThrow(
                 () -> ApiException.notFound("invitation_not_found", "Invitation not found.")));
+  }
+
+  private MembershipInvitationResult result(MembershipInvitationProjection projection) {
+    return new MembershipInvitationResult(
+        projection.getId(),
+        projection.getPolityId(),
+        polities.name(projection.getPolityId()),
+        projection.getEmail(),
+        membershipService.displayName(projection.getInvitedBy()),
+        projection.getStatus(),
+        projection.getInvitedAt(),
+        projection.getRespondedAt());
+  }
+
+  private void requireAdmissionAuthority(Membership inviter, ConstitutionVersion constitution) {
+    try {
+      authority.require(inviter, constitution, PowerCode.ADMIT_MEMBER);
+    } catch (ApiException exception) {
+      if (!exception.code().equals("constitutional_authority_missing")
+          || !polities.hasProvisionalFounderAdmissionAuthority(inviter)) {
+        throw exception;
+      }
+    }
   }
 
   private void requireInvitee(MembershipInvitation invitation, IdentityUser identity) {

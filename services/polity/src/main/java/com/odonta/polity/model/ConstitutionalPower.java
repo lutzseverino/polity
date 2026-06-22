@@ -33,6 +33,9 @@ public class ConstitutionalPower extends AuditedEntity {
   @Column(nullable = false)
   private String name;
 
+  @Column(name = "name_key")
+  private String nameKey;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "holder_scope", nullable = false)
   private PowerHolderScope holderScope;
@@ -46,10 +49,21 @@ public class ConstitutionalPower extends AuditedEntity {
       PowerCode code,
       String name,
       PowerHolderScope holderScope) {
+    this(polityId, constitutionVersionId, code, name, null, holderScope);
+  }
+
+  public ConstitutionalPower(
+      UUID polityId,
+      UUID constitutionVersionId,
+      PowerCode code,
+      String name,
+      ConstitutionalPowerTemplateKey templateKey,
+      PowerHolderScope holderScope) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.code = code;
     this.name = name;
+    this.nameKey = templateKey == null ? null : templateKey.nameKey();
     this.holderScope = holderScope;
   }
 
@@ -59,18 +73,58 @@ public class ConstitutionalPower extends AuditedEntity {
       PowerCode code,
       String name,
       String holderOfficeCode) {
+    this(polityId, constitutionVersionId, code, name, null, holderOfficeCode);
+  }
+
+  public ConstitutionalPower(
+      UUID polityId,
+      UUID constitutionVersionId,
+      PowerCode code,
+      String name,
+      ConstitutionalPowerTemplateKey templateKey,
+      String holderOfficeCode) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.code = code;
     this.name = name;
+    this.nameKey = templateKey == null ? null : templateKey.nameKey();
     this.holderScope = PowerHolderScope.OFFICE;
     this.holderOfficeCode = holderOfficeCode;
   }
 
   public ConstitutionalPower copyTo(UUID constitutionVersionId) {
     if (holderScope == PowerHolderScope.OFFICE) {
-      return new ConstitutionalPower(polityId, constitutionVersionId, code, name, holderOfficeCode);
+      return new ConstitutionalPower(
+          polityId, constitutionVersionId, code, name, nameKey, holderScope, holderOfficeCode);
     }
-    return new ConstitutionalPower(polityId, constitutionVersionId, code, name, holderScope);
+    return new ConstitutionalPower(
+        polityId, constitutionVersionId, code, name, nameKey, holderScope, null);
+  }
+
+  public ConstitutionalPower copyWithHolder(
+      UUID constitutionVersionId, PowerHolderScope holderScope, String holderOfficeCode) {
+    if (holderScope == PowerHolderScope.OFFICE) {
+      return new ConstitutionalPower(
+          polityId, constitutionVersionId, code, name, nameKey, holderScope, holderOfficeCode);
+    }
+    return new ConstitutionalPower(
+        polityId, constitutionVersionId, code, name, nameKey, holderScope, null);
+  }
+
+  private ConstitutionalPower(
+      UUID polityId,
+      UUID constitutionVersionId,
+      PowerCode code,
+      String name,
+      String nameKey,
+      PowerHolderScope holderScope,
+      String holderOfficeCode) {
+    this.polityId = polityId;
+    this.constitutionVersionId = constitutionVersionId;
+    this.code = code;
+    this.name = name;
+    this.nameKey = nameKey;
+    this.holderScope = holderScope;
+    this.holderOfficeCode = holderOfficeCode;
   }
 }

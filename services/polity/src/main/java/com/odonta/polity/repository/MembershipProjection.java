@@ -9,7 +9,7 @@ public interface MembershipProjection {
 
   UUID getUserId();
 
-  String getName();
+  String getDisplayName();
 
   String getEmail();
 

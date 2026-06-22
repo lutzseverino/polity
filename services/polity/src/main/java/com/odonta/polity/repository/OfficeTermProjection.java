@@ -9,11 +9,7 @@ public interface OfficeTermProjection {
 
   UUID getOfficeId();
 
-  String getOfficeName();
-
   UUID getMembershipId();
-
-  String getMemberName();
 
   OfficeTermStatus getStatus();
 

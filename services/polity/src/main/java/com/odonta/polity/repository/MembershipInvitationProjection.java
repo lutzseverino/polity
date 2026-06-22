@@ -9,11 +9,9 @@ public interface MembershipInvitationProjection {
 
   UUID getPolityId();
 
-  String getPolityName();
-
   String getEmail();
 
-  String getInvitedByName();
+  UUID getInvitedBy();
 
   InvitationStatus getStatus();
 

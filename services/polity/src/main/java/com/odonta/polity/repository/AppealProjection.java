@@ -11,8 +11,6 @@ public interface AppealProjection {
 
   UUID getAppellantMembershipId();
 
-  String getAppellantName();
-
   AppealStatus getStatus();
 
   String getReason();

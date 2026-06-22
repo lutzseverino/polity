@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,10 +36,46 @@ public class Polity extends AuditedEntity implements TargetableAuthorizationReso
   @Column(nullable = false)
   private PolityVisibility visibility;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private PolityStatus status = PolityStatus.ACTIVE;
+
+  @Column(name = "disbanded_at")
+  private OffsetDateTime disbandedAt;
+
+  @Column(name = "bootstrap_completed_at")
+  private OffsetDateTime bootstrapCompletedAt;
+
   public Polity(String name, PolityVisibility visibility, UUID founderId) {
     this.name = name;
     this.visibility = visibility;
     this.founderId = founderId;
+  }
+
+  public boolean isActive() {
+    return status == PolityStatus.ACTIVE;
+  }
+
+  public boolean isDisbanded() {
+    return status == PolityStatus.DISBANDED;
+  }
+
+  public void disband(OffsetDateTime disbandedAt) {
+    if (status != PolityStatus.ACTIVE) {
+      throw new IllegalStateException("Only active polities can be disbanded");
+    }
+    status = PolityStatus.DISBANDED;
+    this.disbandedAt = disbandedAt;
+  }
+
+  public boolean isBootstrapComplete() {
+    return bootstrapCompletedAt != null;
+  }
+
+  public void completeBootstrap(OffsetDateTime completedAt) {
+    if (bootstrapCompletedAt == null) {
+      bootstrapCompletedAt = completedAt;
+    }
   }
 
   @Override

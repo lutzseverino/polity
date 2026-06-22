@@ -2,26 +2,32 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.MotionStatus;
-import com.odonta.polity.model.VotingProcedure;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
-public interface MotionProjection extends VotingProcedure {
+public interface MotionProjection {
   UUID getId();
+
+  UUID getConstitutionVersionId();
+
+  UUID getProcedureId();
+
+  UUID getIntroducedBy();
 
   String getTitle();
 
   String getBody();
 
+  String getTitleKey();
+
+  String getBodyKey();
+
+  Map<String, Object> getTemplateParams();
+
   MotionStatus getStatus();
 
   EffectType getEffectType();
-
-  int getConstitutionVersion();
-
-  String getProcedureName();
-
-  String getIntroducedByName();
 
   OffsetDateTime getOpenedAt();
 

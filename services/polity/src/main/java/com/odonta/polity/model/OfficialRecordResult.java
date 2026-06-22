@@ -1,6 +1,7 @@
 package com.odonta.polity.model;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 public record OfficialRecordResult(
@@ -9,6 +10,9 @@ public record OfficialRecordResult(
     OfficialRecordType type,
     String title,
     String body,
+    String titleKey,
+    String bodyKey,
+    Map<String, Object> templateParams,
     String actorName,
     int constitutionVersion,
     UUID sourceId,

@@ -2,13 +2,16 @@ package com.odonta.polity.controller;
 
 import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MotionsApi;
+import com.odonta.polity.api.model.CastOfficeElectionBallotRequest;
 import com.odonta.polity.api.model.CastVoteRequest;
 import com.odonta.polity.api.model.CreateAppealMotionRequest;
 import com.odonta.polity.api.model.CreateConstitutionAmendmentMotionRequest;
+import com.odonta.polity.api.model.CreateDisbandmentMotionRequest;
 import com.odonta.polity.api.model.CreateMotionRequest;
-import com.odonta.polity.api.model.CreateOfficeAssignmentMotionRequest;
+import com.odonta.polity.api.model.CreateOfficeElectionMotionRequest;
 import com.odonta.polity.api.model.CreateSanctionMotionRequest;
 import com.odonta.polity.api.model.MotionResponse;
+import com.odonta.polity.api.model.RespondOfficeElectionCandidacyRequest;
 import com.odonta.polity.mapper.MotionTransportMapper;
 import com.odonta.polity.service.MotionService;
 import jakarta.validation.Valid;
@@ -38,12 +41,12 @@ public class MotionController implements MotionsApi {
   }
 
   @Override
-  public ResponseEntity<MotionResponse> createPolityOfficeAssignmentMotion(
-      UUID polityId, @Valid CreateOfficeAssignmentMotionRequest request) {
+  public ResponseEntity<MotionResponse> createPolityOfficeElectionMotion(
+      UUID polityId, @Valid CreateOfficeElectionMotionRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(
             mapper.toResponse(
-                motions.createOfficeAssignment(
+                motions.createOfficeElection(
                     polityId, users.currentUser(), mapper.toInput(request))));
   }
 
@@ -75,6 +78,15 @@ public class MotionController implements MotionsApi {
   }
 
   @Override
+  public ResponseEntity<MotionResponse> createPolityDisbandmentMotion(
+      UUID polityId, @Valid CreateDisbandmentMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createDisbandment(polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
   public ResponseEntity<List<MotionResponse>> listPolityMotions(UUID polityId) {
     return ResponseEntity.ok(mapper.toResponses(motions.list(polityId, users.currentUser().id())));
   }
@@ -91,6 +103,24 @@ public class MotionController implements MotionsApi {
     return ResponseEntity.ok(
         mapper.toResponse(
             motions.vote(polityId, motionId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> castPolityOfficeElectionBallot(
+      UUID polityId, UUID motionId, @Valid CastOfficeElectionBallotRequest request) {
+    return ResponseEntity.ok(
+        mapper.toResponse(
+            motions.castOfficeElectionBallot(
+                polityId, motionId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> respondPolityOfficeElectionCandidacy(
+      UUID polityId, UUID motionId, @Valid RespondOfficeElectionCandidacyRequest request) {
+    return ResponseEntity.ok(
+        mapper.toResponse(
+            motions.respondOfficeElectionCandidacy(
+                polityId, motionId, users.currentUser(), mapper.toInput(request))));
   }
 
   @Override

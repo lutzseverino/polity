@@ -2,29 +2,27 @@ package com.odonta.polity.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.persistence.Entity;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class PolityApplicationBoundaryTest {
 
   @Test
   void serviceContractsExcludeTransportAndPersistenceTypes() {
-    assertApplicationBoundary(
-        ConstitutionTemplateService.class,
-        EffectApplicationService.class,
-        InvitationService.class,
-        JusticeService.class,
-        MemberStandingService.class,
-        MotionService.class,
-        OfficeService.class,
-        OfficialRecordService.class,
-        PolityService.class);
-  }
-
-  private void assertApplicationBoundary(Class<?>... services) {
-    Arrays.stream(services)
+    Stream.of(
+            ConstitutionTemplateService.class,
+            EffectApplicationService.class,
+            InvitationService.class,
+            JusticeService.class,
+            MembershipService.class,
+            MotionService.class,
+            OfficeService.class,
+            OfficialRecordService.class,
+            PolityService.class)
         .flatMap(service -> Arrays.stream(service.getDeclaredMethods()))
         .filter(method -> java.lang.reflect.Modifier.isPublic(method.getModifiers()))
         .forEach(
@@ -38,7 +36,8 @@ class PolityApplicationBoundaryTest {
   private boolean forbidden(Type type) {
     if (type instanceof Class<?> value) {
       return value.getPackageName().contains(".api.model")
-          || value.getSimpleName().endsWith("Projection");
+          || value.getSimpleName().endsWith("Projection")
+          || value.isAnnotationPresent(Entity.class);
     }
     if (type instanceof ParameterizedType value) {
       return forbidden(value.getRawType())

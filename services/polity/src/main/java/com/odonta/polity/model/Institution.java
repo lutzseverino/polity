@@ -32,6 +32,9 @@ public class Institution extends AuditedEntity {
   @Column(nullable = false)
   private String name;
 
+  @Column(name = "name_key")
+  private String nameKey;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private InstitutionKind kind;
@@ -42,14 +45,40 @@ public class Institution extends AuditedEntity {
       UUID constitutionVersionId,
       String name,
       InstitutionKind kind) {
+    this(polityId, jurisdictionId, constitutionVersionId, name, (String) null, kind);
+  }
+
+  public Institution(
+      UUID polityId,
+      UUID jurisdictionId,
+      UUID constitutionVersionId,
+      String name,
+      InstitutionTemplateKey templateKey,
+      InstitutionKind kind) {
     this.polityId = polityId;
     this.jurisdictionId = jurisdictionId;
     this.constitutionVersionId = constitutionVersionId;
     this.name = name;
+    this.nameKey = templateKey == null ? null : templateKey.nameKey();
     this.kind = kind;
   }
 
   public Institution copyTo(UUID constitutionVersionId) {
-    return new Institution(polityId, jurisdictionId, constitutionVersionId, name, kind);
+    return new Institution(polityId, jurisdictionId, constitutionVersionId, name, nameKey, kind);
+  }
+
+  private Institution(
+      UUID polityId,
+      UUID jurisdictionId,
+      UUID constitutionVersionId,
+      String name,
+      String nameKey,
+      InstitutionKind kind) {
+    this.polityId = polityId;
+    this.jurisdictionId = jurisdictionId;
+    this.constitutionVersionId = constitutionVersionId;
+    this.name = name;
+    this.nameKey = nameKey;
+    this.kind = kind;
   }
 }

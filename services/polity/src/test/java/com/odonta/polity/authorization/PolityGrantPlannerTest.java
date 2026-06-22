@@ -20,10 +20,10 @@ class PolityGrantPlannerTest {
   }
 
   @Test
-  void founderGrantDoesNotEncodeConstitutionalPowers() {
+  void foundingMemberGrantDoesNotEncodeConstitutionalPowers() {
     UUID polityId = UUID.randomUUID();
 
-    GrantPlan plan = planner.founder("user:founder", polityId);
+    GrantPlan plan = planner.membership("user:founder", polityId);
 
     assertThat(plan.authorityGrants()).isEmpty();
     assertThat(plan.resourceGrants()).hasSize(1);

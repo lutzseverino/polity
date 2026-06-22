@@ -12,6 +12,8 @@ public interface OfficeRepository extends JpaRepository<Office, UUID> {
   List<OfficeProjection> findProjectionsByConstitutionVersionIdOrderByName(
       UUID constitutionVersionId);
 
+  Optional<OfficeProjection> findProjectedById(UUID id);
+
   Optional<Office> findByIdAndPolityId(UUID id, UUID polityId);
 
   Optional<Office> findByConstitutionVersionIdAndCode(UUID constitutionVersionId, String code);

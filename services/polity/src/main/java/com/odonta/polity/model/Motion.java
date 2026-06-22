@@ -11,10 +11,13 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Entity
@@ -46,6 +49,16 @@ public class Motion extends AuditedEntity {
 
   @NotBlank @Size(max = 5000) @Column(nullable = false)
   private String body;
+
+  @Column(name = "title_key")
+  private String titleKey;
+
+  @Column(name = "body_key")
+  private String bodyKey;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "template_params", nullable = false, columnDefinition = "jsonb")
+  private Map<String, Object> templateParams = Map.of();
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -84,6 +97,38 @@ public class Motion extends AuditedEntity {
       OffsetDateTime votingOpensAt,
       OffsetDateTime votingClosesAt,
       OffsetDateTime certificationOpensAt) {
+    this(
+        polityId,
+        jurisdictionId,
+        institutionId,
+        constitutionVersionId,
+        procedureId,
+        introducedBy,
+        title,
+        body,
+        null,
+        effectType,
+        openedAt,
+        votingOpensAt,
+        votingClosesAt,
+        certificationOpensAt);
+  }
+
+  public Motion(
+      UUID polityId,
+      UUID jurisdictionId,
+      UUID institutionId,
+      UUID constitutionVersionId,
+      UUID procedureId,
+      UUID introducedBy,
+      String title,
+      String body,
+      MotionTemplate template,
+      EffectType effectType,
+      OffsetDateTime openedAt,
+      OffsetDateTime votingOpensAt,
+      OffsetDateTime votingClosesAt,
+      OffsetDateTime certificationOpensAt) {
     this.polityId = polityId;
     this.jurisdictionId = jurisdictionId;
     this.institutionId = institutionId;
@@ -92,6 +137,11 @@ public class Motion extends AuditedEntity {
     this.introducedBy = introducedBy;
     this.title = title;
     this.body = body;
+    if (template != null) {
+      this.titleKey = template.titleKey();
+      this.bodyKey = template.bodyKey();
+      this.templateParams = template.params();
+    }
     this.effectType = effectType;
     this.status = MotionStatus.VOTING;
     this.openedAt = openedAt;

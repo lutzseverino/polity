@@ -5,8 +5,8 @@ import com.odonta.polity.api.InvitationsApi;
 import com.odonta.polity.api.model.CreateMemberInvitationRequest;
 import com.odonta.polity.api.model.MemberInvitationResponse;
 import com.odonta.polity.api.model.MemberResponse;
-import com.odonta.polity.mapper.InvitationTransportMapper;
-import com.odonta.polity.mapper.PolityTransportMapper;
+import com.odonta.polity.mapper.MembershipInvitationTransportMapper;
+import com.odonta.polity.mapper.MembershipTransportMapper;
 import com.odonta.polity.service.InvitationService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class InvitationController implements InvitationsApi {
   private final InvitationService invitations;
-  private final InvitationTransportMapper invitationMapper;
-  private final PolityTransportMapper memberMapper;
+  private final MembershipInvitationTransportMapper invitationMapper;
+  private final MembershipTransportMapper memberMapper;
   private final AuthenticatedUserReader users;
 
   @Override

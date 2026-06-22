@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Office extends AuditedEntity {
   public static final String STEWARD = "steward";
+  public static final String TRIBUNE = "tribune";
+  public static final String MAGISTRATE = "magistrate";
 
   @Id @GeneratedValue private UUID id;
 
@@ -40,6 +42,12 @@ public class Office extends AuditedEntity {
   @NotBlank @Column(nullable = false)
   private String description;
 
+  @Column(name = "name_key")
+  private String nameKey;
+
+  @Column(name = "description_key")
+  private String descriptionKey;
+
   @Positive @Column(name = "term_length_days", nullable = false)
   private int termLengthDays;
 
@@ -51,17 +59,89 @@ public class Office extends AuditedEntity {
       String name,
       String description,
       int termLengthDays) {
+    this(
+        polityId,
+        constitutionVersionId,
+        jurisdictionId,
+        code,
+        name,
+        description,
+        null,
+        termLengthDays);
+  }
+
+  public Office(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID jurisdictionId,
+      String code,
+      String name,
+      String description,
+      OfficeTemplateKey templateKey,
+      int termLengthDays) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.jurisdictionId = jurisdictionId;
     this.code = code;
     this.name = name;
     this.description = description;
+    if (templateKey != null) {
+      this.nameKey = templateKey.nameKey();
+      this.descriptionKey = templateKey.descriptionKey();
+    }
     this.termLengthDays = termLengthDays;
   }
 
   public Office copyTo(UUID constitutionVersionId) {
     return new Office(
-        polityId, constitutionVersionId, jurisdictionId, code, name, description, termLengthDays);
+        polityId,
+        constitutionVersionId,
+        jurisdictionId,
+        code,
+        name,
+        description,
+        nameKey,
+        descriptionKey,
+        termLengthDays);
+  }
+
+  public Office copyWith(
+      UUID constitutionVersionId,
+      String name,
+      String description,
+      String nameKey,
+      String descriptionKey,
+      int termLengthDays) {
+    return new Office(
+        polityId,
+        constitutionVersionId,
+        jurisdictionId,
+        code,
+        name,
+        description,
+        nameKey,
+        descriptionKey,
+        termLengthDays);
+  }
+
+  private Office(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID jurisdictionId,
+      String code,
+      String name,
+      String description,
+      String nameKey,
+      String descriptionKey,
+      int termLengthDays) {
+    this.polityId = polityId;
+    this.constitutionVersionId = constitutionVersionId;
+    this.jurisdictionId = jurisdictionId;
+    this.code = code;
+    this.name = name;
+    this.description = description;
+    this.nameKey = nameKey;
+    this.descriptionKey = descriptionKey;
+    this.termLengthDays = termLengthDays;
   }
 }

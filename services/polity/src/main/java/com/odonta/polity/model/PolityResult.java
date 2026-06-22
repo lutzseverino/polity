@@ -7,6 +7,7 @@ public record PolityResult(
     UUID id,
     String name,
     PolityVisibility visibility,
+    PolityStatus status,
     int constitutionVersion,
     String jurisdictionName,
     String institutionName,

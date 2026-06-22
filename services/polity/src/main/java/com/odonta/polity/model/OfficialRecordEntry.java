@@ -8,10 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Entity
@@ -71,6 +75,16 @@ public class OfficialRecordEntry {
   @Column(nullable = false)
   private String body;
 
+  @Column(name = "title_key")
+  private String titleKey;
+
+  @Column(name = "body_key")
+  private String bodyKey;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "template_params", nullable = false, columnDefinition = "jsonb")
+  private Map<String, Object> templateParams = Map.of();
+
   @Column(name = "occurred_at", nullable = false)
   private OffsetDateTime occurredAt;
 
@@ -82,35 +96,11 @@ public class OfficialRecordEntry {
       UUID actorMembershipId,
       OfficialRecordType type,
       UUID sourceId,
-      String title,
-      String body,
+      OfficialRecordContext context,
+      OfficialRecordTemplate template,
       OffsetDateTime occurredAt) {
-    this(
-        polityId,
-        entryNumber,
-        jurisdictionId,
-        constitutionVersionId,
-        actorMembershipId,
-        type,
-        sourceId,
-        OfficialRecordCitation.empty(),
-        title,
-        body,
-        occurredAt);
-  }
-
-  public OfficialRecordEntry(
-      UUID polityId,
-      int entryNumber,
-      UUID jurisdictionId,
-      UUID constitutionVersionId,
-      UUID actorMembershipId,
-      OfficialRecordType type,
-      UUID sourceId,
-      OfficialRecordCitation citation,
-      String title,
-      String body,
-      OffsetDateTime occurredAt) {
+    Objects.requireNonNull(context, "context");
+    Objects.requireNonNull(template, "template");
     this.polityId = polityId;
     this.entryNumber = entryNumber;
     this.jurisdictionId = jurisdictionId;
@@ -118,15 +108,18 @@ public class OfficialRecordEntry {
     this.actorMembershipId = actorMembershipId;
     this.type = type;
     this.sourceId = sourceId;
-    this.motionId = citation.motionId();
-    this.procedureId = citation.procedureId();
-    this.institutionId = citation.institutionId();
-    this.powerCode = citation.powerCode();
-    this.certificationId = citation.certificationId();
-    this.effectType = citation.effectType();
-    this.outcome = citation.outcome();
-    this.title = title;
-    this.body = body;
+    this.motionId = context.motionId();
+    this.procedureId = context.procedureId();
+    this.institutionId = context.institutionId();
+    this.powerCode = context.powerCode();
+    this.certificationId = context.certificationId();
+    this.effectType = context.effectType();
+    this.outcome = context.outcome() == null ? null : context.outcome().value();
+    this.title = template.fallbackTitle();
+    this.body = template.fallbackBody();
+    this.titleKey = template.titleKey();
+    this.bodyKey = template.bodyKey();
+    this.templateParams = template.params();
     this.occurredAt = occurredAt;
   }
 }

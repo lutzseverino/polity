@@ -7,12 +7,12 @@ import static org.mockito.Mockito.when;
 
 import com.odonta.polity.model.PolityVisibility;
 import com.odonta.polity.repository.PolityRepository;
-import com.odonta.polity.service.MembershipReader;
+import com.odonta.polity.service.MembershipService;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class PolityAccessPolicyTest {
-  private final MembershipReader memberships = mock(MembershipReader.class);
+  private final MembershipService memberships = mock(MembershipService.class);
   private final PolityRepository polities = mock(PolityRepository.class);
   private final PolityAccessPolicy access = new PolityAccessPolicy(memberships, polities);
 
@@ -36,6 +36,6 @@ class PolityAccessPolicyTest {
 
     access.requireReadable(polityId, userId);
 
-    verify(memberships).active(polityId, userId);
+    verify(memberships).requireActive(polityId, userId);
   }
 }

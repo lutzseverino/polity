@@ -2,10 +2,12 @@ package com.odonta.polity.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.odonta.polity.evaluator.VotingEvaluator;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Procedure;
 import com.odonta.polity.model.Vote;
 import com.odonta.polity.model.VoteChoice;
+import com.odonta.polity.model.VotingOutcomeReason;
 import com.odonta.polity.model.VotingThreshold;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ class VotingEvaluatorTest {
     assertThat(result.quorumMet()).isTrue();
     assertThat(result.thresholdMet()).isTrue();
     assertThat(result.passed()).isTrue();
+    assertThat(result.outcomeReason()).isEqualTo(VotingOutcomeReason.PASSED);
   }
 
   @Test
@@ -41,6 +44,7 @@ class VotingEvaluatorTest {
     assertThat(result.quorumMet()).isTrue();
     assertThat(result.thresholdMet()).isFalse();
     assertThat(result.passed()).isFalse();
+    assertThat(result.outcomeReason()).isEqualTo(VotingOutcomeReason.THRESHOLD_NOT_MET);
   }
 
   @Test
@@ -50,7 +54,7 @@ class VotingEvaluatorTest {
     assertThat(result.quorumMet()).isFalse();
     assertThat(result.thresholdMet()).isTrue();
     assertThat(result.passed()).isFalse();
-    assertThat(result.explanation()).contains("quorum was not satisfied");
+    assertThat(result.outcomeReason()).isEqualTo(VotingOutcomeReason.QUORUM_NOT_MET);
   }
 
   @Test

@@ -10,8 +10,6 @@ public interface SanctionProjection {
 
   UUID getTargetMembershipId();
 
-  String getTargetName();
-
   SanctionType getType();
 
   SanctionStatus getStatus();

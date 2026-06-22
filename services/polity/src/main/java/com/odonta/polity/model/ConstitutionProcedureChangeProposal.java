@@ -39,6 +39,13 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
   @Column(name = "threshold")
   private VotingThreshold threshold;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "electorate")
+  private ProcedureElectorate electorate;
+
+  @Column(name = "electorate_office_code")
+  private String electorateOfficeCode;
+
   @Column(name = "minimum_notice_hours")
   private Integer minimumNoticeHours;
 
@@ -52,6 +59,8 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
       Integer quorumNumerator,
       Integer quorumDenominator,
       VotingThreshold threshold,
+      ProcedureElectorate electorate,
+      String electorateOfficeCode,
       Integer minimumNoticeHours,
       Integer votingPeriodHours) {
     this.polityId = polityId;
@@ -60,6 +69,8 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
     this.quorumNumerator = quorumNumerator;
     this.quorumDenominator = quorumDenominator;
     this.threshold = threshold;
+    this.electorate = electorate;
+    this.electorateOfficeCode = electorateOfficeCode;
     this.minimumNoticeHours = minimumNoticeHours;
     this.votingPeriodHours = votingPeriodHours;
   }

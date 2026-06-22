@@ -9,12 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PolityGrantPlanner {
-  public GrantPlan founder(String subject, UUID polityId) {
-    return GrantPlan.builder()
-        .grantFullAccess(subject, PolityResources.POLITY.resource(polityId))
-        .build();
-  }
-
   public GrantPlan membership(String subject, UUID polityId) {
     return GrantPlan.builder()
         .grantActions(

@@ -13,6 +13,8 @@ From the repository root:
 ```bash
 pnpm test:service
 pnpm compile:service
+pnpm check:service:architecture
+pnpm check:service:static
 ```
 
 Or from this service directory:
@@ -23,6 +25,10 @@ mvn test
 ```
 
 The service consumes Odonta platform artifacts through the local or configured Maven repository.
+
+Architecture rules live in the ArchUnit test suite and run with `mvn test`. SpotBugs runs through
+`pnpm check:service:static`; generated OpenAPI code and low-value model DTO mutability findings are
+excluded in `spotbugs-exclude.xml` so the gate focuses on higher-signal bug patterns.
 
 ## Documentation
 

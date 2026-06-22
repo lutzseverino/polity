@@ -1,11 +1,22 @@
 package com.odonta.polity.model;
 
 public enum PowerCode {
-  ADMIT_MEMBER,
-  INTRODUCE_MOTION,
-  INTRODUCE_OFFICE_ASSIGNMENT,
-  INTRODUCE_SANCTION,
-  INTRODUCE_APPEAL,
-  INTRODUCE_AMENDMENT,
-  REQUEST_CERTIFICATION
+  ADMIT_MEMBER(false),
+  INTRODUCE_MOTION(true),
+  INTRODUCE_OFFICE_ELECTION(true),
+  INTRODUCE_SANCTION(false),
+  INTRODUCE_APPEAL(true),
+  INTRODUCE_AMENDMENT(true),
+  INTRODUCE_DISBANDMENT(true),
+  REQUEST_CERTIFICATION(true);
+
+  private final boolean activeMemberHolderRequired;
+
+  PowerCode(boolean activeMemberHolderRequired) {
+    this.activeMemberHolderRequired = activeMemberHolderRequired;
+  }
+
+  public boolean requiresActiveMemberHolder() {
+    return activeMemberHolderRequired;
+  }
 }

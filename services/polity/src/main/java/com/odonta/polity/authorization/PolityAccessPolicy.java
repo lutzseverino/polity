@@ -2,7 +2,7 @@ package com.odonta.polity.authorization;
 
 import com.odonta.polity.model.PolityVisibility;
 import com.odonta.polity.repository.PolityRepository;
-import com.odonta.polity.service.MembershipReader;
+import com.odonta.polity.service.MembershipService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PolityAccessPolicy {
-  private final MembershipReader memberships;
+  private final MembershipService memberships;
   private final PolityRepository polities;
 
   public boolean isPublic(UUID polityId) {
@@ -21,6 +21,6 @@ public class PolityAccessPolicy {
     if (isPublic(polityId)) {
       return;
     }
-    memberships.active(polityId, userId);
+    memberships.requireActive(polityId, userId);
   }
 }

@@ -4,6 +4,7 @@ import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.PowerCode;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 public interface OfficialRecordProjection {
@@ -11,15 +12,21 @@ public interface OfficialRecordProjection {
 
   int getEntryNumber();
 
+  UUID getConstitutionVersionId();
+
+  UUID getActorMembershipId();
+
   OfficialRecordType getType();
 
   String getTitle();
 
   String getBody();
 
-  String getActorName();
+  String getTitleKey();
 
-  int getConstitutionVersion();
+  String getBodyKey();
+
+  Map<String, Object> getTemplateParams();
 
   UUID getSourceId();
 

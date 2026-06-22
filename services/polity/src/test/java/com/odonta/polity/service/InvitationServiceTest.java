@@ -1,8 +1,10 @@
 package com.odonta.polity.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -10,13 +12,14 @@ import static org.mockito.Mockito.when;
 
 import com.odonta.authorization.grant.Grants;
 import com.odonta.authorization.spring.AuthenticatedUser;
+import com.odonta.common.api.ApiException;
 import com.odonta.identity.client.IdentityUser;
 import com.odonta.identity.client.IdentityUserStatus;
 import com.odonta.identity.client.IdentityUsersClient;
 import com.odonta.identity.client.ProvisionalUser;
+import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
-import com.odonta.polity.mapper.InvitationApplicationMapper;
-import com.odonta.polity.mapper.PolityApplicationMapper;
+import com.odonta.polity.mapper.MembershipApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
@@ -26,6 +29,7 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficialRecordType;
+import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipProjection;
@@ -50,29 +54,30 @@ class InvitationServiceTest {
   private final IdentityUsersClient identityUsers = mock(IdentityUsersClient.class);
   private final MembershipInvitationRepository invitations =
       mock(MembershipInvitationRepository.class);
-  private final MembershipReader membershipReader = mock(MembershipReader.class);
+  private final MembershipService membershipService = mock(MembershipService.class);
   private final MembershipRepository memberships = mock(MembershipRepository.class);
   private final PolityGrantPlanner grantPlanner = new PolityGrantPlanner();
   private final PolityService polities = mock(PolityService.class);
-  private final OfficialRecordWriter record = mock(OfficialRecordWriter.class);
+  private final OfficialRecordService officialRecords = mock(OfficialRecordService.class);
   private InvitationService service;
 
   @BeforeEach
   void setUp() {
+    when(membershipService.displayName(any(UUID.class))).thenReturn("Ada");
+    when(polities.name(any(UUID.class))).thenReturn("Friend Republic");
     service =
         new InvitationService(
             Clock.fixed(Instant.from(NOW), ZoneOffset.UTC),
             authority,
             grants,
             identityUsers,
-            Mappers.getMapper(InvitationApplicationMapper.class),
             invitations,
-            membershipReader,
+            membershipService,
             memberships,
-            Mappers.getMapper(PolityApplicationMapper.class),
+            Mappers.getMapper(MembershipApplicationMapper.class),
             grantPlanner,
             polities,
-            record);
+            officialRecords);
   }
 
   @Test
@@ -82,14 +87,14 @@ class InvitationServiceTest {
     UUID inviterMembershipId = UUID.randomUUID();
     UUID inviteeUserId = UUID.randomUUID();
     UUID invitationId = UUID.randomUUID();
-    Membership inviter = member(polityId, inviterUserId, inviterMembershipId, "Ada");
+    Membership inviter = member(polityId, inviterUserId, inviterMembershipId);
     ConstitutionVersion constitution = constitution(polityId);
     Jurisdiction jurisdiction = jurisdiction(polityId);
     ProvisionalUser invitee = new ProvisionalUser(inviteeUserId, "subject:invitee");
     MembershipInvitationProjection invitationProjection =
         invitationProjection(invitationId, polityId);
 
-    when(membershipReader.active(polityId, inviterUserId)).thenReturn(inviter);
+    when(membershipService.active(polityId, inviterUserId)).thenReturn(inviter);
     when(polities.constitution(polityId)).thenReturn(constitution);
     when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
     when(identityUsers.createProvisional("friend@example.com")).thenReturn(invitee);
@@ -115,7 +120,7 @@ class InvitationServiceTest {
     assertThat(invitationCaptor.getValue().getEmail()).isEqualTo("friend@example.com");
     verify(memberships, never()).saveAndFlush(any(Membership.class));
     verify(grants, never()).stage(any());
-    verify(record)
+    verify(officialRecords)
         .append(
             eq(polityId),
             eq(jurisdiction.getId()),
@@ -126,6 +131,80 @@ class InvitationServiceTest {
             any(),
             any(),
             eq(NOW));
+  }
+
+  @Test
+  void creatingInvitationAllowsProvisionalFounderAdmission() {
+    UUID polityId = UUID.randomUUID();
+    UUID inviterUserId = UUID.randomUUID();
+    UUID inviterMembershipId = UUID.randomUUID();
+    UUID inviteeUserId = UUID.randomUUID();
+    UUID invitationId = UUID.randomUUID();
+    Membership inviter = member(polityId, inviterUserId, inviterMembershipId);
+    ConstitutionVersion constitution = constitution(polityId);
+    Jurisdiction jurisdiction = jurisdiction(polityId);
+    ProvisionalUser invitee = new ProvisionalUser(inviteeUserId, "subject:invitee");
+    MembershipInvitationProjection invitationProjection =
+        invitationProjection(invitationId, polityId);
+
+    when(membershipService.active(polityId, inviterUserId)).thenReturn(inviter);
+    when(polities.constitution(polityId)).thenReturn(constitution);
+    doThrow(
+            ApiException.forbidden(
+                "constitutional_authority_missing", "The member lacks constitutional authority."))
+        .when(authority)
+        .require(inviter, constitution, PowerCode.ADMIT_MEMBER);
+    when(polities.hasProvisionalFounderAdmissionAuthority(inviter)).thenReturn(true);
+    when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
+    when(identityUsers.createProvisional("friend@example.com")).thenReturn(invitee);
+    when(invitations.saveAndFlush(any(MembershipInvitation.class)))
+        .thenAnswer(
+            invocation -> {
+              MembershipInvitation invitation = invocation.getArgument(0);
+              ReflectionTestUtils.setField(invitation, "id", invitationId);
+              return invitation;
+            });
+    when(invitations.findProjectedById(invitationId)).thenReturn(Optional.of(invitationProjection));
+
+    var result =
+        service.create(
+            polityId,
+            new AuthenticatedUser(inviterUserId, "subject:inviter", "Ada"),
+            new CreateMemberInvitationInput("Friend@Example.com"));
+
+    assertThat(result.status()).isEqualTo(InvitationStatus.PENDING);
+    verify(polities).hasProvisionalFounderAdmissionAuthority(inviter);
+    verify(invitations).saveAndFlush(any(MembershipInvitation.class));
+  }
+
+  @Test
+  void creatingInvitationDoesNotBypassMissingAdmissionPower() {
+    UUID polityId = UUID.randomUUID();
+    UUID inviterUserId = UUID.randomUUID();
+    UUID inviterMembershipId = UUID.randomUUID();
+    Membership inviter = member(polityId, inviterUserId, inviterMembershipId);
+    ConstitutionVersion constitution = constitution(polityId);
+
+    when(membershipService.active(polityId, inviterUserId)).thenReturn(inviter);
+    when(polities.constitution(polityId)).thenReturn(constitution);
+    doThrow(
+            ApiException.forbidden(
+                "constitutional_power_missing",
+                "The governing constitution does not authorize this action."))
+        .when(authority)
+        .require(inviter, constitution, PowerCode.ADMIT_MEMBER);
+
+    assertThatThrownBy(
+            () ->
+                service.create(
+                    polityId,
+                    new AuthenticatedUser(inviterUserId, "subject:inviter", "Ada"),
+                    new CreateMemberInvitationInput("Friend@Example.com")))
+        .isInstanceOf(ApiException.class)
+        .hasMessage("The governing constitution does not authorize this action.");
+
+    verify(polities, never()).hasProvisionalFounderAdmissionAuthority(inviter);
+    verify(identityUsers, never()).createProvisional(any());
   }
 
   @Test
@@ -185,7 +264,8 @@ class InvitationServiceTest {
     verify(memberships).saveAndFlush(memberCaptor.capture());
     assertThat(memberCaptor.getValue().getAdmittedBy()).isEqualTo(inviterMembershipId);
     verify(grants).stage(any());
-    verify(record)
+    verify(polities).completeBootstrapIfReady(polityId, NOW);
+    verify(officialRecords)
         .append(
             eq(polityId),
             eq(jurisdiction.getId()),
@@ -198,14 +278,14 @@ class InvitationServiceTest {
             eq(NOW));
   }
 
-  private Membership member(UUID polityId, UUID userId, UUID membershipId, String displayName) {
+  private Membership member(UUID polityId, UUID userId, UUID membershipId) {
     Membership member =
         new Membership(
             polityId,
             userId,
             "subject:" + userId,
-            displayName.toLowerCase() + "@example.com",
-            displayName,
+            "ada@example.com",
+            "Ada",
             NOW.minusDays(1),
             null);
     ReflectionTestUtils.setField(member, "id", membershipId);
@@ -229,9 +309,8 @@ class InvitationServiceTest {
     MembershipInvitationProjection projection = mock(MembershipInvitationProjection.class);
     when(projection.getId()).thenReturn(invitationId);
     when(projection.getPolityId()).thenReturn(polityId);
-    when(projection.getPolityName()).thenReturn("Friend Republic");
     when(projection.getEmail()).thenReturn("friend@example.com");
-    when(projection.getInvitedByName()).thenReturn("Ada");
+    when(projection.getInvitedBy()).thenReturn(UUID.randomUUID());
     when(projection.getStatus()).thenReturn(InvitationStatus.PENDING);
     when(projection.getInvitedAt()).thenReturn(NOW);
     return projection;
@@ -241,7 +320,7 @@ class InvitationServiceTest {
     MembershipProjection projection = mock(MembershipProjection.class);
     when(projection.getId()).thenReturn(membershipId);
     when(projection.getUserId()).thenReturn(userId);
-    when(projection.getName()).thenReturn("Bea");
+    when(projection.getDisplayName()).thenReturn("Bea");
     when(projection.getEmail()).thenReturn("friend@example.com");
     when(projection.getStatus()).thenReturn(MembershipStatus.ACTIVE);
     when(projection.getAdmittedAt()).thenReturn(NOW);

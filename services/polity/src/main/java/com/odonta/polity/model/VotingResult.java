@@ -9,4 +9,4 @@ public record VotingResult(
     boolean quorumMet,
     boolean thresholdMet,
     boolean passed,
-    String explanation) {}
+    VotingOutcomeReason outcomeReason) {}
