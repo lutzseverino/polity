@@ -43,10 +43,37 @@ pnpm check
 pnpm check:js
 pnpm check:service
 pnpm compile:service
+pnpm quality
 ```
 
-`pnpm check` runs both the JS/TS workspace checks and the Polity service tests. Use scoped commands
-when you only need feedback for one side of the workspace.
+`pnpm check` runs the JS/TS workspace checks and the Polity service checks. Use scoped commands
+when you only need feedback for one side of the workspace. `pnpm quality` adds repository hygiene
+checks on top of the default gate.
+
+The quality stack is layered by ownership:
+
+- Formatting: Biome for JS/TS/CSS/config files, Spotless with Google Java Format for Java.
+- Correctness: TypeScript strict checks, Maven tests, and focused typed ESLint rules.
+- Architecture: dependency-cruiser for TS workspace boundaries and ArchUnit for backend package
+  boundaries.
+- Bug patterns: SpotBugs for Java bytecode analysis.
+- Hygiene: Knip for unused TS/JS files, dependencies, and exports.
+
+Useful narrow commands:
+
+```bash
+pnpm lint:ts
+pnpm check:ts:architecture
+pnpm check:ts:architecture:landing
+pnpm check:ts:architecture:mobile
+pnpm check:ts:architecture:design
+pnpm check:deps
+pnpm check:service:architecture
+pnpm check:service:static
+```
+
+SonarQube can be added later as a dashboard and quality-gate layer over these checks. Project-specific
+architecture rules should stay in ArchUnit and dependency-cruiser, where they are explicit and local.
 
 ## Documentation
 

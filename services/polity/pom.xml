@@ -27,6 +27,8 @@
     <mapstruct.version>1.6.3</mapstruct.version>
     <odonta.platform.version>0.0.0-SNAPSHOT</odonta.platform.version>
     <openapi-generator.version>7.22.0</openapi-generator.version>
+    <archunit.version>1.4.2</archunit.version>
+    <spotbugs.version>4.10.2.0</spotbugs.version>
     <spotless.version>3.4.0</spotless.version>
   </properties>
 
@@ -49,6 +51,7 @@
     <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><scope>runtime</scope></dependency>
     <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version><optional>true</optional></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>com.tngtech.archunit</groupId><artifactId>archunit-junit5</artifactId><version>${archunit.version}</version><scope>test</scope></dependency>
   </dependencies>
 
   <build>
@@ -127,6 +130,17 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs.version}</version>
+        <configuration>
+          <effort>Max</effort>
+          <threshold>Medium</threshold>
+          <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
+          <xmlOutput>true</xmlOutput>
         </configuration>
       </plugin>
       <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin>

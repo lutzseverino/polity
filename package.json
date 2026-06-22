@@ -11,8 +11,15 @@
     "build": "node scripts/run-package-script.mjs root build:landing",
     "build:landing": "node scripts/run-package-script.mjs workspace apps/landing build",
     "check": "node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service",
-    "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck",
-    "check:service": "node scripts/run-package-script.mjs root test:service",
+    "check:deps": "knip",
+    "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root lint:ts && node scripts/run-package-script.mjs root check:ts:architecture",
+    "check:service": "node scripts/run-package-script.mjs root test:service && node scripts/run-package-script.mjs root check:service:static",
+    "check:service:architecture": "mvn -f services/polity/pom.xml -Dtest=PolityArchitectureTest test",
+    "check:service:static": "mvn -f services/polity/pom.xml compile spotbugs:check",
+    "check:ts:architecture": "node scripts/check-ts-architecture.mjs",
+    "check:ts:architecture:design": "node scripts/check-ts-architecture.mjs design",
+    "check:ts:architecture:landing": "node scripts/check-ts-architecture.mjs landing",
+    "check:ts:architecture:mobile": "node scripts/check-ts-architecture.mjs mobile",
     "compile:service": "mvn -f services/polity/pom.xml compile",
     "dev": "node scripts/run-package-script.mjs root dev:mobile",
     "dev:landing": "node scripts/run-package-script.mjs workspace apps/landing dev",
@@ -20,6 +27,8 @@
     "format": "biome check . --write",
     "generate:api": "node scripts/run-package-script.mjs workspace apps/landing generate:api",
     "lint": "biome check .",
+    "lint:ts": "eslint --config eslint.config.mjs .",
+    "quality": "node scripts/run-package-script.mjs root check && node scripts/run-package-script.mjs root check:deps",
     "test:service": "mvn -f services/polity/pom.xml test",
     "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"
   },
@@ -27,6 +36,13 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0"
+    "@biomejs/biome": "^2.5.0",
+    "@typescript-eslint/eslint-plugin": "8.61.1",
+    "@typescript-eslint/parser": "8.61.1",
+    "dependency-cruiser": "17.4.3",
+    "eslint": "9.39.1",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.3",
+    "knip": "6.17.2"
   }
 }

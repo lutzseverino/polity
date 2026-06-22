@@ -1,0 +1,41 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreDependencies": [
+    "@fontsource-variable/geist",
+    "@fontsource-variable/geist-mono",
+    "@fontsource/anton",
+    "expo-font",
+    "expo-updates",
+    "shadcn",
+    "tailwindcss",
+    "tw-animate-css"
+  ],
+  "ignoreBinaries": ["mvn"],
+  "ignoreIssues": {
+    "apps/landing/src/components/app/**": ["exports", "types"],
+    "apps/landing/src/components/ui/**": ["exports", "types"]
+  },
+  "workspaces": {
+    ".": {
+      "entry": [
+        "package.json",
+        "scripts/**/*.mjs",
+        "*.config.{js,cjs,mjs,ts}",
+        ".dependency-cruiser*.cjs"
+      ],
+      "project": ["*.{js,cjs,mjs}", "scripts/**/*.mjs"]
+    },
+    "apps/landing": {
+      "entry": ["src/App.tsx"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["src/api/generated/**"]
+    },
+    "apps/mobile": {
+      "entry": ["src/app/**/*.{ts,tsx}", "app.json"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/design": {
+      "project": ["src/**/*.ts", "bin/**/*.mjs"]
+    }
+  }
+}

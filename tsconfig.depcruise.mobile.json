@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "baseUrl": "apps/mobile",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/assets/*": ["assets/*"],
+      "@polity/design": ["../../packages/design/src/index.ts"],
+      "@polity/design/*": ["../../packages/design/src/*"]
+    },
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["apps/mobile/src", "packages/design/src"]
+}

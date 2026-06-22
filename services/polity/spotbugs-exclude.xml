@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <Match>
+    <Package name="~com[.]odonta[.]polity[.]api([.].*)?" />
+  </Match>
+  <Match>
+    <Package name="~com[.]odonta[.]polity[.]model([.].*)?" />
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
+    <Package name="~com[.]odonta[.]polity[.]model([.].*)?" />
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+  </Match>
+</FindBugsFilter>

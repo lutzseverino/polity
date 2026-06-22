@@ -50,13 +50,29 @@ let args;
 
 if (scope === "root") {
   command = packageManager;
-  args = ["run", target, ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : [])];
+  args = [
+    "run",
+    target,
+    ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : []),
+  ];
 } else if (scope === "workspace") {
   command = packageManager;
   args =
     packageManager === "pnpm"
-      ? ["--dir", target, "run", script, ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : [])]
-      : ["--workspace", target, "run", script, ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : [])];
+      ? [
+          "--dir",
+          target,
+          "run",
+          script,
+          ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : []),
+        ]
+      : [
+          "--workspace",
+          target,
+          "run",
+          script,
+          ...(scriptArgs.length > 0 ? ["--", ...scriptArgs] : []),
+        ];
 } else {
   printUsageAndExit();
 }
