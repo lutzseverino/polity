@@ -31,6 +31,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "check:architecture": "depcruise --config dependency-cruiser.cjs src",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit"
   },

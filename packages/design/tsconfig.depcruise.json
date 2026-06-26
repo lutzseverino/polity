@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "strict": true
   },
-  "include": ["packages/design/src"]
+  "include": ["src"]
 }

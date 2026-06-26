@@ -10,11 +10,12 @@
     "includes": [
       "package.json",
       "pnpm-workspace.yaml",
-      ".dependency-cruiser*.cjs",
+      ".dependency-cruiser.base.cjs",
       "eslint.config.mjs",
       "knip.json",
       "scripts/**/*.mjs",
-      "tsconfig.depcruise*.json",
+      "apps/*/dependency-cruiser.cjs",
+      "apps/*/tsconfig.depcruise.json",
       "apps/landing/components.json",
       "apps/landing/index.html",
       "apps/landing/package.json",
@@ -31,9 +32,11 @@
       "apps/mobile/src/**/*.tsx",
       "apps/mobile/tsconfig.json",
       "packages/*/package.json",
+      "packages/*/dependency-cruiser.cjs",
       "packages/*/bin/**/*.mjs",
       "packages/*/src/**/*.json",
       "packages/*/src/**/*.ts",
+      "packages/*/tsconfig.depcruise.json",
       "packages/*/tsconfig.json",
       "!apps/landing/src/api/generated"
     ]

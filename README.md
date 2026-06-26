@@ -73,7 +73,8 @@ pnpm check:service:static
 ```
 
 SonarQube can be added later as a dashboard and quality-gate layer over these checks. Project-specific
-architecture rules should stay in ArchUnit and dependency-cruiser, where they are explicit and local.
+architecture rules should stay in ArchUnit and each TS workspace's local dependency-cruiser config, where
+they are explicit and owned near the code they describe.
 
 ## Documentation
 

@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "baseUrl": "apps/landing",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@polity/design": ["../../packages/design/src/index.ts"],
@@ -20,5 +20,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["apps/landing/src", "packages/design/src"]
+  "include": ["src", "../../packages/design/src"]
 }

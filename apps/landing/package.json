@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b && vite build",
+    "check:architecture": "depcruise --config dependency-cruiser.cjs src",
     "check:theme": "polity-design generate shadcn-theme --out src/design/tokens/shadcn-theme.css --check",
     "dev": "vite",
     "generate:api": "openapi-typescript ../../services/polity/openapi/polity.yaml -o src/api/generated/polity.ts",
