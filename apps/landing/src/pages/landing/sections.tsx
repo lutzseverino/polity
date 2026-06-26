@@ -158,7 +158,7 @@ export function LandingHero({ onboarding }: LandingHeroProps) {
         </div>
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl gap-0 lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[1.05fr_0.95fr] lg:overflow-hidden">
+      <div className="relative mx-auto grid max-w-7xl gap-0 lg:h-[100dvh] lg:grid-cols-[1.05fr_0.95fr] lg:overflow-hidden">
         {/* Left — stays mounted under the poster, so the ground covers/reveals it. */}
         <div
           aria-hidden={isNaming ? undefined : true}
@@ -224,7 +224,7 @@ export function LandingHero({ onboarding }: LandingHeroProps) {
           data-hero-stage
         >
           <Emblem
-            className="absolute top-6 right-6 z-[2] size-20 text-secondary-foreground md:size-28"
+            className="absolute right-6 bottom-6 z-[2] size-20 text-secondary-foreground md:size-28"
             data-hero-stamp
           />
 

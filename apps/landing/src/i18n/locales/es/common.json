@@ -1,9 +1,6 @@
 {
   "brand": {
-    "homeAria": "inicio de decreos",
-    "tagline": "Autogobierno, fundado",
-    "established": "Fund. MMXXVI",
-    "githubAria": "Abrir decreos en GitHub"
+    "homeAria": "inicio de decreos"
   },
   "language": {
     "label": "Idioma"

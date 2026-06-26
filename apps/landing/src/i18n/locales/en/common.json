@@ -1,9 +1,6 @@
 {
   "brand": {
-    "homeAria": "decreos home",
-    "tagline": "Self-government, founded",
-    "established": "Est. MMXXVI",
-    "githubAria": "Open decreos on GitHub"
+    "homeAria": "decreos home"
   },
   "language": {
     "label": "Language"

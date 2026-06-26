@@ -1,6 +1,6 @@
 import { useRef } from "react";
+import { LandingMasthead } from "./masthead";
 import { useLandingMotion } from "./motion";
-import { LandingNavbar } from "./navbar";
 import { useLandingOnboarding } from "./onboarding";
 import {
   Colophon,
@@ -26,7 +26,7 @@ export function LandingPage() {
         className="pointer-events-none fixed inset-0 z-50 opacity-[0.04] mix-blend-multiply texture-grain dark:opacity-[0.05] dark:mix-blend-screen"
       />
 
-      <LandingNavbar />
+      <LandingMasthead />
 
       <LandingHero onboarding={onboarding} />
       <MethodSection />

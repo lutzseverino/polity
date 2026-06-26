@@ -102,28 +102,34 @@ function measureFoundingVisual(
   founding: boolean,
 ): FoundingVisualState {
   const target = foundingVisualTarget(section, founding);
-  const sectionBox = section.getBoundingClientRect();
+  // The clip-path and burst translate are applied to the founding visual, so
+  // every inset must be measured in *its* box. The visual is `absolute inset-0`
+  // within the section's padding box — inside the section's border. Measuring
+  // against the section's border box instead over-clips by the border width and
+  // leaves a hairline of background along the bottom edge before the separator.
+  const { visual } = getFoundingElements(section);
+  const frameBox = (visual ?? section).getBoundingClientRect();
   const targetBox = target.getBoundingClientRect();
-  const top = Math.max(0, targetBox.top - sectionBox.top);
-  const right = Math.max(0, sectionBox.right - targetBox.right);
-  const bottom = Math.max(0, sectionBox.bottom - targetBox.bottom);
-  const left = Math.max(0, targetBox.left - sectionBox.left);
-  const clippedTargetLeft = sectionBox.left + left;
-  const clippedTargetRight = sectionBox.right - right;
-  const clippedTargetTop = sectionBox.top + top;
-  const clippedTargetBottom = sectionBox.bottom - bottom;
+  const top = Math.max(0, targetBox.top - frameBox.top);
+  const right = Math.max(0, frameBox.right - targetBox.right);
+  const bottom = Math.max(0, frameBox.bottom - targetBox.bottom);
+  const left = Math.max(0, targetBox.left - frameBox.left);
+  const clippedTargetLeft = frameBox.left + left;
+  const clippedTargetRight = frameBox.right - right;
+  const clippedTargetTop = frameBox.top + top;
+  const clippedTargetBottom = frameBox.bottom - bottom;
   const targetCenterX =
     clippedTargetLeft + (clippedTargetRight - clippedTargetLeft) / 2;
   const targetCenterY =
     clippedTargetTop + (clippedTargetBottom - clippedTargetTop) / 2;
-  const sectionCenterX = sectionBox.left + sectionBox.width / 2;
-  const sectionCenterY = sectionBox.top + sectionBox.height / 2;
+  const frameCenterX = frameBox.left + frameBox.width / 2;
+  const frameCenterY = frameBox.top + frameBox.height / 2;
 
   return {
     clipPath: `inset(${top}px ${right}px ${bottom}px ${left}px)`,
     scale: founding ? 1.5 : 1,
-    x: targetCenterX - sectionCenterX,
-    y: targetCenterY - sectionCenterY,
+    x: targetCenterX - frameCenterX,
+    y: targetCenterY - frameCenterY,
   };
 }
 
@@ -401,15 +407,22 @@ export function useFoundingTransition(founding: boolean) {
       const { burstShell, onboarding, plate, visual } =
         getFoundingElements(section);
 
+      const outgoingSurface = founding ? plate : onboarding;
+      const incomingSurface = founding ? onboarding : plate;
+
       gsap.killTweensOf(foundingAnimationTargets(section));
       applyFoundingVisual(section, fromVisual);
       gsap.set(plate, { autoAlpha: founding ? 1 : 0 });
       gsap.set(onboarding, { autoAlpha: founding ? 0 : 1 });
-      if (founding) {
-        pinToPreviousVisualPosition(plate, fromVisual, toVisual);
-      } else {
-        pinToPreviousVisualPosition(onboarding, fromVisual, toVisual);
-      }
+      // The incoming surface fades in at its resting centre. Strip any inline
+      // transform a previous crossing pinned on it (a back crossing pins the
+      // onboarding card, and revertOnUpdate can resurrect that transform) so it
+      // cannot flash in from the stale pin position. Clearing — rather than
+      // setting x/y to 0 — is essential: the onboarding card is centred with a
+      // percentage translate from CSS, which an explicit GSAP transform would
+      // overwrite, dropping it half its size off-centre until it settled.
+      gsap.set(incomingSurface, { clearProps: "transform" });
+      pinToPreviousVisualPosition(outgoingSurface, fromVisual, toVisual);
 
       const tl = gsap.timeline({
         onComplete: () => {
