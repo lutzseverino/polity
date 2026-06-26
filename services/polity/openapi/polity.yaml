@@ -14,6 +14,15 @@ tags:
   - name: Justice
   - name: Official Record
 paths:
+  /polity/account:
+    post:
+      tags: [Polities]
+      operationId: provisionPolityAccount
+      summary: Provision baseline Polity grants for the current account.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Baseline account grants were staged. }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /polities:
     get:
       tags: [Polities]
@@ -29,6 +38,8 @@ paths:
       responses:
         "201": { description: Polity created, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /polities/{polityId}:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -147,6 +158,30 @@ paths:
         "201": { description: Appeal motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
+  /polities/{polityId}/motions/office-term-reviews:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolityOfficeTermReviewMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateOfficeTermReviewMotionRequest" } } } }
+      responses:
+        "201": { description: Office term review motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /polities/{polityId}/motions/constitutional-reviews:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Motions]
+      operationId: createPolityConstitutionalReviewMotion
+      security: [{ bearerAuth: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateConstitutionalReviewMotionRequest" } } } }
+      responses:
+        "201": { description: Constitutional review motion introduced, content: { application/json: { schema: { $ref: "#/components/schemas/MotionResponse" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /polities/{polityId}/motions/constitution-amendments:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
@@ -252,6 +287,22 @@ paths:
       security: [{ bearerAuth: [] }]
       responses:
         "200": { description: Appeals, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/AppealResponse" } } } } }
+  /polities/{polityId}/office-term-reviews:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Justice]
+      operationId: listPolityOfficeTermReviews
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Office term reviews, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeTermReviewResponse" } } } } }
+  /polities/{polityId}/constitutional-reviews:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Justice]
+      operationId: listPolityConstitutionalReviews
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Constitutional reviews, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ConstitutionalReviewResponse" } } } } }
   /polities/{polityId}/record:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -342,12 +393,28 @@ components:
       properties:
         sanctionId: { type: string, format: uuid }
         reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CreateOfficeTermReviewMotionRequest:
+      type: object
+      required: [officeTermId, reason]
+      properties:
+        officeTermId: { type: string, format: uuid }
+        reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+    CreateConstitutionalReviewMotionRequest:
+      type: object
+      required: [targetRecordId, reason]
+      properties:
+        targetRecordId: { type: string, format: uuid }
+        reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
     CreateConstitutionAmendmentMotionRequest:
       type: object
       required: [title, body]
       properties:
         title: { type: string, minLength: 1, maxLength: 200, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
         body: { type: string, minLength: 1, maxLength: 10000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        institutionChanges:
+          type: array
+          maxItems: 10
+          items: { $ref: "#/components/schemas/CreateInstitutionChangeRequest" }
         procedureChanges:
           type: array
           maxItems: 10
@@ -360,16 +427,27 @@ components:
           type: array
           maxItems: 10
           items: { $ref: "#/components/schemas/CreatePowerChangeRequest" }
+    CreateInstitutionChangeRequest:
+      type: object
+      required: [action]
+      properties:
+        action: { $ref: "#/components/schemas/ConstitutionInstitutionChangeAction" }
+        institutionId: { type: string, format: uuid }
+        jurisdictionId: { type: string, format: uuid }
+        name: { type: string, minLength: 1, maxLength: 120 }
+        kind: { $ref: "#/components/schemas/InstitutionKind" }
     CreateProcedureChangeRequest:
       type: object
       required: [procedureCode]
       properties:
         procedureCode: { type: string, minLength: 1, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        institutionId: { type: string, format: uuid }
         quorumNumerator: { type: integer, minimum: 1 }
         quorumDenominator: { type: integer, minimum: 1 }
         threshold: { $ref: "#/components/schemas/VotingThreshold" }
         electorate: { $ref: "#/components/schemas/ProcedureElectorate" }
         electorateOfficeCode: { type: string, minLength: 1, maxLength: 64, pattern: "^[a-z][a-z0-9-]*$" }
+        minimumElectorCount: { type: integer, minimum: 1 }
         minimumNoticeHours: { type: integer, minimum: 0 }
         votingPeriodHours: { type: integer, minimum: 1 }
     CreateOfficeChangeRequest:
@@ -378,9 +456,11 @@ components:
       properties:
         action: { $ref: "#/components/schemas/ConstitutionOfficeChangeAction" }
         code: { type: string, minLength: 1, maxLength: 64, pattern: "^[a-z][a-z0-9-]*$", x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
+        jurisdictionId: { type: string, format: uuid }
         name: { type: string, minLength: 1, maxLength: 120 }
         description: { type: string, minLength: 1, maxLength: 1000 }
         termLengthDays: { type: integer, minimum: 1 }
+        seatCount: { type: integer, minimum: 1 }
     CreatePowerChangeRequest:
       type: object
       required: [powerCode, holderScope]
@@ -407,7 +487,8 @@ components:
     PolityVisibility: { type: string, enum: [public, private] }
     PolityStatus: { type: string, enum: [active, disbanded] }
     ConstitutionStatus: { type: string, enum: [ratified, superseded] }
-    InstitutionKind: { type: string, enum: [assembly] }
+    JurisdictionKind: { type: string, enum: [root] }
+    InstitutionKind: { type: string, enum: [assembly, judiciary] }
     PolitySetupPreset: { type: string, enum: [standard_republic] }
     PolityPace: { type: string, enum: [fast, standard, deliberate] }
     InvitationStatus: { type: string, enum: [pending, accepted] }
@@ -416,8 +497,11 @@ components:
     SanctionType: { type: string, enum: [warning, suspension] }
     SanctionStatus: { type: string, enum: [active, vacated, expired] }
     AppealStatus: { type: string, enum: [granted] }
+    OfficeTermReviewStatus: { type: string, enum: [granted] }
+    ConstitutionalReviewStatus: { type: string, enum: [granted] }
     OfficeTermStatus: { type: string, enum: [active, ended] }
     ConstitutionOfficeChangeAction: { type: string, enum: [create, revise, retire] }
+    ConstitutionInstitutionChangeAction: { type: string, enum: [create, revise, retire] }
     PowerHolderScope: { type: string, enum: [active_member, office] }
     OfficialRecordType:
       type: string
@@ -433,12 +517,14 @@ components:
         - resolution_adopted
         - office_assigned
         - office_elected
+        - office_term_vacated
         - sanction_applied
         - appeal_granted
+        - official_act_voided
         - constitution_amended
         - polity_disbanded
         - motion_rejected
-    EffectType: { type: string, enum: [adopt_resolution, assign_office, elect_office, apply_sanction, grant_appeal, amend_constitution, disband_polity] }
+    EffectType: { type: string, enum: [adopt_resolution, elect_office, apply_sanction, grant_appeal, vacate_office_term, void_official_act, amend_constitution, disband_polity] }
     PowerCode:
       type: string
       enum:
@@ -447,6 +533,8 @@ components:
         - introduce_office_election
         - introduce_sanction
         - introduce_appeal
+        - introduce_office_term_review
+        - introduce_constitutional_review
         - introduce_amendment
         - introduce_disbandment
         - request_certification
@@ -458,6 +546,8 @@ components:
         - introduce_office_election
         - introduce_sanction
         - introduce_appeal
+        - introduce_office_term_review
+        - introduce_constitutional_review
         - introduce_amendment
         - introduce_disbandment
         - request_certification
@@ -472,6 +562,7 @@ components:
         constitutionVersion: { type: integer }
         jurisdictionName: { type: string }
         institutionName: { type: string }
+        institutionNameKey: { type: string }
         createdAt: { type: string, format: date-time }
     ActionAvailabilityResponse:
       type: object
@@ -481,24 +572,29 @@ components:
         reason: { type: string }
     PolityActionAvailabilityResponse:
       type: object
-      required: [inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceAmendment, introduceDisbandment, requestCertification]
+      required: [inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceOfficeTermReview, introduceConstitutionalReview, introduceAmendment, introduceDisbandment, requestCertification]
       properties:
         inviteMembers: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceMotion: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceOfficeElection: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceSanction: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceAppeal: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
+        introduceOfficeTermReview: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
+        introduceConstitutionalReview: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceAmendment: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceDisbandment: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         requestCertification: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
     ConstitutionResponse:
       type: object
-      required: [id, version, status, ratifiedAt, institutions, procedures, offices, powers, bootstrap]
+      required: [id, version, status, ratifiedAt, jurisdictions, institutions, procedures, offices, powers, bootstrap]
       properties:
         id: { type: string, format: uuid }
         version: { type: integer }
         status: { $ref: "#/components/schemas/ConstitutionStatus" }
         ratifiedAt: { type: string, format: date-time }
+        jurisdictions:
+          type: array
+          items: { $ref: "#/components/schemas/ConstitutionJurisdictionResponse" }
         institutions:
           type: array
           items: { $ref: "#/components/schemas/ConstitutionInstitutionResponse" }
@@ -512,19 +608,28 @@ components:
           type: array
           items: { $ref: "#/components/schemas/ConstitutionPowerResponse" }
         bootstrap: { $ref: "#/components/schemas/ConstitutionBootstrapResponse" }
-    ConstitutionInstitutionResponse:
+    ConstitutionJurisdictionResponse:
       type: object
       required: [id, name, kind]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
+        kind: { $ref: "#/components/schemas/JurisdictionKind" }
+    ConstitutionInstitutionResponse:
+      type: object
+      required: [id, jurisdictionId, name, kind]
+      properties:
+        id: { type: string, format: uuid }
+        jurisdictionId: { type: string, format: uuid }
+        name: { type: string }
         nameKey: { type: string }
         kind: { $ref: "#/components/schemas/InstitutionKind" }
     ConstitutionProcedureResponse:
       type: object
-      required: [id, code, name, quorumNumerator, quorumDenominator, threshold, electorate, minimumNoticeHours, votingPeriodHours, effectType]
+      required: [id, institutionId, code, name, quorumNumerator, quorumDenominator, threshold, electorate, minimumElectorCount, minimumNoticeHours, votingPeriodHours, effectType]
       properties:
         id: { type: string, format: uuid }
+        institutionId: { type: string, format: uuid }
         code: { type: string }
         name: { type: string }
         nameKey: { type: string }
@@ -533,6 +638,7 @@ components:
         threshold: { $ref: "#/components/schemas/VotingThreshold" }
         electorate: { $ref: "#/components/schemas/ProcedureElectorate" }
         electorateOfficeCode: { type: string }
+        minimumElectorCount: { type: integer }
         minimumNoticeHours: { type: integer }
         votingPeriodHours: { type: integer }
         effectType: { $ref: "#/components/schemas/EffectType" }
@@ -676,15 +782,17 @@ components:
         ballots: { type: integer }
     OfficeResponse:
       type: object
-      required: [id, code, name, description, termLengthDays]
+      required: [id, jurisdictionId, code, name, description, termLengthDays, seatCount]
       properties:
         id: { type: string, format: uuid }
+        jurisdictionId: { type: string, format: uuid }
         code: { type: string }
         name: { type: string }
         description: { type: string }
         nameKey: { type: string }
         descriptionKey: { type: string }
         termLengthDays: { type: integer }
+        seatCount: { type: integer }
     OfficeTermResponse:
       type: object
       required: [id, officeId, officeName, membershipId, memberName, status, startedAt, endsAt]
@@ -719,6 +827,34 @@ components:
         appellantMembershipId: { type: string, format: uuid }
         appellantName: { type: string }
         status: { $ref: "#/components/schemas/AppealStatus" }
+        reason: { type: string }
+        decidedAt: { type: string, format: date-time }
+    OfficeTermReviewResponse:
+      type: object
+      required: [id, officeTermId, petitionerMembershipId, petitionerName, vacatedMembershipId, vacatedMemberName, officeName, status, reason, decidedAt]
+      properties:
+        id: { type: string, format: uuid }
+        officeTermId: { type: string, format: uuid }
+        petitionerMembershipId: { type: string, format: uuid }
+        petitionerName: { type: string }
+        vacatedMembershipId: { type: string, format: uuid }
+        vacatedMemberName: { type: string }
+        officeName: { type: string }
+        officeNameKey: { type: string }
+        status: { $ref: "#/components/schemas/OfficeTermReviewStatus" }
+        reason: { type: string }
+        decidedAt: { type: string, format: date-time }
+    ConstitutionalReviewResponse:
+      type: object
+      required: [id, targetRecordId, targetEntryNumber, targetType, petitionerMembershipId, petitionerName, status, reason, decidedAt]
+      properties:
+        id: { type: string, format: uuid }
+        targetRecordId: { type: string, format: uuid }
+        targetEntryNumber: { type: integer, minimum: 1 }
+        targetType: { $ref: "#/components/schemas/OfficialRecordType" }
+        petitionerMembershipId: { type: string, format: uuid }
+        petitionerName: { type: string }
+        status: { $ref: "#/components/schemas/ConstitutionalReviewStatus" }
         reason: { type: string }
         decidedAt: { type: string, format: date-time }
     OfficialRecordEntryResponse:

@@ -8,8 +8,16 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InstitutionRepository extends JpaRepository<Institution, UUID> {
-  Optional<Institution> findByPolityIdAndConstitutionVersionIdAndKind(
+  Optional<Institution> findEntityByIdAndPolityId(UUID id, UUID polityId);
+
+  Optional<Institution> findEntityByPolityIdAndConstitutionVersionIdAndKind(
       UUID polityId, UUID constitutionVersionId, InstitutionKind kind);
 
-  List<Institution> findByConstitutionVersionId(UUID constitutionVersionId);
+  List<Institution> findEntitiesByConstitutionVersionId(UUID constitutionVersionId);
+
+  List<ConstitutionInstitutionProjection> findProjectionsByConstitutionVersionId(
+      UUID constitutionVersionId);
+
+  List<Institution> findEntitiesByPolityIdAndConstitutionVersionId(
+      UUID polityId, UUID constitutionVersionId);
 }

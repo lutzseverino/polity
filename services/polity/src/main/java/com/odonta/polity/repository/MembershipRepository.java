@@ -8,12 +8,14 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
-  Optional<Membership> findByPolityIdAndUserIdAndStatus(
+  Optional<Membership> findEntityById(UUID id);
+
+  Optional<Membership> findEntityByPolityIdAndUserIdAndStatus(
       UUID polityId, UUID userId, MembershipStatus status);
 
   boolean existsByPolityIdAndUserId(UUID polityId, UUID userId);
 
-  List<Membership> findByPolityIdAndStatusOrderByAdmittedAtAsc(
+  List<Membership> findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
       UUID polityId, MembershipStatus status);
 
   List<MembershipProjection> findProjectionsByPolityIdAndStatusOrderByAdmittedAtAsc(

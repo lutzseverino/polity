@@ -4,6 +4,7 @@ import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficeTermStatus;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,16 +16,27 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
       OfficeTermStatus status,
       OffsetDateTime now);
 
-  List<OfficeTerm> findByPolityIdAndOfficeCodeAndStatus(
-      UUID polityId, String officeCode, OfficeTermStatus status);
+  boolean existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndAssignedByMotionIdIsNull(
+      UUID polityId, String officeCode, UUID membershipId, OfficeTermStatus status);
 
-  List<OfficeTerm> findByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+  boolean existsByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
       UUID polityId, String officeCode, OfficeTermStatus status, OffsetDateTime now);
 
-  List<OfficeTerm> findByPolityIdAndOfficeCodeAndStatusAndAssignedByMotionIdIsNull(
+  long countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
+      UUID polityId, String officeCode, OfficeTermStatus status, OffsetDateTime now);
+
+  Optional<OfficeTerm> findEntityByIdAndPolityId(UUID id, UUID polityId);
+
+  List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatus(
       UUID polityId, String officeCode, OfficeTermStatus status);
 
-  List<OfficeTerm> findByPolityIdAndStatus(UUID polityId, OfficeTermStatus status);
+  List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+      UUID polityId, String officeCode, OfficeTermStatus status, OffsetDateTime now);
+
+  List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatusAndAssignedByMotionIdIsNull(
+      UUID polityId, String officeCode, OfficeTermStatus status);
+
+  List<OfficeTerm> findEntitiesByPolityIdAndStatus(UUID polityId, OfficeTermStatus status);
 
   List<OfficeTermProjection> findProjectionsByPolityIdOrderByStartedAtDesc(UUID polityId);
 }

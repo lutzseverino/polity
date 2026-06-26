@@ -115,8 +115,8 @@ public class OfficialRecordEntry {
     this.certificationId = context.certificationId();
     this.effectType = context.effectType();
     this.outcome = context.outcome() == null ? null : context.outcome().value();
-    this.title = template.fallbackTitle();
-    this.body = template.fallbackBody();
+    this.title = template.storedTitle();
+    this.body = template.storedBody();
     this.titleKey = template.titleKey();
     this.bodyKey = template.bodyKey();
     this.templateParams = template.params();

@@ -1,26 +1,26 @@
 package com.odonta.polity.model;
 
 public enum ProcedureTemplateKey {
-  APPEAL("procedure.appeal", "Appeal"),
-  CONSTITUTION_AMENDMENT("procedure.constitution_amendment", "Constitutional amendment"),
-  DISBANDMENT("procedure.disbandment", "Disbandment"),
-  OFFICE_ELECTION("procedure.office_election", "Office election"),
-  ORDINARY_RESOLUTION("procedure.ordinary_resolution", "Ordinary resolution"),
-  SANCTION("procedure.sanction", "Sanction");
+  APPEAL("procedure.appeal"),
+  CONSTITUTION_AMENDMENT("procedure.constitution_amendment"),
+  CONSTITUTIONAL_REVIEW("procedure.constitutional_review"),
+  DISBANDMENT("procedure.disbandment"),
+  OFFICE_TERM_REVIEW("procedure.office_term_review"),
+  OFFICE_ELECTION("procedure.office_election"),
+  ORDINARY_RESOLUTION("procedure.ordinary_resolution"),
+  SANCTION("procedure.sanction");
 
   private final String keyPrefix;
-  private final String fallbackName;
 
-  ProcedureTemplateKey(String keyPrefix, String fallbackName) {
+  ProcedureTemplateKey(String keyPrefix) {
     this.keyPrefix = keyPrefix;
-    this.fallbackName = fallbackName;
   }
 
   public String nameKey() {
     return keyPrefix + ".name";
   }
 
-  public String fallbackName() {
-    return fallbackName;
+  public String storedName() {
+    return nameKey();
   }
 }

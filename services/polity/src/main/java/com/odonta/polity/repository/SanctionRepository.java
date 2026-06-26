@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SanctionRepository extends JpaRepository<Sanction, UUID> {
-  Optional<Sanction> findByIdAndPolityId(UUID id, UUID polityId);
+  Optional<Sanction> findEntityByIdAndPolityId(UUID id, UUID polityId);
 
   boolean existsByPolityIdAndTargetMembershipIdAndTypeAndStatusAndEndsAtAfter(
       UUID polityId,

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,6 +12,7 @@ import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.ConstitutionalPowerTemplateKey;
 import com.odonta.polity.model.Institution;
+import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.InstitutionTemplateKey;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.JurisdictionKind;
@@ -58,9 +60,12 @@ class ConstitutionTemplateServiceTest {
     service.establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
 
     ArgumentCaptor<Institution> institutionCaptor = ArgumentCaptor.forClass(Institution.class);
-    verify(institutions).saveAndFlush(institutionCaptor.capture());
-    assertThat(institutionCaptor.getValue().getNameKey())
-        .isEqualTo(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey());
+    verify(institutions, times(2)).saveAndFlush(institutionCaptor.capture());
+    assertThat(institutionCaptor.getAllValues())
+        .extracting(Institution::getNameKey, Institution::getKind)
+        .containsExactly(
+            tuple(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey(), InstitutionKind.ASSEMBLY),
+            tuple(InstitutionTemplateKey.MAGISTRATES_COURT.nameKey(), InstitutionKind.JUDICIARY));
 
     ArgumentCaptor<List<Office>> officeCaptor = ArgumentCaptor.forClass(List.class);
     verify(offices).saveAllAndFlush(officeCaptor.capture());
@@ -72,9 +77,16 @@ class ConstitutionTemplateServiceTest {
         .singleElement()
         .extracting(Office::getTermLengthDays)
         .isEqualTo(14);
+    assertThat(officeCaptor.getValue())
+        .filteredOn(office -> office.getCode().equals(Office.MAGISTRATE))
+        .singleElement()
+        .extracting(Office::getSeatCount)
+        .isEqualTo(3);
 
     ArgumentCaptor<List<Procedure>> procedureCaptor = ArgumentCaptor.forClass(List.class);
     verify(procedures).saveAllAndFlush(procedureCaptor.capture());
+    Institution assembly = institutionCaptor.getAllValues().get(0);
+    Institution court = institutionCaptor.getAllValues().get(1);
     assertThat(procedureCaptor.getValue())
         .filteredOn(procedure -> procedure.getCode().equals(Procedure.ORDINARY_RESOLUTION))
         .singleElement()
@@ -88,6 +100,26 @@ class ConstitutionTemplateServiceTest {
               assertThat(procedure.getMinimumNoticeHours()).isEqualTo(24);
               assertThat(procedure.getVotingPeriodHours()).isEqualTo(120);
             });
+    assertThat(procedureCaptor.getValue())
+        .filteredOn(procedure -> procedure.getCode().equals(Procedure.CONSTITUTIONAL_REVIEW))
+        .singleElement()
+        .satisfies(
+            procedure -> {
+              assertThat(procedure.getElectorate()).isEqualTo(ProcedureElectorate.OFFICE_HOLDERS);
+              assertThat(procedure.getElectorateOfficeCode()).isEqualTo(Office.MAGISTRATE);
+              assertThat(procedure.getMinimumElectorCount()).isEqualTo(2);
+              assertThat(procedure.getInstitutionId()).isEqualTo(court.getId());
+            });
+    assertThat(procedureCaptor.getValue())
+        .filteredOn(
+            procedure ->
+                procedure.getCode().equals(Procedure.ORDINARY_RESOLUTION)
+                    || procedure.getCode().equals(Procedure.OFFICE_ELECTION)
+                    || procedure.getCode().equals(Procedure.SANCTION)
+                    || procedure.getCode().equals(Procedure.CONSTITUTION_AMENDMENT)
+                    || procedure.getCode().equals(Procedure.DISBANDMENT))
+        .allSatisfy(
+            procedure -> assertThat(procedure.getInstitutionId()).isEqualTo(assembly.getId()));
     assertThat(procedureCaptor.getValue())
         .filteredOn(procedure -> procedure.getCode().equals(Procedure.DISBANDMENT))
         .singleElement()
@@ -163,9 +195,12 @@ class ConstitutionTemplateServiceTest {
     service.establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
 
     ArgumentCaptor<Institution> institutionCaptor = ArgumentCaptor.forClass(Institution.class);
-    verify(institutions).saveAndFlush(institutionCaptor.capture());
-    assertThat(institutionCaptor.getValue().getNameKey())
-        .isEqualTo(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey());
+    verify(institutions, times(2)).saveAndFlush(institutionCaptor.capture());
+    assertThat(institutionCaptor.getAllValues())
+        .extracting(Institution::getNameKey, Institution::getKind)
+        .containsExactly(
+            tuple(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey(), InstitutionKind.ASSEMBLY),
+            tuple(InstitutionTemplateKey.MAGISTRATES_COURT.nameKey(), InstitutionKind.JUDICIARY));
 
     ArgumentCaptor<List<Office>> officeCaptor = ArgumentCaptor.forClass(List.class);
     verify(offices).saveAllAndFlush(officeCaptor.capture());
@@ -187,6 +222,8 @@ class ConstitutionTemplateServiceTest {
 
     ArgumentCaptor<List<Procedure>> procedureCaptor = ArgumentCaptor.forClass(List.class);
     verify(procedures).saveAllAndFlush(procedureCaptor.capture());
+    Institution assembly = institutionCaptor.getAllValues().get(0);
+    Institution court = institutionCaptor.getAllValues().get(1);
     assertThat(procedureCaptor.getValue())
         .extracting(Procedure::getCode, Procedure::getNameKey)
         .containsExactly(
@@ -195,17 +232,34 @@ class ConstitutionTemplateServiceTest {
             tuple(Procedure.OFFICE_ELECTION, ProcedureTemplateKey.OFFICE_ELECTION.nameKey()),
             tuple(Procedure.SANCTION, ProcedureTemplateKey.SANCTION.nameKey()),
             tuple(Procedure.APPEAL, ProcedureTemplateKey.APPEAL.nameKey()),
+            tuple(Procedure.OFFICE_TERM_REVIEW, ProcedureTemplateKey.OFFICE_TERM_REVIEW.nameKey()),
+            tuple(
+                Procedure.CONSTITUTIONAL_REVIEW,
+                ProcedureTemplateKey.CONSTITUTIONAL_REVIEW.nameKey()),
             tuple(
                 Procedure.CONSTITUTION_AMENDMENT,
                 ProcedureTemplateKey.CONSTITUTION_AMENDMENT.nameKey()),
             tuple(Procedure.DISBANDMENT, ProcedureTemplateKey.DISBANDMENT.nameKey()));
     assertThat(procedureCaptor.getValue())
-        .filteredOn(procedure -> procedure.getCode().equals(Procedure.APPEAL))
-        .singleElement()
-        .satisfies(
+        .filteredOn(
+            procedure ->
+                procedure.getCode().equals(Procedure.APPEAL)
+                    || procedure.getCode().equals(Procedure.OFFICE_TERM_REVIEW)
+                    || procedure.getCode().equals(Procedure.CONSTITUTIONAL_REVIEW))
+        .allSatisfy(
             procedure -> {
               assertThat(procedure.getElectorate()).isEqualTo(ProcedureElectorate.OFFICE_HOLDERS);
               assertThat(procedure.getElectorateOfficeCode()).isEqualTo(Office.MAGISTRATE);
+              assertThat(procedure.getMinimumElectorCount()).isEqualTo(2);
+              assertThat(procedure.getInstitutionId()).isEqualTo(court.getId());
+            });
+    assertThat(procedureCaptor.getValue())
+        .filteredOn(procedure -> procedure.getCode().equals(Procedure.ORDINARY_RESOLUTION))
+        .singleElement()
+        .satisfies(
+            procedure -> {
+              assertThat(procedure.getMinimumElectorCount()).isEqualTo(1);
+              assertThat(procedure.getInstitutionId()).isEqualTo(assembly.getId());
             });
 
     ArgumentCaptor<List<ConstitutionalPower>> powerCaptor = ArgumentCaptor.forClass(List.class);
@@ -225,6 +279,12 @@ class ConstitutionTemplateServiceTest {
             tuple(
                 PowerCode.INTRODUCE_APPEAL,
                 ConstitutionalPowerTemplateKey.INTRODUCE_APPEAL.nameKey()),
+            tuple(
+                PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
+                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_TERM_REVIEW.nameKey()),
+            tuple(
+                PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
+                ConstitutionalPowerTemplateKey.INTRODUCE_CONSTITUTIONAL_REVIEW.nameKey()),
             tuple(
                 PowerCode.INTRODUCE_AMENDMENT,
                 ConstitutionalPowerTemplateKey.INTRODUCE_AMENDMENT.nameKey()),

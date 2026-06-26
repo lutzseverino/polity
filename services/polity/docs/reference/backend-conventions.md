@@ -10,7 +10,8 @@ Top-level packages describe mechanical roles:
 - `controller` owns HTTP adapters and generated API interfaces.
 - `mapper` owns declarative boundary mappings.
 - `model` owns entities, inputs, results, enums, and domain value objects.
-- `repository` owns persistence ports and entity-owned projections.
+- `repository` owns persistence ports, entity-owned projections, and explicit entity materialization
+  for command paths.
 - `service` owns application behavior for product entities and workflows.
 - `authorization` owns product access and constitutional authority rules.
 - `evaluator` owns pure calculation engines.
@@ -27,7 +28,10 @@ existing role.
 - Public application service methods must not accept or return entities, repository projections, or
   generated transport types.
 - Prefer one service per entity or clear workflow owner.
-- Put ordinary entity reads and derived entity rules in that entity service.
+- Put ordinary owner lookups and derived owner rules in that entity service.
+- Avoid materializing entities for application flow. Prefer projections, scalar predicates, and
+  explicit repository commands. Entity materialization is a command-side escape hatch for managed
+  aggregate transitions that cannot be expressed cleanly otherwise.
 - Do not create `Reader` or `Writer` classes for generic entity lookup or persistence commands.
 - A separate non-entity service is acceptable only when it owns a real workflow boundary.
 - Use `authorization` for product authorization rules instead of placing them in `service`.
@@ -38,10 +42,15 @@ existing role.
 - `EntityProjection` exposes fields owned by `Entity`.
 - Generic entity projections must not borrow display names, versions, or labels from neighboring
   entities through joins.
+- Repository read methods return projections or scalar values. A custom repository method that
+  returns an entity must include `Entity` in the method name, such as `findEntityBy...` or
+  `findEntitiesBy...`, and should only serve command-side state transitions that truly require a
+  managed aggregate.
 - When a result needs data from multiple owners, the application service assembles the result by
   asking the owning repository or service for each piece.
 - Repository joins are allowed for filtering, existence predicates, locking, and persistence
-  constraints when the selected projection remains owned by the repository entity.
+  constraints when the selected projection remains owned by the repository entity. Do not use joins
+  to smuggle neighboring-owner state into generic repository reads.
 - Cross-owned read projections are exceptions. Use them only when the read model is a concrete
   product view that cannot be expressed cleanly by owner assembly. Name the projection after that
   concrete view, not as a generic `Slice` or `Summary`.

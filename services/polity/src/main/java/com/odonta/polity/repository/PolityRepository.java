@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PolityRepository extends JpaRepository<Polity, UUID> {
 
+  Optional<Polity> findEntityById(UUID id);
+
   @Query(
       """
       select

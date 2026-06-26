@@ -3,10 +3,16 @@ package com.odonta.polity.service;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.model.AppealResult;
+import com.odonta.polity.model.ConstitutionalReviewResult;
+import com.odonta.polity.model.OfficeTermReviewResult;
 import com.odonta.polity.model.SanctionResult;
 import com.odonta.polity.model.SanctionStatus;
 import com.odonta.polity.repository.AppealProjection;
 import com.odonta.polity.repository.AppealRepository;
+import com.odonta.polity.repository.ConstitutionalReviewProjection;
+import com.odonta.polity.repository.ConstitutionalReviewRepository;
+import com.odonta.polity.repository.OfficeTermReviewProjection;
+import com.odonta.polity.repository.OfficeTermReviewRepository;
 import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
 import java.time.Clock;
@@ -23,6 +29,8 @@ public class JusticeService {
   private final PolityAccessPolicy access;
   private final Clock clock;
   private final AppealRepository appeals;
+  private final ConstitutionalReviewRepository constitutionalReviews;
+  private final OfficeTermReviewRepository officeTermReviews;
   private final MembershipService memberships;
   private final SanctionRepository sanctions;
 
@@ -40,6 +48,22 @@ public class JusticeService {
     access.requireReadable(polityId, userId);
     return appeals.findProjectionsByPolityIdOrderByDecidedAtDesc(polityId).stream()
         .map(this::appeal)
+        .toList();
+  }
+
+  @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
+  public List<OfficeTermReviewResult> officeTermReviews(UUID polityId, UUID userId) {
+    access.requireReadable(polityId, userId);
+    return officeTermReviews.findProjectionsByPolityIdOrderByDecidedAtDesc(polityId).stream()
+        .map(this::officeTermReview)
+        .toList();
+  }
+
+  @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
+  public List<ConstitutionalReviewResult> constitutionalReviews(UUID polityId, UUID userId) {
+    access.requireReadable(polityId, userId);
+    return constitutionalReviews.findProjectionsByPolityIdOrderByDecidedAtDesc(polityId).stream()
+        .map(this::constitutionalReview)
         .toList();
   }
 
@@ -68,5 +92,34 @@ public class JusticeService {
         projection.getReason(),
         projection.getStartedAt(),
         projection.getEndsAt());
+  }
+
+  private OfficeTermReviewResult officeTermReview(OfficeTermReviewProjection projection) {
+    return new OfficeTermReviewResult(
+        projection.getId(),
+        projection.getOfficeTermId(),
+        projection.getPetitionerMembershipId(),
+        memberships.displayName(projection.getPetitionerMembershipId()),
+        projection.getVacatedMembershipId(),
+        memberships.displayName(projection.getVacatedMembershipId()),
+        projection.getOfficeName(),
+        projection.getOfficeNameKey(),
+        projection.getStatus(),
+        projection.getReason(),
+        projection.getDecidedAt());
+  }
+
+  private ConstitutionalReviewResult constitutionalReview(
+      ConstitutionalReviewProjection projection) {
+    return new ConstitutionalReviewResult(
+        projection.getId(),
+        projection.getTargetRecordId(),
+        projection.getTargetEntryNumber(),
+        projection.getTargetType(),
+        projection.getPetitionerMembershipId(),
+        memberships.displayName(projection.getPetitionerMembershipId()),
+        projection.getStatus(),
+        projection.getReason(),
+        projection.getDecidedAt());
   }
 }

@@ -22,6 +22,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
   public static final String OFFICE_ELECTION = "office-election";
   public static final String SANCTION = "sanction";
   public static final String APPEAL = "appeal";
+  public static final String OFFICE_TERM_REVIEW = "office-term-review";
+  public static final String CONSTITUTIONAL_REVIEW = "constitutional-review";
   public static final String CONSTITUTION_AMENDMENT = "constitution-amendment";
   public static final String DISBANDMENT = "disbandment";
 
@@ -62,6 +64,9 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
   @Column(name = "electorate_office_code")
   private String electorateOfficeCode;
 
+  @Column(name = "minimum_elector_count", nullable = false)
+  private int minimumElectorCount;
+
   @Column(name = "minimum_notice_hours", nullable = false)
   private int minimumNoticeHours;
 
@@ -96,6 +101,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         threshold,
         ProcedureElectorate.ACTIVE_MEMBERS,
         null,
+        1,
         minimumNoticeHours,
         votingPeriodHours,
         effectType);
@@ -122,12 +128,47 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         institutionId,
         code,
         name,
+        templateKey,
+        quorumNumerator,
+        quorumDenominator,
+        threshold,
+        electorate,
+        electorateOfficeCode,
+        1,
+        minimumNoticeHours,
+        votingPeriodHours,
+        effectType);
+  }
+
+  public Procedure(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID institutionId,
+      String code,
+      String name,
+      ProcedureTemplateKey templateKey,
+      int quorumNumerator,
+      int quorumDenominator,
+      VotingThreshold threshold,
+      ProcedureElectorate electorate,
+      String electorateOfficeCode,
+      int minimumElectorCount,
+      int minimumNoticeHours,
+      int votingPeriodHours,
+      EffectType effectType) {
+    this(
+        polityId,
+        constitutionVersionId,
+        institutionId,
+        code,
+        name,
         templateKey == null ? null : templateKey.nameKey(),
         quorumNumerator,
         quorumDenominator,
         threshold,
         electorate,
         electorateOfficeCode,
+        minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
         effectType);
@@ -158,6 +199,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         threshold,
         ProcedureElectorate.ACTIVE_MEMBERS,
         null,
+        1,
         minimumNoticeHours,
         votingPeriodHours,
         effectType);
@@ -172,6 +214,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         threshold,
         electorate,
         electorateOfficeCode,
+        minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours);
   }
@@ -184,6 +227,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
       VotingThreshold threshold,
       ProcedureElectorate electorate,
       String electorateOfficeCode,
+      int minimumElectorCount,
       int minimumNoticeHours,
       int votingPeriodHours) {
     return new Procedure(
@@ -198,6 +242,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         threshold,
         electorate,
         electorateOfficeCode,
+        minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
         effectType);
@@ -215,6 +260,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
       VotingThreshold threshold,
       ProcedureElectorate electorate,
       String electorateOfficeCode,
+      int minimumElectorCount,
       int minimumNoticeHours,
       int votingPeriodHours,
       EffectType effectType) {
@@ -229,6 +275,7 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
     this.threshold = threshold;
     this.electorate = electorate;
     this.electorateOfficeCode = electorateOfficeCode;
+    this.minimumElectorCount = minimumElectorCount;
     this.minimumNoticeHours = minimumNoticeHours;
     this.votingPeriodHours = votingPeriodHours;
     this.effectType = effectType;

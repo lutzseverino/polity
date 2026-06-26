@@ -23,6 +23,7 @@ import com.odonta.polity.model.OfficialRecordTemplate;
 import com.odonta.polity.model.OfficialRecordTemplateKey;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.PowerCode;
+import com.odonta.polity.model.TemplateParameters;
 import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipRepository;
@@ -31,7 +32,6 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,7 +99,8 @@ public class InvitationService {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.MEMBER_INVITED,
-            Map.of("inviterName", inviter.getDisplayName(), "inviteeEmail", invitation.getEmail())),
+            TemplateParameters.of(
+                "inviterName", inviter.getDisplayName(), "inviteeEmail", invitation.getEmail())),
         now);
     return result(invitation.getId());
   }
@@ -128,7 +129,7 @@ public class InvitationService {
     IdentityUser identity = identityUsers.get(actor.id());
     MembershipInvitation invitation =
         invitations
-            .findByIdAndStatus(invitationId, InvitationStatus.PENDING)
+            .findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING)
             .orElseThrow(
                 () ->
                     ApiException.notFound("invitation_not_found", "Pending invitation not found."));
@@ -164,7 +165,7 @@ public class InvitationService {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.MEMBER_ADMITTED,
-            Map.of("memberName", admitted.getDisplayName())),
+            TemplateParameters.of("memberName", admitted.getDisplayName())),
         now);
     return memberMapper.toResult(
         memberships

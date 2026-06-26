@@ -12,6 +12,7 @@ import com.odonta.polity.authorization.PolityGrantPlanner;
 import com.odonta.polity.model.ActionAvailabilityResult;
 import com.odonta.polity.model.ConstitutionBootstrapResult;
 import com.odonta.polity.model.ConstitutionInstitutionResult;
+import com.odonta.polity.model.ConstitutionJurisdictionResult;
 import com.odonta.polity.model.ConstitutionPowerResult;
 import com.odonta.polity.model.ConstitutionProcedureResult;
 import com.odonta.polity.model.ConstitutionResult;
@@ -42,12 +43,20 @@ import com.odonta.polity.model.PolitySetupPreset;
 import com.odonta.polity.model.PolityStatus;
 import com.odonta.polity.model.PolityVisibility;
 import com.odonta.polity.model.PowerCode;
+import com.odonta.polity.model.PowerHolderScope;
 import com.odonta.polity.model.Procedure;
+import com.odonta.polity.model.ProcedureElectorate;
+import com.odonta.polity.model.TemplateParameters;
+import com.odonta.polity.repository.ConstitutionInstitutionProjection;
+import com.odonta.polity.repository.ConstitutionJurisdictionProjection;
+import com.odonta.polity.repository.ConstitutionPowerProjection;
+import com.odonta.polity.repository.ConstitutionProcedureProjection;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
 import com.odonta.polity.repository.ConstitutionalPowerRepository;
 import com.odonta.polity.repository.InstitutionRepository;
 import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
+import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityProjection;
@@ -57,7 +66,6 @@ import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,8 +99,15 @@ public class PolityService {
   private final ProcedureRepository procedures;
 
   @Transactional
+  public void provisionAccount(AuthenticatedUser user) {
+    grants.stage(grantPlanner.account(user.authorizationSubject()));
+  }
+
+  @Transactional
+  @PreAuthorize(PolityPermissions.HAS_PUBLIC_POLITY_CREATE)
   public PolityResult create(AuthenticatedUser founder, @Valid CreatePolityInput input) {
     OffsetDateTime now = OffsetDateTime.now(clock);
+    requireSupportedVisibility(input.visibility());
     IdentityUser identity = identityUsers.get(founder.id());
     PolitySetupPreset setupPreset = input.setupPresetOrDefault();
     PolityPace pace = input.paceOrDefault();
@@ -106,8 +121,8 @@ public class PolityService {
             new ConstitutionVersion(
                 polity.getId(),
                 1,
-                ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackTitle(),
-                ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackBody(),
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.storedTitle(),
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.storedBody(),
                 ConstitutionTemplateKey.STRUCTURED_CHARTER,
                 now));
     if (setupPreset == PolitySetupPreset.STANDARD_REPUBLIC) {
@@ -125,7 +140,7 @@ public class PolityService {
                 null));
     Office steward =
         offices
-            .findByConstitutionVersionIdAndCode(constitution.getId(), Office.STEWARD)
+            .findEntityByConstitutionVersionIdAndCode(constitution.getId(), Office.STEWARD)
             .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
     OfficeTerm stewardTerm =
         officeTerms.saveAndFlush(
@@ -147,13 +162,17 @@ public class PolityService {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.POLITY_FOUNDED,
-            Map.of(
+            TemplateParameters.of(
                 "polityName",
                 input.name(),
                 "setupPreset",
                 setupPreset.name(),
+                "setupPresetKey",
+                setupPreset.labelKey(),
                 "pace",
-                pace.name())),
+                pace.name(),
+                "paceKey",
+                pace.labelKey())),
         now);
     officialRecords.append(
         polity.getId(),
@@ -165,15 +184,21 @@ public class PolityService {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.BOOTSTRAP_STEWARD_ASSIGNED,
-            Map.of(
+            TemplateParameters.of(
                 "memberName",
                 membership.getDisplayName(),
                 "officeName",
                 steward.getName(),
+                "officeNameKey",
+                steward.getNameKey(),
+                "officeCode",
+                steward.getCode(),
                 "termLengthDays",
                 steward.getTermLengthDays(),
                 "constitutionName",
-                ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackTitle())),
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.storedTitle(),
+                "constitutionTitleKey",
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.titleKey())),
         now);
     officialRecords.append(
         polity.getId(),
@@ -185,13 +210,24 @@ public class PolityService {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.CONSTITUTION_RATIFIED,
-            Map.of(
+            TemplateParameters.of(
                 "constitutionName",
-                ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackTitle(),
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.storedTitle(),
+                "constitutionTitleKey",
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.titleKey(),
                 "constitutionBody",
-                ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackBody())),
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.storedBody(),
+                "constitutionBodyKey",
+                ConstitutionTemplateKey.STRUCTURED_CHARTER.bodyKey())),
         now);
     return getSummary(polity.getId());
+  }
+
+  private void requireSupportedVisibility(PolityVisibility visibility) {
+    if (visibility == PolityVisibility.PRIVATE) {
+      throw ApiException.conflict(
+          "private_polities_not_enabled", "Private polities are not available yet.");
+    }
   }
 
   public List<PolityResult> list(UUID userId) {
@@ -218,18 +254,22 @@ public class PolityService {
         constitution.getVersion(),
         constitution.getStatus(),
         constitution.getRatifiedAt(),
-        institutions.findByConstitutionVersionId(constitution.getId()).stream()
+        jurisdictions.findProjectionsByPolityId(polityId).stream()
+            .map(this::jurisdictionResult)
+            .sorted(java.util.Comparator.comparing(result -> result.kind().name()))
+            .toList(),
+        institutions.findProjectionsByConstitutionVersionId(constitution.getId()).stream()
             .map(this::institutionResult)
             .sorted(java.util.Comparator.comparing(result -> result.kind().name()))
             .toList(),
-        procedures.findByConstitutionVersionId(constitution.getId()).stream()
+        procedures.findProjectionsByConstitutionVersionId(constitution.getId()).stream()
             .map(this::procedureResult)
             .sorted(java.util.Comparator.comparing(ConstitutionProcedureResult::code))
             .toList(),
-        offices.findByConstitutionVersionIdOrderByName(constitution.getId()).stream()
+        offices.findProjectionsByConstitutionVersionIdOrderByName(constitution.getId()).stream()
             .map(this::officeResult)
             .toList(),
-        powers.findByConstitutionVersionId(constitution.getId()).stream()
+        powers.findProjectionsByConstitutionVersionId(constitution.getId()).stream()
             .map(this::powerResult)
             .sorted(java.util.Comparator.comparing(result -> result.code().name()))
             .toList(),
@@ -255,16 +295,20 @@ public class PolityService {
           unavailable,
           unavailable,
           unavailable,
+          unavailable,
+          unavailable,
           unavailable);
     }
     Membership member =
         memberships
-            .findByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
+            .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
             .orElse(null);
     if (member == null) {
       ActionAvailabilityResult unavailable =
           ActionAvailabilityResult.blocked("polity_membership_required");
       return new PolityActionAvailabilityResult(
+          unavailable,
+          unavailable,
           unavailable,
           unavailable,
           unavailable,
@@ -280,7 +324,18 @@ public class PolityService {
         fullGovernmentAvailability(member, constitution, PowerCode.INTRODUCE_MOTION),
         fullGovernmentAvailability(member, constitution, PowerCode.INTRODUCE_OFFICE_ELECTION),
         fullGovernmentAvailability(member, constitution, PowerCode.INTRODUCE_SANCTION),
-        fullGovernmentAvailability(member, constitution, PowerCode.INTRODUCE_APPEAL),
+        fullGovernmentProcedureAvailability(
+            member, constitution, PowerCode.INTRODUCE_APPEAL, Procedure.APPEAL),
+        fullGovernmentProcedureAvailability(
+            member,
+            constitution,
+            PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
+            Procedure.OFFICE_TERM_REVIEW),
+        fullGovernmentProcedureAvailability(
+            member,
+            constitution,
+            PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
+            Procedure.CONSTITUTIONAL_REVIEW),
         fullGovernmentAvailability(member, constitution, PowerCode.INTRODUCE_AMENDMENT),
         disbandmentAvailability(member, constitution),
         authorityAvailability(member, constitution, PowerCode.REQUEST_CERTIFICATION));
@@ -309,25 +364,26 @@ public class PolityService {
         constitution.getVersion(),
         jurisdiction.getName(),
         institution.getName(),
+        institution.getNameKey(),
         projection.getCreatedAt());
   }
 
   ConstitutionVersion constitution(UUID polityId) {
     return constitutions
-        .findByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
+        .findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
         .orElseThrow(
             () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
   }
 
   private Polity polity(UUID polityId) {
     return polities
-        .findById(polityId)
+        .findEntityById(polityId)
         .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
   }
 
   Jurisdiction jurisdiction(UUID polityId) {
     return jurisdictions
-        .findByPolityIdAndKind(polityId, JurisdictionKind.ROOT)
+        .findEntityByPolityIdAndKind(polityId, JurisdictionKind.ROOT)
         .orElseThrow(
             () -> ApiException.notFound("jurisdiction_not_found", "Jurisdiction not found."));
   }
@@ -337,9 +393,19 @@ public class PolityService {
   }
 
   Institution institution(UUID polityId, ConstitutionVersion constitution) {
+    List<Institution> current =
+        institutions.findEntitiesByPolityIdAndConstitutionVersionId(polityId, constitution.getId());
+    return current.stream()
+        .filter(institution -> institution.getKind() == InstitutionKind.ASSEMBLY)
+        .findFirst()
+        .or(() -> current.stream().findFirst())
+        .orElseThrow(
+            () -> ApiException.notFound("institution_not_found", "Institution not found."));
+  }
+
+  Institution institution(UUID polityId, Procedure procedure) {
     return institutions
-        .findByPolityIdAndConstitutionVersionIdAndKind(
-            polityId, constitution.getId(), InstitutionKind.ASSEMBLY)
+        .findEntityByIdAndPolityId(procedure.getInstitutionId(), polityId)
         .orElseThrow(
             () -> ApiException.notFound("institution_not_found", "Institution not found."));
   }
@@ -383,7 +449,7 @@ public class PolityService {
     polity.completeBootstrap(now);
     polities.saveAndFlush(polity);
     List<OfficeTerm> bootstrapTerms =
-        officeTerms.findByPolityIdAndOfficeCodeAndStatusAndAssignedByMotionIdIsNull(
+        officeTerms.findEntitiesByPolityIdAndOfficeCodeAndStatusAndAssignedByMotionIdIsNull(
             polityId, Office.STEWARD, OfficeTermStatus.ACTIVE);
     bootstrapTerms.forEach(term -> term.end(now));
     if (!bootstrapTerms.isEmpty()) {
@@ -401,7 +467,10 @@ public class PolityService {
       return false;
     }
     return standingMemberCount(member.getPolityId()) < MINIMUM_FULL_GOVERNMENT_MEMBERS
-        && polity.getFounderId().equals(member.getUserId());
+        && polity.getFounderId().equals(member.getUserId())
+        && officeTerms
+            .existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndAssignedByMotionIdIsNull(
+                member.getPolityId(), Office.STEWARD, member.getId(), OfficeTermStatus.ACTIVE);
   }
 
   private long activeMemberCount(UUID polityId) {
@@ -411,23 +480,32 @@ public class PolityService {
   private long standingMemberCount(UUID polityId) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     return memberships
-        .findByPolityIdAndStatusOrderByAdmittedAtAsc(polityId, MembershipStatus.ACTIVE)
+        .findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(polityId, MembershipStatus.ACTIVE)
         .stream()
         .filter(member -> membershipService.hasPoliticalStanding(member, now))
         .count();
   }
 
-  private ConstitutionInstitutionResult institutionResult(Institution institution) {
+  private ConstitutionJurisdictionResult jurisdictionResult(
+      ConstitutionJurisdictionProjection jurisdiction) {
+    return new ConstitutionJurisdictionResult(
+        jurisdiction.getId(), jurisdiction.getName(), jurisdiction.getKind());
+  }
+
+  private ConstitutionInstitutionResult institutionResult(
+      ConstitutionInstitutionProjection institution) {
     return new ConstitutionInstitutionResult(
         institution.getId(),
+        institution.getJurisdictionId(),
         institution.getName(),
         institution.getNameKey(),
         institution.getKind());
   }
 
-  private ConstitutionProcedureResult procedureResult(Procedure procedure) {
+  private ConstitutionProcedureResult procedureResult(ConstitutionProcedureProjection procedure) {
     return new ConstitutionProcedureResult(
         procedure.getId(),
+        procedure.getInstitutionId(),
         procedure.getCode(),
         procedure.getName(),
         procedure.getNameKey(),
@@ -436,23 +514,26 @@ public class PolityService {
         procedure.getThreshold(),
         procedure.getElectorate(),
         procedure.getElectorateOfficeCode(),
+        procedure.getMinimumElectorCount(),
         procedure.getMinimumNoticeHours(),
         procedure.getVotingPeriodHours(),
         procedure.getEffectType());
   }
 
-  private OfficeResult officeResult(Office office) {
+  private OfficeResult officeResult(OfficeProjection office) {
     return new OfficeResult(
         office.getId(),
+        office.getJurisdictionId(),
         office.getCode(),
         office.getName(),
         office.getDescription(),
         office.getNameKey(),
         office.getDescriptionKey(),
-        office.getTermLengthDays());
+        office.getTermLengthDays(),
+        office.getSeatCount());
   }
 
-  private ConstitutionPowerResult powerResult(ConstitutionalPower power) {
+  private ConstitutionPowerResult powerResult(ConstitutionPowerProjection power) {
     return new ConstitutionPowerResult(
         power.getCode(),
         power.getName(),
@@ -486,6 +567,66 @@ public class PolityService {
         : ActionAvailabilityResult.allowed();
   }
 
+  private ActionAvailabilityResult fullGovernmentProcedureAvailability(
+      Membership member,
+      ConstitutionVersion constitution,
+      PowerCode powerCode,
+      String procedureCode) {
+    ActionAvailabilityResult authorityResult =
+        fullGovernmentAvailability(member, constitution, powerCode);
+    if (!authorityResult.available()) {
+      return authorityResult;
+    }
+    return procedureElectorateAvailability(member.getPolityId(), constitution, procedureCode);
+  }
+
+  ActionAvailabilityResult procedureElectorateAvailability(
+      UUID polityId, ConstitutionVersion constitution, String procedureCode) {
+    try {
+      Procedure procedure =
+          procedures
+              .findEntityByConstitutionVersionIdAndCode(constitution.getId(), procedureCode)
+              .orElseThrow(
+                  () ->
+                      ApiException.forbidden(
+                          "procedure_missing",
+                          "The governing constitution does not define this procedure."));
+      if (procedure.getElectorate() == ProcedureElectorate.OFFICE_HOLDERS
+          && !officeTerms.existsByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
+              polityId,
+              procedure.getElectorateOfficeCode(),
+              OfficeTermStatus.ACTIVE,
+              OffsetDateTime.now(clock))) {
+        return ActionAvailabilityResult.blocked("procedure_electorate_office_vacant");
+      }
+      if (eligibleElectorCount(polityId, procedure) < procedure.getMinimumElectorCount()) {
+        return ActionAvailabilityResult.blocked("procedure_electorate_below_minimum");
+      }
+      return ActionAvailabilityResult.allowed();
+    } catch (ApiException exception) {
+      return ActionAvailabilityResult.blocked(exception.code());
+    }
+  }
+
+  private long eligibleElectorCount(UUID polityId, Procedure procedure) {
+    OffsetDateTime now = OffsetDateTime.now(clock);
+    if (procedure.getElectorate() == ProcedureElectorate.OFFICE_HOLDERS) {
+      return officeTerms
+          .findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+              polityId, procedure.getElectorateOfficeCode(), OfficeTermStatus.ACTIVE, now)
+          .stream()
+          .map(OfficeTerm::getMembershipId)
+          .map(membershipService::get)
+          .filter(member -> membershipService.hasPoliticalStanding(member, now))
+          .count();
+    }
+    return memberships
+        .findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(polityId, MembershipStatus.ACTIVE)
+        .stream()
+        .filter(member -> membershipService.hasPoliticalStanding(member, now))
+        .count();
+  }
+
   private ActionAvailabilityResult disbandmentAvailability(
       Membership member, ConstitutionVersion constitution) {
     ActionAvailabilityResult authorityResult =
@@ -493,15 +634,46 @@ public class PolityService {
     if (!authorityResult.available()) {
       return authorityResult;
     }
-    return activeMemberCount(member.getPolityId()) >= MINIMUM_FULL_GOVERNMENT_MEMBERS
-            && standingMemberCount(member.getPolityId()) < MINIMUM_FULL_GOVERNMENT_MEMBERS
-        ? ActionAvailabilityResult.blocked("polity_provisional")
+    return disbandmentSafeguardAvailability(member, constitution);
+  }
+
+  ActionAvailabilityResult disbandmentSafeguardAvailability(
+      Membership member, ConstitutionVersion constitution) {
+    long activeMembers = activeMemberCount(member.getPolityId());
+    if (activeMembers < MINIMUM_FULL_GOVERNMENT_MEMBERS) {
+      return ActionAvailabilityResult.allowed();
+    }
+    if (standingMemberCount(member.getPolityId()) < MINIMUM_FULL_GOVERNMENT_MEMBERS) {
+      return ActionAvailabilityResult.blocked("polity_provisional");
+    }
+    ActionAvailabilityResult reviewAvailability =
+        procedureElectorateAvailability(
+            member.getPolityId(), constitution, Procedure.CONSTITUTIONAL_REVIEW);
+    return !reviewAvailability.available()
+            && !"procedure_missing".equals(reviewAvailability.reason())
+        ? reviewAvailability
         : ActionAvailabilityResult.allowed();
   }
 
   private ActionAvailabilityResult authorityAvailability(
       Membership member, ConstitutionVersion constitution, PowerCode powerCode) {
     try {
+      ConstitutionalPower power =
+          powers
+              .findEntityByConstitutionVersionIdAndCode(constitution.getId(), powerCode)
+              .orElseThrow(
+                  () ->
+                      ApiException.forbidden(
+                          "constitutional_power_missing",
+                          "The governing constitution does not authorize this action."));
+      if (power.getHolderScope() == PowerHolderScope.OFFICE
+          && !officeTerms.existsByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
+              member.getPolityId(),
+              power.getHolderOfficeCode(),
+              OfficeTermStatus.ACTIVE,
+              OffsetDateTime.now(clock))) {
+        return ActionAvailabilityResult.blocked("constitutional_office_vacant");
+      }
       return authority.allows(member, constitution, powerCode)
           ? ActionAvailabilityResult.allowed()
           : ActionAvailabilityResult.blocked("constitutional_authority_missing");

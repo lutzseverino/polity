@@ -8,8 +8,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ConstitutionalPowerRepository extends JpaRepository<ConstitutionalPower, UUID> {
-  Optional<ConstitutionalPower> findByConstitutionVersionIdAndCode(
+  Optional<ConstitutionalPower> findEntityByConstitutionVersionIdAndCode(
       UUID constitutionVersionId, PowerCode code);
 
-  List<ConstitutionalPower> findByConstitutionVersionId(UUID constitutionVersionId);
+  List<ConstitutionalPower> findEntitiesByConstitutionVersionId(UUID constitutionVersionId);
+
+  List<ConstitutionPowerProjection> findProjectionsByConstitutionVersionId(
+      UUID constitutionVersionId);
 }

@@ -1,7 +1,10 @@
 package com.odonta.polity.repository;
 
 import com.odonta.polity.model.Resolution;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ResolutionRepository extends JpaRepository<Resolution, UUID> {}
+public interface ResolutionRepository extends JpaRepository<Resolution, UUID> {
+  Optional<Resolution> findEntityByIdAndPolityId(UUID id, UUID polityId);
+}

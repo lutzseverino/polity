@@ -1,24 +1,14 @@
 package com.odonta.polity.model;
 
 public enum OfficeTemplateKey {
-  MAGISTRATE(
-      "office.magistrate",
-      "Magistrate",
-      "Decides appeals so sanctions remain reviewable by an independent office."),
-  STEWARD("office.steward", "Steward", "Admits citizens and coordinates official proceedings."),
-  TRIBUNE(
-      "office.tribune",
-      "Tribune",
-      "Introduces sanction proceedings while citizens retain voting and appeal rights.");
+  MAGISTRATE("office.magistrate"),
+  STEWARD("office.steward"),
+  TRIBUNE("office.tribune");
 
   private final String keyPrefix;
-  private final String fallbackName;
-  private final String fallbackDescription;
 
-  OfficeTemplateKey(String keyPrefix, String fallbackName, String fallbackDescription) {
+  OfficeTemplateKey(String keyPrefix) {
     this.keyPrefix = keyPrefix;
-    this.fallbackName = fallbackName;
-    this.fallbackDescription = fallbackDescription;
   }
 
   public String nameKey() {
@@ -29,11 +19,11 @@ public enum OfficeTemplateKey {
     return keyPrefix + ".description";
   }
 
-  public String fallbackName() {
-    return fallbackName;
+  public String storedName() {
+    return nameKey();
   }
 
-  public String fallbackDescription() {
-    return fallbackDescription;
+  public String storedDescription() {
+    return descriptionKey();
   }
 }

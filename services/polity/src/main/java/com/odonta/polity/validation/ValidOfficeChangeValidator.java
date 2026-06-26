@@ -14,11 +14,22 @@ public final class ValidOfficeChangeValidator
     }
     return switch (value.action()) {
       case CREATE ->
-          hasText(value.name()) && hasText(value.description()) && value.termLengthDays() != null;
+          hasText(value.name())
+              && hasText(value.description())
+              && value.termLengthDays() != null
+              && value.seatCount() != null;
       case REVISE ->
-          hasText(value.name()) || hasText(value.description()) || value.termLengthDays() != null;
+          value.jurisdictionId() != null
+              || hasText(value.name())
+              || hasText(value.description())
+              || value.termLengthDays() != null
+              || value.seatCount() != null;
       case RETIRE ->
-          isBlank(value.name()) && isBlank(value.description()) && value.termLengthDays() == null;
+          value.jurisdictionId() == null
+              && isBlank(value.name())
+              && isBlank(value.description())
+              && value.termLengthDays() == null
+              && value.seatCount() == null;
     };
   }
 

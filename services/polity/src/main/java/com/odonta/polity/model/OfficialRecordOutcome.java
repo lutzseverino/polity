@@ -9,10 +9,12 @@ public enum OfficialRecordOutcome {
   ELECTION_BALLOT_CAST("election_ballot_cast"),
   INTRODUCED("introduced"),
   OFFICE_ELECTED("office_elected"),
+  OFFICE_TERM_VACATED("office_term_vacated"),
   PASSED("passed"),
   POLITY_DISBANDED("polity_disbanded"),
   REJECTED("rejected"),
   SANCTION_APPLIED("sanction_applied"),
+  VOIDED("voided"),
   VOTE_CAST("vote_cast");
 
   private final String value;

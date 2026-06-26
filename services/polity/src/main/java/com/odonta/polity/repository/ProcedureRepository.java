@@ -7,7 +7,13 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProcedureRepository extends JpaRepository<Procedure, UUID> {
-  Optional<Procedure> findByConstitutionVersionIdAndCode(UUID constitutionVersionId, String code);
+  Optional<Procedure> findEntityById(UUID id);
 
-  List<Procedure> findByConstitutionVersionId(UUID constitutionVersionId);
+  Optional<Procedure> findEntityByConstitutionVersionIdAndCode(
+      UUID constitutionVersionId, String code);
+
+  List<Procedure> findEntitiesByConstitutionVersionId(UUID constitutionVersionId);
+
+  List<ConstitutionProcedureProjection> findProjectionsByConstitutionVersionId(
+      UUID constitutionVersionId);
 }

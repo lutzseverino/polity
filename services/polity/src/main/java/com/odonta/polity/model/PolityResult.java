@@ -11,4 +11,5 @@ public record PolityResult(
     int constitutionVersion,
     String jurisdictionName,
     String institutionName,
+    String institutionNameKey,
     OffsetDateTime createdAt) {}

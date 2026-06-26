@@ -17,7 +17,7 @@ public interface MembershipInvitationRepository extends JpaRepository<Membership
   boolean existsByPolityIdAndEmailIgnoreCaseAndStatus(
       UUID polityId, String email, InvitationStatus status);
 
-  Optional<MembershipInvitation> findByIdAndStatus(UUID id, InvitationStatus status);
+  Optional<MembershipInvitation> findEntityByIdAndStatus(UUID id, InvitationStatus status);
 
   List<MembershipInvitationProjection> findProjectionsByPolityIdOrderByInvitedAtDesc(UUID polityId);
 

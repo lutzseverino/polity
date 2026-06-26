@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidProcedureChangeValidator.class)
 public @interface ValidProcedureChange {
-  String message() default "Procedure change must contain a valid set of rule updates.";
+  String message() default "{polity.validation.procedureChange.validRules}";
 
   Class<?>[] groups() default {};
 

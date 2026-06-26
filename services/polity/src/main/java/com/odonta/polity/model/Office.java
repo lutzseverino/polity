@@ -51,6 +51,9 @@ public class Office extends AuditedEntity {
   @Positive @Column(name = "term_length_days", nullable = false)
   private int termLengthDays;
 
+  @Positive @Column(name = "seat_count", nullable = false)
+  private int seatCount;
+
   public Office(
       UUID polityId,
       UUID constitutionVersionId,
@@ -67,7 +70,30 @@ public class Office extends AuditedEntity {
         name,
         description,
         null,
-        termLengthDays);
+        termLengthDays,
+        1);
+  }
+
+  public Office(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID jurisdictionId,
+      String code,
+      String name,
+      String description,
+      int termLengthDays,
+      int seatCount) {
+    this(
+        polityId,
+        constitutionVersionId,
+        jurisdictionId,
+        code,
+        name,
+        description,
+        null,
+        null,
+        termLengthDays,
+        seatCount);
   }
 
   public Office(
@@ -79,6 +105,28 @@ public class Office extends AuditedEntity {
       String description,
       OfficeTemplateKey templateKey,
       int termLengthDays) {
+    this(
+        polityId,
+        constitutionVersionId,
+        jurisdictionId,
+        code,
+        name,
+        description,
+        templateKey,
+        termLengthDays,
+        1);
+  }
+
+  public Office(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID jurisdictionId,
+      String code,
+      String name,
+      String description,
+      OfficeTemplateKey templateKey,
+      int termLengthDays,
+      int seatCount) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.jurisdictionId = jurisdictionId;
@@ -90,6 +138,7 @@ public class Office extends AuditedEntity {
       this.descriptionKey = templateKey.descriptionKey();
     }
     this.termLengthDays = termLengthDays;
+    this.seatCount = seatCount;
   }
 
   public Office copyTo(UUID constitutionVersionId) {
@@ -102,16 +151,19 @@ public class Office extends AuditedEntity {
         description,
         nameKey,
         descriptionKey,
-        termLengthDays);
+        termLengthDays,
+        seatCount);
   }
 
   public Office copyWith(
       UUID constitutionVersionId,
+      UUID jurisdictionId,
       String name,
       String description,
       String nameKey,
       String descriptionKey,
-      int termLengthDays) {
+      int termLengthDays,
+      int seatCount) {
     return new Office(
         polityId,
         constitutionVersionId,
@@ -121,7 +173,8 @@ public class Office extends AuditedEntity {
         description,
         nameKey,
         descriptionKey,
-        termLengthDays);
+        termLengthDays,
+        seatCount);
   }
 
   private Office(
@@ -133,7 +186,8 @@ public class Office extends AuditedEntity {
       String description,
       String nameKey,
       String descriptionKey,
-      int termLengthDays) {
+      int termLengthDays,
+      int seatCount) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.jurisdictionId = jurisdictionId;
@@ -143,5 +197,6 @@ public class Office extends AuditedEntity {
     this.nameKey = nameKey;
     this.descriptionKey = descriptionKey;
     this.termLengthDays = termLengthDays;
+    this.seatCount = seatCount;
   }
 }

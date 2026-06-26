@@ -35,7 +35,8 @@ class ProcedureElectorateServiceTest {
     Membership suspended = member(polityId);
     Procedure procedure = activeMemberProcedure(polityId);
 
-    when(memberships.findByPolityIdAndStatusOrderByAdmittedAtAsc(polityId, MembershipStatus.ACTIVE))
+    when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
+            polityId, MembershipStatus.ACTIVE))
         .thenReturn(List.of(standing, suspended));
     when(membershipService.hasPoliticalStanding(standing, NOW)).thenReturn(true);
     when(membershipService.hasPoliticalStanding(suspended, NOW)).thenReturn(false);
@@ -58,7 +59,7 @@ class ProcedureElectorateServiceTest {
             NOW.plusDays(10));
     Procedure procedure = officeHolderProcedure(polityId);
 
-    when(officeTerms.findByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+    when(officeTerms.findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
             polityId, Office.MAGISTRATE, OfficeTermStatus.ACTIVE, NOW))
         .thenReturn(List.of(term));
     when(membershipService.get(magistrate.getId())).thenReturn(magistrate);

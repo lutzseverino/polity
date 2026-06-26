@@ -13,6 +13,18 @@ class PolityGrantPlannerTest {
   private final PolityGrantPlanner planner = new PolityGrantPlanner();
 
   @Test
+  void accountGrantAllowsPublicPolityCreation() {
+    GrantPlan plan = planner.account("user:founder");
+
+    assertThat(plan.resourceGrants()).isEmpty();
+    assertThat(plan.authorityGrants()).hasSize(1);
+    assertThat(plan.authorityGrants().getFirst().resourceServerClientId())
+        .isEqualTo(PolityPermissions.CLIENT_ID);
+    assertThat(plan.authorityGrants().getFirst().authorities())
+        .containsExactly(PolityPermissions.PUBLIC_POLITY_CREATE);
+  }
+
+  @Test
   void polityResourceOnlyDefinesCoarseProductAccessActions() {
     assertThat(PolityResources.POLITY.actions())
         .containsExactly(PolityPermissions.READ, PolityPermissions.PARTICIPATE)

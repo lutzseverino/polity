@@ -30,6 +30,10 @@ import org.springframework.stereotype.Service;
 public class ConstitutionTemplateService {
   private static final int DEFAULT_QUORUM_NUMERATOR = 1;
   private static final int DEFAULT_QUORUM_DENOMINATOR = 2;
+  private static final int DEFAULT_MINIMUM_ELECTOR_COUNT = 1;
+  private static final int STANDARD_JUDICIAL_MINIMUM_ELECTOR_COUNT = 2;
+  private static final int DEFAULT_OFFICE_SEAT_COUNT = 1;
+  private static final int STANDARD_MAGISTRATE_SEAT_COUNT = 3;
 
   private final ConstitutionalPowerRepository powers;
   private final InstitutionRepository institutions;
@@ -43,28 +47,37 @@ public class ConstitutionTemplateService {
 
   Institution establishStarterRepublic(
       Jurisdiction jurisdiction, ConstitutionVersion constitution, PolityPace pace) {
-    Institution institution =
+    Institution assembly =
         institutions.saveAndFlush(
             new Institution(
                 constitution.getPolityId(),
                 jurisdiction.getId(),
                 constitution.getId(),
-                InstitutionTemplateKey.CITIZENS_ASSEMBLY.fallbackName(),
+                InstitutionTemplateKey.CITIZENS_ASSEMBLY.storedName(),
                 InstitutionTemplateKey.CITIZENS_ASSEMBLY,
                 InstitutionKind.ASSEMBLY));
-    seedProcedures(constitution, institution, pace);
+    Institution court =
+        institutions.saveAndFlush(
+            new Institution(
+                constitution.getPolityId(),
+                jurisdiction.getId(),
+                constitution.getId(),
+                InstitutionTemplateKey.MAGISTRATES_COURT.storedName(),
+                InstitutionTemplateKey.MAGISTRATES_COURT,
+                InstitutionKind.JUDICIARY));
+    seedProcedures(constitution, assembly, court, pace);
     seedOffices(jurisdiction, constitution, pace);
     seedPowers(constitution);
-    return institution;
+    return assembly;
   }
 
   private void seedProcedures(
-      ConstitutionVersion constitution, Institution institution, PolityPace pace) {
+      ConstitutionVersion constitution, Institution assembly, Institution court, PolityPace pace) {
     procedures.saveAllAndFlush(
         List.of(
             procedure(
                 constitution,
-                institution,
+                assembly,
                 Procedure.ORDINARY_RESOLUTION,
                 ProcedureTemplateKey.ORDINARY_RESOLUTION,
                 EffectType.ADOPT_RESOLUTION,
@@ -73,7 +86,7 @@ public class ConstitutionTemplateService {
                 pace.ordinaryVotingPeriodHours()),
             procedure(
                 constitution,
-                institution,
+                assembly,
                 Procedure.OFFICE_ELECTION,
                 ProcedureTemplateKey.OFFICE_ELECTION,
                 EffectType.ELECT_OFFICE,
@@ -82,7 +95,7 @@ public class ConstitutionTemplateService {
                 pace.officeElectionVotingPeriodHours()),
             procedure(
                 constitution,
-                institution,
+                assembly,
                 Procedure.SANCTION,
                 ProcedureTemplateKey.SANCTION,
                 EffectType.APPLY_SANCTION,
@@ -91,18 +104,43 @@ public class ConstitutionTemplateService {
                 pace.sanctionVotingPeriodHours()),
             procedure(
                 constitution,
-                institution,
+                court,
                 Procedure.APPEAL,
                 ProcedureTemplateKey.APPEAL,
                 EffectType.GRANT_APPEAL,
                 VotingThreshold.SIMPLE_MAJORITY_CAST,
                 ProcedureElectorate.OFFICE_HOLDERS,
                 Office.MAGISTRATE,
+                STANDARD_JUDICIAL_MINIMUM_ELECTOR_COUNT,
                 0,
                 pace.ordinaryVotingPeriodHours()),
             procedure(
                 constitution,
-                institution,
+                court,
+                Procedure.OFFICE_TERM_REVIEW,
+                ProcedureTemplateKey.OFFICE_TERM_REVIEW,
+                EffectType.VACATE_OFFICE_TERM,
+                VotingThreshold.SIMPLE_MAJORITY_CAST,
+                ProcedureElectorate.OFFICE_HOLDERS,
+                Office.MAGISTRATE,
+                STANDARD_JUDICIAL_MINIMUM_ELECTOR_COUNT,
+                0,
+                pace.ordinaryVotingPeriodHours()),
+            procedure(
+                constitution,
+                court,
+                Procedure.CONSTITUTIONAL_REVIEW,
+                ProcedureTemplateKey.CONSTITUTIONAL_REVIEW,
+                EffectType.VOID_OFFICIAL_ACT,
+                VotingThreshold.SIMPLE_MAJORITY_CAST,
+                ProcedureElectorate.OFFICE_HOLDERS,
+                Office.MAGISTRATE,
+                STANDARD_JUDICIAL_MINIMUM_ELECTOR_COUNT,
+                0,
+                pace.ordinaryVotingPeriodHours()),
+            procedure(
+                constitution,
+                assembly,
                 Procedure.CONSTITUTION_AMENDMENT,
                 ProcedureTemplateKey.CONSTITUTION_AMENDMENT,
                 EffectType.AMEND_CONSTITUTION,
@@ -111,7 +149,7 @@ public class ConstitutionTemplateService {
                 pace.constitutionalAmendmentVotingPeriodHours()),
             procedure(
                 constitution,
-                institution,
+                assembly,
                 Procedure.DISBANDMENT,
                 ProcedureTemplateKey.DISBANDMENT,
                 EffectType.DISBAND_POLITY,
@@ -153,18 +191,45 @@ public class ConstitutionTemplateService {
       String electorateOfficeCode,
       int minimumNoticeHours,
       int votingPeriodHours) {
+    return procedure(
+        constitution,
+        institution,
+        code,
+        templateKey,
+        effectType,
+        threshold,
+        electorate,
+        electorateOfficeCode,
+        DEFAULT_MINIMUM_ELECTOR_COUNT,
+        minimumNoticeHours,
+        votingPeriodHours);
+  }
+
+  private Procedure procedure(
+      ConstitutionVersion constitution,
+      Institution institution,
+      String code,
+      ProcedureTemplateKey templateKey,
+      EffectType effectType,
+      VotingThreshold threshold,
+      ProcedureElectorate electorate,
+      String electorateOfficeCode,
+      int minimumElectorCount,
+      int minimumNoticeHours,
+      int votingPeriodHours) {
     return new Procedure(
         constitution.getPolityId(),
         constitution.getId(),
         institution.getId(),
         code,
-        templateKey.fallbackName(),
+        templateKey.storedName(),
         templateKey,
         DEFAULT_QUORUM_NUMERATOR,
         DEFAULT_QUORUM_DENOMINATOR,
         threshold,
         electorate,
         electorateOfficeCode,
+        minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
         effectType);
@@ -179,28 +244,31 @@ public class ConstitutionTemplateService {
                 constitution.getId(),
                 jurisdiction.getId(),
                 Office.STEWARD,
-                OfficeTemplateKey.STEWARD.fallbackName(),
-                OfficeTemplateKey.STEWARD.fallbackDescription(),
+                OfficeTemplateKey.STEWARD.storedName(),
+                OfficeTemplateKey.STEWARD.storedDescription(),
                 OfficeTemplateKey.STEWARD,
-                pace.bootstrapStewardTermDays()),
+                pace.bootstrapStewardTermDays(),
+                DEFAULT_OFFICE_SEAT_COUNT),
             new Office(
                 constitution.getPolityId(),
                 constitution.getId(),
                 jurisdiction.getId(),
                 Office.MAGISTRATE,
-                OfficeTemplateKey.MAGISTRATE.fallbackName(),
-                OfficeTemplateKey.MAGISTRATE.fallbackDescription(),
+                OfficeTemplateKey.MAGISTRATE.storedName(),
+                OfficeTemplateKey.MAGISTRATE.storedDescription(),
                 OfficeTemplateKey.MAGISTRATE,
-                pace.bootstrapStewardTermDays()),
+                pace.bootstrapStewardTermDays(),
+                STANDARD_MAGISTRATE_SEAT_COUNT),
             new Office(
                 constitution.getPolityId(),
                 constitution.getId(),
                 jurisdiction.getId(),
                 Office.TRIBUNE,
-                OfficeTemplateKey.TRIBUNE.fallbackName(),
-                OfficeTemplateKey.TRIBUNE.fallbackDescription(),
+                OfficeTemplateKey.TRIBUNE.storedName(),
+                OfficeTemplateKey.TRIBUNE.storedDescription(),
                 OfficeTemplateKey.TRIBUNE,
-                pace.bootstrapStewardTermDays())));
+                pace.bootstrapStewardTermDays(),
+                DEFAULT_OFFICE_SEAT_COUNT)));
   }
 
   private void seedPowers(ConstitutionVersion constitution) {
@@ -223,6 +291,14 @@ public class ConstitutionTemplateService {
                 constitution,
                 PowerCode.INTRODUCE_APPEAL,
                 ConstitutionalPowerTemplateKey.INTRODUCE_APPEAL),
+            power(
+                constitution,
+                PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
+                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_TERM_REVIEW),
+            power(
+                constitution,
+                PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
+                ConstitutionalPowerTemplateKey.INTRODUCE_CONSTITUTIONAL_REVIEW),
             power(
                 constitution,
                 PowerCode.INTRODUCE_AMENDMENT,
@@ -250,7 +326,7 @@ public class ConstitutionTemplateService {
         constitution.getPolityId(),
         constitution.getId(),
         code,
-        templateKey.fallbackName(),
+        templateKey.storedName(),
         templateKey,
         PowerHolderScope.ACTIVE_MEMBER);
   }
@@ -264,7 +340,7 @@ public class ConstitutionTemplateService {
         constitution.getPolityId(),
         constitution.getId(),
         code,
-        templateKey.fallbackName(),
+        templateKey.storedName(),
         templateKey,
         officeCode);
   }

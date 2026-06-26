@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OfficeElectionProposalRepository
     extends JpaRepository<OfficeElectionProposal, UUID> {
-  Optional<OfficeElectionProposal> findByMotionId(UUID motionId);
+  Optional<OfficeElectionProposalProjection> findProjectedByMotionId(UUID motionId);
 }

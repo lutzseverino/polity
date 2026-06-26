@@ -2,11 +2,14 @@ package com.odonta.polity.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
 import com.odonta.polity.model.ConstitutionOfficeChangeAction;
 import com.odonta.polity.model.CreateConstitutionAmendmentMotionInput;
+import com.odonta.polity.model.CreateInstitutionChangeInput;
 import com.odonta.polity.model.CreateOfficeChangeInput;
 import com.odonta.polity.model.CreatePowerChangeInput;
 import com.odonta.polity.model.CreateProcedureChangeInput;
+import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.model.PowerHolderScope;
 import com.odonta.polity.model.Procedure;
@@ -15,6 +18,7 @@ import com.odonta.polity.model.VotingThreshold;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class ConstitutionAmendmentInputValidationTest {
@@ -33,6 +37,62 @@ class ConstitutionAmendmentInputValidationTest {
   }
 
   @Test
+  void acceptsInstitutionCreationWithRequiredFields() {
+    CreateInstitutionChangeInput input =
+        new CreateInstitutionChangeInput(
+            ConstitutionInstitutionChangeAction.CREATE,
+            null,
+            UUID.randomUUID(),
+            "People's Court",
+            InstitutionKind.JUDICIARY);
+
+    assertThat(validator.validate(input)).isEmpty();
+  }
+
+  @Test
+  void rejectsInstitutionCreationWithExistingInstitutionId() {
+    CreateInstitutionChangeInput input =
+        new CreateInstitutionChangeInput(
+            ConstitutionInstitutionChangeAction.CREATE,
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "People's Court",
+            InstitutionKind.JUDICIARY);
+
+    assertThat(validator.validate(input))
+        .anyMatch(
+            violation ->
+                violation.getConstraintDescriptor().getAnnotation()
+                    instanceof ValidInstitutionChange);
+  }
+
+  @Test
+  void rejectsEmptyInstitutionRevision() {
+    CreateInstitutionChangeInput input =
+        new CreateInstitutionChangeInput(
+            ConstitutionInstitutionChangeAction.REVISE, UUID.randomUUID(), null, " ", null);
+
+    assertThat(validator.validate(input))
+        .anyMatch(
+            violation ->
+                violation.getConstraintDescriptor().getAnnotation()
+                    instanceof ValidInstitutionChange);
+  }
+
+  @Test
+  void rejectsInstitutionRetirementWithRevisionFields() {
+    CreateInstitutionChangeInput input =
+        new CreateInstitutionChangeInput(
+            ConstitutionInstitutionChangeAction.RETIRE, UUID.randomUUID(), null, "New name", null);
+
+    assertThat(validator.validate(input))
+        .anyMatch(
+            violation ->
+                violation.getConstraintDescriptor().getAnnotation()
+                    instanceof ValidInstitutionChange);
+  }
+
+  @Test
   void rejectsDuplicateAmendmentChanges() {
     CreateConstitutionAmendmentMotionInput input =
         new CreateConstitutionAmendmentMotionInput(
@@ -47,12 +107,14 @@ class ConstitutionAmendmentInputValidationTest {
                     null,
                     null,
                     null,
+                    null,
                     null),
                 new CreateProcedureChangeInput(
                     Procedure.ORDINARY_RESOLUTION,
                     null,
                     null,
                     VotingThreshold.TWO_THIRDS_ELIGIBLE,
+                    null,
                     null,
                     null,
                     null,
@@ -78,6 +140,7 @@ class ConstitutionAmendmentInputValidationTest {
             ProcedureElectorate.OFFICE_HOLDERS,
             "magistrate",
             null,
+            null,
             null);
 
     assertThat(validator.validate(input)).isEmpty();
@@ -92,6 +155,7 @@ class ConstitutionAmendmentInputValidationTest {
             null,
             null,
             ProcedureElectorate.OFFICE_HOLDERS,
+            null,
             null,
             null,
             null);
@@ -114,6 +178,7 @@ class ConstitutionAmendmentInputValidationTest {
             ProcedureElectorate.ACTIVE_MEMBERS,
             "magistrate",
             null,
+            null,
             null);
 
     assertThat(validator.validate(input))
@@ -127,7 +192,7 @@ class ConstitutionAmendmentInputValidationTest {
   void acceptsOfficeCreationWithRequiredFields() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.CREATE, "clerk", "Clerk", "Keeps records.", 30);
+            ConstitutionOfficeChangeAction.CREATE, "clerk", "Clerk", "Keeps records.", 30, 1);
 
     assertThat(validator.validate(input)).isEmpty();
   }
@@ -135,7 +200,8 @@ class ConstitutionAmendmentInputValidationTest {
   @Test
   void rejectsOfficeCreationWithoutRequiredFields() {
     CreateOfficeChangeInput input =
-        new CreateOfficeChangeInput(ConstitutionOfficeChangeAction.CREATE, "clerk", "", null, null);
+        new CreateOfficeChangeInput(
+            ConstitutionOfficeChangeAction.CREATE, "clerk", "", null, null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -147,7 +213,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsEmptyOfficeRevision() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.REVISE, "clerk", null, " ", null);
+            ConstitutionOfficeChangeAction.REVISE, "clerk", null, " ", null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -159,7 +225,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsOfficeRetirementWithRevisionFields() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.RETIRE, "clerk", "Clerk", null, null);
+            ConstitutionOfficeChangeAction.RETIRE, "clerk", "Clerk", null, null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(

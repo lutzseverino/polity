@@ -6,5 +6,5 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SanctionProposalRepository extends JpaRepository<SanctionProposal, UUID> {
-  Optional<SanctionProposal> findByMotionId(UUID motionId);
+  Optional<SanctionProposalProjection> findProjectedByMotionId(UUID motionId);
 }

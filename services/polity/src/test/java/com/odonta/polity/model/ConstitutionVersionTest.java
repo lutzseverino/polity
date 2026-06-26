@@ -15,8 +15,8 @@ class ConstitutionVersionTest {
         new ConstitutionVersion(
             UUID.randomUUID(),
             1,
-            ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackTitle(),
-            ConstitutionTemplateKey.STRUCTURED_CHARTER.fallbackBody(),
+            ConstitutionTemplateKey.STRUCTURED_CHARTER.storedTitle(),
+            ConstitutionTemplateKey.STRUCTURED_CHARTER.storedBody(),
             ConstitutionTemplateKey.STRUCTURED_CHARTER,
             NOW);
 

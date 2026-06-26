@@ -6,9 +6,11 @@ import com.odonta.polity.api.model.CastOfficeElectionBallotRequest;
 import com.odonta.polity.api.model.CastVoteRequest;
 import com.odonta.polity.api.model.CreateAppealMotionRequest;
 import com.odonta.polity.api.model.CreateConstitutionAmendmentMotionRequest;
+import com.odonta.polity.api.model.CreateConstitutionalReviewMotionRequest;
 import com.odonta.polity.api.model.CreateDisbandmentMotionRequest;
 import com.odonta.polity.api.model.CreateMotionRequest;
 import com.odonta.polity.api.model.CreateOfficeElectionMotionRequest;
+import com.odonta.polity.api.model.CreateOfficeTermReviewMotionRequest;
 import com.odonta.polity.api.model.CreateSanctionMotionRequest;
 import com.odonta.polity.api.model.MotionResponse;
 import com.odonta.polity.api.model.RespondOfficeElectionCandidacyRequest;
@@ -66,6 +68,26 @@ public class MotionController implements MotionsApi {
         .body(
             mapper.toResponse(
                 motions.createAppeal(polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolityOfficeTermReviewMotion(
+      UUID polityId, @Valid CreateOfficeTermReviewMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createOfficeTermReview(
+                    polityId, users.currentUser(), mapper.toInput(request))));
+  }
+
+  @Override
+  public ResponseEntity<MotionResponse> createPolityConstitutionalReviewMotion(
+      UUID polityId, @Valid CreateConstitutionalReviewMotionRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            mapper.toResponse(
+                motions.createConstitutionalReview(
+                    polityId, users.currentUser(), mapper.toInput(request))));
   }
 
   @Override

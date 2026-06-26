@@ -3,23 +3,18 @@ package com.odonta.polity.model;
 import java.util.Map;
 
 public enum MotionTemplateKey {
-  APPEAL("motion.appeal", "Appeal sanction", "{reason}"),
-  CONSTITUTION_AMENDMENT("motion.constitution_amendment", "Amend constitution: {title}", "{body}"),
-  DISBANDMENT("motion.disbandment", "Disband polity: {title}", "{body}"),
-  OFFICE_ELECTION(
-      "motion.office_election",
-      "Elect {officeName}",
-      "Election for {officeName} with candidates: {candidateNames}."),
-  SANCTION("motion.sanction", "Sanction {targetName}", "{reason}");
+  APPEAL("motion.appeal"),
+  CONSTITUTION_AMENDMENT("motion.constitution_amendment"),
+  CONSTITUTIONAL_REVIEW("motion.constitutional_review"),
+  DISBANDMENT("motion.disbandment"),
+  OFFICE_TERM_REVIEW("motion.office_term_review"),
+  OFFICE_ELECTION("motion.office_election"),
+  SANCTION("motion.sanction");
 
   private final String keyPrefix;
-  private final String fallbackTitle;
-  private final String fallbackBody;
 
-  MotionTemplateKey(String keyPrefix, String fallbackTitle, String fallbackBody) {
+  MotionTemplateKey(String keyPrefix) {
     this.keyPrefix = keyPrefix;
-    this.fallbackTitle = fallbackTitle;
-    this.fallbackBody = fallbackBody;
   }
 
   public String titleKey() {
@@ -30,11 +25,11 @@ public enum MotionTemplateKey {
     return keyPrefix + ".body";
   }
 
-  public String fallbackTitle(Map<String, ?> params) {
-    return TemplateText.render(fallbackTitle, params);
+  public String storedTitle(Map<String, ?> params) {
+    return titleKey();
   }
 
-  public String fallbackBody(Map<String, ?> params) {
-    return TemplateText.render(fallbackBody, params);
+  public String storedBody(Map<String, ?> params) {
+    return bodyKey();
   }
 }

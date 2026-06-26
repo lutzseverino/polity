@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidOfficeChangeValidator.class)
 public @interface ValidOfficeChange {
-  String message() default "Office change must contain fields allowed by its action.";
+  String message() default "{polity.validation.officeChange.validFields}";
 
   Class<?>[] groups() default {};
 

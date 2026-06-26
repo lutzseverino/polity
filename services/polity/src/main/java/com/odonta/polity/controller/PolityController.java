@@ -26,6 +26,12 @@ public class PolityController implements PolitiesApi {
   private final AuthenticatedUserReader users;
 
   @Override
+  public ResponseEntity<Void> provisionPolityAccount() {
+    polities.provisionAccount(users.currentUser());
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(mapper.toResponse(polities.create(users.currentUser(), mapper.toInput(request))));

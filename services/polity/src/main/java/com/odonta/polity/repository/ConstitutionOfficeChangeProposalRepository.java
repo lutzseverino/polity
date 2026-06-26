@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ConstitutionOfficeChangeProposalRepository
     extends JpaRepository<ConstitutionOfficeChangeProposal, UUID> {
 
-  List<ConstitutionOfficeChangeProposal> findByAmendmentProposalId(UUID amendmentProposalId);
+  List<ConstitutionOfficeChangeProposalProjection> findProjectionsByAmendmentProposalId(
+      UUID amendmentProposalId);
 }

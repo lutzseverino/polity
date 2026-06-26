@@ -239,7 +239,7 @@ class InvitationServiceTest {
     MembershipProjection memberProjection = memberProjection(admittedMembershipId, inviteeUserId);
 
     when(identityUsers.get(inviteeUserId)).thenReturn(invitee);
-    when(invitations.findByIdAndStatus(invitationId, InvitationStatus.PENDING))
+    when(invitations.findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING))
         .thenReturn(Optional.of(invitation));
     when(memberships.saveAndFlush(any(Membership.class)))
         .thenAnswer(

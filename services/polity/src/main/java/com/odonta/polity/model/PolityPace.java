@@ -64,4 +64,8 @@ public enum PolityPace {
   public int constitutionalAmendmentVotingPeriodHours() {
     return constitutionalAmendmentVotingPeriodHours;
   }
+
+  public String labelKey() {
+    return "polity.pace." + name().toLowerCase();
+  }
 }

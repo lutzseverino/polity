@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record ConstitutionProcedureResult(
     UUID id,
+    UUID institutionId,
     String code,
     String name,
     String nameKey,
@@ -12,6 +13,7 @@ public record ConstitutionProcedureResult(
     VotingThreshold threshold,
     ProcedureElectorate electorate,
     String electorateOfficeCode,
+    int minimumElectorCount,
     int minimumNoticeHours,
     int votingPeriodHours,
     EffectType effectType) {}

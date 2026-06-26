@@ -7,7 +7,10 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ConstitutionVersionRepository extends JpaRepository<ConstitutionVersion, UUID> {
-  Optional<ConstitutionVersion> findByPolityIdAndStatus(UUID polityId, ConstitutionStatus status);
+  Optional<ConstitutionVersion> findEntityById(UUID id);
 
-  Optional<ConstitutionVersion> findTopByPolityIdOrderByVersionDesc(UUID polityId);
+  Optional<ConstitutionVersion> findEntityByPolityIdAndStatus(
+      UUID polityId, ConstitutionStatus status);
+
+  Optional<ConstitutionVersion> findTopEntityByPolityIdOrderByVersionDesc(UUID polityId);
 }

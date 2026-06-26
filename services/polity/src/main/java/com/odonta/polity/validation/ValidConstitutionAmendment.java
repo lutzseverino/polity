@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidConstitutionAmendmentValidator.class)
 public @interface ValidConstitutionAmendment {
-  String message() default "Constitution amendment must contain a unique set of changes.";
+  String message() default "{polity.validation.constitutionAmendment.validChanges}";
 
   Class<?>[] groups() default {};
 

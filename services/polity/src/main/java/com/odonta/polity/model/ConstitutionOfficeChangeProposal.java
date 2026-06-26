@@ -33,6 +33,9 @@ public class ConstitutionOfficeChangeProposal extends AuditedEntity {
   @Column(name = "office_code", nullable = false)
   private String officeCode;
 
+  @Column(name = "jurisdiction_id")
+  private UUID jurisdictionId;
+
   @Column private String name;
 
   @Column private String description;
@@ -40,20 +43,27 @@ public class ConstitutionOfficeChangeProposal extends AuditedEntity {
   @Column(name = "term_length_days")
   private Integer termLengthDays;
 
+  @Column(name = "seat_count")
+  private Integer seatCount;
+
   public ConstitutionOfficeChangeProposal(
       UUID polityId,
       UUID amendmentProposalId,
       ConstitutionOfficeChangeAction action,
       String officeCode,
+      UUID jurisdictionId,
       String name,
       String description,
-      Integer termLengthDays) {
+      Integer termLengthDays,
+      Integer seatCount) {
     this.polityId = polityId;
     this.amendmentProposalId = amendmentProposalId;
     this.action = action;
     this.officeCode = officeCode;
+    this.jurisdictionId = jurisdictionId;
     this.name = name;
     this.description = description;
     this.termLengthDays = termLengthDays;
+    this.seatCount = seatCount;
   }
 }

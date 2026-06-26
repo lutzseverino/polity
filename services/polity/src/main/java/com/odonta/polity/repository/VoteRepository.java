@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VoteRepository extends JpaRepository<Vote, UUID> {
-  Optional<Vote> findByMotionIdAndMembershipId(UUID motionId, UUID membershipId);
+  Optional<Vote> findEntityByMotionIdAndMembershipId(UUID motionId, UUID membershipId);
 
-  List<Vote> findByMotionId(UUID motionId);
+  List<Vote> findEntitiesByMotionId(UUID motionId);
 }

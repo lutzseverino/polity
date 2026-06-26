@@ -15,11 +15,11 @@ import com.odonta.polity.model.OfficialRecordSequence;
 import com.odonta.polity.model.OfficialRecordTemplate;
 import com.odonta.polity.model.OfficialRecordTemplateKey;
 import com.odonta.polity.model.OfficialRecordType;
+import com.odonta.polity.model.TemplateParameters;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
 import com.odonta.polity.repository.OfficialRecordRepository;
 import com.odonta.polity.repository.OfficialRecordSequenceRepository;
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class OfficialRecordServiceTest {
   void assignsSequentialEntryNumbersForAPolity() {
     UUID polityId = UUID.randomUUID();
     OfficialRecordSequence sequence = new OfficialRecordSequence(polityId);
-    when(sequences.findByPolityIdForUpdate(polityId)).thenReturn(Optional.of(sequence));
+    when(sequences.findEntityByPolityIdForUpdate(polityId)).thenReturn(Optional.of(sequence));
     when(records.save(any(OfficialRecordEntry.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -65,7 +65,7 @@ class OfficialRecordServiceTest {
   @Test
   void createsSequenceWhenMissing() {
     UUID polityId = UUID.randomUUID();
-    when(sequences.findByPolityIdForUpdate(polityId)).thenReturn(Optional.empty());
+    when(sequences.findEntityByPolityIdForUpdate(polityId)).thenReturn(Optional.empty());
     when(sequences.saveAndFlush(any(OfficialRecordSequence.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
     when(records.save(any(OfficialRecordEntry.class)))
@@ -83,7 +83,7 @@ class OfficialRecordServiceTest {
   @Test
   void storesStructuredMessageMetadata() {
     UUID polityId = UUID.randomUUID();
-    when(sequences.findByPolityIdForUpdate(polityId))
+    when(sequences.findEntityByPolityIdForUpdate(polityId))
         .thenReturn(Optional.of(new OfficialRecordSequence(polityId)));
     when(records.save(any(OfficialRecordEntry.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
@@ -98,7 +98,7 @@ class OfficialRecordServiceTest {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.POLITY_FOUNDED,
-            Map.of(
+            TemplateParameters.of(
                 "polityName", "Tiny Senate", "setupPreset", "standard republic", "pace", "fast")),
         NOW);
 
@@ -108,9 +108,8 @@ class OfficialRecordServiceTest {
     OfficialRecordEntry entry = entries.getValue();
     assertThat(entry.getTitleKey()).isEqualTo("official_record.polity_founded.title");
     assertThat(entry.getBodyKey()).isEqualTo("official_record.polity_founded.body");
-    assertThat(entry.getTitle()).isEqualTo("Tiny Senate was founded");
-    assertThat(entry.getBody())
-        .isEqualTo("The polity was founded with the standard republic preset and fast pace.");
+    assertThat(entry.getTitle()).isEqualTo("official_record.polity_founded.title");
+    assertThat(entry.getBody()).isEqualTo("official_record.polity_founded.body");
     assertThat(entry.getTemplateParams()).containsEntry("polityName", "Tiny Senate");
   }
 
@@ -125,7 +124,7 @@ class OfficialRecordServiceTest {
         OfficialRecordContext.none(),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.POLITY_FOUNDED,
-            Map.of(
+            TemplateParameters.of(
                 "polityName", "Tiny Senate", "setupPreset", "standard republic", "pace", "fast")),
         NOW);
   }

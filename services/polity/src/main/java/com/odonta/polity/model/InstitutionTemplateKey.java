@@ -1,21 +1,20 @@
 package com.odonta.polity.model;
 
 public enum InstitutionTemplateKey {
-  CITIZENS_ASSEMBLY("polity.institution.citizensAssembly", "Citizens' Assembly");
+  CITIZENS_ASSEMBLY("polity.institution.citizensAssembly"),
+  MAGISTRATES_COURT("polity.institution.magistratesCourt");
 
   private final String keyPrefix;
-  private final String fallbackName;
 
-  InstitutionTemplateKey(String keyPrefix, String fallbackName) {
+  InstitutionTemplateKey(String keyPrefix) {
     this.keyPrefix = keyPrefix;
-    this.fallbackName = fallbackName;
   }
 
   public String nameKey() {
     return keyPrefix + ".name";
   }
 
-  public String fallbackName() {
-    return fallbackName;
+  public String storedName() {
+    return nameKey();
   }
 }

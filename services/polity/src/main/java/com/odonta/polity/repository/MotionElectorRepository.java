@@ -10,5 +10,5 @@ public interface MotionElectorRepository extends JpaRepository<MotionElector, UU
 
   long countByMotionId(UUID motionId);
 
-  List<MotionElector> findByMotionId(UUID motionId);
+  List<MotionElector> findEntitiesByMotionId(UUID motionId);
 }

@@ -9,6 +9,7 @@ public record ConstitutionResult(
     int version,
     ConstitutionStatus status,
     OffsetDateTime ratifiedAt,
+    List<ConstitutionJurisdictionResult> jurisdictions,
     List<ConstitutionInstitutionResult> institutions,
     List<ConstitutionProcedureResult> procedures,
     List<OfficeResult> offices,

@@ -42,7 +42,7 @@ public class MembershipService {
 
   Membership active(UUID polityId, UUID userId) {
     return memberships
-        .findByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
+        .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
         .orElseThrow(
             () ->
                 ApiException.forbidden(
@@ -51,7 +51,7 @@ public class MembershipService {
 
   Membership get(UUID membershipId) {
     return memberships
-        .findById(membershipId)
+        .findEntityById(membershipId)
         .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
   }
 

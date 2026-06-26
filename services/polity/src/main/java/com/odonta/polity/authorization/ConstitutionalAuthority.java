@@ -57,7 +57,7 @@ public class ConstitutionalAuthority {
     OffsetDateTime now = OffsetDateTime.now(clock);
     var power =
         powers
-            .findByConstitutionVersionIdAndCode(constitution.getId(), code)
+            .findEntityByConstitutionVersionIdAndCode(constitution.getId(), code)
             .orElseThrow(
                 () ->
                     ApiException.forbidden(

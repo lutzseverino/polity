@@ -67,6 +67,15 @@ public class Institution extends AuditedEntity {
     return new Institution(polityId, jurisdictionId, constitutionVersionId, name, nameKey, kind);
   }
 
+  public Institution copyWith(
+      UUID constitutionVersionId,
+      UUID jurisdictionId,
+      String name,
+      String nameKey,
+      InstitutionKind kind) {
+    return new Institution(polityId, jurisdictionId, constitutionVersionId, name, nameKey, kind);
+  }
+
   private Institution(
       UUID polityId,
       UUID jurisdictionId,

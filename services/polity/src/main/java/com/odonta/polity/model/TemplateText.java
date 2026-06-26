@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-final class TemplateText {
+public final class TemplateText {
   private TemplateText() {}
 
-  static String render(String template, Map<String, ?> params) {
+  public static String render(String template, Map<String, ?> params) {
     String rendered = template;
     for (Map.Entry<String, ?> entry : params.entrySet()) {
       rendered = rendered.replace("{" + entry.getKey() + "}", value(entry.getValue()));

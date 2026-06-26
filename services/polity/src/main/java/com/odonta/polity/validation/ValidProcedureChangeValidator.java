@@ -25,9 +25,11 @@ public final class ValidProcedureChangeValidator
             };
     return quorumValid
         && electorateValid
-        && (quorumComplete
+        && (value.institutionId() != null
+            || quorumComplete
             || value.threshold() != null
             || value.electorate() != null
+            || value.minimumElectorCount() != null
             || value.minimumNoticeHours() != null
             || value.votingPeriodHours() != null);
   }

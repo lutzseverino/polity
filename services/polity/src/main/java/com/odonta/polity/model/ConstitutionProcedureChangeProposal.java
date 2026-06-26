@@ -29,6 +29,9 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
   @Column(name = "procedure_code", nullable = false)
   private String procedureCode;
 
+  @Column(name = "institution_id")
+  private UUID institutionId;
+
   @Column(name = "quorum_numerator")
   private Integer quorumNumerator;
 
@@ -46,6 +49,9 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
   @Column(name = "electorate_office_code")
   private String electorateOfficeCode;
 
+  @Column(name = "minimum_elector_count")
+  private Integer minimumElectorCount;
+
   @Column(name = "minimum_notice_hours")
   private Integer minimumNoticeHours;
 
@@ -56,21 +62,25 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
       UUID polityId,
       UUID amendmentProposalId,
       String procedureCode,
+      UUID institutionId,
       Integer quorumNumerator,
       Integer quorumDenominator,
       VotingThreshold threshold,
       ProcedureElectorate electorate,
       String electorateOfficeCode,
+      Integer minimumElectorCount,
       Integer minimumNoticeHours,
       Integer votingPeriodHours) {
     this.polityId = polityId;
     this.amendmentProposalId = amendmentProposalId;
     this.procedureCode = procedureCode;
+    this.institutionId = institutionId;
     this.quorumNumerator = quorumNumerator;
     this.quorumDenominator = quorumDenominator;
     this.threshold = threshold;
     this.electorate = electorate;
     this.electorateOfficeCode = electorateOfficeCode;
+    this.minimumElectorCount = minimumElectorCount;
     this.minimumNoticeHours = minimumNoticeHours;
     this.votingPeriodHours = votingPeriodHours;
   }

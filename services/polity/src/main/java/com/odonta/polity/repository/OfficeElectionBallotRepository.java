@@ -7,7 +7,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OfficeElectionBallotRepository extends JpaRepository<OfficeElectionBallot, UUID> {
-  Optional<OfficeElectionBallot> findByMotionIdAndMembershipId(UUID motionId, UUID membershipId);
+  Optional<OfficeElectionBallot> findEntityByMotionIdAndMembershipId(
+      UUID motionId, UUID membershipId);
 
-  List<OfficeElectionBallot> findByMotionId(UUID motionId);
+  List<OfficeElectionBallot> findEntitiesByMotionId(UUID motionId);
 }

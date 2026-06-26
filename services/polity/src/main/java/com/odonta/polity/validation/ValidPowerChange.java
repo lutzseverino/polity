@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPowerChangeValidator.class)
 public @interface ValidPowerChange {
-  String message() default "Power change holder fields must match the holder scope.";
+  String message() default "{polity.validation.powerChange.validHolder}";
 
   Class<?>[] groups() default {};
 

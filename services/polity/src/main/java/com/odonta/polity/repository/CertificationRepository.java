@@ -6,5 +6,5 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CertificationRepository extends JpaRepository<Certification, UUID> {
-  Optional<Certification> findByMotionId(UUID motionId);
+  Optional<Certification> findEntityByMotionId(UUID motionId);
 }

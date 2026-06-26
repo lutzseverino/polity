@@ -1,19 +1,12 @@
 package com.odonta.polity.model;
 
 public enum ConstitutionTemplateKey {
-  STRUCTURED_CHARTER(
-      "constitution.structured_charter",
-      "Structured Charter",
-      "Binding constitutional rules are stored as structured institutions, procedures, offices, and powers.");
+  STRUCTURED_CHARTER("constitution.structured_charter");
 
   private final String keyPrefix;
-  private final String fallbackTitle;
-  private final String fallbackBody;
 
-  ConstitutionTemplateKey(String keyPrefix, String fallbackTitle, String fallbackBody) {
+  ConstitutionTemplateKey(String keyPrefix) {
     this.keyPrefix = keyPrefix;
-    this.fallbackTitle = fallbackTitle;
-    this.fallbackBody = fallbackBody;
   }
 
   public String titleKey() {
@@ -24,15 +17,15 @@ public enum ConstitutionTemplateKey {
     return keyPrefix + ".body";
   }
 
-  public String fallbackTitle() {
-    return fallbackTitle;
+  public String storedTitle() {
+    return titleKey();
   }
 
-  public String fallbackTitle(int version) {
-    return fallbackTitle + " v" + version;
+  public String storedTitle(int version) {
+    return titleKey();
   }
 
-  public String fallbackBody() {
-    return fallbackBody;
+  public String storedBody() {
+    return bodyKey();
   }
 }

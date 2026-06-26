@@ -18,5 +18,5 @@ public interface OfficialRecordSequenceRepository
       from OfficialRecordSequence recordSequence
       where recordSequence.polityId = :polityId
       """)
-  Optional<OfficialRecordSequence> findByPolityIdForUpdate(UUID polityId);
+  Optional<OfficialRecordSequence> findEntityByPolityIdForUpdate(UUID polityId);
 }

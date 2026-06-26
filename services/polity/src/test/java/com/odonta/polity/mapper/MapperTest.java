@@ -63,6 +63,7 @@ class MapperTest {
     when(projection.getNameKey()).thenReturn("office.steward.name");
     when(projection.getDescriptionKey()).thenReturn("office.steward.description");
     when(projection.getTermLengthDays()).thenReturn(14);
+    when(projection.getSeatCount()).thenReturn(3);
 
     var results = offices.toResults(List.of(projection));
 
@@ -77,6 +78,7 @@ class MapperTest {
               assertThat(result.nameKey()).isEqualTo("office.steward.name");
               assertThat(result.descriptionKey()).isEqualTo("office.steward.description");
               assertThat(result.termLengthDays()).isEqualTo(14);
+              assertThat(result.seatCount()).isEqualTo(3);
             });
   }
 

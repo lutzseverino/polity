@@ -9,6 +9,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PolityGrantPlanner {
+  public GrantPlan account(String subject) {
+    return GrantPlan.builder()
+        .grantAuthorities(
+            subject, PolityPermissions.CLIENT_ID, List.of(PolityPermissions.PUBLIC_POLITY_CREATE))
+        .build();
+  }
+
   public GrantPlan membership(String subject, UUID polityId) {
     return GrantPlan.builder()
         .grantActions(

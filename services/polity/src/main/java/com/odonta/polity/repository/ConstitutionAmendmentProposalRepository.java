@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ConstitutionAmendmentProposalRepository
     extends JpaRepository<ConstitutionAmendmentProposal, UUID> {
-  Optional<ConstitutionAmendmentProposal> findByMotionId(UUID motionId);
+  Optional<ConstitutionAmendmentProposalProjection> findProjectedByMotionId(UUID motionId);
 }

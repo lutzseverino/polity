@@ -1,6 +1,7 @@
 package com.odonta.polity.validation;
 
 import com.odonta.polity.model.CreateConstitutionAmendmentMotionInput;
+import com.odonta.polity.model.CreateInstitutionChangeInput;
 import com.odonta.polity.model.CreateOfficeChangeInput;
 import com.odonta.polity.model.CreatePowerChangeInput;
 import com.odonta.polity.model.CreateProcedureChangeInput;
@@ -23,12 +24,24 @@ public final class ValidConstitutionAmendmentValidator
       return true;
     }
     List<CreateProcedureChangeInput> procedureChanges = list(value.procedureChanges());
+    List<CreateInstitutionChangeInput> institutionChanges = list(value.institutionChanges());
     List<CreateOfficeChangeInput> officeChanges = list(value.officeChanges());
     List<CreatePowerChangeInput> powerChanges = list(value.powerChanges());
-    return !(procedureChanges.isEmpty() && officeChanges.isEmpty() && powerChanges.isEmpty())
+    return !(institutionChanges.isEmpty()
+            && procedureChanges.isEmpty()
+            && officeChanges.isEmpty()
+            && powerChanges.isEmpty())
+        && hasUniqueInstitutionIds(institutionChanges)
         && hasUniqueProcedureCodes(procedureChanges)
         && hasUniqueOfficeCodes(officeChanges)
         && hasUniquePowerCodes(powerChanges);
+  }
+
+  private boolean hasUniqueInstitutionIds(List<CreateInstitutionChangeInput> changes) {
+    Set<java.util.UUID> ids = new HashSet<>();
+    return changes.stream()
+        .filter(change -> change.institutionId() != null)
+        .allMatch(change -> ids.add(change.institutionId()));
   }
 
   private boolean hasUniqueProcedureCodes(List<CreateProcedureChangeInput> changes) {

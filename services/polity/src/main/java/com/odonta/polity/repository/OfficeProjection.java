@@ -5,6 +5,8 @@ import java.util.UUID;
 public interface OfficeProjection {
   UUID getId();
 
+  UUID getJurisdictionId();
+
   String getCode();
 
   String getName();
@@ -16,4 +18,6 @@ public interface OfficeProjection {
   String getDescriptionKey();
 
   int getTermLengthDays();
+
+  int getSeatCount();
 }

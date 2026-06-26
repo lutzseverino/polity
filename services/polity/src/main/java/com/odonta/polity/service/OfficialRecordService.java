@@ -71,7 +71,7 @@ public class OfficialRecordService {
   private OfficialRecordResult result(OfficialRecordProjection projection) {
     ConstitutionVersion constitution =
         constitutions
-            .findById(projection.getConstitutionVersionId())
+            .findEntityById(projection.getConstitutionVersionId())
             .orElseThrow(
                 () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
     return mapper.toResult(
@@ -83,7 +83,7 @@ public class OfficialRecordService {
   private int nextEntryNumber(UUID polityId) {
     OfficialRecordSequence sequence =
         sequences
-            .findByPolityIdForUpdate(polityId)
+            .findEntityByPolityIdForUpdate(polityId)
             .orElseGet(() -> sequences.saveAndFlush(new OfficialRecordSequence(polityId)));
     return sequence.claimNextEntryNumber();
   }

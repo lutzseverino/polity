@@ -27,7 +27,7 @@ class ProcedureElectorateService {
 
   private List<Membership> activeMembers(Procedure procedure, OffsetDateTime votingOpensAt) {
     return memberships
-        .findByPolityIdAndStatusOrderByAdmittedAtAsc(
+        .findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
             procedure.getPolityId(), MembershipStatus.ACTIVE)
         .stream()
         .filter(member -> membershipService.hasPoliticalStanding(member, votingOpensAt))
@@ -36,7 +36,7 @@ class ProcedureElectorateService {
 
   private List<Membership> officeHolders(Procedure procedure, OffsetDateTime votingOpensAt) {
     return officeTerms
-        .findByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+        .findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
             procedure.getPolityId(),
             procedure.getElectorateOfficeCode(),
             OfficeTermStatus.ACTIVE,
