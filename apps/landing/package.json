@@ -13,9 +13,9 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@fontsource-variable/big-shoulders-stencil-display": "^5.2.5",
     "@fontsource-variable/geist": "^5.2.9",
     "@fontsource-variable/geist-mono": "^5.2.8",
-    "@fontsource/anton": "^5.2.7",
     "@gsap/react": "^2.1.2",
     "@polity/design": "file:../../packages/design",
     "@tailwindcss/vite": "^4.3.0",

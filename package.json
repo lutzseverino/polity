@@ -14,7 +14,7 @@
     "check:deps": "knip",
     "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root lint:ts && node scripts/run-package-script.mjs root check:ts:architecture",
     "check:service": "node scripts/run-package-script.mjs root test:service && node scripts/run-package-script.mjs root check:service:static",
-    "check:service:architecture": "mvn -f services/polity/pom.xml -Dtest=PolityArchitectureTest test",
+    "check:service:architecture": "mvn -f services/polity/pom.xml -Dtest=PolityArchitectureTest,PolityRepositoryBoundaryTest,PolityApplicationBoundaryTest test",
     "check:service:static": "mvn -f services/polity/pom.xml compile spotbugs:check",
     "check:ts:architecture": "node scripts/run-package-script.mjs root check:ts:architecture:landing && node scripts/run-package-script.mjs root check:ts:architecture:mobile && node scripts/run-package-script.mjs root check:ts:architecture:design",
     "check:ts:architecture:design": "node scripts/run-package-script.mjs workspace packages/design check:architecture",

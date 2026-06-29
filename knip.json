@@ -1,9 +1,9 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreDependencies": [
+    "@fontsource-variable/big-shoulders-stencil-display",
     "@fontsource-variable/geist",
     "@fontsource-variable/geist-mono",
-    "@fontsource/anton",
     "expo-font",
     "expo-updates",
     "shadcn",

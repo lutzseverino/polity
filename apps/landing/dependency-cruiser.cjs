@@ -39,6 +39,14 @@ module.exports = {
       to: { path: "^src/components/app/" },
     },
     {
+      name: "landing-pages-use-app-component-wrappers",
+      severity: "error",
+      comment:
+        "Page code should depend on app component wrappers instead of importing shadcn primitives directly.",
+      from: { path: "^src/(?!components/(?:app|ui)/)" },
+      to: { path: "^src/components/ui/" },
+    },
+    {
       name: "generated-api-stays-behind-api-boundary",
       severity: "error",
       comment:

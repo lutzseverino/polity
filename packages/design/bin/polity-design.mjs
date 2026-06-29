@@ -64,8 +64,11 @@ function declarations(entries, indent = "  ") {
 
 function shadcnMode(tokens, mode) {
   const colors = tokens.colorModes[mode];
-  const border = mode === "light" ? "var(--ink)" : cssToken(colors.border);
-  const input = mode === "light" ? "var(--ink)" : cssToken(colors.input);
+  // Both modes read border/input straight from the tokens so each can carry its
+  // own (softer) value. Light was previously hardcoded to solid --ink, which
+  // made light borders far heavier than dark's translucent ones.
+  const border = cssToken(colors.border);
+  const input = cssToken(colors.input);
 
   return declarations([
     ["paper", cssToken(colors.paper)],

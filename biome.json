@@ -38,7 +38,8 @@
       "packages/*/src/**/*.ts",
       "packages/*/tsconfig.depcruise.json",
       "packages/*/tsconfig.json",
-      "!apps/landing/src/api/generated"
+      "!apps/landing/src/api/generated",
+      "!apps/landing/src/design/tokens/shadcn-theme.css"
     ]
   },
   "formatter": {
