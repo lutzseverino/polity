@@ -1,8 +1,8 @@
 import { X } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AppButton } from "./app-button";
 
 type AppBadgeProps = Readonly<
   ComponentProps<typeof Badge> & {
@@ -11,7 +11,7 @@ type AppBadgeProps = Readonly<
 >;
 
 type BadgeRemoveButtonProps = Readonly<
-  Omit<ComponentProps<typeof Button>, "children" | "size" | "variant">
+  Omit<ComponentProps<typeof AppButton>, "children" | "size" | "variant">
 >;
 
 export function AppBadge({
@@ -39,15 +39,16 @@ export function BadgeRemoveButton({
   ...props
 }: BadgeRemoveButtonProps) {
   return (
-    <Button
+    <AppButton
       className={cn("rounded-none", className)}
       data-slot="badge-remove"
       size="icon-xs"
+      treatment="plain"
       type={type}
       variant="secondary"
       {...props}
     >
       <X aria-hidden="true" />
-    </Button>
+    </AppButton>
   );
 }

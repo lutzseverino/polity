@@ -2,7 +2,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Anton", "Geist Variable", sans-serif;
+  --font-display: "Big Shoulders Stencil Display Variable", "Geist Variable", sans-serif;
   --font-heading: var(--font-display);
   --font-sans: "Geist Variable", sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
@@ -66,8 +66,8 @@
   --accent: var(--primary);
   --accent-foreground: var(--primary-foreground);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: var(--ink);
-  --input: var(--ink);
+  --border: oklch(0.16 0.014 55 / 16%);
+  --input: oklch(0.16 0.014 55 / 26%);
   --ring: var(--primary);
   --chart-1: var(--primary);
   --chart-2: var(--secondary);
@@ -87,25 +87,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --paper: oklch(0.155 0.012 55);
-    --ink: oklch(0.95 0.01 83);
+    --paper: oklch(0.135 0.004 286);
+    --ink: oklch(0.925 0.017 88);
     --background: var(--paper);
     --foreground: var(--ink);
-    --card: oklch(0.195 0.014 55);
+    --card: oklch(0.175 0.004 286);
     --card-foreground: var(--ink);
-    --popover: oklch(0.195 0.014 55);
+    --popover: oklch(0.175 0.004 286);
     --popover-foreground: var(--ink);
-    --primary: oklch(0.62 0.245 28);
-    --primary-foreground: oklch(0.98 0.012 83);
-    --secondary: oklch(0.95 0.01 83);
-    --secondary-foreground: oklch(0.155 0.012 55);
-    --muted: oklch(0.25 0.012 55);
-    --muted-foreground: oklch(0.74 0.012 83);
+    --primary: oklch(0.605 0.226 26);
+    --primary-foreground: oklch(0.97 0.012 88);
+    --secondary: oklch(0.925 0.017 88);
+    --secondary-foreground: oklch(0.135 0.004 286);
+    --muted: oklch(0.235 0.005 286);
+    --muted-foreground: oklch(0.66 0.012 86);
     --accent: var(--primary);
     --accent-foreground: var(--primary-foreground);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(0.95 0.01 83 / 22%);
-    --input: oklch(0.95 0.01 83 / 26%);
+    --destructive: oklch(0.62 0.2 27);
+    --border: oklch(0.925 0.017 88 / 16%);
+    --input: oklch(0.925 0.017 88 / 24%);
     --ring: var(--primary);
     --chart-1: var(--primary);
     --chart-2: var(--secondary);
@@ -124,25 +124,25 @@
 }
 
 .dark {
-  --paper: oklch(0.155 0.012 55);
-  --ink: oklch(0.95 0.01 83);
+  --paper: oklch(0.135 0.004 286);
+  --ink: oklch(0.925 0.017 88);
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: oklch(0.195 0.014 55);
+  --card: oklch(0.175 0.004 286);
   --card-foreground: var(--ink);
-  --popover: oklch(0.195 0.014 55);
+  --popover: oklch(0.175 0.004 286);
   --popover-foreground: var(--ink);
-  --primary: oklch(0.62 0.245 28);
-  --primary-foreground: oklch(0.98 0.012 83);
-  --secondary: oklch(0.95 0.01 83);
-  --secondary-foreground: oklch(0.155 0.012 55);
-  --muted: oklch(0.25 0.012 55);
-  --muted-foreground: oklch(0.74 0.012 83);
+  --primary: oklch(0.605 0.226 26);
+  --primary-foreground: oklch(0.97 0.012 88);
+  --secondary: oklch(0.925 0.017 88);
+  --secondary-foreground: oklch(0.135 0.004 286);
+  --muted: oklch(0.235 0.005 286);
+  --muted-foreground: oklch(0.66 0.012 86);
   --accent: var(--primary);
   --accent-foreground: var(--primary-foreground);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.95 0.01 83 / 22%);
-  --input: oklch(0.95 0.01 83 / 26%);
+  --destructive: oklch(0.62 0.2 27);
+  --border: oklch(0.925 0.017 88 / 16%);
+  --input: oklch(0.925 0.017 88 / 24%);
   --ring: var(--primary);
   --chart-1: var(--primary);
   --chart-2: var(--secondary);

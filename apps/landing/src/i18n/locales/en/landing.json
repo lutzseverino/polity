@@ -1,11 +1,14 @@
 {
   "hero": {
-    "eyebrow": "Official Record - Entry 001",
+    "eyebrow": "Official Record / Entry 001",
     "titleLine1": "Every group",
     "titleLine2": "deserves a",
     "titleEmphasis": "constitution.",
     "body": "decreos turns a group chat into a polity - votes, offices, invitations, and an official record that outlives the feed.",
     "cta": "How it governs",
+    "command": {
+      "prompt": "decreos:~$ found --name"
+    },
     "plate": {
       "official": "Official",
       "number": "No. 001",
@@ -47,29 +50,60 @@
     "eyebrow": "The official record",
     "title": "Social media forgets. The record does not.",
     "body": "Motions, votes, offices, invitations, admissions, and amendments are entered, numbered, and kept. Some things should survive the feed.",
+    "ledger": "Official Ledger",
     "selectedEntries": "Selected entries",
+    "append": "awaiting entry No. 042",
     "entries": [
       {
         "entry": "001",
-        "detail": "Polity founded"
+        "detail": "Polity founded",
+        "kind": "FND"
       },
       {
         "entry": "002",
-        "detail": "Steward office assigned"
+        "detail": "Bootstrap Steward assigned",
+        "kind": "OFC"
       },
       {
         "entry": "003",
-        "detail": "Starter Constitution ratified"
+        "detail": "Starter Constitution ratified",
+        "kind": "RAT"
       },
       {
         "entry": "027",
-        "detail": "Motion certified - quorum met"
+        "detail": "Motion certified · quorum met",
+        "kind": "MOT"
+      },
+      {
+        "entry": "033",
+        "detail": "Magistrate elected",
+        "kind": "ELC"
       },
       {
         "entry": "041",
-        "detail": "Constitution amended"
+        "detail": "Constitution amended",
+        "kind": "AMD"
       }
     ]
+  },
+  "social": {
+    "eyebrow": "On every motion",
+    "titleLine1": "Votes count.",
+    "titleLine2": "Comments don't.",
+    "body": "Every motion comes with a thread. Like it, reply, argue it out - then cast your vote. The talk is just talk; the vote is what moves things. Likes and replies never touch the tally.",
+    "motion": {
+      "label": "Motion No. 027",
+      "author": "introduced by @mira",
+      "status": "Voting open",
+      "text": "Adopt Taco Tuesday as a standing resolution.",
+      "vote": "Cast your vote",
+      "tally": "12 aye · 3 nay",
+      "quorum": "quorum met",
+      "discussion": "Discussion",
+      "likes": "18 likes",
+      "comments": "7 comments"
+    },
+    "caption": "Likes and replies never move the tally - only votes do"
   },
   "colophon": {
     "tagline": "Constitutional software for friend-group government",
@@ -78,7 +112,9 @@
     "established": "Established",
     "establishedValue": "MMXXVI",
     "source": "Source",
-    "sourceLink": "Drafted in the open"
+    "sourceLink": "Drafted in the open",
+    "signoff": "End of transmission · decreos MMXXVI",
+    "transmission": "End of transmission"
   },
   "onboarding": {
     "back": "Go back",

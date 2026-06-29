@@ -15,7 +15,7 @@ type ThemeProviderState = {
   setTheme: (theme: ThemeMode) => void;
 };
 
-const defaultTheme: ThemeMode = "system";
+const defaultTheme: ThemeMode = "dark";
 const themeStorageKey = "polity-landing-theme";
 const ThemeProviderContext = createContext<ThemeProviderState | null>(null);
 

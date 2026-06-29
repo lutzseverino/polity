@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { AppCard, AppCardCluster } from "@/components/app/app-card";
 import { Stepper, StepperStep } from "@/components/app/stepper";
 
 import type { OnboardingStep } from "./onboarding";
@@ -81,18 +82,19 @@ export function StepIntro({ description, title }: StepIntroProps) {
 
 export function SummaryGrid({ rows }: SummaryGridProps) {
   return (
-    <div className="grid gap-px border bg-border">
+    <AppCardCluster>
       {rows.map(({ label, value }) => (
-        <div
-          className="grid grid-cols-[7rem_1fr] items-center gap-3 bg-card px-4 py-3 text-sm"
+        <AppCard
+          className="grid grid-cols-[7rem_1fr] items-center gap-3 px-4 py-3 text-sm"
           key={label}
+          padding="none"
         >
           <span className="font-mono text-[0.7rem] leading-none tracking-[0.16em] text-muted-foreground uppercase">
             {label}
           </span>
           <span className="truncate font-medium">{value}</span>
-        </div>
+        </AppCard>
       ))}
-    </div>
+    </AppCardCluster>
   );
 }

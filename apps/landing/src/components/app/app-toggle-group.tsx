@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,11 @@ type AppToggleGroupItemProps = Readonly<
     treatment?: "default" | "choice";
   }
 >;
+
+type AppToggleChoiceContentProps = Readonly<{
+  copy: ReactNode;
+  label: ReactNode;
+}>;
 
 export function AppToggleGroup(props: AppToggleGroupProps) {
   return <ToggleGroup {...props} />;
@@ -30,5 +35,22 @@ export function AppToggleGroupItem({
       variant={treatment === "choice" ? "outline" : variant}
       {...props}
     />
+  );
+}
+
+export function AppToggleChoiceContent({
+  copy,
+  label,
+}: AppToggleChoiceContentProps) {
+  return (
+    <span className="grid gap-1">
+      <span className="font-display text-lg">{label}</span>
+      <span
+        className="text-xs leading-5 text-muted-foreground"
+        data-slot="choice-copy"
+      >
+        {copy}
+      </span>
+    </span>
   );
 }

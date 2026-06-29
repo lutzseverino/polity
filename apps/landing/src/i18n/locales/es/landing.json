@@ -1,11 +1,14 @@
 {
   "hero": {
-    "eyebrow": "Registro oficial - Entrada 001",
+    "eyebrow": "Registro oficial / Entrada 001",
     "titleLine1": "Todo grupo",
     "titleLine2": "merece una",
     "titleEmphasis": "constitución.",
     "body": "decreos convierte un chat de grupo en una politeia: votos, cargos, invitaciones y un registro oficial que sobrevive al feed.",
     "cta": "Cómo gobierna",
+    "command": {
+      "prompt": "decreos:~$ fundar --nombre"
+    },
     "plate": {
       "official": "Oficial",
       "number": "No. 001",
@@ -47,29 +50,60 @@
     "eyebrow": "El registro oficial",
     "title": "Las redes olvidan. El registro no.",
     "body": "Mociones, votos, cargos, invitaciones, admisiones y enmiendas se inscriben, se numeran y se conservan. Algunas cosas deberían sobrevivir al feed.",
+    "ledger": "Libro oficial",
     "selectedEntries": "Entradas seleccionadas",
+    "append": "esperando entrada No. 042",
     "entries": [
       {
         "entry": "001",
-        "detail": "Politeia fundada"
+        "detail": "Politeia fundada",
+        "kind": "FND"
       },
       {
         "entry": "002",
-        "detail": "Cargo de Steward asignado"
+        "detail": "Steward inicial asignado",
+        "kind": "OFC"
       },
       {
         "entry": "003",
-        "detail": "Constitución inicial ratificada"
+        "detail": "Constitución inicial ratificada",
+        "kind": "RAT"
       },
       {
         "entry": "027",
-        "detail": "Moción certificada - quórum alcanzado"
+        "detail": "Moción certificada · quórum alcanzado",
+        "kind": "MOC"
+      },
+      {
+        "entry": "033",
+        "detail": "Magistrado electo",
+        "kind": "ELC"
       },
       {
         "entry": "041",
-        "detail": "Constitución enmendada"
+        "detail": "Constitución enmendada",
+        "kind": "ENM"
       }
     ]
+  },
+  "social": {
+    "eyebrow": "En cada moción",
+    "titleLine1": "El voto cuenta.",
+    "titleLine2": "El comentario no.",
+    "body": "Cada moción trae su hilo. Dale like, responde, debátelo - y luego emite tu voto. La charla es solo charla; el voto es lo que mueve las cosas. Los likes y las respuestas nunca tocan el recuento.",
+    "motion": {
+      "label": "Moción No. 027",
+      "author": "presentada por @mira",
+      "status": "Votación abierta",
+      "text": "Adoptar el martes de tacos como resolución permanente.",
+      "vote": "Emite tu voto",
+      "tally": "12 a favor · 3 en contra",
+      "quorum": "quórum alcanzado",
+      "discussion": "Conversación",
+      "likes": "18 likes",
+      "comments": "7 comentarios"
+    },
+    "caption": "Los likes y respuestas nunca mueven el recuento - solo los votos"
   },
   "colophon": {
     "tagline": "Software constitucional para gobiernos de grupos de amigos",
@@ -78,7 +112,9 @@
     "established": "Fundación",
     "establishedValue": "MMXXVI",
     "source": "Código",
-    "sourceLink": "Redactado en abierto"
+    "sourceLink": "Redactado en abierto",
+    "signoff": "Fin de la transmisión · decreos MMXXVI",
+    "transmission": "Fin de la transmisión"
   },
   "onboarding": {
     "back": "Volver",

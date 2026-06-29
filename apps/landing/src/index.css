@@ -3,8 +3,19 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
-@import "@fontsource/anton";
+@import "@fontsource-variable/big-shoulders-stencil-display";
 @import "./design/tokens/shadcn-theme.css";
+
+/*
+ * THE CONSTITUTIONAL MAINFRAME
+ * ----------------------------
+ * The brand — the dark-first "government terminal" palette (near-black void,
+ * state-red signal, warm bone printout) and the Big Shoulders Stencil display
+ * face — lives in the shared design tokens (packages/design/tokens.json) and is
+ * generated into ./design/tokens/shadcn-theme.css. This file only adds the
+ * typographic treatment and terminal textures on top; it no longer overrides
+ * the palette.
+ */
 
 @layer base {
   * {
@@ -15,6 +26,8 @@
   }
   html {
     @apply font-sans;
+    /* The brand loads as the mainframe; the switcher can step back to paper. */
+    color-scheme: dark;
   }
 }
 
@@ -31,45 +44,18 @@
   }
 }
 
+/* Display treatment — the family comes from the --font-display token (Big
+   Shoulders Stencil Display); here we set it at max weight, uppercase, tight,
+   with a hair of tracking so the stencil cuts read. */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 100%;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+}
+
 @layer components {
-  [data-hero][data-founding-state="naming"] [data-founding-visual] {
-    clip-path: inset(calc(100% - 26rem - 1px) 0 1px 0);
-  }
-
-  [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
-    transform: translateY(calc((100% - 26rem - 1px) / 2));
-  }
-
-  @media (min-width: 64rem) {
-    [data-hero][data-founding-state="naming"] [data-founding-visual] {
-      clip-path: inset(0 0 0 52.5%);
-    }
-
-    [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
-      transform: translateX(26.25%);
-    }
-  }
-
-  @media (min-width: 80rem) {
-    [data-hero][data-founding-state="naming"] [data-founding-visual] {
-      clip-path: inset(
-        0 calc((100% - 80rem) / 2) 0 calc((100% - 80rem) / 2 + 42rem)
-      );
-    }
-
-    [data-hero][data-founding-state="naming"] [data-hero-burst-shell] {
-      transform: translateX(21rem);
-    }
-  }
-
-  /* Heavy poster display — Anton, set uppercase with tight tracking. */
-  .font-display {
-    font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: 0.005em;
-    text-transform: uppercase;
-  }
-
   .type-mono-label {
     font-family: var(--font-mono);
     font-size: 0.7rem;
@@ -78,15 +64,25 @@
     text-transform: uppercase;
   }
 
-  /* Printer's halftone dot field, scaled by --dot. */
-  .texture-halftone {
-    --dot: 7px;
-    background-image: radial-gradient(
-      currentColor calc(var(--dot) * 0.28),
-      transparent calc(var(--dot) * 0.32)
+  /* Raw teletype art — preformatted, non-selectable, hairline leading. */
+  .ascii {
+    font-family: var(--font-mono);
+    white-space: pre;
+    line-height: 1;
+    letter-spacing: 0;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* CRT scanlines — every other hairline darkened a touch. */
+  .texture-scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      oklch(0 0 0 / 0%) 0px,
+      oklch(0 0 0 / 0%) 2px,
+      oklch(0 0 0 / 28%) 3px
     );
-    background-size: var(--dot) var(--dot);
-    background-position: 0 0;
+    background-size: 100% 3px;
   }
 
   /* Fine paper grain laid over the page for printed-stock texture. */
@@ -94,9 +90,93 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   }
 
-  /* Outlined poster numerals (the "020" treatment). */
-  .text-outline {
-    color: transparent;
-    -webkit-text-stroke: 2px currentColor;
+  /* Vignette — pulls the void in at the screen edges like a tube monitor. */
+  .crt-vignette {
+    background: radial-gradient(
+      120% 120% at 50% 38%,
+      transparent 52%,
+      oklch(0 0 0 / 34%) 100%
+    );
+  }
+
+  /* Blinking command caret — the through-line of the terminal voice. */
+  .terminal-caret {
+    display: inline-block;
+    width: 0.62ch;
+    height: 1.04em;
+    translate: 0 0.1em;
+    background: var(--primary);
+  }
+
+  /* Brand mark — a red square that morphs into the eight-point seal star on
+     hover, spinning a half-turn as it goes. Both shapes are 16-point polygons in
+     the same vertex order, so the clip-path interpolates cleanly. */
+  .brand-mark {
+    clip-path: polygon(
+      50% 0%,
+      70.7% 0%,
+      100% 0%,
+      100% 29.3%,
+      100% 50%,
+      100% 70.7%,
+      100% 100%,
+      70.7% 100%,
+      50% 100%,
+      29.3% 100%,
+      0% 100%,
+      0% 70.7%,
+      0% 50%,
+      0% 29.3%,
+      0% 0%,
+      29.3% 0%
+    );
+    transition:
+      clip-path 0.5s cubic-bezier(0.65, 0, 0.35, 1),
+      transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .brand-trigger:hover .brand-mark,
+  .brand-trigger:focus-visible .brand-mark {
+    clip-path: polygon(
+      50% 0%,
+      60.7% 24.1%,
+      100% 0%,
+      75.9% 39.3%,
+      100% 50%,
+      75.9% 60.7%,
+      100% 100%,
+      60.7% 75.9%,
+      50% 100%,
+      39.3% 75.9%,
+      0% 100%,
+      24.1% 60.7%,
+      0% 50%,
+      24.1% 39.3%,
+      0% 0%,
+      39.3% 24.1%
+    );
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-mark {
+      transition: none;
+    }
+  }
+}
+
+@keyframes terminal-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  49%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-caret {
+    animation: terminal-blink 1.06s steps(1, end) infinite;
   }
 }

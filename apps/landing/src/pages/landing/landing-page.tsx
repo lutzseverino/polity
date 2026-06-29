@@ -7,6 +7,7 @@ import {
   LandingHero,
   MethodSection,
   RecordSection,
+  SocialSection,
 } from "./sections";
 
 export function LandingPage() {
@@ -17,13 +18,23 @@ export function LandingPage() {
 
   return (
     <main
-      className="relative min-h-[100dvh] bg-background text-foreground [overflow-anchor:none]"
+      className="relative min-h-[100dvh] bg-background pt-12 text-foreground [overflow-anchor:none]"
       data-landing-page
       ref={scope}
     >
+      {/* Tube-monitor atmosphere: scanlines, an edge vignette, and paper grain,
+          all click-through and held above the content. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-50 opacity-[0.04] mix-blend-multiply texture-grain dark:opacity-[0.05] dark:mix-blend-screen"
+        className="pointer-events-none fixed inset-0 z-40 opacity-[0.5] texture-scanlines"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-40 crt-vignette"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-40 opacity-[0.04] mix-blend-screen texture-grain"
       />
 
       <LandingMasthead />
@@ -31,6 +42,7 @@ export function LandingPage() {
       <LandingHero onboarding={onboarding} />
       <MethodSection />
       <RecordSection />
+      <SocialSection />
       <Colophon />
     </main>
   );

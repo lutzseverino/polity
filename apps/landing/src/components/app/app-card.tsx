@@ -1,58 +1,75 @@
-import type { ComponentProps } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-type AppCardProps = Readonly<ComponentProps<typeof Card>>;
-type AppCardHeaderProps = Readonly<ComponentProps<typeof CardHeader>>;
-type AppCardTitleProps = Readonly<ComponentProps<typeof CardTitle>>;
-type AppCardDescriptionProps = Readonly<ComponentProps<typeof CardDescription>>;
-type AppCardActionProps = Readonly<ComponentProps<typeof CardAction>>;
-type AppCardContentProps = Readonly<ComponentProps<typeof CardContent>>;
-type AppCardFooterProps = Readonly<ComponentProps<typeof CardFooter>>;
+type AppCardElement = "article" | "div";
+type AppCardPadding = "none" | "md" | "lg";
+type AppCardTone = "default" | "primary";
 
-export function AppCard({ className, ...props }: AppCardProps) {
+type AppCardProps = Readonly<
+  HTMLAttributes<HTMLElement> & {
+    as?: AppCardElement;
+    padding?: AppCardPadding;
+    tone?: AppCardTone;
+  }
+>;
+
+type AppCardClusterProps = Readonly<
+  HTMLAttributes<HTMLDivElement> & {
+    children: ReactNode;
+  }
+>;
+
+const paddingClassName = {
+  lg: "p-7 md:p-9",
+  md: "p-6",
+  none: "",
+} satisfies Record<AppCardPadding, string>;
+
+const toneClassName = {
+  default: "bg-card text-card-foreground",
+  primary: "bg-primary text-primary-foreground",
+} satisfies Record<AppCardTone, string>;
+
+export function AppCard({
+  as: Element = "div",
+  children,
+  className,
+  padding = "md",
+  tone = "default",
+  ...props
+}: AppCardProps) {
+  const cardClassName = cn(
+    "rounded-none border-0 py-0 ring-0",
+    paddingClassName[padding],
+    toneClassName[tone],
+    className,
+  );
+
+  if (Element === "article") {
+    return (
+      <article className={cardClassName} {...props}>
+        {children}
+      </article>
+    );
+  }
+
   return (
-    <Card
-      className={cn("gap-0 rounded-none border py-0 ring-0", className)}
-      {...props}
-    />
+    <Card className={cardClassName} {...props}>
+      {children}
+    </Card>
   );
 }
 
-export function AppCardHeader({ className, ...props }: AppCardHeaderProps) {
+export function AppCardCluster({
+  className,
+  children,
+  ...props
+}: AppCardClusterProps) {
   return (
-    <CardHeader
-      className={cn("rounded-none border-b px-4 pt-2.5 pb-2.5!", className)}
-      {...props}
-    />
+    <div className={cn("grid gap-px border bg-border", className)} {...props}>
+      {children}
+    </div>
   );
-}
-
-export function AppCardTitle(props: AppCardTitleProps) {
-  return <CardTitle {...props} />;
-}
-
-export function AppCardDescription(props: AppCardDescriptionProps) {
-  return <CardDescription {...props} />;
-}
-
-export function AppCardAction(props: AppCardActionProps) {
-  return <CardAction {...props} />;
-}
-
-export function AppCardContent({ className, ...props }: AppCardContentProps) {
-  return <CardContent className={cn("p-5", className)} {...props} />;
-}
-
-export function AppCardFooter(props: AppCardFooterProps) {
-  return <CardFooter {...props} />;
 }
