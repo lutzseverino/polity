@@ -11,12 +11,6 @@ public interface OfficeTermReviewProjection {
 
   UUID getPetitionerMembershipId();
 
-  UUID getVacatedMembershipId();
-
-  String getOfficeName();
-
-  String getOfficeNameKey();
-
   OfficeTermReviewStatus getStatus();
 
   String getReason();

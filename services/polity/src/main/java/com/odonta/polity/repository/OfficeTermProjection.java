@@ -9,6 +9,8 @@ public interface OfficeTermProjection {
 
   UUID getOfficeId();
 
+  String getOfficeCode();
+
   UUID getMembershipId();
 
   OfficeTermStatus getStatus();

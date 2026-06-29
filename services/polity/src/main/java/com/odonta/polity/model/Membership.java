@@ -47,6 +47,9 @@ public class Membership extends AuditedEntity implements PersonalDataEntity {
   @Column(name = "admitted_by")
   private UUID admittedBy;
 
+  @Column(name = "resigned_at")
+  private OffsetDateTime resignedAt;
+
   public Membership(
       UUID polityId,
       UUID userId,
@@ -63,5 +66,31 @@ public class Membership extends AuditedEntity implements PersonalDataEntity {
     this.status = MembershipStatus.ACTIVE;
     this.admittedAt = admittedAt;
     this.admittedBy = admittedBy;
+  }
+
+  public void resign(OffsetDateTime resignedAt) {
+    if (status != MembershipStatus.ACTIVE) {
+      throw new IllegalStateException("Only active memberships can resign");
+    }
+    this.status = MembershipStatus.RESIGNED;
+    this.resignedAt = resignedAt;
+  }
+
+  public void reactivate(
+      String authorizationSubject,
+      String email,
+      String displayName,
+      OffsetDateTime admittedAt,
+      UUID admittedBy) {
+    if (status == MembershipStatus.ACTIVE) {
+      throw new IllegalStateException("Only inactive memberships can be reactivated");
+    }
+    this.authorizationSubject = authorizationSubject;
+    this.email = email;
+    this.displayName = displayName;
+    this.status = MembershipStatus.ACTIVE;
+    this.admittedAt = admittedAt;
+    this.admittedBy = admittedBy;
+    this.resignedAt = null;
   }
 }

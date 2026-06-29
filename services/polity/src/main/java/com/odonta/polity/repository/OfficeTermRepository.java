@@ -27,6 +27,8 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
 
   Optional<OfficeTerm> findEntityByIdAndPolityId(UUID id, UUID polityId);
 
+  Optional<OfficeTermProjection> findProjectedByIdAndPolityId(UUID id, UUID polityId);
+
   List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatus(
       UUID polityId, String officeCode, OfficeTermStatus status);
 
@@ -35,6 +37,9 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
 
   List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatusAndAssignedByMotionIdIsNull(
       UUID polityId, String officeCode, OfficeTermStatus status);
+
+  List<OfficeTerm> findEntitiesByPolityIdAndMembershipIdAndStatus(
+      UUID polityId, UUID membershipId, OfficeTermStatus status);
 
   List<OfficeTerm> findEntitiesByPolityIdAndStatus(UUID polityId, OfficeTermStatus status);
 

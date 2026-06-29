@@ -8,7 +8,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(config = PolityMapperConfig.class, uses = PolityTransportConversions.class)
+@Mapper(config = PolityMapperConfig.class, uses = OfficeTransportConversions.class)
 public interface OfficeTransportMapper {
   @Mapping(target = "name", source = ".", qualifiedByName = "officeName")
   @Mapping(target = "description", source = ".", qualifiedByName = "officeDescription")
@@ -16,6 +16,7 @@ public interface OfficeTransportMapper {
 
   List<OfficeResponse> toResponses(List<OfficeResult> results);
 
+  @Mapping(target = "officeName", source = ".", qualifiedByName = "officeTermOfficeName")
   OfficeTermResponse toResponse(OfficeTermResult result);
 
   List<OfficeTermResponse> toTermResponses(List<OfficeTermResult> results);

@@ -43,7 +43,7 @@ public class OfficialRecordService {
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  void append(
+  public void append(
       UUID polityId,
       UUID jurisdictionId,
       UUID constitutionVersionId,

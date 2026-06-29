@@ -10,5 +10,7 @@ public interface OfficialRecordRepository extends JpaRepository<OfficialRecordEn
 
   Optional<OfficialRecordEntry> findEntityByIdAndPolityId(UUID id, UUID polityId);
 
+  Optional<OfficialRecordProjection> findProjectedByIdAndPolityId(UUID id, UUID polityId);
+
   List<OfficialRecordProjection> findProjectionsByPolityIdOrderByEntryNumberDesc(UUID polityId);
 }

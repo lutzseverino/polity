@@ -6,7 +6,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(config = PolityMapperConfig.class, uses = PolityTransportConversions.class)
+@Mapper(config = PolityMapperConfig.class, uses = OfficeTermReviewTransportConversions.class)
 public interface OfficeTermReviewTransportMapper {
   @Mapping(target = "officeName", source = ".", qualifiedByName = "officeTermReviewOfficeName")
   OfficeTermReviewResponse toResponse(OfficeTermReviewResult result);

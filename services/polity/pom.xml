@@ -35,6 +35,8 @@
   <dependencies>
     <dependency><groupId>com.odonta</groupId><artifactId>common</artifactId><version>${odonta.platform.version}</version></dependency>
     <dependency><groupId>com.odonta</groupId><artifactId>authorization</artifactId><version>${odonta.platform.version}</version></dependency>
+    <dependency><groupId>com.odonta</groupId><artifactId>billing-client</artifactId><version>${odonta.platform.version}</version></dependency>
+    <dependency><groupId>com.odonta</groupId><artifactId>billing-client-http</artifactId><version>${odonta.platform.version}</version><scope>runtime</scope></dependency>
     <dependency><groupId>com.odonta</groupId><artifactId>identity-client</artifactId><version>${odonta.platform.version}</version></dependency>
     <dependency><groupId>com.odonta</groupId><artifactId>identity-client-http</artifactId><version>${odonta.platform.version}</version><scope>runtime</scope></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>

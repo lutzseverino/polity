@@ -5,6 +5,8 @@ import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.effect.MotionEffectApplier;
+import com.odonta.polity.effect.OfficialActVoidRemedy;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.evaluator.VotingEvaluator;
 import com.odonta.polity.mapper.MotionApplicationMapper;
@@ -88,6 +90,7 @@ import com.odonta.polity.repository.ConstitutionProcedureChangeProposalRepositor
 import com.odonta.polity.repository.ConstitutionVersionRepository;
 import com.odonta.polity.repository.ConstitutionalPowerRepository;
 import com.odonta.polity.repository.ConstitutionalReviewProposalRepository;
+import com.odonta.polity.repository.ConstitutionalReviewRepository;
 import com.odonta.polity.repository.InstitutionRepository;
 import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
@@ -105,10 +108,10 @@ import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.SanctionProposalRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.repository.VoteRepository;
+import com.odonta.polity.resolver.ProcedureElectorateResolver;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,7 +121,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -143,7 +145,8 @@ public class MotionService {
   private final ConstitutionVersionRepository constitutions;
   private final ConstitutionalPowerRepository powers;
   private final ConstitutionalReviewProposalRepository constitutionalReviewProposals;
-  private final EffectApplicationService effects;
+  private final ConstitutionalReviewRepository constitutionalReviews;
+  private final MotionEffectApplier effects;
   private final InstitutionRepository institutions;
   private final JurisdictionRepository jurisdictions;
   private final OfficeTermReviewProposalRepository officeTermReviewProposals;
@@ -158,10 +161,11 @@ public class MotionService {
   private final OfficeElectionProposalRepository officeElectionProposals;
   private final OfficeRepository offices;
   private final OfficeTermRepository officeTerms;
+  private final OfficialActVoidRemedy officialActVoidRemedies;
   private final OfficialRecordRepository officialRecordEntries;
   private final OfficialRecordService officialRecords;
   private final PolityService polities;
-  private final ProcedureElectorateService procedureElectorates;
+  private final ProcedureElectorateResolver procedureElectorates;
   private final ProcedureRepository procedures;
   private final SanctionProposalRepository sanctionProposals;
   private final SanctionRepository sanctions;
@@ -263,10 +267,11 @@ public class MotionService {
     ConstitutionVersion constitution = polities.constitution(polityId);
     authority.require(introducer, constitution, PowerCode.INTRODUCE_SANCTION);
     polities.requireFullGovernment(polityId);
+    Membership target = activeMembership(input.targetMembershipId(), polityId);
+    requireSanctionSafeguards(introducer, constitution, target, input.durationDays(), now);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
     Procedure procedure = procedure(constitution.getId(), Procedure.SANCTION);
     Institution institution = polities.institution(polityId, procedure);
-    Membership target = activeMembership(input.targetMembershipId(), polityId);
     MotionTemplate template =
         MotionTemplate.of(
             MotionTemplateKey.SANCTION,
@@ -324,6 +329,7 @@ public class MotionService {
       authority.require(introducer, constitution, PowerCode.INTRODUCE_APPEAL);
       polities.requireFullGovernment(polityId);
     }
+    UUID sanctionIntroducerId = motion(polityId, sanction.getMotionId()).getIntroducedBy();
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
     Procedure procedure = procedure(constitution.getId(), Procedure.APPEAL);
     Institution institution = polities.institution(polityId, procedure);
@@ -344,7 +350,7 @@ public class MotionService {
             template.storedBody(),
             template,
             PowerCode.INTRODUCE_APPEAL,
-            recusals(sanction.getTargetMembershipId(), introducer.getId()),
+            recusals(sanction.getTargetMembershipId(), introducer.getId(), sanctionIntroducerId),
             now);
     appealProposals.saveAndFlush(
         new AppealProposal(
@@ -422,8 +428,8 @@ public class MotionService {
     ConstitutionVersion constitution = polities.constitution(polityId);
     authority.require(introducer, constitution, PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW);
     polities.requireFullGovernment(polityId);
-    OfficialRecordEntry target = reviewableOfficialAct(polityId, input.targetRecordId());
-    requireReviewable(polityId, target);
+    OfficialRecordEntry target = voidableOfficialAct(polityId, input.targetRecordId());
+    requireConstitutionalReviewVoidRemedy(polityId, target, now);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
     Procedure procedure = procedure(constitution.getId(), Procedure.CONSTITUTIONAL_REVIEW);
     Institution institution = polities.institution(polityId, procedure);
@@ -502,11 +508,7 @@ public class MotionService {
     ConstitutionAmendmentProposal proposal =
         amendmentProposals.saveAndFlush(
             new ConstitutionAmendmentProposal(
-                polityId,
-                motion.getId(),
-                input.title(),
-                input.body(),
-                summarize(institutionChanges, procedureChanges, officeChanges, powerChanges)));
+                polityId, motion.getId(), input.title(), input.body()));
     institutionChangeProposals.saveAllAndFlush(
         institutionChanges.stream()
             .map(change -> toProposal(polityId, proposal.getId(), change))
@@ -536,7 +538,6 @@ public class MotionService {
     ConstitutionVersion constitution = polities.constitution(polityId);
     authority.require(introducer, constitution, PowerCode.INTRODUCE_DISBANDMENT);
     polities.requireDisbandmentGovernment(polityId);
-    requireDisbandmentSafeguards(introducer, constitution);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
     Procedure procedure = procedure(constitution.getId(), Procedure.DISBANDMENT);
     Institution institution = polities.institution(polityId, procedure);
@@ -883,23 +884,12 @@ public class MotionService {
             .findEntityById(motion.getConstitutionVersionId())
             .orElseThrow(
                 () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
-    return new MotionResult(
-        motion.getId(),
-        motion.getTitle(),
-        motion.getBody(),
-        motion.getTitleKey(),
-        motion.getBodyKey(),
-        motion.getTemplateParams(),
-        motion.getStatus(),
-        motion.getEffectType(),
+    return mapper.toResult(
+        motion,
         constitution.getVersion(),
         procedure.getName(),
         procedure.getNameKey(),
         membershipService.displayName(motion.getIntroducedBy()),
-        motion.getOpenedAt(),
-        motion.getVotingOpensAt(),
-        motion.getVotingClosesAt(),
-        motion.getCertificationOpensAt(),
         tally,
         officeElection(motion),
         electionTally,
@@ -925,7 +915,7 @@ public class MotionService {
                           candidate -> {
                             Membership membership =
                                 membershipService.get(candidate.getMembershipId());
-                            return new OfficeElectionCandidateResult(
+                            return mapper.toCandidateResult(
                                 membership.getId(),
                                 membership.getDisplayName(),
                                 candidate.getStatus(),
@@ -935,7 +925,7 @@ public class MotionService {
                           java.util.Comparator.comparing(OfficeElectionCandidateResult::name)
                               .thenComparing(candidate -> candidate.membershipId().toString()))
                       .toList();
-              return new OfficeElectionResult(
+              return mapper.toOfficeElectionResult(
                   office.getId(),
                   office.getCode(),
                   office.getName(),
@@ -1165,7 +1155,7 @@ public class MotionService {
                 () -> ApiException.notFound("office_term_not_found", "Office term not found."));
     if (term.getStatus() != OfficeTermStatus.ACTIVE || !term.getEndsAt().isAfter(now)) {
       throw ApiException.conflict(
-          "office_term_not_active", "Only active office terms can be reviewed.");
+          "office_term_not_reviewable", "Only active office terms can be reviewed.");
     }
     return term;
   }
@@ -1279,7 +1269,7 @@ public class MotionService {
         .anyMatch(proposal -> isVotingMotion(proposal.getMotionId()));
   }
 
-  private OfficialRecordEntry reviewableOfficialAct(UUID polityId, UUID recordId) {
+  private OfficialRecordEntry voidableOfficialAct(UUID polityId, UUID recordId) {
     OfficialRecordEntry record =
         officialRecordEntries
             .findEntityByIdAndPolityId(recordId, polityId)
@@ -1287,29 +1277,69 @@ public class MotionService {
                 () ->
                     ApiException.notFound(
                         "official_record_entry_not_found", "Official record entry not found."));
-    if (!record.getType().isConstitutionallyReviewable()) {
+    if (!record.getType().isVoidableByConstitutionalReview()) {
       throw ApiException.conflict(
-          "official_act_not_reviewable", "This official act cannot be constitutionally reviewed.");
+          "official_act_not_reviewable",
+          "This official act does not have a constitutional-review void remedy.");
     }
     return record;
   }
 
-  private void requireReviewable(UUID polityId, OfficialRecordEntry record) {
+  private void requireConstitutionalReviewVoidRemedy(
+      UUID polityId, OfficialRecordEntry record, OffsetDateTime now) {
     if (hasOpenConstitutionalReviewProposal(polityId, record.getId())) {
       throw ApiException.conflict(
           "constitutional_review_already_open",
           "This official act already has an open constitutional review motion.");
     }
+    if (constitutionalReviews.existsByPolityIdAndTargetRecordId(polityId, record.getId())) {
+      throw ApiException.conflict(
+          "constitutional_review_already_granted",
+          "This official act has already been constitutionally reviewed.");
+    }
+    if (!officialActVoidRemedies.hasActiveRemedy(record, now)) {
+      throw ApiException.conflict(
+          "official_act_void_remedy_unavailable",
+          "This official act no longer has an active remedy to void.");
+    }
   }
 
-  private void requireDisbandmentSafeguards(
-      Membership introducer, ConstitutionVersion constitution) {
-    ActionAvailabilityResult availability =
-        polities.disbandmentSafeguardAvailability(introducer, constitution);
+  private void requireSanctionSafeguards(
+      Membership introducer,
+      ConstitutionVersion constitution,
+      Membership target,
+      int durationDays,
+      OffsetDateTime now) {
+    ActionAvailabilityResult availability = polities.sanctionAvailability(introducer, constitution);
     if (!availability.available()) {
       throw ApiException.conflict(
-          availability.reason(), "Disbandment is not available under the current constitution.");
+          availability.reason(), "Sanctions require an available appeal procedure.");
     }
+    Procedure appealProcedure = procedure(constitution.getId(), Procedure.APPEAL);
+    int minimumDurationDays = minimumAppealableSanctionDurationDays(appealProcedure);
+    if (durationDays < minimumDurationDays) {
+      throw ApiException.badRequest(
+          "sanction_duration_too_short",
+          "Sanctions must last long enough for an appeal to be completed.",
+          Map.of("minimumDurationDays", minimumDurationDays));
+    }
+    OffsetDateTime appealVotingOpensAt = now.plusHours(appealProcedure.getMinimumNoticeHours());
+    List<Membership> eligible =
+        procedureElectorates.electors(appealProcedure, appealVotingOpensAt).stream()
+            .filter(member -> !member.getId().equals(target.getId()))
+            .filter(member -> !member.getId().equals(introducer.getId()))
+            .toList();
+    if (eligible.size() < appealProcedure.getMinimumElectorCount()) {
+      throw ApiException.conflict(
+          "appeal_procedure_conflict_recusal_unavailable",
+          "Sanctions require an available appeal procedure after conflict recusal.");
+    }
+  }
+
+  private int minimumAppealableSanctionDurationDays(Procedure appealProcedure) {
+    int appealHours =
+        appealProcedure.getMinimumNoticeHours() + appealProcedure.getVotingPeriodHours();
+    return appealHours == 0 ? 1 : appealHours / 24 + 1;
   }
 
   private boolean hasOpenConstitutionalReviewProposal(UUID polityId, UUID targetRecordId) {
@@ -1329,8 +1359,11 @@ public class MotionService {
     if (record.getType() == OfficialRecordType.SANCTION_APPLIED) {
       sanctions
           .findEntityByIdAndPolityId(record.getSourceId(), record.getPolityId())
-          .map(Sanction::getTargetMembershipId)
-          .ifPresent(recused::add);
+          .ifPresent(
+              sanction -> {
+                recused.add(sanction.getTargetMembershipId());
+                recused.add(motion(record.getPolityId(), sanction.getMotionId()).getIntroducedBy());
+              });
     }
     if (record.getType() == OfficialRecordType.OFFICE_ELECTED) {
       officeTerms
@@ -1375,12 +1408,9 @@ public class MotionService {
             .map(
                 change -> {
                   Procedure procedure = procedure(constitution.getId(), change.procedureCode());
-                  if (change.threshold() == VotingThreshold.PLURALITY_CAST
-                      && procedure.getEffectType() != EffectType.ELECT_OFFICE) {
-                    throw ApiException.badRequest(
-                        "plurality_requires_election",
-                        "Plurality thresholds can only be used by office election procedures.");
-                  }
+                  requireCompatibleProcedureThreshold(
+                      procedure.getEffectType(),
+                      valueOr(change.threshold(), procedure.getThreshold()));
                   UUID institutionId =
                       valueOr(change.institutionId(), procedure.getInstitutionId());
                   requireKnownProcedureInstitution(institutionId, institutionKinds.keySet());
@@ -1389,9 +1419,8 @@ public class MotionService {
                   ProcedureElectorate electorate =
                       valueOr(change.electorate(), procedure.getElectorate());
                   String electorateOfficeCode =
-                      valueOr(
-                          normalizedProposalOfficeCode(change.electorateOfficeCode()),
-                          procedure.getElectorateOfficeCode());
+                      resultingElectorateOfficeCode(
+                          electorate, change.electorateOfficeCode(), procedure);
                   requireKnownElectorateOffice(electorate, electorateOfficeCode, officeCodes);
                   return change;
                 })
@@ -1561,91 +1590,6 @@ public class MotionService {
         change.kind());
   }
 
-  private String summarize(
-      List<CreateInstitutionChangeInput> institutionChanges,
-      List<CreateProcedureChangeInput> procedureChanges,
-      List<CreateOfficeChangeInput> officeChanges,
-      List<CreatePowerChangeInput> powerChanges) {
-    List<String> summaries = new ArrayList<>();
-    summaries.addAll(summarizeInstitutionChanges(institutionChanges));
-    summaries.addAll(summarizeProcedureChanges(procedureChanges));
-    summaries.addAll(summarizeOfficeChanges(officeChanges));
-    summaries.addAll(summarizePowerChanges(powerChanges));
-    return String.join("; ", summaries);
-  }
-
-  private List<String> summarizeInstitutionChanges(List<CreateInstitutionChangeInput> changes) {
-    return changes.stream()
-        .map(
-            change ->
-                "institution:%s(%s)"
-                    .formatted(valueOr(change.institutionId(), change.name()), change.action()))
-        .toList();
-  }
-
-  private List<String> summarizeProcedureChanges(List<CreateProcedureChangeInput> changes) {
-    return changes.stream()
-        .map(
-            change ->
-                "procedure:%s(%s)"
-                    .formatted(
-                        change.procedureCode(),
-                        Stream.of(
-                                part("institutionId", change.institutionId()),
-                                part("quorum", quorum(change)),
-                                part("threshold", change.threshold()),
-                                part("electorate", electorate(change)),
-                                part("minimumElectorCount", change.minimumElectorCount()),
-                                part("minimumNoticeHours", change.minimumNoticeHours()),
-                                part("votingPeriodHours", change.votingPeriodHours()))
-                            .filter(part -> !part.isBlank())
-                            .reduce((left, right) -> left + ", " + right)
-                            .orElse("")))
-        .toList();
-  }
-
-  private List<String> summarizeOfficeChanges(List<CreateOfficeChangeInput> changes) {
-    return changes.stream()
-        .map(
-            change ->
-                "office:%s(%s)".formatted(normalizedOfficeCode(change.code()), change.action()))
-        .toList();
-  }
-
-  private List<String> summarizePowerChanges(List<CreatePowerChangeInput> changes) {
-    return changes.stream()
-        .map(
-            change ->
-                "power:%s(%s%s)"
-                    .formatted(
-                        change.powerCode(),
-                        change.holderScope(),
-                        isBlankProposalValue(change.holderOfficeCode())
-                            ? ""
-                            : ":" + normalizedOfficeCode(change.holderOfficeCode())))
-        .toList();
-  }
-
-  private Object quorum(CreateProcedureChangeInput change) {
-    if (change.quorumNumerator() == null) {
-      return null;
-    }
-    return change.quorumNumerator() + "/" + change.quorumDenominator();
-  }
-
-  private Object electorate(CreateProcedureChangeInput change) {
-    if (change.electorate() == null) {
-      return null;
-    }
-    return change.electorate() == ProcedureElectorate.OFFICE_HOLDERS
-        ? change.electorate() + ":" + normalizedOfficeCode(change.electorateOfficeCode())
-        : change.electorate();
-  }
-
-  private String part(String label, Object value) {
-    return value == null ? "" : label + "=" + value;
-  }
-
   private Map<String, Office> currentOffices(ConstitutionVersion constitution) {
     return offices.findEntitiesByConstitutionVersionIdOrderByName(constitution.getId()).stream()
         .collect(java.util.stream.Collectors.toMap(Office::getCode, office -> office));
@@ -1775,9 +1719,8 @@ public class MotionService {
               String electorateOfficeCode =
                   change == null
                       ? procedure.getElectorateOfficeCode()
-                      : valueOr(
-                          normalizedProposalOfficeCode(change.electorateOfficeCode()),
-                          procedure.getElectorateOfficeCode());
+                      : resultingElectorateOfficeCode(
+                          electorate, change.electorateOfficeCode(), procedure);
               int minimumElectorCount =
                   change == null
                       ? procedure.getMinimumElectorCount()
@@ -1827,10 +1770,25 @@ public class MotionService {
     }
   }
 
+  private void requireCompatibleProcedureThreshold(
+      EffectType effectType, VotingThreshold threshold) {
+    if (effectType == EffectType.ELECT_OFFICE && threshold != VotingThreshold.PLURALITY_CAST) {
+      throw ApiException.badRequest(
+          "office_election_requires_plurality",
+          "Office election procedures must use plurality thresholds.");
+    }
+    if (effectType != EffectType.ELECT_OFFICE && threshold == VotingThreshold.PLURALITY_CAST) {
+      throw ApiException.badRequest(
+          "plurality_requires_election",
+          "Plurality thresholds can only be used by office election procedures.");
+    }
+  }
+
   private void requireKnownJurisdiction(UUID jurisdictionId, Set<UUID> jurisdictionIds) {
     if (!jurisdictionIds.contains(jurisdictionId)) {
       throw ApiException.badRequest(
-          "jurisdiction_not_found", "Constitution changes must refer to an existing jurisdiction.");
+          "constitution_change_jurisdiction_not_found",
+          "Constitution changes must refer to an existing jurisdiction.");
     }
   }
 
@@ -1842,6 +1800,16 @@ public class MotionService {
           "procedure_electorate_office_missing",
           "Office-held procedure electorates must refer to an office in the amended constitution.");
     }
+  }
+
+  private String resultingElectorateOfficeCode(
+      ProcedureElectorate electorate, String proposedOfficeCode, Procedure currentProcedure) {
+    if (electorate != ProcedureElectorate.OFFICE_HOLDERS) {
+      return null;
+    }
+    return valueOr(
+        normalizedProposalOfficeCode(proposedOfficeCode),
+        currentProcedure.getElectorateOfficeCode());
   }
 
   private void requireSufficientElectorateOfficeSeats(

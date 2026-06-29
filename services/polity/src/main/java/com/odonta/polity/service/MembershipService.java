@@ -40,6 +40,10 @@ public class MembershipService {
     requirePoliticalStanding(get(membershipId), at);
   }
 
+  public boolean hasPoliticalStanding(UUID membershipId, OffsetDateTime at) {
+    return hasPoliticalStanding(get(membershipId), at);
+  }
+
   Membership active(UUID polityId, UUID userId) {
     return memberships
         .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)

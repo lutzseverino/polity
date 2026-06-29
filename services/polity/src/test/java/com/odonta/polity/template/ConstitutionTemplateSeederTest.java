@@ -1,4 +1,4 @@
-package com.odonta.polity.service;
+package com.odonta.polity.template;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -35,19 +35,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class ConstitutionTemplateServiceTest {
+class ConstitutionTemplateSeederTest {
   private static final OffsetDateTime NOW = OffsetDateTime.parse("2026-06-17T10:00:00Z");
 
   private final ConstitutionalPowerRepository powers = mock(ConstitutionalPowerRepository.class);
   private final InstitutionRepository institutions = mock(InstitutionRepository.class);
   private final OfficeRepository offices = mock(OfficeRepository.class);
   private final ProcedureRepository procedures = mock(ProcedureRepository.class);
-  private final ConstitutionTemplateService service =
-      new ConstitutionTemplateService(powers, institutions, offices, procedures);
+  private final ConstitutionTemplateSeeder service =
+      new ConstitutionTemplateSeeder(powers, institutions, offices, procedures);
 
   @Test
   @SuppressWarnings("unchecked")
-  void standardRepublicPaceControlsBootstrapTermAndVotingWindows() {
+  void standardRepublicPaceControlsStarterOfficeTermsAndVotingWindows() {
     UUID polityId = UUID.randomUUID();
     Jurisdiction jurisdiction = new Jurisdiction(polityId, "Commons", JurisdictionKind.ROOT);
     ReflectionTestUtils.setField(jurisdiction, "id", UUID.randomUUID());

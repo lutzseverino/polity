@@ -15,7 +15,10 @@ import com.odonta.polity.repository.OfficeTermRepository;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -43,29 +46,41 @@ public class OfficeService {
   public List<OfficeTermResult> terms(UUID polityId, UUID userId) {
     access.requireReadable(polityId, userId);
     OffsetDateTime now = OffsetDateTime.now(clock);
+    ConstitutionVersion constitution = polities.constitution(polityId);
+    Map<String, OfficeProjection> currentOffices =
+        offices.findProjectionsByConstitutionVersionIdOrderByName(constitution.getId()).stream()
+            .collect(Collectors.toMap(OfficeProjection::getCode, Function.identity()));
     return terms.findProjectionsByPolityIdOrderByStartedAtDesc(polityId).stream()
-        .map(term -> term(term, now))
+        .map(term -> term(term, currentOffices, now))
         .toList();
   }
 
-  private OfficeTermResult term(OfficeTermProjection projection, OffsetDateTime now) {
+  private OfficeTermResult term(
+      OfficeTermProjection projection,
+      Map<String, OfficeProjection> currentOffices,
+      OffsetDateTime now) {
     OfficeTermStatus status =
         projection.getStatus() == OfficeTermStatus.ACTIVE && !projection.getEndsAt().isAfter(now)
             ? OfficeTermStatus.ENDED
             : projection.getStatus();
-    OfficeProjection office =
-        offices
-            .findProjectedById(projection.getOfficeId())
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
-    return new OfficeTermResult(
-        projection.getId(),
-        projection.getOfficeId(),
+    OfficeProjection office = currentOffice(projection, currentOffices);
+    return mapper.toResult(
+        projection,
+        office.getId(),
         office.getName(),
         office.getNameKey(),
-        projection.getMembershipId(),
         memberships.displayName(projection.getMembershipId()),
-        status,
-        projection.getStartedAt(),
-        projection.getEndsAt());
+        status);
+  }
+
+  private OfficeProjection currentOffice(
+      OfficeTermProjection projection, Map<String, OfficeProjection> currentOffices) {
+    OfficeProjection office = currentOffices.get(projection.getOfficeCode());
+    if (office != null) {
+      return office;
+    }
+    return offices
+        .findProjectedById(projection.getOfficeId())
+        .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
   }
 }

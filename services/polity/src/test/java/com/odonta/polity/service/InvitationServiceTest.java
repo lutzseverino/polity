@@ -20,6 +20,7 @@ import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
+import com.odonta.polity.mapper.MembershipInvitationApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
@@ -74,6 +75,7 @@ class InvitationServiceTest {
             invitations,
             membershipService,
             memberships,
+            Mappers.getMapper(MembershipInvitationApplicationMapper.class),
             Mappers.getMapper(MembershipApplicationMapper.class),
             grantPlanner,
             polities,
@@ -178,6 +180,76 @@ class InvitationServiceTest {
   }
 
   @Test
+  void creatingInvitationAllowsResignedMemberToBeInvitedAgain() {
+    UUID polityId = UUID.randomUUID();
+    UUID inviterUserId = UUID.randomUUID();
+    UUID inviterMembershipId = UUID.randomUUID();
+    UUID inviteeUserId = UUID.randomUUID();
+    UUID invitationId = UUID.randomUUID();
+    Membership inviter = member(polityId, inviterUserId, inviterMembershipId);
+    Membership resigned = member(polityId, inviteeUserId, UUID.randomUUID());
+    resigned.resign(NOW.minusDays(1));
+    ConstitutionVersion constitution = constitution(polityId);
+    Jurisdiction jurisdiction = jurisdiction(polityId);
+    ProvisionalUser invitee = new ProvisionalUser(inviteeUserId, "subject:invitee");
+    MembershipInvitationProjection invitationProjection =
+        invitationProjection(invitationId, polityId);
+
+    when(membershipService.active(polityId, inviterUserId)).thenReturn(inviter);
+    when(polities.constitution(polityId)).thenReturn(constitution);
+    when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
+    when(identityUsers.createProvisional("friend@example.com")).thenReturn(invitee);
+    when(memberships.findEntityByPolityIdAndUserId(polityId, inviteeUserId))
+        .thenReturn(Optional.of(resigned));
+    when(invitations.saveAndFlush(any(MembershipInvitation.class)))
+        .thenAnswer(
+            invocation -> {
+              MembershipInvitation invitation = invocation.getArgument(0);
+              ReflectionTestUtils.setField(invitation, "id", invitationId);
+              return invitation;
+            });
+    when(invitations.findProjectedById(invitationId)).thenReturn(Optional.of(invitationProjection));
+
+    var result =
+        service.create(
+            polityId,
+            new AuthenticatedUser(inviterUserId, "subject:inviter", "Ada"),
+            new CreateMemberInvitationInput("Friend@Example.com"));
+
+    assertThat(result.status()).isEqualTo(InvitationStatus.PENDING);
+    verify(invitations).saveAndFlush(any(MembershipInvitation.class));
+  }
+
+  @Test
+  void creatingInvitationRejectsAlreadyActiveMember() {
+    UUID polityId = UUID.randomUUID();
+    UUID inviterUserId = UUID.randomUUID();
+    UUID inviteeUserId = UUID.randomUUID();
+    Membership inviter = member(polityId, inviterUserId, UUID.randomUUID());
+    Membership active = member(polityId, inviteeUserId, UUID.randomUUID());
+    ConstitutionVersion constitution = constitution(polityId);
+    ProvisionalUser invitee = new ProvisionalUser(inviteeUserId, "subject:invitee");
+
+    when(membershipService.active(polityId, inviterUserId)).thenReturn(inviter);
+    when(polities.constitution(polityId)).thenReturn(constitution);
+    when(identityUsers.createProvisional("friend@example.com")).thenReturn(invitee);
+    when(memberships.findEntityByPolityIdAndUserId(polityId, inviteeUserId))
+        .thenReturn(Optional.of(active));
+
+    assertThatThrownBy(
+            () ->
+                service.create(
+                    polityId,
+                    new AuthenticatedUser(inviterUserId, "subject:inviter", "Ada"),
+                    new CreateMemberInvitationInput("Friend@Example.com")))
+        .isInstanceOf(ApiException.class)
+        .hasMessage("This user is already a member.");
+
+    verify(invitations, never()).saveAndFlush(any());
+    verify(grants, never()).stage(any());
+  }
+
+  @Test
   void creatingInvitationDoesNotBypassMissingAdmissionPower() {
     UUID polityId = UUID.randomUUID();
     UUID inviterUserId = UUID.randomUUID();
@@ -218,7 +290,7 @@ class InvitationServiceTest {
         new MembershipInvitation(
             polityId,
             inviteeUserId,
-            "subject:invitee",
+            "subject:old-invitee",
             "friend@example.com",
             inviterMembershipId,
             NOW.minusDays(1));
@@ -276,6 +348,119 @@ class InvitationServiceTest {
             any(),
             any(),
             eq(NOW));
+  }
+
+  @Test
+  void acceptingInvitationReactivatesResignedMembership() {
+    UUID polityId = UUID.randomUUID();
+    UUID invitationId = UUID.randomUUID();
+    UUID inviteeUserId = UUID.randomUUID();
+    UUID inviterMembershipId = UUID.randomUUID();
+    UUID admittedMembershipId = UUID.randomUUID();
+    Membership resigned = member(polityId, inviteeUserId, admittedMembershipId);
+    resigned.resign(NOW.minusDays(1));
+    MembershipInvitation invitation =
+        new MembershipInvitation(
+            polityId,
+            inviteeUserId,
+            "subject:invitee",
+            "friend@example.com",
+            inviterMembershipId,
+            NOW.minusDays(1));
+    ReflectionTestUtils.setField(invitation, "id", invitationId);
+    IdentityUser invitee =
+        new IdentityUser(
+            inviteeUserId,
+            "subject:invitee",
+            "friend@example.com",
+            "Bea",
+            null,
+            IdentityUserStatus.ACTIVE,
+            true,
+            NOW.minusDays(10),
+            NOW.minusDays(1));
+    ConstitutionVersion constitution = constitution(polityId);
+    Jurisdiction jurisdiction = jurisdiction(polityId);
+    MembershipProjection memberProjection = memberProjection(admittedMembershipId, inviteeUserId);
+
+    when(identityUsers.get(inviteeUserId)).thenReturn(invitee);
+    when(invitations.findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING))
+        .thenReturn(Optional.of(invitation));
+    when(memberships.findEntityByPolityIdAndUserId(polityId, inviteeUserId))
+        .thenReturn(Optional.of(resigned));
+    when(memberships.saveAndFlush(resigned)).thenReturn(resigned);
+    when(polities.constitution(polityId)).thenReturn(constitution);
+    when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
+    when(memberships.findProjectedById(admittedMembershipId))
+        .thenReturn(Optional.of(memberProjection));
+
+    var result =
+        service.accept(
+            invitationId, new AuthenticatedUser(inviteeUserId, "subject:invitee", "Bea"));
+
+    assertThat(result.id()).isEqualTo(admittedMembershipId);
+    assertThat(resigned.getStatus()).isEqualTo(MembershipStatus.ACTIVE);
+    assertThat(resigned.getAuthorizationSubject()).isEqualTo("subject:invitee");
+    assertThat(resigned.getEmail()).isEqualTo("friend@example.com");
+    assertThat(resigned.getDisplayName()).isEqualTo("Bea");
+    assertThat(resigned.getAdmittedAt()).isEqualTo(NOW);
+    assertThat(resigned.getAdmittedBy()).isEqualTo(inviterMembershipId);
+    assertThat(resigned.getResignedAt()).isNull();
+    verify(grants).stage(any());
+    verify(officialRecords)
+        .append(
+            eq(polityId),
+            eq(jurisdiction.getId()),
+            eq(constitution.getId()),
+            eq(admittedMembershipId),
+            eq(OfficialRecordType.MEMBER_ADMITTED),
+            eq(admittedMembershipId),
+            any(),
+            any(),
+            eq(NOW));
+  }
+
+  @Test
+  void acceptingInvitationRejectsAlreadyActiveMembership() {
+    UUID polityId = UUID.randomUUID();
+    UUID invitationId = UUID.randomUUID();
+    UUID inviteeUserId = UUID.randomUUID();
+    Membership active = member(polityId, inviteeUserId, UUID.randomUUID());
+    MembershipInvitation invitation =
+        new MembershipInvitation(
+            polityId,
+            inviteeUserId,
+            "subject:invitee",
+            "friend@example.com",
+            UUID.randomUUID(),
+            NOW.minusDays(1));
+    IdentityUser invitee =
+        new IdentityUser(
+            inviteeUserId,
+            "subject:invitee",
+            "friend@example.com",
+            "Bea",
+            null,
+            IdentityUserStatus.ACTIVE,
+            true,
+            NOW.minusDays(10),
+            NOW.minusDays(1));
+
+    when(identityUsers.get(inviteeUserId)).thenReturn(invitee);
+    when(invitations.findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING))
+        .thenReturn(Optional.of(invitation));
+    when(memberships.findEntityByPolityIdAndUserId(polityId, inviteeUserId))
+        .thenReturn(Optional.of(active));
+
+    assertThatThrownBy(
+            () ->
+                service.accept(
+                    invitationId, new AuthenticatedUser(inviteeUserId, "subject:invitee", "Bea")))
+        .isInstanceOf(ApiException.class)
+        .hasMessage("This user is already a member.");
+
+    verify(memberships, never()).saveAndFlush(any());
+    verify(grants, never()).stage(any());
   }
 
   private Membership member(UUID polityId, UUID userId, UUID membershipId) {

@@ -13,7 +13,7 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
   Optional<Membership> findEntityByPolityIdAndUserIdAndStatus(
       UUID polityId, UUID userId, MembershipStatus status);
 
-  boolean existsByPolityIdAndUserId(UUID polityId, UUID userId);
+  Optional<Membership> findEntityByPolityIdAndUserId(UUID polityId, UUID userId);
 
   List<Membership> findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
       UUID polityId, MembershipStatus status);

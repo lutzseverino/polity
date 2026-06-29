@@ -10,4 +10,5 @@ public record PolityActionAvailabilityResult(
     ActionAvailabilityResult introduceConstitutionalReview,
     ActionAvailabilityResult introduceAmendment,
     ActionAvailabilityResult introduceDisbandment,
-    ActionAvailabilityResult requestCertification) {}
+    ActionAvailabilityResult requestCertification,
+    ActionAvailabilityResult resignMembership) {}

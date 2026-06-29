@@ -87,4 +87,8 @@ public class OfficeTerm extends AuditedEntity {
     this.status = OfficeTermStatus.ENDED;
     this.endedAt = endedAt;
   }
+
+  public boolean isActiveAt(OffsetDateTime when) {
+    return status == OfficeTermStatus.ACTIVE && endsAt.isAfter(when);
+  }
 }

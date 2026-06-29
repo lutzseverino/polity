@@ -12,7 +12,7 @@ public class PolityGrantPlanner {
   public GrantPlan account(String subject) {
     return GrantPlan.builder()
         .grantAuthorities(
-            subject, PolityPermissions.CLIENT_ID, List.of(PolityPermissions.PUBLIC_POLITY_CREATE))
+            subject, PolityPermissions.CLIENT_ID, List.of(PolityPermissions.POLITY_CREATE))
         .build();
   }
 

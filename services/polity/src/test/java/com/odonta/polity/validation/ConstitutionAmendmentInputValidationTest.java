@@ -19,10 +19,19 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.List;
 import java.util.UUID;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.junit.jupiter.api.Test;
 
 class ConstitutionAmendmentInputValidationTest {
   private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+  private final Validator messageValidator =
+      Validation.byDefaultProvider()
+          .configure()
+          .messageInterpolator(
+              new ResourceBundleMessageInterpolator(new PlatformResourceBundleLocator("messages")))
+          .buildValidatorFactory()
+          .getValidator();
 
   @Test
   void rejectsAmendmentWithoutChanges() {
@@ -207,6 +216,19 @@ class ConstitutionAmendmentInputValidationTest {
         .anyMatch(
             violation ->
                 violation.getConstraintDescriptor().getAnnotation() instanceof ValidOfficeChange);
+  }
+
+  @Test
+  void interpolatesCustomValidationMessagesFromMessagesBundle() {
+    CreateOfficeChangeInput input =
+        new CreateOfficeChangeInput(
+            ConstitutionOfficeChangeAction.CREATE, "clerk", "", null, null, null);
+
+    assertThat(messageValidator.validate(input))
+        .anySatisfy(
+            violation ->
+                assertThat(violation.getMessage())
+                    .isEqualTo("Office change fields are inconsistent with the requested action."));
   }
 
   @Test

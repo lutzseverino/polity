@@ -34,8 +34,16 @@ public class ConstitutionalAuthority {
     require(member, constitution, PowerCode.INTRODUCE_APPEAL, false);
   }
 
+  public boolean allowsOwnAppealIntroduction(Membership member, ConstitutionVersion constitution) {
+    return allows(member, constitution, PowerCode.INTRODUCE_APPEAL, false);
+  }
+
   public void requireAppealCertification(Membership member, ConstitutionVersion constitution) {
     require(member, constitution, PowerCode.REQUEST_CERTIFICATION, false);
+  }
+
+  public boolean allowsAppealCertification(Membership member, ConstitutionVersion constitution) {
+    return allows(member, constitution, PowerCode.REQUEST_CERTIFICATION, false);
   }
 
   private void require(

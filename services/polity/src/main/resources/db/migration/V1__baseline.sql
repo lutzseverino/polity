@@ -74,7 +74,6 @@ CREATE TABLE public.constitution_amendment_proposals (
     motion_id uuid NOT NULL,
     title text NOT NULL,
     body text NOT NULL,
-    change_summary text DEFAULT ''::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -258,8 +257,11 @@ CREATE TABLE public.memberships (
     status text NOT NULL,
     admitted_at timestamp with time zone NOT NULL,
     admitted_by uuid,
+    resigned_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT memberships_resigned_at_check CHECK ((((status = 'RESIGNED'::text) AND (resigned_at IS NOT NULL)) OR ((status = 'ACTIVE'::text) AND (resigned_at IS NULL)))),
+    CONSTRAINT memberships_status_check CHECK ((status = ANY (ARRAY['ACTIVE'::text, 'RESIGNED'::text])))
 );
 
 CREATE TABLE public.motion_electors (

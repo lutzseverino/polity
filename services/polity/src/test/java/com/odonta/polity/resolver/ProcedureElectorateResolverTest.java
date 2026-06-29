@@ -1,4 +1,4 @@
-package com.odonta.polity.service;
+package com.odonta.polity.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -14,19 +14,21 @@ import com.odonta.polity.model.ProcedureElectorate;
 import com.odonta.polity.model.VotingThreshold;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
+import com.odonta.polity.service.MembershipService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
-class ProcedureElectorateServiceTest {
+class ProcedureElectorateResolverTest {
   private static final OffsetDateTime NOW = OffsetDateTime.parse("2026-06-22T10:00:00Z");
 
   private final MembershipRepository memberships = mock(MembershipRepository.class);
   private final MembershipService membershipService = mock(MembershipService.class);
   private final OfficeTermRepository officeTerms = mock(OfficeTermRepository.class);
-  private final ProcedureElectorateService service =
-      new ProcedureElectorateService(memberships, membershipService, officeTerms);
+  private final ProcedureElectorateResolver service =
+      new ProcedureElectorateResolver(memberships, membershipService, officeTerms);
 
   @Test
   void activeMemberElectorateUsesStandingMembers() {
@@ -38,8 +40,8 @@ class ProcedureElectorateServiceTest {
     when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
             polityId, MembershipStatus.ACTIVE))
         .thenReturn(List.of(standing, suspended));
-    when(membershipService.hasPoliticalStanding(standing, NOW)).thenReturn(true);
-    when(membershipService.hasPoliticalStanding(suspended, NOW)).thenReturn(false);
+    when(membershipService.hasPoliticalStanding(standing.getId(), NOW)).thenReturn(true);
+    when(membershipService.hasPoliticalStanding(suspended.getId(), NOW)).thenReturn(false);
 
     assertThat(service.electors(procedure, NOW)).containsExactly(standing);
   }
@@ -62,8 +64,9 @@ class ProcedureElectorateServiceTest {
     when(officeTerms.findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
             polityId, Office.MAGISTRATE, OfficeTermStatus.ACTIVE, NOW))
         .thenReturn(List.of(term));
-    when(membershipService.get(magistrate.getId())).thenReturn(magistrate);
-    when(membershipService.hasPoliticalStanding(magistrate, NOW)).thenReturn(true);
+    when(memberships.findEntityById(magistrate.getId()))
+        .thenReturn(java.util.Optional.of(magistrate));
+    when(membershipService.hasPoliticalStanding(magistrate.getId(), NOW)).thenReturn(true);
 
     assertThat(service.electors(procedure, NOW)).containsExactly(magistrate);
   }
@@ -102,13 +105,16 @@ class ProcedureElectorateServiceTest {
   }
 
   private Membership member(UUID polityId) {
-    return new Membership(
-        polityId,
-        UUID.randomUUID(),
-        UUID.randomUUID().toString(),
-        "citizen@example.test",
-        "Citizen",
-        NOW.minusDays(2),
-        null);
+    Membership member =
+        new Membership(
+            polityId,
+            UUID.randomUUID(),
+            UUID.randomUUID().toString(),
+            "citizen@example.test",
+            "Citizen",
+            NOW.minusDays(2),
+            null);
+    ReflectionTestUtils.setField(member, "id", UUID.randomUUID());
+    return member;
   }
 }

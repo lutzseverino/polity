@@ -17,6 +17,12 @@ public final class TemplateParameters {
     return Collections.unmodifiableMap(params);
   }
 
+  public static Map<String, Object> ofPresent(Object... keyValues) {
+    Map<String, Object> params = new LinkedHashMap<>();
+    putAllPresent(params, keyValues);
+    return Collections.unmodifiableMap(params);
+  }
+
   public static Map<String, Object> copyOf(Map<String, ?> values) {
     if (values == null || values.isEmpty()) {
       return empty();
@@ -44,6 +50,21 @@ public final class TemplateParameters {
         throw new IllegalArgumentException("Template parameter keys must be strings.");
       }
       params.put(key, keyValues[i + 1]);
+    }
+  }
+
+  private static void putAllPresent(Map<String, Object> params, Object... keyValues) {
+    if (keyValues.length % 2 != 0) {
+      throw new IllegalArgumentException("Template parameters require key/value pairs.");
+    }
+    for (int i = 0; i < keyValues.length; i += 2) {
+      if (!(keyValues[i] instanceof String key)) {
+        throw new IllegalArgumentException("Template parameter keys must be strings.");
+      }
+      Object value = keyValues[i + 1];
+      if (value != null) {
+        params.put(key, value);
+      }
     }
   }
 }

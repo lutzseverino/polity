@@ -5,7 +5,7 @@ public enum PolityPace {
   STANDARD(14, 48, 12, 48, 12, 48, 24, 120),
   DELIBERATE(30, 96, 24, 96, 24, 96, 48, 168);
 
-  private final int bootstrapStewardTermDays;
+  private final int starterOfficeTermDays;
   private final int ordinaryVotingPeriodHours;
   private final int officeElectionMinimumNoticeHours;
   private final int officeElectionVotingPeriodHours;
@@ -15,7 +15,7 @@ public enum PolityPace {
   private final int constitutionalAmendmentVotingPeriodHours;
 
   PolityPace(
-      int bootstrapStewardTermDays,
+      int starterOfficeTermDays,
       int ordinaryVotingPeriodHours,
       int officeElectionMinimumNoticeHours,
       int officeElectionVotingPeriodHours,
@@ -23,7 +23,7 @@ public enum PolityPace {
       int sanctionVotingPeriodHours,
       int constitutionalAmendmentMinimumNoticeHours,
       int constitutionalAmendmentVotingPeriodHours) {
-    this.bootstrapStewardTermDays = bootstrapStewardTermDays;
+    this.starterOfficeTermDays = starterOfficeTermDays;
     this.ordinaryVotingPeriodHours = ordinaryVotingPeriodHours;
     this.officeElectionMinimumNoticeHours = officeElectionMinimumNoticeHours;
     this.officeElectionVotingPeriodHours = officeElectionVotingPeriodHours;
@@ -33,8 +33,8 @@ public enum PolityPace {
     this.constitutionalAmendmentVotingPeriodHours = constitutionalAmendmentVotingPeriodHours;
   }
 
-  public int bootstrapStewardTermDays() {
-    return bootstrapStewardTermDays;
+  public int starterOfficeTermDays() {
+    return starterOfficeTermDays;
   }
 
   public int ordinaryVotingPeriodHours() {

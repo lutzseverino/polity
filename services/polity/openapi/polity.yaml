@@ -75,6 +75,18 @@ paths:
       security: [{ bearerAuth: [] }]
       responses:
         "200": { description: Members, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } } }
+  /polities/{polityId}/members/me/resignation:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    post:
+      tags: [Members]
+      operationId: resignPolityMembership
+      summary: Resign the current user's polity membership.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Membership resigned and polity access revocation staged. }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
   /polities/{polityId}/invitations:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -386,7 +398,10 @@ components:
         targetMembershipId: { type: string, format: uuid }
         type: { $ref: "#/components/schemas/SanctionType" }
         reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
-        durationDays: { type: integer, minimum: 1 }
+        durationDays:
+          type: integer
+          minimum: 1
+          description: Must be long enough for the current appeal procedure to complete.
     CreateAppealMotionRequest:
       type: object
       required: [sanctionId, reason]
@@ -401,9 +416,13 @@ components:
         reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
     CreateConstitutionalReviewMotionRequest:
       type: object
+      description: Opens a constitutional-review motion for an official record with an active void remedy.
       required: [targetRecordId, reason]
       properties:
-        targetRecordId: { type: string, format: uuid }
+        targetRecordId:
+          type: string
+          format: uuid
+          description: Official record entry to void. The entry must be a resolution adoption, sanction application, or office election with an active remedy.
         reason: { type: string, minLength: 1, maxLength: 5000, x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank" }
     CreateConstitutionAmendmentMotionRequest:
       type: object
@@ -510,6 +529,7 @@ components:
         - constitution_ratified
         - member_invited
         - member_admitted
+        - member_resigned
         - motion_introduced
         - candidacy_responded
         - vote_cast
@@ -570,9 +590,10 @@ components:
       properties:
         available: { type: boolean }
         reason: { type: string }
+        reasonMessage: { type: string }
     PolityActionAvailabilityResponse:
       type: object
-      required: [inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceOfficeTermReview, introduceConstitutionalReview, introduceAmendment, introduceDisbandment, requestCertification]
+      required: [inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceOfficeTermReview, introduceConstitutionalReview, introduceAmendment, introduceDisbandment, requestCertification, resignMembership]
       properties:
         inviteMembers: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceMotion: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
@@ -584,6 +605,7 @@ components:
         introduceAmendment: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceDisbandment: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         requestCertification: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
+        resignMembership: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
     ConstitutionResponse:
       type: object
       required: [id, version, status, ratifiedAt, jurisdictions, institutions, procedures, offices, powers, bootstrap]
@@ -668,7 +690,7 @@ components:
         userId: { type: string, format: uuid }
         name: { type: string }
         email: { type: string, format: email }
-        status: { type: string, enum: [active] }
+        status: { type: string, enum: [active, resigned] }
         admittedAt: { type: string, format: date-time }
     MemberInvitationResponse:
       type: object

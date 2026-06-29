@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odonta.polity.api.model.ActionAvailabilityResponse;
+import com.odonta.polity.model.ActionAvailabilityResult;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.CertificationOutcomeReason;
 import com.odonta.polity.model.MembershipStatus;
@@ -15,10 +17,14 @@ import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficialRecordProjection;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.StaticMessageSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class MapperTest {
   private static final OffsetDateTime NOW = OffsetDateTime.parse("2026-06-16T12:00:00Z");
@@ -124,5 +130,31 @@ class MapperTest {
     assertThat(result.constitutionVersion()).isEqualTo(3);
     assertThat(result.sourceId()).isEqualTo(sourceId);
     assertThat(result.occurredAt()).isEqualTo(NOW);
+  }
+
+  @Test
+  void mapsActionAvailabilityWithLocalizedReasonMessage() {
+    try {
+      LocaleContextHolder.setLocale(Locale.ENGLISH);
+      StaticMessageSource messages = new StaticMessageSource();
+      messages.addMessage(
+          "api_error.polity_provisional", Locale.ENGLISH, "This polity needs more citizens.");
+      TransportTextResolver text =
+          new TransportTextResolver(new ConstitutionChangeTextResolver(messages), messages);
+      PolityTransportMapper mapper = Mappers.getMapper(PolityTransportMapper.class);
+      ReflectionTestUtils.setField(
+          mapper, "polityTransportConversions", new PolityTransportConversions(text));
+      ReflectionTestUtils.setField(
+          mapper, "officeTransportConversions", new OfficeTransportConversions(text));
+
+      ActionAvailabilityResponse response =
+          mapper.toResponse(ActionAvailabilityResult.blocked("polity_provisional"));
+
+      assertThat(response.getAvailable()).isFalse();
+      assertThat(response.getReason()).isEqualTo("polity_provisional");
+      assertThat(response.getReasonMessage()).isEqualTo("This polity needs more citizens.");
+    } finally {
+      LocaleContextHolder.resetLocaleContext();
+    }
   }
 }

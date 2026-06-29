@@ -1,4 +1,4 @@
-package com.odonta.polity.service;
+package com.odonta.polity.effect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,7 +8,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odonta.authorization.grant.RevocationPlan;
+import com.odonta.authorization.grant.Revocations;
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.PolityPermissions;
+import com.odonta.polity.PolityResources;
+import com.odonta.polity.authorization.PolityRevocationPlanner;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.model.AppealProposal;
 import com.odonta.polity.model.ConstitutionAmendmentProposal;
@@ -42,6 +47,7 @@ import com.odonta.polity.model.OfficeTermReview;
 import com.odonta.polity.model.OfficeTermReviewProposal;
 import com.odonta.polity.model.OfficeTermStatus;
 import com.odonta.polity.model.OfficialRecordEntry;
+import com.odonta.polity.model.OfficialRecordTemplate;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.Polity;
 import com.odonta.polity.model.PolityStatus;
@@ -92,9 +98,12 @@ import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.ResolutionRepository;
 import com.odonta.polity.repository.SanctionProposalRepository;
 import com.odonta.polity.repository.SanctionRepository;
+import com.odonta.polity.service.MembershipService;
+import com.odonta.polity.service.OfficialRecordService;
 import java.lang.reflect.Proxy;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,7 +111,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class EffectApplicationServiceTest {
+class MotionEffectApplierTest {
   private static final OffsetDateTime NOW = OffsetDateTime.parse("2026-06-14T10:00:00Z");
 
   private final AppealProposalRepository appealProposals = mock(AppealProposalRepository.class);
@@ -151,9 +160,13 @@ class EffectApplicationServiceTest {
   private final SanctionRepository sanctions = mock(SanctionRepository.class);
   private final MembershipRepository memberships = mock(MembershipRepository.class);
   private final MembershipService membershipService = mock(MembershipService.class);
+  private final PolityRevocationPlanner revocationPlanner = mock(PolityRevocationPlanner.class);
+  private final Revocations revocations = mock(Revocations.class);
+  private final OfficialActVoidRemedy officialActVoidRemedies =
+      new OfficialActVoidRemedy(officeTerms, resolutions, sanctions);
 
-  private final EffectApplicationService service =
-      new EffectApplicationService(
+  private final MotionEffectApplier service =
+      new MotionEffectApplier(
           appealProposals,
           appeals,
           amendmentProposals,
@@ -176,6 +189,7 @@ class EffectApplicationServiceTest {
           officeElectionProposals,
           offices,
           officeTerms,
+          officialActVoidRemedies,
           officialRecordEntries,
           polities,
           officialRecords,
@@ -184,7 +198,9 @@ class EffectApplicationServiceTest {
           sanctionProposals,
           sanctions,
           memberships,
-          membershipService);
+          membershipService,
+          revocationPlanner,
+          revocations);
 
   @BeforeEach
   void setUp() {
@@ -204,11 +220,7 @@ class EffectApplicationServiceTest {
     Motion motion = motion(polityId, actor.getId(), currentConstitutionId);
     ConstitutionAmendmentProposal proposal =
         new ConstitutionAmendmentProposal(
-            polityId,
-            motion.getId(),
-            "Second Constitution",
-            "New body",
-            "ordinary-resolution(threshold=TWO_THIRDS_CAST)");
+            polityId, motion.getId(), "Second Constitution", "New body");
     ReflectionTestUtils.setField(proposal, "id", UUID.randomUUID());
     ConstitutionProcedureChangeProposal procedureChange =
         new ConstitutionProcedureChangeProposal(
@@ -219,7 +231,7 @@ class EffectApplicationServiceTest {
             null,
             null,
             VotingThreshold.TWO_THIRDS_CAST,
-            null,
+            ProcedureElectorate.ACTIVE_MEMBERS,
             null,
             null,
             null,
@@ -239,9 +251,12 @@ class EffectApplicationServiceTest {
             institutionId,
             Procedure.ORDINARY_RESOLUTION,
             "Ordinary resolution",
+            null,
             1,
             2,
             VotingThreshold.SIMPLE_MAJORITY_CAST,
+            ProcedureElectorate.OFFICE_HOLDERS,
+            Office.MAGISTRATE,
             0,
             24,
             EffectType.ADOPT_RESOLUTION);
@@ -295,6 +310,9 @@ class EffectApplicationServiceTest {
         .isEqualTo(VotingThreshold.TWO_THIRDS_CAST);
     assertThat(procedureCaptor.getValue().getElectorate())
         .isEqualTo(ProcedureElectorate.ACTIVE_MEMBERS);
+    assertThat(procedureCaptor.getValue().getElectorateOfficeCode()).isNull();
+    ArgumentCaptor<OfficialRecordTemplate> recordTemplate =
+        ArgumentCaptor.forClass(OfficialRecordTemplate.class);
     verify(officialRecords)
         .append(
             any(),
@@ -304,8 +322,22 @@ class EffectApplicationServiceTest {
             org.mockito.ArgumentMatchers.eq(OfficialRecordType.CONSTITUTION_AMENDED),
             any(),
             any(),
-            any(),
+            recordTemplate.capture(),
             any());
+    assertThat(recordTemplate.getValue().params())
+        .containsEntry("changeCount", 1)
+        .containsEntry("amendmentBody", "New body");
+    assertThat((List<?>) recordTemplate.getValue().params().get("changeItems"))
+        .singleElement()
+        .satisfies(
+            item -> {
+              Map<?, ?> changeItem = (Map<?, ?>) item;
+              assertThat(changeItem.get("kind")).isEqualTo("procedure");
+              assertThat(changeItem.get("operation")).isEqualTo("revise");
+              assertThat(changeItem.get("subject")).isEqualTo("Ordinary resolution");
+              Map<?, ?> details = (Map<?, ?>) changeItem.get("details");
+              assertThat(details.get("threshold")).isEqualTo(VotingThreshold.TWO_THIRDS_CAST);
+            });
   }
 
   @Test
@@ -320,11 +352,7 @@ class EffectApplicationServiceTest {
     Motion motion = motion(polityId, actor.getId(), currentConstitutionId);
     ConstitutionAmendmentProposal proposal =
         new ConstitutionAmendmentProposal(
-            polityId,
-            motion.getId(),
-            "Second Constitution",
-            "New body",
-            "office:clerk(CREATE); power:ADMIT_MEMBER(OFFICE:clerk)");
+            polityId, motion.getId(), "Second Constitution", "New body");
     ReflectionTestUtils.setField(proposal, "id", UUID.randomUUID());
     Institution institution =
         new Institution(
@@ -422,12 +450,7 @@ class EffectApplicationServiceTest {
     Motion motion = motion(polityId, actor.getId(), currentConstitutionId);
     ConstitutionAmendmentProposal proposal =
         new ConstitutionAmendmentProposal(
-            polityId,
-            motion.getId(),
-            "Second Constitution",
-            "New body",
-            "institution:%s(RETIRE); institution:%s(REVISE); institution:Audit Chamber(CREATE)"
-                .formatted(assemblyId, courtId));
+            polityId, motion.getId(), "Second Constitution", "New body");
     ReflectionTestUtils.setField(proposal, "id", UUID.randomUUID());
     Institution assembly =
         new Institution(
@@ -625,10 +648,11 @@ class EffectApplicationServiceTest {
                 new OfficeElectionCandidate(polityId, motion.getId(), otherCandidateMembershipId)));
     when(officeElectionBallots.findEntitiesByMotionId(motion.getId()))
         .thenReturn(List.of(first, second));
-    when(membershipService.get(winnerMembershipId)).thenReturn(winner);
-    when(membershipService.get(otherCandidateMembershipId)).thenReturn(otherCandidate);
-    when(membershipService.hasPoliticalStanding(winner, NOW)).thenReturn(true);
-    when(membershipService.hasPoliticalStanding(otherCandidate, NOW)).thenReturn(true);
+    when(memberships.findEntityById(winnerMembershipId)).thenReturn(Optional.of(winner));
+    when(memberships.findEntityById(otherCandidateMembershipId))
+        .thenReturn(Optional.of(otherCandidate));
+    when(membershipService.hasPoliticalStanding(winnerMembershipId, NOW)).thenReturn(true);
+    when(membershipService.hasPoliticalStanding(otherCandidateMembershipId, NOW)).thenReturn(true);
     when(officeTerms.saveAndFlush(any(OfficeTerm.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
 
@@ -699,8 +723,8 @@ class EffectApplicationServiceTest {
         .thenReturn(
             List.of(new OfficeElectionCandidate(polityId, motion.getId(), winnerMembershipId)));
     when(officeElectionBallots.findEntitiesByMotionId(motion.getId())).thenReturn(List.of(ballot));
-    when(membershipService.get(winnerMembershipId)).thenReturn(winner);
-    when(membershipService.hasPoliticalStanding(winner, NOW)).thenReturn(true);
+    when(memberships.findEntityById(winnerMembershipId)).thenReturn(Optional.of(winner));
+    when(membershipService.hasPoliticalStanding(winnerMembershipId, NOW)).thenReturn(true);
     when(officeTerms.countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
             polityId, Office.STEWARD, OfficeTermStatus.ACTIVE, NOW))
         .thenReturn(1L);
@@ -746,6 +770,7 @@ class EffectApplicationServiceTest {
   void disbandmentEffectMarksPolityDisbandedAndEndsActiveOfficeTerms() {
     UUID polityId = UUID.randomUUID();
     Membership actor = member(polityId);
+    Membership member = member(polityId);
     ConstitutionVersion constitution = constitution(polityId, UUID.randomUUID(), "Body");
     Motion motion =
         motion(polityId, actor.getId(), constitution.getId(), EffectType.DISBAND_POLITY);
@@ -763,11 +788,36 @@ class EffectApplicationServiceTest {
     when(polities.findEntityById(polityId)).thenReturn(Optional.of(polity));
     when(officeTerms.findEntitiesByPolityIdAndStatus(polityId, OfficeTermStatus.ACTIVE))
         .thenReturn(List.of(term));
+    when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
+            polityId, MembershipStatus.ACTIVE))
+        .thenReturn(List.of(actor, member));
+    RevocationPlan actorRevocation =
+        RevocationPlan.builder()
+            .revokeActions(
+                actor.getAuthorizationSubject(),
+                PolityResources.POLITY.resource(polityId),
+                List.of(PolityPermissions.PARTICIPATE))
+            .build();
+    RevocationPlan memberRevocation =
+        RevocationPlan.builder()
+            .revokeActions(
+                member.getAuthorizationSubject(),
+                PolityResources.POLITY.resource(polityId),
+                List.of(PolityPermissions.PARTICIPATE))
+            .build();
+    when(revocationPlanner.participation(actor.getAuthorizationSubject(), polityId))
+        .thenReturn(actorRevocation);
+    when(revocationPlanner.participation(member.getAuthorizationSubject(), polityId))
+        .thenReturn(memberRevocation);
 
     service.apply(motion, actor, constitution, NOW);
 
     assertThat(polity.getStatus()).isEqualTo(PolityStatus.DISBANDED);
     assertThat(term.getStatus()).isEqualTo(OfficeTermStatus.ENDED);
+    verify(revocationPlanner).participation(actor.getAuthorizationSubject(), polityId);
+    verify(revocationPlanner).participation(member.getAuthorizationSubject(), polityId);
+    verify(revocations).stage(actorRevocation);
+    verify(revocations).stage(memberRevocation);
     verify(polities).saveAndFlush(polity);
     verify(officialRecords)
         .append(
@@ -820,7 +870,7 @@ class EffectApplicationServiceTest {
         .thenReturn(Optional.of(projection(OfficeTermReviewProposalProjection.class, proposal)));
     when(officeTerms.findEntityByIdAndPolityId(termId, polityId)).thenReturn(Optional.of(term));
     when(offices.findEntityByIdAndPolityId(officeId, polityId)).thenReturn(Optional.of(office));
-    when(membershipService.get(holderMembershipId)).thenReturn(holder);
+    when(memberships.findEntityById(holderMembershipId)).thenReturn(Optional.of(holder));
     when(officeTermReviews.saveAndFlush(any(OfficeTermReview.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
 
@@ -956,6 +1006,62 @@ class EffectApplicationServiceTest {
   }
 
   @Test
+  void constitutionalReviewEffectVoidsActiveElectedOfficeTerm() {
+    UUID polityId = UUID.randomUUID();
+    UUID targetRecordId = UUID.randomUUID();
+    UUID termId = UUID.randomUUID();
+    Membership actor = member(polityId);
+    ConstitutionVersion constitution = constitution(polityId, UUID.randomUUID(), "Body");
+    Motion motion =
+        motion(polityId, actor.getId(), constitution.getId(), EffectType.VOID_OFFICIAL_ACT);
+    OfficeTerm term =
+        new OfficeTerm(
+            polityId,
+            UUID.randomUUID(),
+            Office.STEWARD,
+            actor.getId(),
+            motion.getId(),
+            NOW.minusDays(1),
+            NOW.plusDays(3));
+    ReflectionTestUtils.setField(term, "id", termId);
+    OfficialRecordEntry targetRecord = mock(OfficialRecordEntry.class);
+    ConstitutionalReviewProposal proposal =
+        new ConstitutionalReviewProposal(
+            polityId, motion.getId(), targetRecordId, actor.getId(), "Unconstitutional");
+
+    when(targetRecord.getId()).thenReturn(targetRecordId);
+    when(targetRecord.getPolityId()).thenReturn(polityId);
+    when(targetRecord.getEntryNumber()).thenReturn(13);
+    when(targetRecord.getType()).thenReturn(OfficialRecordType.OFFICE_ELECTED);
+    when(targetRecord.getSourceId()).thenReturn(termId);
+    when(constitutionalReviewProposals.findProjectedByMotionId(motion.getId()))
+        .thenReturn(
+            Optional.of(projection(ConstitutionalReviewProposalProjection.class, proposal)));
+    when(officialRecordEntries.findEntityByIdAndPolityId(targetRecordId, polityId))
+        .thenReturn(Optional.of(targetRecord));
+    when(officeTerms.findEntityByIdAndPolityId(termId, polityId)).thenReturn(Optional.of(term));
+    when(constitutionalReviews.saveAndFlush(any(ConstitutionalReview.class)))
+        .thenAnswer(invocation -> withId(invocation.getArgument(0)));
+
+    service.apply(motion, actor, constitution, NOW);
+
+    assertThat(term.getStatus()).isEqualTo(OfficeTermStatus.ENDED);
+    assertThat(term.getEndedAt()).isEqualTo(NOW);
+    verify(officeTerms).saveAndFlush(term);
+    verify(officialRecords)
+        .append(
+            any(),
+            any(),
+            any(),
+            any(),
+            org.mockito.ArgumentMatchers.eq(OfficialRecordType.OFFICIAL_ACT_VOIDED),
+            any(),
+            any(),
+            any(),
+            any());
+  }
+
+  @Test
   void constitutionalReviewEffectFailsWhenVoidRemedyIsUnavailable() {
     UUID polityId = UUID.randomUUID();
     UUID targetRecordId = UUID.randomUUID();
@@ -989,6 +1095,35 @@ class EffectApplicationServiceTest {
     assertThatThrownBy(() -> service.apply(motion, actor, constitution, NOW))
         .isInstanceOf(ApiException.class)
         .hasMessageContaining("no longer has an active remedy");
+
+    verify(constitutionalReviews, never()).saveAndFlush(any());
+    verify(officialRecords, never())
+        .append(any(), any(), any(), any(), any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void constitutionalReviewEffectRejectsOfficialActWithoutVoidRemedy() {
+    UUID polityId = UUID.randomUUID();
+    UUID targetRecordId = UUID.randomUUID();
+    Membership actor = member(polityId);
+    ConstitutionVersion constitution = constitution(polityId, UUID.randomUUID(), "Body");
+    Motion motion =
+        motion(polityId, actor.getId(), constitution.getId(), EffectType.VOID_OFFICIAL_ACT);
+    OfficialRecordEntry targetRecord = mock(OfficialRecordEntry.class);
+    ConstitutionalReviewProposal proposal =
+        new ConstitutionalReviewProposal(
+            polityId, motion.getId(), targetRecordId, actor.getId(), "Unconstitutional");
+
+    when(targetRecord.getType()).thenReturn(OfficialRecordType.APPEAL_GRANTED);
+    when(constitutionalReviewProposals.findProjectedByMotionId(motion.getId()))
+        .thenReturn(
+            Optional.of(projection(ConstitutionalReviewProposalProjection.class, proposal)));
+    when(officialRecordEntries.findEntityByIdAndPolityId(targetRecordId, polityId))
+        .thenReturn(Optional.of(targetRecord));
+
+    assertThatThrownBy(() -> service.apply(motion, actor, constitution, NOW))
+        .isInstanceOf(ApiException.class)
+        .hasMessageContaining("does not have a constitutional-review void remedy");
 
     verify(constitutionalReviews, never()).saveAndFlush(any());
     verify(officialRecords, never())
@@ -1030,7 +1165,13 @@ class EffectApplicationServiceTest {
   private Membership member(UUID polityId) {
     Membership member =
         new Membership(
-            polityId, UUID.randomUUID(), "subject", "friend@example.com", "Friend", NOW, null);
+            polityId,
+            UUID.randomUUID(),
+            "subject:" + UUID.randomUUID(),
+            "friend@example.com",
+            "Friend",
+            NOW,
+            null);
     ReflectionTestUtils.setField(member, "id", UUID.randomUUID());
     return member;
   }

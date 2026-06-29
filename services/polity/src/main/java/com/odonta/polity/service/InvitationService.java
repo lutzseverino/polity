@@ -10,6 +10,7 @@ import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
+import com.odonta.polity.mapper.MembershipInvitationApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
@@ -18,6 +19,7 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.model.MembershipInvitationResult;
 import com.odonta.polity.model.MembershipResult;
+import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficialRecordContext;
 import com.odonta.polity.model.OfficialRecordTemplate;
 import com.odonta.polity.model.OfficialRecordTemplateKey;
@@ -50,6 +52,7 @@ public class InvitationService {
   private final MembershipInvitationRepository invitations;
   private final MembershipService membershipService;
   private final MembershipRepository memberships;
+  private final MembershipInvitationApplicationMapper invitationMapper;
   private final MembershipApplicationMapper memberMapper;
   private final PolityGrantPlanner grantPlanner;
   private final PolityService polities;
@@ -71,9 +74,13 @@ public class InvitationService {
           "invitation_exists", "This user already has a pending invitation.");
     }
     ProvisionalUser invitee = identityUsers.createProvisional(email);
-    if (memberships.existsByPolityIdAndUserId(polityId, invitee.id())) {
-      throw ApiException.conflict("member_exists", "This user is already a member.");
-    }
+    memberships
+        .findEntityByPolityIdAndUserId(polityId, invitee.id())
+        .filter(membership -> membership.getStatus() == MembershipStatus.ACTIVE)
+        .ifPresent(
+            membership -> {
+              throw ApiException.conflict("member_exists", "This user is already a member.");
+            });
     if (invitations.existsByPolityIdAndInvitedUserIdAndStatus(
         polityId, invitee.id(), InvitationStatus.PENDING)) {
       throw ApiException.conflict(
@@ -131,23 +138,36 @@ public class InvitationService {
         invitations
             .findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING)
             .orElseThrow(
-                () ->
-                    ApiException.notFound("invitation_not_found", "Pending invitation not found."));
+                () -> ApiException.notFound("invitation_not_found", "Invitation not found."));
     polities.requireActive(invitation.getPolityId());
     requireInvitee(invitation, identity);
-    if (memberships.existsByPolityIdAndUserId(invitation.getPolityId(), identity.id())) {
-      throw ApiException.conflict("member_exists", "This user is already a member.");
-    }
     Membership admitted =
-        memberships.saveAndFlush(
-            new Membership(
-                invitation.getPolityId(),
-                identity.id(),
-                identity.authorizationSubject(),
-                identity.email(),
-                displayName(identity),
-                now,
-                invitation.getInvitedBy()));
+        memberships
+            .findEntityByPolityIdAndUserId(invitation.getPolityId(), identity.id())
+            .map(
+                membership -> {
+                  if (membership.getStatus() == MembershipStatus.ACTIVE) {
+                    throw ApiException.conflict("member_exists", "This user is already a member.");
+                  }
+                  membership.reactivate(
+                      identity.authorizationSubject(),
+                      identity.email(),
+                      displayName(identity),
+                      now,
+                      invitation.getInvitedBy());
+                  return memberships.saveAndFlush(membership);
+                })
+            .orElseGet(
+                () ->
+                    memberships.saveAndFlush(
+                        new Membership(
+                            invitation.getPolityId(),
+                            identity.id(),
+                            identity.authorizationSubject(),
+                            identity.email(),
+                            displayName(identity),
+                            now,
+                            invitation.getInvitedBy())));
     invitation.accept(now);
     invitations.saveAndFlush(invitation);
     grants.stage(
@@ -182,15 +202,10 @@ public class InvitationService {
   }
 
   private MembershipInvitationResult result(MembershipInvitationProjection projection) {
-    return new MembershipInvitationResult(
-        projection.getId(),
-        projection.getPolityId(),
+    return invitationMapper.toResult(
+        projection,
         polities.name(projection.getPolityId()),
-        projection.getEmail(),
-        membershipService.displayName(projection.getInvitedBy()),
-        projection.getStatus(),
-        projection.getInvitedAt(),
-        projection.getRespondedAt());
+        membershipService.displayName(projection.getInvitedBy()));
   }
 
   private void requireAdmissionAuthority(Membership inviter, ConstitutionVersion constitution) {

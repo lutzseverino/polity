@@ -1,9 +1,11 @@
 package com.odonta.polity.mapper;
 
+import com.odonta.polity.api.model.ActionAvailabilityResponse;
 import com.odonta.polity.api.model.ConstitutionResponse;
 import com.odonta.polity.api.model.CreatePolityRequest;
 import com.odonta.polity.api.model.PolityActionAvailabilityResponse;
 import com.odonta.polity.api.model.PolityResponse;
+import com.odonta.polity.model.ActionAvailabilityResult;
 import com.odonta.polity.model.ConstitutionInstitutionResult;
 import com.odonta.polity.model.ConstitutionPowerResult;
 import com.odonta.polity.model.ConstitutionProcedureResult;
@@ -16,7 +18,9 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(config = PolityMapperConfig.class, uses = PolityTransportConversions.class)
+@Mapper(
+    config = PolityMapperConfig.class,
+    uses = {PolityTransportConversions.class, OfficeTransportConversions.class})
 public interface PolityTransportMapper {
 
   CreatePolityInput toInput(CreatePolityRequest request);
@@ -40,6 +44,9 @@ public interface PolityTransportMapper {
 
   @Mapping(target = "name", source = ".", qualifiedByName = "powerName")
   com.odonta.polity.api.model.ConstitutionPowerResponse toResponse(ConstitutionPowerResult result);
+
+  @Mapping(target = "reasonMessage", source = ".", qualifiedByName = "availabilityReasonMessage")
+  ActionAvailabilityResponse toResponse(ActionAvailabilityResult result);
 
   PolityActionAvailabilityResponse toResponse(PolityActionAvailabilityResult result);
 

@@ -11,6 +11,7 @@ public enum OfficialRecordTemplateKey {
   CONSTITUTION_RATIFIED("official_record.constitution_ratified"),
   MEMBER_ADMITTED("official_record.member_admitted"),
   MEMBER_INVITED("official_record.member_invited"),
+  MEMBER_RESIGNED("official_record.member_resigned"),
   MOTION_CERTIFIED("official_record.motion_certified"),
   MOTION_INTRODUCED("official_record.motion_introduced"),
   MOTION_REJECTED("official_record.motion_rejected"),

@@ -6,6 +6,4 @@ public interface ConstitutionAmendmentProposalProjection {
   UUID getId();
 
   String getBody();
-
-  String getChangeSummary();
 }

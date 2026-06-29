@@ -8,6 +8,8 @@ import java.util.UUID;
 public interface SanctionProjection {
   UUID getId();
 
+  UUID getMotionId();
+
   UUID getTargetMembershipId();
 
   SanctionType getType();

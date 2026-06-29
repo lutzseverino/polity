@@ -11,4 +11,7 @@ public interface AppealProposalRepository extends JpaRepository<AppealProposal, 
 
   List<AppealProposalProjection> findProjectionsByPolityIdAndSanctionId(
       UUID polityId, UUID sanctionId);
+
+  List<AppealProposalProjection> findProjectionsByPolityIdAndAppellantMembershipId(
+      UUID polityId, UUID appellantMembershipId);
 }

@@ -21,7 +21,7 @@ class PolityGrantPlannerTest {
     assertThat(plan.authorityGrants().getFirst().resourceServerClientId())
         .isEqualTo(PolityPermissions.CLIENT_ID);
     assertThat(plan.authorityGrants().getFirst().authorities())
-        .containsExactly(PolityPermissions.PUBLIC_POLITY_CREATE);
+        .containsExactly(PolityPermissions.POLITY_CREATE);
   }
 
   @Test

@@ -20,4 +20,8 @@ public interface SanctionRepository extends JpaRepository<Sanction, UUID> {
       OffsetDateTime now);
 
   List<SanctionProjection> findProjectionsByPolityIdOrderByStartedAtDesc(UUID polityId);
+
+  List<SanctionProjection>
+      findProjectionsByPolityIdAndTargetMembershipIdAndStatusAndEndsAtAfterOrderByStartedAtDesc(
+          UUID polityId, UUID targetMembershipId, SanctionStatus status, OffsetDateTime now);
 }

@@ -1,4 +1,4 @@
-package com.odonta.polity.service;
+package com.odonta.polity.template;
 
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
@@ -23,11 +23,11 @@ import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class ConstitutionTemplateService {
+public class ConstitutionTemplateSeeder {
   private static final int DEFAULT_QUORUM_NUMERATOR = 1;
   private static final int DEFAULT_QUORUM_DENOMINATOR = 2;
   private static final int DEFAULT_MINIMUM_ELECTOR_COUNT = 1;
@@ -40,12 +40,12 @@ public class ConstitutionTemplateService {
   private final OfficeRepository offices;
   private final ProcedureRepository procedures;
 
-  Institution establishStarterRepublic(
+  public Institution establishStarterRepublic(
       Jurisdiction jurisdiction, ConstitutionVersion constitution) {
     return establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
   }
 
-  Institution establishStarterRepublic(
+  public Institution establishStarterRepublic(
       Jurisdiction jurisdiction, ConstitutionVersion constitution, PolityPace pace) {
     Institution assembly =
         institutions.saveAndFlush(
@@ -247,7 +247,7 @@ public class ConstitutionTemplateService {
                 OfficeTemplateKey.STEWARD.storedName(),
                 OfficeTemplateKey.STEWARD.storedDescription(),
                 OfficeTemplateKey.STEWARD,
-                pace.bootstrapStewardTermDays(),
+                pace.starterOfficeTermDays(),
                 DEFAULT_OFFICE_SEAT_COUNT),
             new Office(
                 constitution.getPolityId(),
@@ -257,7 +257,7 @@ public class ConstitutionTemplateService {
                 OfficeTemplateKey.MAGISTRATE.storedName(),
                 OfficeTemplateKey.MAGISTRATE.storedDescription(),
                 OfficeTemplateKey.MAGISTRATE,
-                pace.bootstrapStewardTermDays(),
+                pace.starterOfficeTermDays(),
                 STANDARD_MAGISTRATE_SEAT_COUNT),
             new Office(
                 constitution.getPolityId(),
@@ -267,7 +267,7 @@ public class ConstitutionTemplateService {
                 OfficeTemplateKey.TRIBUNE.storedName(),
                 OfficeTemplateKey.TRIBUNE.storedDescription(),
                 OfficeTemplateKey.TRIBUNE,
-                pace.bootstrapStewardTermDays(),
+                pace.starterOfficeTermDays(),
                 DEFAULT_OFFICE_SEAT_COUNT)));
   }
 

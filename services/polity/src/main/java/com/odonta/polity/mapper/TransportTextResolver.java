@@ -1,8 +1,9 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.model.TemplateText;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class TransportTextResolver {
+  private static final String CHANGE_ITEMS = "changeItems";
+  private static final String CHANGE_SUMMARY = "changeSummary";
   private static final String KEY_SUFFIX = "Key";
 
+  private final ConstitutionChangeTextResolver constitutionChanges;
   private final MessageSource messages;
 
   public String resolve(String key, String fallback, Map<String, ?> params) {
@@ -20,7 +24,7 @@ public class TransportTextResolver {
       return fallback;
     }
     String template = message(key, fallback == null || fallback.isBlank() ? key : fallback);
-    return TemplateText.render(template, resolvedParams(params));
+    return render(template, resolvedParams(params));
   }
 
   public String resolveName(String key, String fallback) {
@@ -38,10 +42,29 @@ public class TransportTextResolver {
             String resolvedName = name.substring(0, name.length() - KEY_SUFFIX.length());
             Object fallback = resolved.get(resolvedName);
             String template = message(key, fallback == null ? key : String.valueOf(fallback));
-            resolved.put(resolvedName, TemplateText.render(template, resolved));
+            resolved.put(resolvedName, render(template, resolved));
           }
         });
+    resolved.putIfAbsent(
+        CHANGE_SUMMARY, constitutionChanges.changeSummary(params.get(CHANGE_ITEMS)));
     return resolved;
+  }
+
+  private String render(String template, Map<String, ?> params) {
+    String rendered = template;
+    for (Map.Entry<String, ?> entry : params.entrySet()) {
+      rendered = rendered.replace("{" + entry.getKey() + "}", value(entry.getValue()));
+    }
+    return rendered;
+  }
+
+  private String value(Object value) {
+    if (value instanceof Iterable<?> iterable) {
+      return StreamSupport.stream(iterable.spliterator(), false)
+          .map(String::valueOf)
+          .collect(Collectors.joining(", "));
+    }
+    return String.valueOf(value);
   }
 
   private String message(String key, String fallback) {

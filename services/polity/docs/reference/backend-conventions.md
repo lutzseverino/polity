@@ -13,6 +13,10 @@ Top-level packages describe mechanical roles:
 - `repository` owns persistence ports, entity-owned projections, and explicit entity materialization
   for command paths.
 - `service` owns application behavior for product entities and workflows.
+- `effect` owns official-effect application components and effect-specific remedies.
+- `resolver` owns repository-backed components that resolve a domain set or context for another
+  owner.
+- `template` owns preset and template seeding components.
 - `authorization` owns product access and constitutional authority rules.
 - `evaluator` owns pure calculation engines.
 - `validation` owns Bean Validation annotations and validators.
@@ -23,6 +27,11 @@ existing role.
 
 ## Service Rules
 
+- Use the `Service` suffix and `@Service` stereotype for application services that own a product
+  entity or a real workflow spanning multiple entities.
+- Internal collaborators that resolve, adapt, plan, apply, or calculate one mechanic should use a
+  precise noun such as `Resolver`, `Adapter`, `Planner`, `Applicator`, or `Evaluator` and the
+  narrowest fitting stereotype/package.
 - Public application service methods accept application-owned inputs or ordinary context values and
   return application-owned results or no value.
 - Public application service methods must not accept or return entities, repository projections, or
@@ -36,6 +45,15 @@ existing role.
 - A separate non-entity service is acceptable only when it owns a real workflow boundary.
 - Use `authorization` for product authorization rules instead of placing them in `service`.
 - Use `evaluator` for pure tally or calculation code with no repository ownership.
+
+## Platform Client Rules
+
+- Platform clients may gate product access, delivery, billing, identity, or grants.
+- Keep commercial rules outside constitutional state. Billing may decide whether a caller can create
+  or use a paid product surface, but it must not grant membership, political standing, office
+  authority, procedure eligibility, or official effects.
+- Product services should consume published platform client contracts directly and keep product
+  limits in product-owned terms.
 
 ## Projection Rules
 

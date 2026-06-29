@@ -2,16 +2,29 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.Polity;
+import com.odonta.polity.model.PolityStatus;
 import com.odonta.polity.model.PolityVisibility;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PolityRepository extends JpaRepository<Polity, UUID> {
+  long FOUNDER_PRIVATE_POLITY_QUOTA_LOCK_NAMESPACE = 825701L;
 
   Optional<Polity> findEntityById(UUID id);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query(
+      """
+      select polity
+      from Polity polity
+      where polity.id = :id
+      """)
+  Optional<Polity> findEntityByIdForUpdate(UUID id);
 
   @Query(
       """
@@ -32,4 +45,15 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
   Optional<PolityProjection> findProjectedById(UUID id);
 
   boolean existsByIdAndVisibility(UUID id, PolityVisibility visibility);
+
+  @Query(
+      value =
+          "select 1 from pg_advisory_xact_lock(hashtextextended(cast(:founderId as text), "
+              + FOUNDER_PRIVATE_POLITY_QUOTA_LOCK_NAMESPACE
+              + "))",
+      nativeQuery = true)
+  int lockFounderPrivatePolityQuota(UUID founderId);
+
+  long countByFounderIdAndVisibilityAndStatus(
+      UUID founderId, PolityVisibility visibility, PolityStatus status);
 }

@@ -1,24 +1,26 @@
-package com.odonta.polity.service;
+package com.odonta.polity.resolver;
 
+import com.odonta.common.api.ApiException;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficeTermStatus;
 import com.odonta.polity.model.Procedure;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
+import com.odonta.polity.service.MembershipService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-class ProcedureElectorateService {
+public class ProcedureElectorateResolver {
   private final MembershipRepository memberships;
   private final MembershipService membershipService;
   private final OfficeTermRepository officeTerms;
 
-  List<Membership> electors(Procedure procedure, OffsetDateTime votingOpensAt) {
+  public List<Membership> electors(Procedure procedure, OffsetDateTime votingOpensAt) {
     return switch (procedure.getElectorate()) {
       case ACTIVE_MEMBERS -> activeMembers(procedure, votingOpensAt);
       case OFFICE_HOLDERS -> officeHolders(procedure, votingOpensAt);
@@ -30,7 +32,7 @@ class ProcedureElectorateService {
         .findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
             procedure.getPolityId(), MembershipStatus.ACTIVE)
         .stream()
-        .filter(member -> membershipService.hasPoliticalStanding(member, votingOpensAt))
+        .filter(member -> membershipService.hasPoliticalStanding(member.getId(), votingOpensAt))
         .toList();
   }
 
@@ -42,8 +44,14 @@ class ProcedureElectorateService {
             OfficeTermStatus.ACTIVE,
             votingOpensAt)
         .stream()
-        .map(term -> membershipService.get(term.getMembershipId()))
-        .filter(member -> membershipService.hasPoliticalStanding(member, votingOpensAt))
+        .map(term -> membership(term.getMembershipId()))
+        .filter(member -> membershipService.hasPoliticalStanding(member.getId(), votingOpensAt))
         .toList();
+  }
+
+  private Membership membership(java.util.UUID membershipId) {
+    return memberships
+        .findEntityById(membershipId)
+        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
   }
 }

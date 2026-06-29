@@ -1,11 +1,13 @@
 package com.odonta.polity.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.springframework.stereotype.Service;
 
 @AnalyzeClasses(
     packages = "com.odonta.polity",
@@ -57,6 +59,16 @@ class PolityArchitectureTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage("..controller..", "com.odonta.polity.api..");
+
+  @ArchTest
+  static final ArchRule service_package_contains_application_services =
+      classes()
+          .that()
+          .resideInAPackage("..service..")
+          .and()
+          .areTopLevelClasses()
+          .should()
+          .beAnnotatedWith(Service.class);
 
   @ArchTest
   static final ArchRule mappers_do_not_depend_on_orchestration =

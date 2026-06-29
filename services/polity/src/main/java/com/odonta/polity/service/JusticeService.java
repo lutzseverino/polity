@@ -1,7 +1,9 @@
 package com.odonta.polity.service;
 
+import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.mapper.JusticeApplicationMapper;
 import com.odonta.polity.model.AppealResult;
 import com.odonta.polity.model.ConstitutionalReviewResult;
 import com.odonta.polity.model.OfficeTermReviewResult;
@@ -11,8 +13,14 @@ import com.odonta.polity.repository.AppealProjection;
 import com.odonta.polity.repository.AppealRepository;
 import com.odonta.polity.repository.ConstitutionalReviewProjection;
 import com.odonta.polity.repository.ConstitutionalReviewRepository;
+import com.odonta.polity.repository.OfficeProjection;
+import com.odonta.polity.repository.OfficeRepository;
+import com.odonta.polity.repository.OfficeTermProjection;
+import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.OfficeTermReviewProjection;
 import com.odonta.polity.repository.OfficeTermReviewRepository;
+import com.odonta.polity.repository.OfficialRecordProjection;
+import com.odonta.polity.repository.OfficialRecordRepository;
 import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
 import java.time.Clock;
@@ -30,7 +38,11 @@ public class JusticeService {
   private final Clock clock;
   private final AppealRepository appeals;
   private final ConstitutionalReviewRepository constitutionalReviews;
+  private final JusticeApplicationMapper mapper;
+  private final OfficeRepository offices;
+  private final OfficeTermRepository officeTerms;
   private final OfficeTermReviewRepository officeTermReviews;
+  private final OfficialRecordRepository officialRecords;
   private final MembershipService memberships;
   private final SanctionRepository sanctions;
 
@@ -55,7 +67,7 @@ public class JusticeService {
   public List<OfficeTermReviewResult> officeTermReviews(UUID polityId, UUID userId) {
     access.requireReadable(polityId, userId);
     return officeTermReviews.findProjectionsByPolityIdOrderByDecidedAtDesc(polityId).stream()
-        .map(this::officeTermReview)
+        .map(projection -> officeTermReview(polityId, projection))
         .toList();
   }
 
@@ -63,19 +75,13 @@ public class JusticeService {
   public List<ConstitutionalReviewResult> constitutionalReviews(UUID polityId, UUID userId) {
     access.requireReadable(polityId, userId);
     return constitutionalReviews.findProjectionsByPolityIdOrderByDecidedAtDesc(polityId).stream()
-        .map(this::constitutionalReview)
+        .map(projection -> constitutionalReview(polityId, projection))
         .toList();
   }
 
   private AppealResult appeal(AppealProjection projection) {
-    return new AppealResult(
-        projection.getId(),
-        projection.getSanctionId(),
-        projection.getAppellantMembershipId(),
-        memberships.displayName(projection.getAppellantMembershipId()),
-        projection.getStatus(),
-        projection.getReason(),
-        projection.getDecidedAt());
+    return mapper.toResult(
+        projection, memberships.displayName(projection.getAppellantMembershipId()));
   }
 
   private SanctionResult sanction(SanctionProjection projection, OffsetDateTime now) {
@@ -83,43 +89,43 @@ public class JusticeService {
         projection.getStatus() == SanctionStatus.ACTIVE && !projection.getEndsAt().isAfter(now)
             ? SanctionStatus.EXPIRED
             : projection.getStatus();
-    return new SanctionResult(
-        projection.getId(),
-        projection.getTargetMembershipId(),
-        memberships.displayName(projection.getTargetMembershipId()),
-        projection.getType(),
-        status,
-        projection.getReason(),
-        projection.getStartedAt(),
-        projection.getEndsAt());
+    return mapper.toResult(
+        projection, memberships.displayName(projection.getTargetMembershipId()), status);
   }
 
-  private OfficeTermReviewResult officeTermReview(OfficeTermReviewProjection projection) {
-    return new OfficeTermReviewResult(
-        projection.getId(),
-        projection.getOfficeTermId(),
-        projection.getPetitionerMembershipId(),
+  private OfficeTermReviewResult officeTermReview(
+      UUID polityId, OfficeTermReviewProjection projection) {
+    OfficeTermProjection term =
+        officeTerms
+            .findProjectedByIdAndPolityId(projection.getOfficeTermId(), polityId)
+            .orElseThrow(
+                () -> ApiException.notFound("office_term_not_found", "Office term not found."));
+    OfficeProjection office =
+        offices
+            .findProjectedById(term.getOfficeId())
+            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+    return mapper.toResult(
+        projection,
         memberships.displayName(projection.getPetitionerMembershipId()),
-        projection.getVacatedMembershipId(),
-        memberships.displayName(projection.getVacatedMembershipId()),
-        projection.getOfficeName(),
-        projection.getOfficeNameKey(),
-        projection.getStatus(),
-        projection.getReason(),
-        projection.getDecidedAt());
+        term.getMembershipId(),
+        memberships.displayName(term.getMembershipId()),
+        office.getName(),
+        office.getNameKey());
   }
 
   private ConstitutionalReviewResult constitutionalReview(
-      ConstitutionalReviewProjection projection) {
-    return new ConstitutionalReviewResult(
-        projection.getId(),
-        projection.getTargetRecordId(),
-        projection.getTargetEntryNumber(),
-        projection.getTargetType(),
-        projection.getPetitionerMembershipId(),
-        memberships.displayName(projection.getPetitionerMembershipId()),
-        projection.getStatus(),
-        projection.getReason(),
-        projection.getDecidedAt());
+      UUID polityId, ConstitutionalReviewProjection projection) {
+    OfficialRecordProjection target =
+        officialRecords
+            .findProjectedByIdAndPolityId(projection.getTargetRecordId(), polityId)
+            .orElseThrow(
+                () ->
+                    ApiException.notFound(
+                        "official_record_entry_not_found", "Official record entry not found."));
+    return mapper.toResult(
+        projection,
+        target.getEntryNumber(),
+        target.getType(),
+        memberships.displayName(projection.getPetitionerMembershipId()));
   }
 }

@@ -5,6 +5,7 @@ public enum OfficialRecordType {
   CONSTITUTION_RATIFIED("constitution_ratified"),
   MEMBER_INVITED("member_invited"),
   MEMBER_ADMITTED("member_admitted"),
+  MEMBER_RESIGNED("member_resigned"),
   MOTION_INTRODUCED("motion_introduced"),
   CANDIDACY_RESPONDED("candidacy_responded"),
   VOTE_CAST("vote_cast"),
@@ -38,7 +39,7 @@ public enum OfficialRecordType {
     return labelKey();
   }
 
-  public boolean isConstitutionallyReviewable() {
+  public boolean isVoidableByConstitutionalReview() {
     return this == RESOLUTION_ADOPTED || this == SANCTION_APPLIED || this == OFFICE_ELECTED;
   }
 }
