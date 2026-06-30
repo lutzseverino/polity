@@ -28,27 +28,18 @@ public class OfficeElectionBallot extends AuditedEntity {
   @Column(name = "membership_id", nullable = false)
   private UUID membershipId;
 
-  @Column(name = "candidate_membership_id", nullable = false)
-  private UUID candidateMembershipId;
-
   @Column(name = "cast_at", nullable = false)
   private OffsetDateTime castAt;
 
   public OfficeElectionBallot(
-      UUID polityId,
-      UUID motionId,
-      UUID membershipId,
-      UUID candidateMembershipId,
-      OffsetDateTime castAt) {
+      UUID polityId, UUID motionId, UUID membershipId, OffsetDateTime castAt) {
     this.polityId = polityId;
     this.motionId = motionId;
     this.membershipId = membershipId;
-    this.candidateMembershipId = candidateMembershipId;
     this.castAt = castAt;
   }
 
-  public void replace(UUID candidateMembershipId, OffsetDateTime castAt) {
-    this.candidateMembershipId = candidateMembershipId;
+  public void replace(OffsetDateTime castAt) {
     this.castAt = castAt;
   }
 }

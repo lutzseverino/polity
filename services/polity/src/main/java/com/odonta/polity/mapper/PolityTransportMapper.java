@@ -2,7 +2,9 @@ package com.odonta.polity.mapper;
 
 import com.odonta.polity.api.model.ActionAvailabilityResponse;
 import com.odonta.polity.api.model.ConstitutionResponse;
+import com.odonta.polity.api.model.ConstitutionalHealthResponse;
 import com.odonta.polity.api.model.CreatePolityRequest;
+import com.odonta.polity.api.model.GovernmentReadinessResponse;
 import com.odonta.polity.api.model.PolityActionAvailabilityResponse;
 import com.odonta.polity.api.model.PolityResponse;
 import com.odonta.polity.model.ActionAvailabilityResult;
@@ -10,7 +12,9 @@ import com.odonta.polity.model.ConstitutionInstitutionResult;
 import com.odonta.polity.model.ConstitutionPowerResult;
 import com.odonta.polity.model.ConstitutionProcedureResult;
 import com.odonta.polity.model.ConstitutionResult;
+import com.odonta.polity.model.ConstitutionalHealthResult;
 import com.odonta.polity.model.CreatePolityInput;
+import com.odonta.polity.model.GovernmentReadinessResult;
 import com.odonta.polity.model.OfficeResult;
 import com.odonta.polity.model.PolityActionAvailabilityResult;
 import com.odonta.polity.model.PolityResult;
@@ -47,6 +51,20 @@ public interface PolityTransportMapper {
 
   @Mapping(target = "reasonMessage", source = ".", qualifiedByName = "availabilityReasonMessage")
   ActionAvailabilityResponse toResponse(ActionAvailabilityResult result);
+
+  @Mapping(target = "statusMessage", source = ".", qualifiedByName = "readinessStatusMessage")
+  @Mapping(target = "diagnostics", source = ".", qualifiedByName = "readinessDiagnostics")
+  GovernmentReadinessResponse toResponse(GovernmentReadinessResult result);
+
+  @Mapping(
+      target = "statusMessage",
+      source = ".",
+      qualifiedByName = "constitutionalHealthStatusMessage")
+  @Mapping(
+      target = "diagnostics",
+      source = ".",
+      qualifiedByName = "constitutionalHealthDiagnostics")
+  ConstitutionalHealthResponse toResponse(ConstitutionalHealthResult result);
 
   PolityActionAvailabilityResponse toResponse(PolityActionAvailabilityResult result);
 

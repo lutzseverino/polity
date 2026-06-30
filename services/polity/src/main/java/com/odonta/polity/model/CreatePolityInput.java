@@ -10,7 +10,9 @@ public record CreatePolityInput(
     PolitySetupPreset setupPreset,
     PolityPace pace) {
   public PolitySetupPreset setupPresetOrDefault() {
-    return setupPreset == null ? PolitySetupPreset.STANDARD_REPUBLIC : setupPreset;
+    return setupPreset == null
+        ? PolitySetupPreset.STANDARD_CONSTITUTIONAL_COUNCIL_REPUBLIC
+        : setupPreset;
   }
 
   public PolityPace paceOrDefault() {

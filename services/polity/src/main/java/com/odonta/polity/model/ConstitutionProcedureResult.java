@@ -11,6 +11,7 @@ public record ConstitutionProcedureResult(
     int quorumNumerator,
     int quorumDenominator,
     VotingThreshold threshold,
+    OfficeElectionMethod officeElectionMethod,
     ProcedureElectorate electorate,
     String electorateOfficeCode,
     int minimumElectorCount,

@@ -28,6 +28,7 @@ public final class ValidProcedureChangeValidator
         && (value.institutionId() != null
             || quorumComplete
             || value.threshold() != null
+            || value.officeElectionMethod() != null
             || value.electorate() != null
             || value.minimumElectorCount() != null
             || value.minimumNoticeHours() != null

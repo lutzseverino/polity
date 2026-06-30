@@ -3,8 +3,10 @@ package com.odonta.polity.mapper;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.CertificationResult;
 import com.odonta.polity.model.MotionResult;
+import com.odonta.polity.model.OfficeElectionBallotResult;
 import com.odonta.polity.model.OfficeElectionCandidateResult;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
+import com.odonta.polity.model.OfficeElectionMethod;
 import com.odonta.polity.model.OfficeElectionResult;
 import com.odonta.polity.model.OfficeElectionTallyResult;
 import com.odonta.polity.model.VotingResult;
@@ -33,8 +35,8 @@ public interface MotionApplicationMapper {
         "abstainCount",
         "electionParticipationCount",
         "electionDecisive",
-        "electionWinnerMembershipId",
-        "electionWinnerName",
+        "electionWinnerCount",
+        "electionTallySnapshot",
         "quorumRequired",
         "quorumMet",
         "thresholdMet"
@@ -65,5 +67,8 @@ public interface MotionApplicationMapper {
       String officeCode,
       String officeName,
       String officeNameKey,
+      int seatsAvailable,
+      OfficeElectionMethod method,
+      OfficeElectionBallotResult currentBallot,
       List<OfficeElectionCandidateResult> candidates);
 }

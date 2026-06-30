@@ -390,6 +390,7 @@ components:
           type: array
           minItems: 1
           maxItems: 12
+          uniqueItems: true
           items: { type: string, format: uuid }
     CreateSanctionMotionRequest:
       type: object
@@ -464,6 +465,7 @@ components:
         quorumNumerator: { type: integer, minimum: 1 }
         quorumDenominator: { type: integer, minimum: 1 }
         threshold: { $ref: "#/components/schemas/VotingThreshold" }
+        officeElectionMethod: { $ref: "#/components/schemas/OfficeElectionMethod" }
         electorate: { $ref: "#/components/schemas/ProcedureElectorate" }
         electorateOfficeCode: { type: string, minLength: 1, maxLength: 64, pattern: "^[a-z][a-z0-9-]*$" }
         minimumElectorCount: { type: integer, minimum: 1 }
@@ -494,9 +496,14 @@ components:
         choice: { $ref: "#/components/schemas/VoteChoice" }
     CastOfficeElectionBallotRequest:
       type: object
-      required: [candidateMembershipId]
+      required: [candidateMembershipIds]
       properties:
-        candidateMembershipId: { type: string, format: uuid }
+        candidateMembershipIds:
+          type: array
+          minItems: 1
+          maxItems: 12
+          uniqueItems: true
+          items: { type: string, format: uuid }
     RespondOfficeElectionCandidacyRequest:
       type: object
       required: [accepted]
@@ -507,11 +514,12 @@ components:
     PolityStatus: { type: string, enum: [active, disbanded] }
     ConstitutionStatus: { type: string, enum: [ratified, superseded] }
     JurisdictionKind: { type: string, enum: [root] }
-    InstitutionKind: { type: string, enum: [assembly, judiciary] }
-    PolitySetupPreset: { type: string, enum: [standard_republic] }
+    InstitutionKind: { type: string, enum: [assembly, council, judiciary] }
+    PolitySetupPreset: { type: string, enum: [standard_constitutional_council_republic] }
     PolityPace: { type: string, enum: [fast, standard, deliberate] }
     InvitationStatus: { type: string, enum: [pending, accepted] }
-    VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible, plurality_cast] }
+    VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible, office_election_result] }
+    OfficeElectionMethod: { type: string, enum: [plurality, ranked_choice] }
     ProcedureElectorate: { type: string, enum: [active_members, office_holders] }
     SanctionType: { type: string, enum: [warning, suspension] }
     SanctionStatus: { type: string, enum: [active, vacated, expired] }
@@ -591,10 +599,84 @@ components:
         available: { type: boolean }
         reason: { type: string }
         reasonMessage: { type: string }
+    GovernmentReadinessStatus:
+      type: string
+      enum:
+        - provisional
+        - forming_offices
+        - ready
+        - blocked
+        - disbanded
+    GovernmentReadinessDiagnostic:
+      type: string
+      enum:
+        - needs_more_standing_members
+        - ordinary_governance_authority_unavailable
+        - ordinary_governance_electorate_unavailable
+        - office_election_authority_unavailable
+        - office_election_electorate_unavailable
+        - certification_authority_unavailable
+        - appeal_authority_unavailable
+        - appeal_electorate_unavailable
+        - constitutional_review_authority_unavailable
+        - constitutional_review_electorate_unavailable
+        - polity_disbanded
+    GovernmentReadinessDiagnosticResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: { $ref: "#/components/schemas/GovernmentReadinessDiagnostic" }
+        message: { type: string }
+    GovernmentReadinessResponse:
+      type: object
+      required: [status, statusMessage, diagnostics]
+      properties:
+        status: { $ref: "#/components/schemas/GovernmentReadinessStatus" }
+        statusMessage: { type: string }
+        diagnostics:
+          type: array
+          items: { $ref: "#/components/schemas/GovernmentReadinessDiagnosticResponse" }
+    ConstitutionalHealthStatus:
+      type: string
+      enum:
+        - healthy
+        - degraded
+        - critical
+    ConstitutionalHealthDiagnostic:
+      type: string
+      enum:
+        - admission_path_unavailable
+        - ordinary_governance_unavailable
+        - sanction_path_unavailable
+        - appeal_path_unavailable
+        - office_term_review_path_unavailable
+        - constitutional_review_path_unavailable
+        - office_election_path_unavailable
+        - amendment_path_unavailable
+        - disbandment_path_unavailable
+        - certification_path_unavailable
+        - polity_disbanded
+    ConstitutionalHealthDiagnosticResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code: { $ref: "#/components/schemas/ConstitutionalHealthDiagnostic" }
+        message: { type: string }
+    ConstitutionalHealthResponse:
+      type: object
+      required: [status, statusMessage, diagnostics]
+      properties:
+        status: { $ref: "#/components/schemas/ConstitutionalHealthStatus" }
+        statusMessage: { type: string }
+        diagnostics:
+          type: array
+          items: { $ref: "#/components/schemas/ConstitutionalHealthDiagnosticResponse" }
     PolityActionAvailabilityResponse:
       type: object
-      required: [inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceOfficeTermReview, introduceConstitutionalReview, introduceAmendment, introduceDisbandment, requestCertification, resignMembership]
+      required: [readiness, constitutionalHealth, inviteMembers, introduceMotion, introduceOfficeElection, introduceSanction, introduceAppeal, introduceOfficeTermReview, introduceConstitutionalReview, introduceAmendment, introduceDisbandment, requestCertification, resignMembership]
       properties:
+        readiness: { $ref: "#/components/schemas/GovernmentReadinessResponse" }
+        constitutionalHealth: { $ref: "#/components/schemas/ConstitutionalHealthResponse" }
         inviteMembers: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceMotion: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
         introduceOfficeElection: { $ref: "#/components/schemas/ActionAvailabilityResponse" }
@@ -658,6 +740,7 @@ components:
         quorumNumerator: { type: integer }
         quorumDenominator: { type: integer }
         threshold: { $ref: "#/components/schemas/VotingThreshold" }
+        officeElectionMethod: { $ref: "#/components/schemas/OfficeElectionMethod" }
         electorate: { $ref: "#/components/schemas/ProcedureElectorate" }
         electorateOfficeCode: { type: string }
         minimumElectorCount: { type: integer }
@@ -724,13 +807,13 @@ components:
         certifiedAt: { type: string, format: date-time }
     CertificationOutcomeReason:
       type: string
-      enum: [passed, quorum_not_met, threshold_not_met, no_decisive_plurality]
+      enum: [passed, quorum_not_met, threshold_not_met, no_decisive_result]
     VotingOutcomeReason:
       type: string
       enum: [passed, quorum_not_met, threshold_not_met]
     OfficeElectionOutcomeReason:
       type: string
-      enum: [passed, quorum_not_met, no_decisive_plurality]
+      enum: [passed, quorum_not_met, no_decisive_result]
     MotionResponse:
       type: object
       required: [id, title, body, status, effectType, constitutionVersion, procedureName, introducedByName, openedAt, votingOpensAt, votingClosesAt, certificationOpensAt]
@@ -762,15 +845,27 @@ components:
       enum: [pending, accepted, declined, disqualified]
     OfficeElectionResponse:
       type: object
-      required: [officeId, officeCode, officeName, candidates]
+      required: [officeId, officeCode, officeName, seatsAvailable, method, candidates]
       properties:
         officeId: { type: string, format: uuid }
         officeCode: { type: string }
         officeName: { type: string }
         officeNameKey: { type: string }
+        seatsAvailable: { type: integer }
+        method: { $ref: "#/components/schemas/OfficeElectionMethod" }
+        currentBallot: { $ref: "#/components/schemas/OfficeElectionBallotResponse" }
         candidates:
           type: array
           items: { $ref: "#/components/schemas/OfficeElectionCandidateResponse" }
+    OfficeElectionBallotResponse:
+      type: object
+      required: [castAt, candidateMembershipIds]
+      properties:
+        castAt: { type: string, format: date-time }
+        candidateMembershipIds:
+          type: array
+          uniqueItems: true
+          items: { type: string, format: uuid }
     OfficeElectionCandidateResponse:
       type: object
       required: [membershipId, name, status]
@@ -781,27 +876,61 @@ components:
         respondedAt: { type: string, format: date-time }
     OfficeElectionTallyResponse:
       type: object
-      required: [eligible, participation, quorumRequired, quorumMet, decisive, passed, outcomeReason, candidates]
+      required: [eligible, participation, quorumRequired, quorumMet, seatsAvailable, seatsFilled, method, decisive, passed, outcomeReason, winners, candidates, rounds]
       properties:
         eligible: { type: integer }
         participation: { type: integer }
         quorumRequired: { type: integer }
         quorumMet: { type: boolean }
+        seatsAvailable: { type: integer }
+        seatsFilled: { type: integer }
+        method: { $ref: "#/components/schemas/OfficeElectionMethod" }
+        quota: { type: number }
         decisive: { type: boolean }
         passed: { type: boolean }
-        winnerMembershipId: { type: string, format: uuid }
-        winnerName: { type: string }
         outcomeReason: { $ref: "#/components/schemas/OfficeElectionOutcomeReason" }
+        winners:
+          type: array
+          items: { $ref: "#/components/schemas/OfficeElectionCandidateTallyResponse" }
         candidates:
           type: array
           items: { $ref: "#/components/schemas/OfficeElectionCandidateTallyResponse" }
+        rounds:
+          type: array
+          items: { $ref: "#/components/schemas/OfficeElectionRoundResponse" }
     OfficeElectionCandidateTallyResponse:
       type: object
-      required: [membershipId, name, ballots]
+      required: [membershipId, name, voteTotal]
       properties:
         membershipId: { type: string, format: uuid }
         name: { type: string }
-        ballots: { type: integer }
+        voteTotal: { type: number }
+    OfficeElectionRoundAction:
+      type: string
+      enum: [elected, eliminated, elected_remaining, no_continuing_candidates, no_countable_ballots]
+    OfficeElectionTieBreakReason:
+      type: string
+      enum: [deterministic]
+    OfficeElectionRoundResponse:
+      type: object
+      required: [roundNumber, action, exhaustedVoteTotal, candidates]
+      properties:
+        roundNumber: { type: integer }
+        action: { $ref: "#/components/schemas/OfficeElectionRoundAction" }
+        candidateMembershipId: { type: string, format: uuid }
+        exhaustedVoteTotal: { type: number }
+        transferFactor: { type: number }
+        tieBreakReason: { $ref: "#/components/schemas/OfficeElectionTieBreakReason" }
+        candidates:
+          type: array
+          items: { $ref: "#/components/schemas/OfficeElectionCandidateRoundTallyResponse" }
+    OfficeElectionCandidateRoundTallyResponse:
+      type: object
+      required: [membershipId, name, voteTotal]
+      properties:
+        membershipId: { type: string, format: uuid }
+        name: { type: string }
+        voteTotal: { type: number }
     OfficeResponse:
       type: object
       required: [id, jurisdictionId, code, name, description, termLengthDays, seatCount]

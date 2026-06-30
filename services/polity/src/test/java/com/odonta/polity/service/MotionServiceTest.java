@@ -53,8 +53,10 @@ import com.odonta.polity.model.MotionElector;
 import com.odonta.polity.model.MotionStatus;
 import com.odonta.polity.model.Office;
 import com.odonta.polity.model.OfficeElectionBallot;
+import com.odonta.polity.model.OfficeElectionBallotPreference;
 import com.odonta.polity.model.OfficeElectionCandidate;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
+import com.odonta.polity.model.OfficeElectionMethod;
 import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficialRecordEntry;
 import com.odonta.polity.model.OfficialRecordType;
@@ -87,6 +89,7 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
 import com.odonta.polity.repository.MotionProjection;
 import com.odonta.polity.repository.MotionRepository;
+import com.odonta.polity.repository.OfficeElectionBallotPreferenceRepository;
 import com.odonta.polity.repository.OfficeElectionBallotRepository;
 import com.odonta.polity.repository.OfficeElectionCandidateRepository;
 import com.odonta.polity.repository.OfficeElectionProposalProjection;
@@ -154,6 +157,8 @@ class MotionServiceTest {
   private final MotionRepository motions = mock(MotionRepository.class);
   private final OfficeElectionBallotRepository officeElectionBallots =
       mock(OfficeElectionBallotRepository.class);
+  private final OfficeElectionBallotPreferenceRepository officeElectionBallotPreferences =
+      mock(OfficeElectionBallotPreferenceRepository.class);
   private final OfficeElectionCandidateRepository officeElectionCandidates =
       mock(OfficeElectionCandidateRepository.class);
   private final OfficeElectionEvaluator officeElections = new OfficeElectionEvaluator();
@@ -206,6 +211,7 @@ class MotionServiceTest {
             Mappers.getMapper(MotionApplicationMapper.class),
             motions,
             officeElectionBallots,
+            officeElectionBallotPreferences,
             officeElectionCandidates,
             officeElections,
             officeElectionProposals,
@@ -489,21 +495,33 @@ class MotionServiceTest {
   }
 
   @Test
-  void rejectsGoverningMotionsUntilPolityReachesFullGovernmentSize() {
+  void rejectsGoverningMotionsWhenProcedureElectorateIsBelowMinimum() {
     UUID polityId = UUID.randomUUID();
     UUID actorUserId = UUID.randomUUID();
     UUID actorMembershipId = UUID.randomUUID();
     Membership actor = member(polityId, actorUserId, actorMembershipId);
     ConstitutionVersion constitution = constitution(polityId, UUID.randomUUID());
+    Jurisdiction jurisdiction = jurisdiction(polityId);
+    Institution assembly = institution(polityId, jurisdiction.getId(), constitution.getId());
+    Procedure procedure =
+        procedure(
+            polityId,
+            UUID.randomUUID(),
+            constitution.getId(),
+            Procedure.ORDINARY_RESOLUTION,
+            "Ordinary resolution",
+            EffectType.ADOPT_RESOLUTION);
+    ReflectionTestUtils.setField(procedure, "minimumElectorCount", 2);
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
     when(polities.constitution(polityId)).thenReturn(constitution);
-    doThrow(
-            ApiException.conflict(
-                "polity_provisional",
-                "This polity needs at least three citizens with political standing before full government motions can be introduced."))
-        .when(polities)
-        .requireFullGovernment(polityId);
+    when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
+    when(polities.institution(eq(polityId), any(Procedure.class))).thenReturn(assembly);
+    when(procedures.findEntityByConstitutionVersionIdAndCode(
+            constitution.getId(), Procedure.ORDINARY_RESOLUTION))
+        .thenReturn(Optional.of(procedure));
+    when(procedureElectorates.electors(eq(procedure), any(OffsetDateTime.class)))
+        .thenReturn(List.of(actor));
 
     assertThatThrownBy(
             () ->
@@ -514,9 +532,10 @@ class MotionServiceTest {
                         "Paint the plaza", "Ceremonially, but enforceably.")))
         .isInstanceOf(ApiException.class)
         .hasMessage(
-            "This polity needs at least three citizens with political standing before full government motions can be introduced.");
+            "This procedure does not have enough eligible electors under the current constitution.");
 
     verify(authority).require(actor, constitution, PowerCode.INTRODUCE_MOTION);
+    verify(motions, never()).saveAndFlush(any());
   }
 
   @Test
@@ -547,7 +566,7 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
     Motion[] saved = new Motion[1];
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
@@ -576,7 +595,11 @@ class MotionServiceTest {
                     projection(
                         OfficeElectionProposalProjection.class,
                         new com.odonta.polity.model.OfficeElectionProposal(
-                            polityId, invocation.getArgument(0), office.getId()))));
+                            polityId,
+                            invocation.getArgument(0),
+                            office.getId(),
+                            1,
+                            OfficeElectionMethod.RANKED_CHOICE))));
     when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
             polityId, com.odonta.polity.model.MembershipStatus.ACTIVE))
         .thenReturn(List.of(actor, candidate));
@@ -598,7 +621,9 @@ class MotionServiceTest {
                         candidateMembershipId,
                         OfficeElectionCandidateStatus.PENDING,
                         null)));
-    when(officeElectionBallots.findEntitiesByMotionId(any(UUID.class))).thenReturn(List.of());
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            any(UUID.class)))
+        .thenReturn(List.of());
 
     var result =
         service.createOfficeElection(
@@ -649,12 +674,9 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
-    OfficeElectionBallot first =
-        new OfficeElectionBallot(
-            polityId, motionId, requesterMembershipId, winnerMembershipId, NOW);
-    OfficeElectionBallot second =
-        new OfficeElectionBallot(polityId, motionId, UUID.randomUUID(), winnerMembershipId, NOW);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
+    Office office = stewardOffice(polityId, constitution.getId(), motion.getJurisdictionId());
+    UUID secondVoterMembershipId = UUID.randomUUID();
 
     when(membershipService.active(polityId, requesterUserId)).thenReturn(requester);
     when(motions.findEntityByIdAndPolityId(motionId, polityId)).thenReturn(Optional.of(motion));
@@ -670,7 +692,25 @@ class MotionServiceTest {
     when(memberships.findEntityById(winnerMembershipId)).thenReturn(Optional.of(winner));
     when(memberships.findEntityById(otherCandidateMembershipId))
         .thenReturn(Optional.of(otherCandidate));
-    when(officeElectionBallots.findEntitiesByMotionId(motionId)).thenReturn(List.of(first, second));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motionId))
+        .thenReturn(
+            List.of(
+                preference(polityId, motionId, requesterMembershipId, winnerMembershipId, 1),
+                preference(polityId, motionId, secondVoterMembershipId, winnerMembershipId, 1)));
+    when(officeElectionProposals.findProjectedByMotionId(motionId))
+        .thenReturn(
+            Optional.of(
+                projection(
+                    OfficeElectionProposalProjection.class,
+                    new com.odonta.polity.model.OfficeElectionProposal(
+                        polityId,
+                        motionId,
+                        office.getId(),
+                        1,
+                        OfficeElectionMethod.RANKED_CHOICE))));
+    when(offices.findEntityByIdAndPolityId(office.getId(), polityId))
+        .thenReturn(Optional.of(office));
     when(certifications.saveAndFlush(any(Certification.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
     when(certifications.findEntityByMotionId(motionId)).thenReturn(Optional.empty());
@@ -684,7 +724,10 @@ class MotionServiceTest {
 
     assertThat(result.status()).isEqualTo(MotionStatus.ENACTED);
     assertThat(result.tally()).isNull();
-    assertThat(result.electionTally().winnerMembershipId()).isEqualTo(winnerMembershipId);
+    assertThat(result.electionTally().winners())
+        .singleElement()
+        .extracting(com.odonta.polity.model.OfficeElectionCandidateTallyResult::membershipId)
+        .isEqualTo(winnerMembershipId);
     ArgumentCaptor<Certification> certificationCaptor =
         ArgumentCaptor.forClass(Certification.class);
     verify(certifications).saveAndFlush(certificationCaptor.capture());
@@ -695,11 +738,43 @@ class MotionServiceTest {
     assertThat(certificationCaptor.getValue().getAbstainCount()).isNull();
     assertThat(certificationCaptor.getValue().getElectionParticipationCount()).isEqualTo(2);
     assertThat(certificationCaptor.getValue().getElectionDecisive()).isTrue();
-    assertThat(certificationCaptor.getValue().getElectionWinnerMembershipId())
+    assertThat(certificationCaptor.getValue().getElectionWinnerCount()).isEqualTo(1);
+    assertThat(certificationCaptor.getValue().getElectionTallySnapshot()).isNotNull();
+    assertThat(certificationCaptor.getValue().getElectionTallySnapshot().winners())
+        .singleElement()
+        .extracting(com.odonta.polity.model.OfficeElectionCandidateTallyResult::membershipId)
         .isEqualTo(winnerMembershipId);
-    assertThat(certificationCaptor.getValue().getElectionWinnerName())
-        .isEqualTo(winner.getDisplayName());
     verify(effects).apply(motion, requester, constitution, NOW);
+
+    OfficeElectionBallot ballot =
+        new OfficeElectionBallot(polityId, motionId, requesterMembershipId, NOW.minusHours(1));
+    when(memberships.findEntityByPolityIdAndUserIdAndStatus(
+            polityId, requesterUserId, MembershipStatus.ACTIVE))
+        .thenReturn(Optional.of(requester));
+    when(certifications.findEntityByMotionId(motionId))
+        .thenReturn(Optional.of(certificationCaptor.getValue()));
+    when(officeElectionBallots.findEntityByMotionIdAndMembershipId(motionId, requesterMembershipId))
+        .thenReturn(Optional.of(ballot));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdAndMembershipIdOrderByRankAsc(
+            motionId, requesterMembershipId))
+        .thenReturn(
+            List.of(
+                preference(polityId, motionId, requesterMembershipId, winnerMembershipId, 1),
+                preference(
+                    polityId, motionId, requesterMembershipId, otherCandidateMembershipId, 2)));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motionId))
+        .thenReturn(List.of());
+
+    var storedResult = service.get(polityId, motionId, requesterUserId);
+
+    assertThat(storedResult.electionTally().winners())
+        .singleElement()
+        .extracting(com.odonta.polity.model.OfficeElectionCandidateTallyResult::membershipId)
+        .isEqualTo(winnerMembershipId);
+    assertThat(storedResult.officeElection().currentBallot().castAt()).isEqualTo(NOW.minusHours(1));
+    assertThat(storedResult.officeElection().currentBallot().candidateMembershipIds())
+        .containsExactly(winnerMembershipId, otherCandidateMembershipId);
   }
 
   @Test
@@ -725,15 +800,12 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
+    Office office = stewardOffice(polityId, constitution.getId(), motion.getJurisdictionId());
     OfficeElectionCandidate disqualifiedCandidate =
         new OfficeElectionCandidate(polityId, motionId, disqualifiedMembershipId);
     OfficeElectionCandidate otherCandidateOption =
         new OfficeElectionCandidate(polityId, motionId, otherCandidateMembershipId);
-    OfficeElectionBallot ballot =
-        new OfficeElectionBallot(
-            polityId, motionId, requesterMembershipId, disqualifiedMembershipId, NOW);
-
     when(membershipService.active(polityId, requesterUserId)).thenReturn(requester);
     when(motions.findEntityByIdAndPolityId(motionId, polityId)).thenReturn(Optional.of(motion));
     when(constitutions.findEntityById(constitution.getId())).thenReturn(Optional.of(constitution));
@@ -750,7 +822,25 @@ class MotionServiceTest {
         .thenReturn(Optional.of(otherCandidate));
     when(membershipService.hasPoliticalStanding(disqualified, NOW)).thenReturn(false);
     when(membershipService.hasPoliticalStanding(otherCandidate, NOW)).thenReturn(true);
-    when(officeElectionBallots.findEntitiesByMotionId(motionId)).thenReturn(List.of(ballot));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motionId))
+        .thenReturn(
+            List.of(
+                preference(
+                    polityId, motionId, requesterMembershipId, disqualifiedMembershipId, 1)));
+    when(officeElectionProposals.findProjectedByMotionId(motionId))
+        .thenReturn(
+            Optional.of(
+                projection(
+                    OfficeElectionProposalProjection.class,
+                    new com.odonta.polity.model.OfficeElectionProposal(
+                        polityId,
+                        motionId,
+                        office.getId(),
+                        1,
+                        OfficeElectionMethod.RANKED_CHOICE))));
+    when(offices.findEntityByIdAndPolityId(office.getId(), polityId))
+        .thenReturn(Optional.of(office));
     when(certifications.saveAndFlush(any(Certification.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
     when(certifications.findEntityByMotionId(motionId)).thenReturn(Optional.empty());
@@ -765,7 +855,7 @@ class MotionServiceTest {
     assertThat(disqualifiedCandidate.getStatus())
         .isEqualTo(OfficeElectionCandidateStatus.DISQUALIFIED);
     assertThat(result.status()).isEqualTo(MotionStatus.REJECTED);
-    assertThat(result.electionTally().winnerMembershipId()).isNull();
+    assertThat(result.electionTally().winners()).isEmpty();
     verify(officeElectionCandidates).saveAllAndFlush(List.of(disqualifiedCandidate));
     verify(effects, never()).apply(motion, requester, constitution, NOW);
   }
@@ -790,7 +880,7 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
 
     when(membershipService.active(polityId, candidateUserId)).thenReturn(candidate);
     when(motions.findEntityByIdAndPolityId(motionId, polityId)).thenReturn(Optional.of(motion));
@@ -807,7 +897,9 @@ class MotionServiceTest {
     when(officeElectionCandidates.findEntitiesByMotionIdAndStatus(
             motionId, OfficeElectionCandidateStatus.ACCEPTED))
         .thenReturn(List.of(candidacy));
-    when(officeElectionBallots.findEntitiesByMotionId(motionId)).thenReturn(List.of());
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motionId))
+        .thenReturn(List.of());
     when(memberships.findEntityById(candidateMembershipId)).thenReturn(Optional.of(candidate));
 
     service.respondOfficeElectionCandidacy(
@@ -880,7 +972,7 @@ class MotionServiceTest {
                     polityId,
                     motionId,
                     new AuthenticatedUser(voterUserId, "subject", "Voter"),
-                    new CastOfficeElectionBallotInput(candidateMembershipId)))
+                    new CastOfficeElectionBallotInput(List.of(candidateMembershipId))))
         .isInstanceOf(ApiException.class)
         .hasMessage("This member is not an accepted candidate in the election.");
   }
@@ -981,7 +1073,7 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
     when(polities.constitution(polityId)).thenReturn(constitution);
@@ -1295,6 +1387,7 @@ class MotionServiceTest {
                     null,
                     null,
                     null,
+                    null,
                     ProcedureElectorate.ACTIVE_MEMBERS,
                     null,
                     null,
@@ -1387,7 +1480,7 @@ class MotionServiceTest {
   }
 
   @Test
-  void rejectsPluralityThresholdOnNonElectionProcedureAmendments() {
+  void rejectsOfficeElectionResultThresholdOnNonElectionProcedureAmendments() {
     UUID polityId = UUID.randomUUID();
     UUID actorUserId = UUID.randomUUID();
     UUID actorMembershipId = UUID.randomUUID();
@@ -1430,14 +1523,15 @@ class MotionServiceTest {
                     polityId,
                     new AuthenticatedUser(actorUserId, "subject", "Requester"),
                     new CreateConstitutionAmendmentMotionInput(
-                        "Plurality everywhere",
-                        "Try to make ordinary motions plurality-based.",
+                        "Election results everywhere",
+                        "Try to make ordinary motions election-result based.",
                         List.of(
                             new com.odonta.polity.model.CreateProcedureChangeInput(
                                 Procedure.ORDINARY_RESOLUTION,
                                 null,
                                 null,
-                                VotingThreshold.PLURALITY_CAST,
+                                VotingThreshold.OFFICE_ELECTION_RESULT,
+                                null,
                                 null,
                                 null,
                                 null,
@@ -1446,11 +1540,12 @@ class MotionServiceTest {
                         null,
                         null)))
         .isInstanceOf(ApiException.class)
-        .hasMessage("Plurality thresholds can only be used by office election procedures.");
+        .hasMessage(
+            "Office-election result thresholds can only be used by office election procedures.");
   }
 
   @Test
-  void rejectsNonPluralityThresholdOnOfficeElectionProcedureAmendments() {
+  void rejectsNonElectionResultThresholdOnOfficeElectionProcedureAmendments() {
     UUID polityId = UUID.randomUUID();
     UUID actorUserId = UUID.randomUUID();
     UUID actorMembershipId = UUID.randomUUID();
@@ -1475,7 +1570,7 @@ class MotionServiceTest {
             Procedure.OFFICE_ELECTION,
             "Office election",
             EffectType.ELECT_OFFICE,
-            VotingThreshold.PLURALITY_CAST);
+            VotingThreshold.OFFICE_ELECTION_RESULT);
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
     when(polities.constitution(polityId)).thenReturn(constitution);
@@ -1506,15 +1601,16 @@ class MotionServiceTest {
                                 null,
                                 null,
                                 null,
+                                null,
                                 null)),
                         null,
                         null)))
         .isInstanceOf(ApiException.class)
-        .hasMessage("Office election procedures must use plurality thresholds.");
+        .hasMessage("Office election procedures must use office-election result thresholds.");
   }
 
   @Test
-  void rejectsAmendmentsThatMoveOfficeElectionInitiativeOutOfCitizenHands() {
+  void rejectsAmendmentsThatMoveDisbandmentOutOfCitizenHands() {
     UUID polityId = UUID.randomUUID();
     UUID actorUserId = UUID.randomUUID();
     UUID actorMembershipId = UUID.randomUUID();
@@ -1532,12 +1628,12 @@ class MotionServiceTest {
             "Constitutional amendment",
             EffectType.AMEND_CONSTITUTION);
     Office steward = stewardOffice(polityId, constitution.getId(), jurisdiction.getId());
-    ConstitutionalPower officeElection =
+    ConstitutionalPower disbandment =
         new ConstitutionalPower(
             polityId,
             constitution.getId(),
-            PowerCode.INTRODUCE_OFFICE_ELECTION,
-            "Propose office elections",
+            PowerCode.INTRODUCE_DISBANDMENT,
+            "Propose disbandment",
             PowerHolderScope.ACTIVE_MEMBER);
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
@@ -1550,7 +1646,7 @@ class MotionServiceTest {
     when(offices.findEntitiesByConstitutionVersionIdOrderByName(constitution.getId()))
         .thenReturn(List.of(steward));
     when(powers.findEntitiesByConstitutionVersionId(constitution.getId()))
-        .thenReturn(List.of(officeElection));
+        .thenReturn(List.of(disbandment));
 
     assertThatThrownBy(
             () ->
@@ -1559,17 +1655,16 @@ class MotionServiceTest {
                     new AuthenticatedUser(actorUserId, "subject", "Requester"),
                     new CreateConstitutionAmendmentMotionInput(
                         "Gate elections",
-                        "Try to move election initiative to the Steward.",
+                        "Try to move disbandment to the Steward.",
                         null,
                         null,
                         List.of(
                             new CreatePowerChangeInput(
-                                PowerCode.INTRODUCE_OFFICE_ELECTION,
+                                PowerCode.INTRODUCE_DISBANDMENT,
                                 PowerHolderScope.OFFICE,
                                 Office.STEWARD)))))
         .isInstanceOf(ApiException.class)
-        .hasMessage(
-            "Member initiative, election, appeal, amendment, disbandment, and certification powers must remain active citizen powers.");
+        .hasMessage("Disbandment must remain an active citizen power.");
 
     verify(motions, never()).saveAndFlush(any());
   }
@@ -1753,7 +1848,7 @@ class MotionServiceTest {
   }
 
   @Test
-  void rejectsReducingOfficeSeatsBelowProcedureMinimumElectorate() {
+  void allowsReducingOfficeSeatsBelowProcedureMinimumElectorate() {
     UUID polityId = UUID.randomUUID();
     UUID actorUserId = UUID.randomUUID();
     UUID actorMembershipId = UUID.randomUUID();
@@ -1805,6 +1900,7 @@ class MotionServiceTest {
             "Decides reviews.",
             14,
             3);
+    Motion[] saved = new Motion[1];
 
     when(membershipService.active(polityId, actorUserId)).thenReturn(actor);
     when(polities.constitution(polityId)).thenReturn(constitution);
@@ -1820,30 +1916,36 @@ class MotionServiceTest {
     when(offices.findEntitiesByConstitutionVersionIdOrderByName(constitution.getId()))
         .thenReturn(List.of(magistrate));
     when(powers.findEntitiesByConstitutionVersionId(constitution.getId())).thenReturn(List.of());
+    when(motions.saveAndFlush(any(Motion.class)))
+        .thenAnswer(
+            invocation -> {
+              saved[0] = withId(invocation.getArgument(0));
+              return saved[0];
+            });
+    when(procedureElectorates.electors(eq(amendmentProcedure), any(OffsetDateTime.class)))
+        .thenReturn(List.of(actor));
+    when(amendmentProposals.saveAndFlush(any()))
+        .thenAnswer(invocation -> withId(invocation.getArgument(0)));
+    when(motions.findProjectedByIdAndPolityId(any(UUID.class), eq(polityId)))
+        .thenAnswer(invocation -> Optional.of(projection(saved[0], amendmentProcedure)));
+    when(certifications.findEntityByMotionId(any(UUID.class))).thenReturn(Optional.empty());
+    when(electors.countByMotionId(any(UUID.class))).thenReturn(1L);
+    when(votes.findEntitiesByMotionId(any(UUID.class))).thenReturn(List.of());
 
-    assertThatThrownBy(
-            () ->
-                service.createAmendment(
-                    polityId,
-                    new AuthenticatedUser(actorUserId, "subject", "Requester"),
-                    new CreateConstitutionAmendmentMotionInput(
-                        "Shrink the bench",
-                        "Reduce the court below its own review minimum.",
-                        null,
-                        List.of(
-                            new CreateOfficeChangeInput(
-                                ConstitutionOfficeChangeAction.REVISE,
-                                Office.MAGISTRATE,
-                                null,
-                                null,
-                                null,
-                                1)),
-                        null)))
-        .isInstanceOf(ApiException.class)
-        .hasMessage(
-            "Office-held procedure electorates must have enough seats for their minimum electorate.");
+    service.createAmendment(
+        polityId,
+        new AuthenticatedUser(actorUserId, "subject", "Requester"),
+        new CreateConstitutionAmendmentMotionInput(
+            "Shrink the bench",
+            "Reduce the court below its own review minimum.",
+            null,
+            List.of(
+                new CreateOfficeChangeInput(
+                    ConstitutionOfficeChangeAction.REVISE, Office.MAGISTRATE, null, null, null, 1)),
+            null));
 
-    verify(motions, never()).saveAndFlush(any());
+    verify(motions).saveAndFlush(any());
+    verify(officeChangeProposals).saveAllAndFlush(any());
   }
 
   @Test
@@ -1901,7 +2003,6 @@ class MotionServiceTest {
     verify(motions).saveAndFlush(motionCaptor.capture());
     assertThat(motionCaptor.getValue().getEffectType()).isEqualTo(EffectType.GRANT_APPEAL);
     verify(authority).require(actor, constitution, PowerCode.INTRODUCE_APPEAL);
-    verify(polities).requireFullGovernment(polityId);
   }
 
   @Test
@@ -2022,7 +2123,6 @@ class MotionServiceTest {
 
     verify(authority).requireOwnAppealIntroduction(actor, constitution);
     verify(authority, never()).require(actor, constitution, PowerCode.INTRODUCE_APPEAL);
-    verify(polities, never()).requireFullGovernment(polityId);
   }
 
   @Test
@@ -2146,7 +2246,6 @@ class MotionServiceTest {
             new CreateOfficeTermReviewMotionInput(term.getId(), "Contested authority"));
 
     verify(authority).require(actor, constitution, PowerCode.INTRODUCE_OFFICE_TERM_REVIEW);
-    verify(polities).requireFullGovernment(polityId);
     verify(officeTermReviewProposals).saveAndFlush(any());
     verify(electors)
         .saveAllAndFlush(
@@ -2293,7 +2392,6 @@ class MotionServiceTest {
             new CreateConstitutionalReviewMotionInput(targetRecordId, "Wrong authority"));
 
     verify(authority).require(actor, constitution, PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW);
-    verify(polities).requireFullGovernment(polityId);
     verify(constitutionalReviewProposals).saveAndFlush(any());
     verify(electors)
         .saveAllAndFlush(
@@ -2721,6 +2819,12 @@ class MotionServiceTest {
       ReflectionTestUtils.setField(entity, "id", UUID.randomUUID());
     }
     return entity;
+  }
+
+  private OfficeElectionBallotPreference preference(
+      UUID polityId, UUID motionId, UUID voterId, UUID candidateId, int rank) {
+    return new OfficeElectionBallotPreference(
+        polityId, motionId, UUID.randomUUID(), voterId, candidateId, rank);
   }
 
   private static <T> T projection(Class<T> type, Object source) {

@@ -1,16 +1,20 @@
 package com.odonta.polity.model;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 public record OfficeElectionTallyResult(
     int eligible,
     int participation,
     int quorumRequired,
     boolean quorumMet,
+    int seatsAvailable,
+    int seatsFilled,
+    OfficeElectionMethod method,
+    BigDecimal quota,
     boolean decisive,
     boolean passed,
-    UUID winnerMembershipId,
-    String winnerName,
     OfficeElectionOutcomeReason outcomeReason,
-    List<OfficeElectionCandidateTallyResult> candidates) {}
+    List<OfficeElectionCandidateTallyResult> winners,
+    List<OfficeElectionCandidateTallyResult> candidates,
+    List<OfficeElectionRoundResult> rounds) {}

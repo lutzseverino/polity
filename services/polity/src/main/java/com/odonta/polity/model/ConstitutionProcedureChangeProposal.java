@@ -43,6 +43,10 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
   private VotingThreshold threshold;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "office_election_method")
+  private OfficeElectionMethod officeElectionMethod;
+
+  @Enumerated(EnumType.STRING)
   @Column(name = "electorate")
   private ProcedureElectorate electorate;
 
@@ -66,6 +70,7 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
       Integer quorumNumerator,
       Integer quorumDenominator,
       VotingThreshold threshold,
+      OfficeElectionMethod officeElectionMethod,
       ProcedureElectorate electorate,
       String electorateOfficeCode,
       Integer minimumElectorCount,
@@ -78,6 +83,7 @@ public class ConstitutionProcedureChangeProposal extends AuditedEntity {
     this.quorumNumerator = quorumNumerator;
     this.quorumDenominator = quorumDenominator;
     this.threshold = threshold;
+    this.officeElectionMethod = officeElectionMethod;
     this.electorate = electorate;
     this.electorateOfficeCode = electorateOfficeCode;
     this.minimumElectorCount = minimumElectorCount;

@@ -8,4 +8,7 @@ public record OfficeElectionResult(
     String officeCode,
     String officeName,
     String officeNameKey,
+    int seatsAvailable,
+    OfficeElectionMethod method,
+    OfficeElectionBallotResult currentBallot,
     List<OfficeElectionCandidateResult> candidates) {}

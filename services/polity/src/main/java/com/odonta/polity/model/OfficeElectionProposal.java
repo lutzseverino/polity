@@ -3,6 +3,8 @@ package com.odonta.polity.model;
 import com.odonta.common.data.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -27,9 +29,23 @@ public class OfficeElectionProposal extends AuditedEntity {
   @Column(name = "office_id", nullable = false)
   private UUID officeId;
 
-  public OfficeElectionProposal(UUID polityId, UUID motionId, UUID officeId) {
+  @Column(name = "seats_available", nullable = false)
+  private int seatsAvailable;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "method", nullable = false)
+  private OfficeElectionMethod method;
+
+  public OfficeElectionProposal(
+      UUID polityId,
+      UUID motionId,
+      UUID officeId,
+      int seatsAvailable,
+      OfficeElectionMethod method) {
     this.polityId = polityId;
     this.motionId = motionId;
     this.officeId = officeId;
+    this.seatsAvailable = seatsAvailable;
+    this.method = method;
   }
 }

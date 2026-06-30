@@ -13,6 +13,8 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Entity
@@ -52,11 +54,12 @@ public class Certification extends AuditedEntity {
   @Column(name = "election_decisive")
   private Boolean electionDecisive;
 
-  @Column(name = "election_winner_membership_id")
-  private UUID electionWinnerMembershipId;
+  @Column(name = "election_winner_count")
+  private Integer electionWinnerCount;
 
-  @Column(name = "election_winner_name")
-  private String electionWinnerName;
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "election_tally_snapshot", columnDefinition = "jsonb")
+  private OfficeElectionTallyResult electionTallySnapshot;
 
   @Column(name = "quorum_required", nullable = false)
   private int quorumRequired;
@@ -93,8 +96,8 @@ public class Certification extends AuditedEntity {
     this.abstainCount = result.abstain();
     this.electionParticipationCount = null;
     this.electionDecisive = null;
-    this.electionWinnerMembershipId = null;
-    this.electionWinnerName = null;
+    this.electionWinnerCount = null;
+    this.electionTallySnapshot = null;
     this.quorumRequired = result.quorumRequired();
     this.quorumMet = result.quorumMet();
     this.thresholdMet = result.thresholdMet();
@@ -119,8 +122,8 @@ public class Certification extends AuditedEntity {
     this.abstainCount = null;
     this.electionParticipationCount = result.participation();
     this.electionDecisive = result.decisive();
-    this.electionWinnerMembershipId = result.winnerMembershipId();
-    this.electionWinnerName = result.winnerName();
+    this.electionWinnerCount = result.seatsFilled();
+    this.electionTallySnapshot = result;
     this.quorumRequired = result.quorumRequired();
     this.quorumMet = result.quorumMet();
     this.thresholdMet = result.decisive();
@@ -142,7 +145,7 @@ public class Certification extends AuditedEntity {
     return switch (result.outcomeReason()) {
       case PASSED -> CertificationOutcomeReason.PASSED;
       case QUORUM_NOT_MET -> CertificationOutcomeReason.QUORUM_NOT_MET;
-      case NO_DECISIVE_PLURALITY -> CertificationOutcomeReason.NO_DECISIVE_PLURALITY;
+      case NO_DECISIVE_RESULT -> CertificationOutcomeReason.NO_DECISIVE_RESULT;
     };
   }
 }

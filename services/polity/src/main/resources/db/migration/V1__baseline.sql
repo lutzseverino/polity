@@ -61,11 +61,11 @@ CREATE TABLE public.certifications (
     modality text DEFAULT 'YES_NO'::text NOT NULL,
     election_participation_count integer,
     election_decisive boolean,
-    election_winner_membership_id uuid,
-    election_winner_name text,
-    CONSTRAINT certifications_outcome_reason_check CHECK ((outcome_reason = ANY (ARRAY['PASSED'::text, 'QUORUM_NOT_MET'::text, 'THRESHOLD_NOT_MET'::text, 'NO_DECISIVE_PLURALITY'::text]))),
+    election_winner_count integer,
+    election_tally_snapshot jsonb,
+    CONSTRAINT certifications_outcome_reason_check CHECK ((outcome_reason = ANY (ARRAY['PASSED'::text, 'QUORUM_NOT_MET'::text, 'THRESHOLD_NOT_MET'::text, 'NO_DECISIVE_RESULT'::text]))),
     CONSTRAINT chk_certification_modality CHECK ((modality = ANY (ARRAY['YES_NO'::text, 'OFFICE_ELECTION'::text]))),
-    CONSTRAINT chk_certification_yes_no_counts CHECK ((((modality = 'YES_NO'::text) AND (yes_count IS NOT NULL) AND (no_count IS NOT NULL) AND (abstain_count IS NOT NULL) AND (election_participation_count IS NULL) AND (election_decisive IS NULL) AND (election_winner_membership_id IS NULL) AND (election_winner_name IS NULL)) OR ((modality = 'OFFICE_ELECTION'::text) AND (yes_count IS NULL) AND (no_count IS NULL) AND (abstain_count IS NULL) AND (election_participation_count IS NOT NULL) AND (election_decisive IS NOT NULL) AND ((passed = false) OR (election_winner_membership_id IS NOT NULL)) AND ((passed = false) OR (election_winner_name IS NOT NULL)))))
+    CONSTRAINT chk_certification_yes_no_counts CHECK ((((modality = 'YES_NO'::text) AND (yes_count IS NOT NULL) AND (no_count IS NOT NULL) AND (abstain_count IS NOT NULL) AND (election_participation_count IS NULL) AND (election_decisive IS NULL) AND (election_winner_count IS NULL) AND (election_tally_snapshot IS NULL)) OR ((modality = 'OFFICE_ELECTION'::text) AND (yes_count IS NULL) AND (no_count IS NULL) AND (abstain_count IS NULL) AND (election_participation_count IS NOT NULL) AND (election_decisive IS NOT NULL) AND (election_winner_count IS NOT NULL) AND (election_tally_snapshot IS NOT NULL) AND ((passed = false) OR (election_winner_count > 0)))))
 );
 
 CREATE TABLE public.constitution_amendment_proposals (
@@ -109,7 +109,7 @@ CREATE TABLE public.constitution_institution_change_proposals (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT constitution_institution_change_proposals_action_check CHECK ((action = ANY (ARRAY['CREATE'::text, 'REVISE'::text, 'RETIRE'::text]))),
-    CONSTRAINT constitution_institution_change_proposals_kind_check CHECK (((kind IS NULL) OR (kind = ANY (ARRAY['ASSEMBLY'::text, 'JUDICIARY'::text])))),
+    CONSTRAINT constitution_institution_change_proposals_kind_check CHECK (((kind IS NULL) OR (kind = ANY (ARRAY['ASSEMBLY'::text, 'COUNCIL'::text, 'JUDICIARY'::text])))),
     CONSTRAINT chk_constitution_institution_change_fields CHECK ((((action = 'CREATE'::text) AND (institution_id IS NULL) AND (jurisdiction_id IS NOT NULL) AND (name IS NOT NULL) AND (kind IS NOT NULL)) OR ((action = 'REVISE'::text) AND (institution_id IS NOT NULL) AND ((jurisdiction_id IS NOT NULL) OR (name IS NOT NULL) OR (kind IS NOT NULL))) OR ((action = 'RETIRE'::text) AND (institution_id IS NOT NULL) AND (jurisdiction_id IS NULL) AND (name IS NULL) AND (kind IS NULL))))
 );
 
@@ -136,6 +136,7 @@ CREATE TABLE public.constitution_procedure_change_proposals (
     quorum_numerator integer,
     quorum_denominator integer,
     threshold text,
+    office_election_method text,
     minimum_notice_hours integer,
     voting_period_hours integer,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -150,7 +151,8 @@ CREATE TABLE public.constitution_procedure_change_proposals (
     CONSTRAINT constitution_procedure_change_propos_minimum_notice_hours_check CHECK (((minimum_notice_hours IS NULL) OR (minimum_notice_hours >= 0))),
     CONSTRAINT constitution_procedure_change_proposa_voting_period_hours_check CHECK (((voting_period_hours IS NULL) OR (voting_period_hours > 0))),
     CONSTRAINT constitution_procedure_change_proposals_check CHECK ((((quorum_numerator IS NULL) AND (quorum_denominator IS NULL)) OR ((quorum_numerator > 0) AND (quorum_denominator > 0) AND (quorum_numerator <= quorum_denominator)))),
-    CONSTRAINT constitution_procedure_change_proposals_threshold_check CHECK (((threshold IS NULL) OR (threshold = ANY (ARRAY['SIMPLE_MAJORITY_CAST'::text, 'MAJORITY_OF_ELIGIBLE'::text, 'TWO_THIRDS_CAST'::text, 'TWO_THIRDS_ELIGIBLE'::text, 'PLURALITY_CAST'::text]))))
+    CONSTRAINT constitution_procedure_change_proposals_method_check CHECK (((office_election_method IS NULL) OR (office_election_method = ANY (ARRAY['PLURALITY'::text, 'RANKED_CHOICE'::text])))),
+    CONSTRAINT constitution_procedure_change_proposals_threshold_check CHECK (((threshold IS NULL) OR (threshold = ANY (ARRAY['SIMPLE_MAJORITY_CAST'::text, 'MAJORITY_OF_ELIGIBLE'::text, 'TWO_THIRDS_CAST'::text, 'TWO_THIRDS_ELIGIBLE'::text, 'OFFICE_ELECTION_RESULT'::text]))))
 );
 
 CREATE TABLE public.constitution_versions (
@@ -219,7 +221,7 @@ CREATE TABLE public.institutions (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     name_key text,
-    CONSTRAINT institutions_kind_check CHECK ((kind = ANY (ARRAY['ASSEMBLY'::text, 'JUDICIARY'::text])))
+    CONSTRAINT institutions_kind_check CHECK ((kind = ANY (ARRAY['ASSEMBLY'::text, 'COUNCIL'::text, 'JUDICIARY'::text])))
 );
 
 CREATE TABLE public.jurisdictions (
@@ -304,10 +306,22 @@ CREATE TABLE public.office_election_ballots (
     polity_id uuid NOT NULL,
     motion_id uuid NOT NULL,
     membership_id uuid NOT NULL,
-    candidate_membership_id uuid NOT NULL,
     cast_at timestamp with time zone NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+CREATE TABLE public.office_election_ballot_preferences (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    polity_id uuid NOT NULL,
+    motion_id uuid NOT NULL,
+    ballot_id uuid NOT NULL,
+    membership_id uuid NOT NULL,
+    candidate_membership_id uuid NOT NULL,
+    rank integer NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT office_election_ballot_preferences_rank_check CHECK ((rank > 0))
 );
 
 CREATE TABLE public.office_election_candidates (
@@ -327,8 +341,11 @@ CREATE TABLE public.office_election_proposals (
     polity_id uuid NOT NULL,
     motion_id uuid NOT NULL,
     office_id uuid NOT NULL,
+    seats_available integer NOT NULL,
+    method text DEFAULT 'RANKED_CHOICE'::text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT office_election_proposals_method_check CHECK ((method = ANY (ARRAY['PLURALITY'::text, 'RANKED_CHOICE'::text])))
 );
 
 CREATE TABLE public.office_term_review_proposals (
@@ -459,12 +476,14 @@ CREATE TABLE public.procedures (
     electorate text DEFAULT 'ACTIVE_MEMBERS'::text NOT NULL,
     electorate_office_code text,
     minimum_elector_count integer DEFAULT 1 NOT NULL,
+    office_election_method text,
     CONSTRAINT chk_procedure_effect_type CHECK ((effect_type = ANY (ARRAY['ADOPT_RESOLUTION'::text, 'ELECT_OFFICE'::text, 'APPLY_SANCTION'::text, 'GRANT_APPEAL'::text, 'VACATE_OFFICE_TERM'::text, 'VOID_OFFICIAL_ACT'::text, 'AMEND_CONSTITUTION'::text, 'DISBAND_POLITY'::text]))),
     CONSTRAINT chk_procedure_electorate CHECK ((electorate = ANY (ARRAY['ACTIVE_MEMBERS'::text, 'OFFICE_HOLDERS'::text]))),
     CONSTRAINT chk_procedure_electorate_office CHECK ((((electorate = 'OFFICE_HOLDERS'::text) AND (electorate_office_code IS NOT NULL)) OR ((electorate <> 'OFFICE_HOLDERS'::text) AND (electorate_office_code IS NULL)))),
     CONSTRAINT chk_procedure_electorate_office_code CHECK (((electorate_office_code IS NULL) OR (electorate_office_code ~ '^[a-z][a-z0-9-]*$'::text))),
     CONSTRAINT chk_procedure_minimum_elector_count CHECK ((minimum_elector_count > 0)),
-    CONSTRAINT chk_procedure_threshold CHECK ((threshold = ANY (ARRAY['SIMPLE_MAJORITY_CAST'::text, 'MAJORITY_OF_ELIGIBLE'::text, 'TWO_THIRDS_CAST'::text, 'TWO_THIRDS_ELIGIBLE'::text, 'PLURALITY_CAST'::text]))),
+    CONSTRAINT chk_procedure_office_election_method CHECK ((((effect_type = 'ELECT_OFFICE'::text) AND (office_election_method IS NOT NULL) AND (office_election_method = ANY (ARRAY['PLURALITY'::text, 'RANKED_CHOICE'::text]))) OR ((effect_type <> 'ELECT_OFFICE'::text) AND (office_election_method IS NULL)))),
+    CONSTRAINT chk_procedure_threshold CHECK ((threshold = ANY (ARRAY['SIMPLE_MAJORITY_CAST'::text, 'MAJORITY_OF_ELIGIBLE'::text, 'TWO_THIRDS_CAST'::text, 'TWO_THIRDS_ELIGIBLE'::text, 'OFFICE_ELECTION_RESULT'::text]))),
     CONSTRAINT chk_procedure_timing CHECK (((minimum_notice_hours >= 0) AND (voting_period_hours > 0))),
     CONSTRAINT procedures_check CHECK (((quorum_numerator > 0) AND (quorum_denominator > 0) AND (quorum_numerator <= quorum_denominator)))
 );
@@ -656,6 +675,15 @@ ALTER TABLE ONLY public.office_election_ballots
 
 ALTER TABLE ONLY public.office_election_ballots
     ADD CONSTRAINT office_election_ballots_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_ballot_id_rank_key UNIQUE (ballot_id, rank);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_ballot_id_candidate_membership_id_key UNIQUE (ballot_id, candidate_membership_id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.office_election_candidates
     ADD CONSTRAINT office_election_candidates_motion_id_membership_id_key UNIQUE (motion_id, membership_id);
@@ -941,12 +969,6 @@ ALTER TABLE ONLY public.motions
     ADD CONSTRAINT motions_polity_id_procedure_id_fkey FOREIGN KEY (polity_id, procedure_id) REFERENCES public.procedures(polity_id, id);
 
 ALTER TABLE ONLY public.office_election_ballots
-    ADD CONSTRAINT office_election_ballots_motion_id_candidate_membership_id_fkey FOREIGN KEY (motion_id, candidate_membership_id) REFERENCES public.office_election_candidates(motion_id, membership_id);
-
-ALTER TABLE ONLY public.office_election_ballots
-    ADD CONSTRAINT office_election_ballots_polity_id_candidate_membership_id_fkey FOREIGN KEY (polity_id, candidate_membership_id) REFERENCES public.memberships(polity_id, id);
-
-ALTER TABLE ONLY public.office_election_ballots
     ADD CONSTRAINT office_election_ballots_polity_id_fkey FOREIGN KEY (polity_id) REFERENCES public.polities(id);
 
 ALTER TABLE ONLY public.office_election_ballots
@@ -954,6 +976,24 @@ ALTER TABLE ONLY public.office_election_ballots
 
 ALTER TABLE ONLY public.office_election_ballots
     ADD CONSTRAINT office_election_ballots_polity_id_motion_id_fkey FOREIGN KEY (polity_id, motion_id) REFERENCES public.motions(polity_id, id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_ballot_id_fkey FOREIGN KEY (ballot_id) REFERENCES public.office_election_ballots(id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_motion_id_candidate_membership_id_fkey FOREIGN KEY (motion_id, candidate_membership_id) REFERENCES public.office_election_candidates(motion_id, membership_id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_polity_id_fkey FOREIGN KEY (polity_id) REFERENCES public.polities(id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_polity_id_candidate_membership_id_fkey FOREIGN KEY (polity_id, candidate_membership_id) REFERENCES public.memberships(polity_id, id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_polity_id_membership_id_fkey FOREIGN KEY (polity_id, membership_id) REFERENCES public.memberships(polity_id, id);
+
+ALTER TABLE ONLY public.office_election_ballot_preferences
+    ADD CONSTRAINT office_election_ballot_preferences_polity_id_motion_id_fkey FOREIGN KEY (polity_id, motion_id) REFERENCES public.motions(polity_id, id);
 
 ALTER TABLE ONLY public.office_election_candidates
     ADD CONSTRAINT office_election_candidates_polity_id_fkey FOREIGN KEY (polity_id) REFERENCES public.polities(id);

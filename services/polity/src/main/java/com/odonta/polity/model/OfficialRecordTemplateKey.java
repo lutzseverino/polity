@@ -21,6 +21,7 @@ public enum OfficialRecordTemplateKey {
   OFFICIAL_ACT_VOIDED("official_record.official_act_voided"),
   OFFICE_ELECTION_BALLOT_CAST("official_record.office_election_ballot_cast"),
   POLITY_DISBANDED("official_record.polity_disbanded"),
+  POLITY_DISBANDED_BY_LAST_RESIGNATION("official_record.polity_disbanded_by_last_resignation"),
   POLITY_FOUNDED("official_record.polity_founded"),
   RESOLUTION_ADOPTED("official_record.resolution_adopted"),
   SANCTION_APPLIED("official_record.sanction_applied"),

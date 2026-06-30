@@ -30,6 +30,8 @@ import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.CreatePolityInput;
 import com.odonta.polity.model.EffectType;
+import com.odonta.polity.model.GovernmentReadinessDiagnostic;
+import com.odonta.polity.model.GovernmentReadinessStatus;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.InstitutionTemplateKey;
@@ -73,6 +75,7 @@ import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
+import com.odonta.polity.resolver.GovernmentAssessmentResolver;
 import com.odonta.polity.resolver.ProcedureElectorateResolver;
 import com.odonta.polity.template.ConstitutionTemplateSeeder;
 import java.lang.reflect.Proxy;
@@ -110,10 +113,23 @@ class PolityServiceTest {
   private final Grants grants = mock(Grants.class);
   private final BillingEntitlementsClient entitlements = mock(BillingEntitlementsClient.class);
   private final IdentityUsersClient identityUsers = mock(IdentityUsersClient.class);
+  private GovernmentAssessmentResolver governmentAssessments;
   private PolityService service;
 
   @BeforeEach
   void setUp() {
+    ProcedureElectorateResolver procedureElectorates =
+        new ProcedureElectorateResolver(memberships, membershipService, officeTerms);
+    governmentAssessments =
+        new GovernmentAssessmentResolver(
+            Clock.fixed(NOW.toInstant(), ZoneOffset.UTC),
+            powers,
+            memberships,
+            membershipService,
+            offices,
+            officeTerms,
+            procedureElectorates,
+            procedures);
     service =
         new PolityService(
             Clock.fixed(NOW.toInstant(), ZoneOffset.UTC),
@@ -126,6 +142,7 @@ class PolityServiceTest {
             constitutions,
             powers,
             grants,
+            governmentAssessments,
             identityUsers,
             Mappers.getMapper(PolityApplicationMapper.class),
             institutions,
@@ -139,7 +156,7 @@ class PolityServiceTest {
             mock(OfficialRecordService.class),
             new PolityGrantPlanner(),
             polities,
-            new ProcedureElectorateResolver(memberships, membershipService, officeTerms),
+            procedureElectorates,
             procedures,
             sanctions);
     when(membershipService.hasPoliticalStanding(any(UUID.class), any(OffsetDateTime.class)))
@@ -383,13 +400,18 @@ class PolityServiceTest {
             polityId, MembershipStatus.ACTIVE))
         .thenReturn(List.of(member));
     when(membershipService.hasPoliticalStanding(member, NOW)).thenReturn(true);
+    stubOfficeHolderProcedure(
+        constitution, Procedure.ORDINARY_RESOLUTION, EffectType.ADOPT_RESOLUTION);
     stubActiveMemberProcedure(constitution, Procedure.DISBANDMENT, EffectType.DISBAND_POLITY);
 
     var result = service.getActionAvailability(polityId, userId);
 
+    assertThat(result.readiness().status()).isEqualTo(GovernmentReadinessStatus.PROVISIONAL);
+    assertThat(result.readiness().diagnostics())
+        .containsExactly(GovernmentReadinessDiagnostic.NEEDS_MORE_STANDING_MEMBERS);
     assertThat(result.inviteMembers().available()).isTrue();
     assertThat(result.introduceMotion().available()).isFalse();
-    assertThat(result.introduceMotion().reason()).isEqualTo("polity_provisional");
+    assertThat(result.introduceMotion().reason()).isEqualTo("procedure_electorate_office_vacant");
     assertThat(result.introduceSanction().available()).isFalse();
     assertThat(result.introduceSanction().reason()).isEqualTo("constitutional_office_vacant");
     assertThat(result.introduceDisbandment().available()).isTrue();
@@ -733,11 +755,13 @@ class PolityServiceTest {
     when(membershipService.hasPoliticalStanding(second, NOW)).thenReturn(true);
     when(membershipService.hasPoliticalStanding(suspended, NOW)).thenReturn(false);
     when(membershipService.hasPoliticalStanding(suspended.getId(), NOW)).thenReturn(false);
+    stubOfficeHolderProcedure(
+        constitution, Procedure.ORDINARY_RESOLUTION, EffectType.ADOPT_RESOLUTION);
 
     var result = service.getActionAvailability(polityId, userId);
 
     assertThat(result.introduceMotion().available()).isFalse();
-    assertThat(result.introduceMotion().reason()).isEqualTo("polity_provisional");
+    assertThat(result.introduceMotion().reason()).isEqualTo("procedure_electorate_office_vacant");
     assertThat(result.introduceDisbandment().available()).isTrue();
   }
 
@@ -786,47 +810,15 @@ class PolityServiceTest {
     when(officeTerms.findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
             polityId, Office.MAGISTRATE, OfficeTermStatus.ACTIVE, NOW))
         .thenReturn(List.of(term));
-    when(membershipService.get(magistrateMembershipId)).thenReturn(magistrate);
+    when(memberships.findEntityById(magistrateMembershipId)).thenReturn(Optional.of(magistrate));
     when(membershipService.hasPoliticalStanding(magistrate, NOW)).thenReturn(true);
 
     ActionAvailabilityResult result =
-        service.procedureElectorateAvailability(
+        governmentAssessments.procedureAvailability(
             polityId, constitution, Procedure.CONSTITUTIONAL_REVIEW);
 
     assertThat(result.available()).isFalse();
     assertThat(result.reason()).isEqualTo("procedure_electorate_below_minimum");
-  }
-
-  @Test
-  void requireFullGovernmentRejectsProvisionalPolities() {
-    UUID polityId = UUID.randomUUID();
-    Membership first = member(polityId, UUID.randomUUID());
-    Membership second = member(polityId, UUID.randomUUID());
-    when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
-            polityId, MembershipStatus.ACTIVE))
-        .thenReturn(List.of(first, second));
-    when(membershipService.hasPoliticalStanding(any(Membership.class), any(OffsetDateTime.class)))
-        .thenReturn(true);
-
-    assertThatThrownBy(() -> service.requireFullGovernment(polityId))
-        .isInstanceOf(ApiException.class)
-        .hasMessage(
-            "This polity needs at least three citizens with political standing before full government motions can be introduced.");
-  }
-
-  @Test
-  void requireFullGovernmentAllowsThreeStandingMembers() {
-    UUID polityId = UUID.randomUUID();
-    Membership first = member(polityId, UUID.randomUUID());
-    Membership second = member(polityId, UUID.randomUUID());
-    Membership third = member(polityId, UUID.randomUUID());
-    when(memberships.findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
-            polityId, MembershipStatus.ACTIVE))
-        .thenReturn(List.of(first, second, third));
-    when(membershipService.hasPoliticalStanding(any(Membership.class), any(OffsetDateTime.class)))
-        .thenReturn(true);
-
-    service.requireFullGovernment(polityId);
   }
 
   @Test

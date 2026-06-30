@@ -18,4 +18,6 @@ public interface OfficeRepository extends JpaRepository<Office, UUID> {
 
   Optional<Office> findEntityByConstitutionVersionIdAndCode(
       UUID constitutionVersionId, String code);
+
+  boolean existsByConstitutionVersionIdAndCode(UUID constitutionVersionId, String code);
 }

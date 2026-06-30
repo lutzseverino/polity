@@ -1,6 +1,8 @@
 package com.odonta.polity.model;
 
 public record PolityActionAvailabilityResult(
+    GovernmentReadinessResult readiness,
+    ConstitutionalHealthResult constitutionalHealth,
     ActionAvailabilityResult inviteMembers,
     ActionAvailabilityResult introduceMotion,
     ActionAvailabilityResult introduceOfficeElection,

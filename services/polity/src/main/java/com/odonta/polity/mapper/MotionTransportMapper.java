@@ -16,6 +16,8 @@ import com.odonta.polity.api.model.CreatePowerChangeRequest;
 import com.odonta.polity.api.model.CreateProcedureChangeRequest;
 import com.odonta.polity.api.model.CreateSanctionMotionRequest;
 import com.odonta.polity.api.model.MotionResponse;
+import com.odonta.polity.api.model.OfficeElectionCandidateRoundTallyResponse;
+import com.odonta.polity.api.model.OfficeElectionRoundResponse;
 import com.odonta.polity.api.model.RespondOfficeElectionCandidacyRequest;
 import com.odonta.polity.api.model.VoteTallyResponse;
 import com.odonta.polity.model.CastOfficeElectionBallotInput;
@@ -34,6 +36,8 @@ import com.odonta.polity.model.CreatePowerChangeInput;
 import com.odonta.polity.model.CreateProcedureChangeInput;
 import com.odonta.polity.model.CreateSanctionMotionInput;
 import com.odonta.polity.model.MotionResult;
+import com.odonta.polity.model.OfficeElectionCandidateRoundTallyResult;
+import com.odonta.polity.model.OfficeElectionRoundResult;
 import com.odonta.polity.model.RespondOfficeElectionCandidacyInput;
 import com.odonta.polity.model.VotingResult;
 import java.util.List;
@@ -83,6 +87,11 @@ public interface MotionTransportMapper {
 
   @BeanMapping(ignoreUnmappedSourceProperties = {"thresholdMet", "passed"})
   VoteTallyResponse toResponse(VotingResult tally);
+
+  OfficeElectionRoundResponse toResponse(OfficeElectionRoundResult round);
+
+  OfficeElectionCandidateRoundTallyResponse toResponse(
+      OfficeElectionCandidateRoundTallyResult tally);
 
   CertificationResponse toResponse(CertificationResult certification);
 }

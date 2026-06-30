@@ -7,6 +7,7 @@ import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
+import com.odonta.polity.model.ConstitutionalHealthDiagnostic;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.JurisdictionKind;
 import com.odonta.polity.model.Membership;
@@ -25,6 +26,7 @@ import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityRepository;
+import com.odonta.polity.resolver.GovernmentAssessmentResolver;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -39,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MembershipResignationService {
   private final Clock clock;
   private final ConstitutionVersionRepository constitutions;
+  private final GovernmentAssessmentResolver governmentAssessments;
   private final JurisdictionRepository jurisdictions;
   private final MembershipRepository memberships;
   private final OfficeTermRepository officeTerms;
@@ -66,12 +69,17 @@ public class MembershipResignationService {
                 () ->
                     ApiException.forbidden(
                         "polity_membership_required", "Active membership is required."));
-    if (memberships.countByPolityIdAndStatus(polityId, MembershipStatus.ACTIVE) <= 1) {
+    ConstitutionVersion constitution = constitution(polityId);
+    long activeMembers = memberships.countByPolityIdAndStatus(polityId, MembershipStatus.ACTIVE);
+    boolean closePolity = activeMembers <= 1 && isDisbandmentUnavailable(polity, constitution);
+    if (activeMembers <= 1 && !closePolity) {
       throw ApiException.conflict(
           "last_member_resignation_unavailable",
           "The last active citizen must disband the polity instead of resigning.");
     }
-    if (!polity.isBootstrapComplete() && polity.getFounderId().equals(member.getUserId())) {
+    if (!closePolity
+        && !polity.isBootstrapComplete()
+        && polity.getFounderId().equals(member.getUserId())) {
       throw ApiException.conflict(
           "provisional_founder_resignation_unavailable",
           "The founding citizen cannot resign before the polity reaches full government size.");
@@ -86,7 +94,10 @@ public class MembershipResignationService {
       officeTerms.saveAllAndFlush(activeTerms);
     }
     revocations.stage(revocationPlanner.membership(member.getAuthorizationSubject(), polityId));
-    ConstitutionVersion constitution = constitution(polityId);
+    if (closePolity) {
+      polity.disband(now);
+      polities.saveAndFlush(polity);
+    }
     Jurisdiction jurisdiction = jurisdiction(polityId);
     officialRecords.append(
         polityId,
@@ -100,6 +111,28 @@ public class MembershipResignationService {
             OfficialRecordTemplateKey.MEMBER_RESIGNED,
             TemplateParameters.of("memberName", member.getDisplayName())),
         now);
+    if (closePolity) {
+      officialRecords.append(
+          polityId,
+          jurisdiction.getId(),
+          constitution.getId(),
+          member.getId(),
+          OfficialRecordType.POLITY_DISBANDED,
+          polity.getId(),
+          OfficialRecordContext.none(),
+          OfficialRecordTemplate.of(
+              OfficialRecordTemplateKey.POLITY_DISBANDED_BY_LAST_RESIGNATION,
+              TemplateParameters.of("polityName", polity.getName())),
+          now);
+    }
+  }
+
+  private boolean isDisbandmentUnavailable(Polity polity, ConstitutionVersion constitution) {
+    return governmentAssessments
+        .assess(polity, constitution)
+        .constitutionalHealth()
+        .diagnostics()
+        .contains(ConstitutionalHealthDiagnostic.DISBANDMENT_PATH_UNAVAILABLE);
   }
 
   private ConstitutionVersion constitution(UUID polityId) {

@@ -38,9 +38,10 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.Motion;
 import com.odonta.polity.model.Office;
-import com.odonta.polity.model.OfficeElectionBallot;
+import com.odonta.polity.model.OfficeElectionBallotPreference;
 import com.odonta.polity.model.OfficeElectionCandidate;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
+import com.odonta.polity.model.OfficeElectionMethod;
 import com.odonta.polity.model.OfficeElectionProposal;
 import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficeTermReview;
@@ -83,7 +84,7 @@ import com.odonta.polity.repository.InstitutionRepository;
 import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
-import com.odonta.polity.repository.OfficeElectionBallotRepository;
+import com.odonta.polity.repository.OfficeElectionBallotPreferenceRepository;
 import com.odonta.polity.repository.OfficeElectionCandidateRepository;
 import com.odonta.polity.repository.OfficeElectionProposalProjection;
 import com.odonta.polity.repository.OfficeElectionProposalRepository;
@@ -140,8 +141,8 @@ class MotionEffectApplierTest {
   private final OfficeTermReviewRepository officeTermReviews =
       mock(OfficeTermReviewRepository.class);
   private final MotionElectorRepository electors = mock(MotionElectorRepository.class);
-  private final OfficeElectionBallotRepository officeElectionBallots =
-      mock(OfficeElectionBallotRepository.class);
+  private final OfficeElectionBallotPreferenceRepository officeElectionBallotPreferences =
+      mock(OfficeElectionBallotPreferenceRepository.class);
   private final OfficeElectionCandidateRepository officeElectionCandidates =
       mock(OfficeElectionCandidateRepository.class);
   private final OfficeElectionEvaluator officeElections = new OfficeElectionEvaluator();
@@ -183,7 +184,7 @@ class MotionEffectApplierTest {
           officeTermReviewProposals,
           officeTermReviews,
           electors,
-          officeElectionBallots,
+          officeElectionBallotPreferences,
           officeElectionCandidates,
           officeElections,
           officeElectionProposals,
@@ -231,6 +232,7 @@ class MotionEffectApplierTest {
             null,
             null,
             VotingThreshold.TWO_THIRDS_CAST,
+            null,
             ProcedureElectorate.ACTIVE_MEMBERS,
             null,
             null,
@@ -529,6 +531,7 @@ class MotionEffectApplierTest {
             null,
             null,
             null,
+            null,
             null);
 
     when(amendmentProposals.findProjectedByMotionId(motion.getId()))
@@ -622,18 +625,15 @@ class MotionEffectApplierTest {
             "Office election",
             1,
             2,
-            VotingThreshold.PLURALITY_CAST,
+            VotingThreshold.OFFICE_ELECTION_RESULT,
             0,
             24,
             EffectType.ELECT_OFFICE);
     ReflectionTestUtils.setField(procedure, "id", motion.getProcedureId());
     OfficeElectionProposal proposal =
-        new OfficeElectionProposal(polityId, motion.getId(), officeId);
-    OfficeElectionBallot first =
-        new OfficeElectionBallot(polityId, motion.getId(), actor.getId(), winnerMembershipId, NOW);
-    OfficeElectionBallot second =
-        new OfficeElectionBallot(
-            polityId, motion.getId(), UUID.randomUUID(), winnerMembershipId, NOW);
+        new OfficeElectionProposal(
+            polityId, motion.getId(), officeId, 1, OfficeElectionMethod.RANKED_CHOICE);
+    UUID secondVoterId = UUID.randomUUID();
 
     when(officeElectionProposals.findProjectedByMotionId(motion.getId()))
         .thenReturn(Optional.of(projection(OfficeElectionProposalProjection.class, proposal)));
@@ -646,8 +646,12 @@ class MotionEffectApplierTest {
             List.of(
                 new OfficeElectionCandidate(polityId, motion.getId(), winnerMembershipId),
                 new OfficeElectionCandidate(polityId, motion.getId(), otherCandidateMembershipId)));
-    when(officeElectionBallots.findEntitiesByMotionId(motion.getId()))
-        .thenReturn(List.of(first, second));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motion.getId()))
+        .thenReturn(
+            List.of(
+                preference(polityId, motion.getId(), actor.getId(), winnerMembershipId, 1),
+                preference(polityId, motion.getId(), secondVoterId, winnerMembershipId, 1)));
     when(memberships.findEntityById(winnerMembershipId)).thenReturn(Optional.of(winner));
     when(memberships.findEntityById(otherCandidateMembershipId))
         .thenReturn(Optional.of(otherCandidate));
@@ -703,15 +707,14 @@ class MotionEffectApplierTest {
             "Office election",
             1,
             2,
-            VotingThreshold.PLURALITY_CAST,
+            VotingThreshold.OFFICE_ELECTION_RESULT,
             0,
             24,
             EffectType.ELECT_OFFICE);
     ReflectionTestUtils.setField(procedure, "id", motion.getProcedureId());
     OfficeElectionProposal proposal =
-        new OfficeElectionProposal(polityId, motion.getId(), officeId);
-    OfficeElectionBallot ballot =
-        new OfficeElectionBallot(polityId, motion.getId(), actor.getId(), winnerMembershipId, NOW);
+        new OfficeElectionProposal(
+            polityId, motion.getId(), officeId, 1, OfficeElectionMethod.RANKED_CHOICE);
 
     when(officeElectionProposals.findProjectedByMotionId(motion.getId()))
         .thenReturn(Optional.of(projection(OfficeElectionProposalProjection.class, proposal)));
@@ -722,7 +725,10 @@ class MotionEffectApplierTest {
             motion.getId(), OfficeElectionCandidateStatus.ACCEPTED))
         .thenReturn(
             List.of(new OfficeElectionCandidate(polityId, motion.getId(), winnerMembershipId)));
-    when(officeElectionBallots.findEntitiesByMotionId(motion.getId())).thenReturn(List.of(ballot));
+    when(officeElectionBallotPreferences.findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(
+            motion.getId()))
+        .thenReturn(
+            List.of(preference(polityId, motion.getId(), actor.getId(), winnerMembershipId, 1)));
     when(memberships.findEntityById(winnerMembershipId)).thenReturn(Optional.of(winner));
     when(membershipService.hasPoliticalStanding(winnerMembershipId, NOW)).thenReturn(true);
     when(officeTerms.countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
@@ -1187,6 +1193,12 @@ class MotionEffectApplierTest {
       ReflectionTestUtils.setField(entity, "id", UUID.randomUUID());
     }
     return entity;
+  }
+
+  private OfficeElectionBallotPreference preference(
+      UUID polityId, UUID motionId, UUID voterId, UUID candidateId, int rank) {
+    return new OfficeElectionBallotPreference(
+        polityId, motionId, UUID.randomUUID(), voterId, candidateId, rank);
   }
 
   private static <T> T projection(Class<T> type, Object source) {

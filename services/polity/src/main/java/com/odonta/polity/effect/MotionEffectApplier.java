@@ -22,6 +22,7 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.Motion;
 import com.odonta.polity.model.Office;
+import com.odonta.polity.model.OfficeElectionBallotRanking;
 import com.odonta.polity.model.OfficeElectionCandidateOption;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
 import com.odonta.polity.model.OfficeElectionTallyResult;
@@ -64,7 +65,7 @@ import com.odonta.polity.repository.InstitutionRepository;
 import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
-import com.odonta.polity.repository.OfficeElectionBallotRepository;
+import com.odonta.polity.repository.OfficeElectionBallotPreferenceRepository;
 import com.odonta.polity.repository.OfficeElectionCandidateRepository;
 import com.odonta.polity.repository.OfficeElectionProposalRepository;
 import com.odonta.polity.repository.OfficeRepository;
@@ -84,6 +85,7 @@ import com.odonta.polity.service.OfficialRecordService;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +114,7 @@ public class MotionEffectApplier {
   private final OfficeTermReviewProposalRepository officeTermReviewProposals;
   private final OfficeTermReviewRepository officeTermReviews;
   private final MotionElectorRepository electors;
-  private final OfficeElectionBallotRepository officeElectionBallots;
+  private final OfficeElectionBallotPreferenceRepository officeElectionBallotPreferences;
   private final OfficeElectionCandidateRepository officeElectionCandidates;
   private final OfficeElectionEvaluator officeElections;
   private final OfficeElectionProposalRepository officeElectionProposals;
@@ -197,60 +199,63 @@ public class MotionEffectApplier {
         officeElections.evaluate(
             procedure,
             Math.toIntExact(electors.countByMotionId(motion.getId())),
+            proposal.getSeatsAvailable(),
+            proposal.getMethod(),
             electionCandidates(motion.getId(), now),
-            officeElectionBallots.findEntitiesByMotionId(motion.getId()));
-    if (!result.passed() || result.winnerMembershipId() == null) {
+            officeElectionBallotRankings(motion.getId()));
+    if (!result.passed() || result.winners().isEmpty()) {
       throw ApiException.conflict(
           "office_election_not_passed", "Only passed office elections can assign office terms.");
     }
-    if (officeTerms.existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndEndsAtAfter(
-        motion.getPolityId(),
-        office.getCode(),
-        result.winnerMembershipId(),
-        OfficeTermStatus.ACTIVE,
-        now)) {
-      throw ApiException.conflict(
-          "office_term_already_held",
-          "The elected member already holds an active term for this office.");
-    }
-    if (officeTerms.countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
-            motion.getPolityId(), office.getCode(), OfficeTermStatus.ACTIVE, now)
-        >= office.getSeatCount()) {
+    int vacantSeats = vacantSeatCount(office, now);
+    if (vacantSeats < result.seatsFilled()) {
       throw ApiException.conflict(
           "office_seats_full", "This office has no vacant seats for another active term.");
     }
-    OfficeTerm term =
-        officeTerms.saveAndFlush(
-            new OfficeTerm(
-                motion.getPolityId(),
-                office.getId(),
-                office.getCode(),
-                result.winnerMembershipId(),
-                motion.getId(),
-                now,
-                now.plusDays(office.getTermLengthDays())));
-    officialRecords.append(
-        motion.getPolityId(),
-        motion.getJurisdictionId(),
-        constitution.getId(),
-        actor.getId(),
-        OfficialRecordType.OFFICE_ELECTED,
-        term.getId(),
-        OfficialRecordContext.effect(motion, OfficialRecordOutcome.OFFICE_ELECTED),
-        OfficialRecordTemplate.of(
-            OfficialRecordTemplateKey.OFFICE_ELECTED,
-            TemplateParameters.of(
-                "memberName",
-                result.winnerName(),
-                "officeName",
-                office.getName(),
-                "officeNameKey",
-                office.getNameKey(),
-                "officeCode",
-                office.getCode(),
-                "termLengthDays",
-                office.getTermLengthDays())),
-        now);
+    for (var winner : result.winners()) {
+      if (officeTerms.existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndEndsAtAfter(
+          motion.getPolityId(),
+          office.getCode(),
+          winner.membershipId(),
+          OfficeTermStatus.ACTIVE,
+          now)) {
+        throw ApiException.conflict(
+            "office_term_already_held",
+            "The elected member already holds an active term for this office.");
+      }
+      OfficeTerm term =
+          officeTerms.saveAndFlush(
+              new OfficeTerm(
+                  motion.getPolityId(),
+                  office.getId(),
+                  office.getCode(),
+                  winner.membershipId(),
+                  motion.getId(),
+                  now,
+                  now.plusDays(office.getTermLengthDays())));
+      officialRecords.append(
+          motion.getPolityId(),
+          motion.getJurisdictionId(),
+          constitution.getId(),
+          actor.getId(),
+          OfficialRecordType.OFFICE_ELECTED,
+          term.getId(),
+          OfficialRecordContext.effect(motion, OfficialRecordOutcome.OFFICE_ELECTED),
+          OfficialRecordTemplate.of(
+              OfficialRecordTemplateKey.OFFICE_ELECTED,
+              TemplateParameters.of(
+                  "memberName",
+                  winner.name(),
+                  "officeName",
+                  office.getName(),
+                  "officeNameKey",
+                  office.getNameKey(),
+                  "officeCode",
+                  office.getCode(),
+                  "termLengthDays",
+                  office.getTermLengthDays())),
+          now);
+    }
   }
 
   private void applySanction(
@@ -601,7 +606,8 @@ public class MotionEffectApplier {
     return new ConstitutionChangeItem(
         ConstitutionChangeKind.INSTITUTION,
         changeOperation(change.getAction()),
-        valueOr(change.getName(), institution == null ? "institution" : institution.getName()),
+        proposedOrCurrent(
+            change.getName(), institution == null ? "institution" : institution.getName()),
         change.getName() == null && institution != null ? institution.getNameKey() : null,
         TemplateParameters.ofPresent(
             "jurisdiction",
@@ -632,6 +638,8 @@ public class MotionEffectApplier {
             change.getQuorumDenominator(),
             "threshold",
             change.getThreshold(),
+            "officeElectionMethod",
+            change.getOfficeElectionMethod(),
             "electorate",
             change.getElectorate(),
             "electorateOfficeCode",
@@ -652,7 +660,8 @@ public class MotionEffectApplier {
     return new ConstitutionChangeItem(
         ConstitutionChangeKind.OFFICE,
         changeOperation(change.getAction()),
-        valueOr(change.getName(), office == null ? change.getOfficeCode() : office.getName()),
+        proposedOrCurrent(
+            change.getName(), office == null ? change.getOfficeCode() : office.getName()),
         change.getName() == null && office != null ? office.getNameKey() : null,
         TemplateParameters.ofPresent(
             "jurisdiction",
@@ -799,16 +808,17 @@ public class MotionEffectApplier {
                         "This institution already exists in the constitution.");
                 case REVISE -> {
                   UUID jurisdictionId =
-                      valueOr(change.getJurisdictionId(), institution.getJurisdictionId());
+                      proposedOrCurrent(
+                          change.getJurisdictionId(), institution.getJurisdictionId());
                   requireKnownJurisdiction(jurisdictionId, jurisdictionIds);
                   Institution copied =
                       institutions.saveAndFlush(
                           institution.copyWith(
                               amended.getId(),
                               jurisdictionId,
-                              valueOr(change.getName(), institution.getName()),
+                              proposedOrCurrent(change.getName(), institution.getName()),
                               change.getName() == null ? institution.getNameKey() : null,
-                              valueOr(change.getKind(), institution.getKind())));
+                              proposedOrCurrent(change.getKind(), institution.getKind())));
                   institutionIds.put(institution.getId(), copied.getId());
                 }
                 case RETIRE -> {
@@ -864,31 +874,36 @@ public class MotionEffectApplier {
                 procedures.save(procedure.copyTo(amended.getId(), institutionId));
               } else {
                 ProcedureElectorate electorate =
-                    valueOr(change.getElectorate(), procedure.getElectorate());
+                    proposedOrCurrent(change.getElectorate(), procedure.getElectorate());
                 Procedure copied =
                     procedure.copyWithRules(
                         amended.getId(),
                         institutionId,
-                        valueOr(change.getQuorumNumerator(), procedure.getQuorumNumerator()),
-                        valueOr(change.getQuorumDenominator(), procedure.getQuorumDenominator()),
-                        valueOr(change.getThreshold(), procedure.getThreshold()),
+                        proposedOrCurrent(
+                            change.getQuorumNumerator(), procedure.getQuorumNumerator()),
+                        proposedOrCurrent(
+                            change.getQuorumDenominator(), procedure.getQuorumDenominator()),
+                        proposedOrCurrent(change.getThreshold(), procedure.getThreshold()),
                         electorate,
                         resultingElectorateOfficeCode(electorate, change, procedure),
-                        valueOr(
+                        proposedOrCurrent(
                             change.getMinimumElectorCount(), procedure.getMinimumElectorCount()),
-                        valueOr(change.getMinimumNoticeHours(), procedure.getMinimumNoticeHours()),
-                        valueOr(change.getVotingPeriodHours(), procedure.getVotingPeriodHours()));
-                requireSufficientActiveMembers(copied);
+                        proposedOrCurrent(
+                            change.getMinimumNoticeHours(), procedure.getMinimumNoticeHours()),
+                        proposedOrCurrent(
+                            change.getVotingPeriodHours(), procedure.getVotingPeriodHours()),
+                        proposedOrCurrent(
+                            change.getOfficeElectionMethod(), procedure.getOfficeElectionMethod()));
                 procedures.save(copied);
               }
             });
   }
 
-  private int valueOr(Integer value, int fallback) {
+  private int proposedOrCurrent(Integer value, int fallback) {
     return value == null ? fallback : value;
   }
 
-  private <T> T valueOr(T value, T fallback) {
+  private <T> T proposedOrCurrent(T value, T fallback) {
     return value == null ? fallback : value;
   }
 
@@ -919,18 +934,18 @@ public class MotionEffectApplier {
                     throw ApiException.conflict(
                         "office_already_exists", "This office already exists in the constitution.");
                 case REVISE -> {
-                  int seatCount = valueOr(change.getSeatCount(), office.getSeatCount());
+                  int seatCount = proposedOrCurrent(change.getSeatCount(), office.getSeatCount());
                   requireOfficeSeatCapacity(
                       current.getPolityId(), office.getCode(), seatCount, now);
                   offices.save(
                       office.copyWith(
                           amended.getId(),
-                          valueOr(change.getJurisdictionId(), office.getJurisdictionId()),
-                          valueOr(change.getName(), office.getName()),
-                          valueOr(change.getDescription(), office.getDescription()),
+                          proposedOrCurrent(change.getJurisdictionId(), office.getJurisdictionId()),
+                          proposedOrCurrent(change.getName(), office.getName()),
+                          proposedOrCurrent(change.getDescription(), office.getDescription()),
                           change.getName() == null ? office.getNameKey() : null,
                           change.getDescription() == null ? office.getDescriptionKey() : null,
-                          valueOr(change.getTermLengthDays(), office.getTermLengthDays()),
+                          proposedOrCurrent(change.getTermLengthDays(), office.getTermLengthDays()),
                           seatCount));
                   officeCodes.add(office.getCode());
                 }
@@ -948,7 +963,7 @@ public class MotionEffectApplier {
                   new Office(
                       amended.getPolityId(),
                       amended.getId(),
-                      valueOr(change.getJurisdictionId(), currentJurisdictionId(current)),
+                      proposedOrCurrent(change.getJurisdictionId(), currentJurisdictionId(current)),
                       change.getOfficeCode(),
                       change.getName(),
                       change.getDescription(),
@@ -1009,7 +1024,7 @@ public class MotionEffectApplier {
             case REVISE ->
                 kinds.put(
                     change.getInstitutionId(),
-                    valueOr(change.getKind(), kinds.get(change.getInstitutionId())));
+                    proposedOrCurrent(change.getKind(), kinds.get(change.getInstitutionId())));
             case RETIRE -> kinds.remove(change.getInstitutionId());
           }
         });
@@ -1019,7 +1034,7 @@ public class MotionEffectApplier {
   private void requireCompatibleProcedureInstitution(
       EffectType effectType, UUID institutionId, Map<UUID, InstitutionKind> institutionKinds) {
     InstitutionKind institutionKind = institutionKinds.get(institutionId);
-    if (institutionKind != effectType.requiredInstitutionKind()) {
+    if (!effectType.supportsInstitutionKind(institutionKind)) {
       throw ApiException.badRequest(
           "procedure_institution_kind_mismatch",
           "Procedures must belong to an institution kind compatible with their effect.");
@@ -1033,17 +1048,8 @@ public class MotionEffectApplier {
     if (electorate != ProcedureElectorate.OFFICE_HOLDERS) {
       return null;
     }
-    return valueOr(change.getElectorateOfficeCode(), currentProcedure.getElectorateOfficeCode());
-  }
-
-  private void requireSufficientActiveMembers(Procedure procedure) {
-    if (procedure.getElectorate() == ProcedureElectorate.ACTIVE_MEMBERS
-        && memberships.countByPolityIdAndStatus(procedure.getPolityId(), MembershipStatus.ACTIVE)
-            < procedure.getMinimumElectorCount()) {
-      throw ApiException.badRequest(
-          "procedure_electorate_active_member_capacity_insufficient",
-          "Active-member procedure electorates must not require more electors than the polity has.");
-    }
+    return proposedOrCurrent(
+        change.getElectorateOfficeCode(), currentProcedure.getElectorateOfficeCode());
   }
 
   private void requireOfficeSeatCapacity(
@@ -1068,8 +1074,7 @@ public class MotionEffectApplier {
   private void requireAllowedPowerHolder(PowerCode powerCode, PowerHolderScope holderScope) {
     if (powerCode.requiresActiveMemberHolder() && holderScope != PowerHolderScope.ACTIVE_MEMBER) {
       throw ApiException.badRequest(
-          "citizen_power_required",
-          "Member initiative, election, appeal, amendment, disbandment, and certification powers must remain active citizen powers.");
+          "citizen_power_required", "Disbandment must remain an active citizen power.");
     }
   }
 
@@ -1089,6 +1094,13 @@ public class MotionEffectApplier {
     officeTerms.flush();
   }
 
+  private int vacantSeatCount(Office office, OffsetDateTime now) {
+    long activeTerms =
+        officeTerms.countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
+            office.getPolityId(), office.getCode(), OfficeTermStatus.ACTIVE, now);
+    return Math.max(0, office.getSeatCount() - Math.toIntExact(activeTerms));
+  }
+
   private List<OfficeElectionCandidateOption> electionCandidates(
       UUID motionId, OffsetDateTime now) {
     return officeElectionCandidates
@@ -1100,11 +1112,50 @@ public class MotionEffectApplier {
               if (!membershipService.hasPoliticalStanding(membership.getId(), now)) {
                 return null;
               }
+              if (officeHeldByCandidate(motionId, membership.getId(), now)) {
+                return null;
+              }
               return new OfficeElectionCandidateOption(
                   membership.getId(), membership.getDisplayName());
             })
         .filter(java.util.Objects::nonNull)
         .toList();
+  }
+
+  private List<OfficeElectionBallotRanking> officeElectionBallotRankings(UUID motionId) {
+    Map<UUID, List<UUID>> candidateMembershipIdsByMembershipId = new LinkedHashMap<>();
+    officeElectionBallotPreferences
+        .findEntitiesByMotionIdOrderByMembershipIdAscRankAsc(motionId)
+        .forEach(
+            preference ->
+                candidateMembershipIdsByMembershipId
+                    .computeIfAbsent(
+                        preference.getMembershipId(), ignored -> new java.util.ArrayList<>())
+                    .add(preference.getCandidateMembershipId()));
+    return candidateMembershipIdsByMembershipId.entrySet().stream()
+        .map(entry -> new OfficeElectionBallotRanking(entry.getKey(), entry.getValue()))
+        .toList();
+  }
+
+  private boolean officeHeldByCandidate(UUID motionId, UUID membershipId, OffsetDateTime now) {
+    return officeElectionProposals
+        .findProjectedByMotionId(motionId)
+        .map(
+            proposal -> {
+              Office office =
+                  offices
+                      .findEntityByIdAndPolityId(proposal.getOfficeId(), proposal.getPolityId())
+                      .orElseThrow(
+                          () -> ApiException.notFound("office_not_found", "Office not found."));
+              return officeTerms
+                  .existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndEndsAtAfter(
+                      proposal.getPolityId(),
+                      office.getCode(),
+                      membershipId,
+                      OfficeTermStatus.ACTIVE,
+                      now);
+            })
+        .orElse(false);
   }
 
   private Membership membership(UUID membershipId) {

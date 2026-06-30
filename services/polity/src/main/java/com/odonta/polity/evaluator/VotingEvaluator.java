@@ -39,7 +39,7 @@ public class VotingEvaluator {
       case MAJORITY_OF_ELIGIBLE -> yes > eligible / 2;
       case TWO_THIRDS_CAST -> cast > 0 && yes * 3 >= cast * 2;
       case TWO_THIRDS_ELIGIBLE -> yes * 3 >= eligible * 2;
-      case PLURALITY_CAST -> false;
+      case OFFICE_ELECTION_RESULT -> false;
     };
   }
 

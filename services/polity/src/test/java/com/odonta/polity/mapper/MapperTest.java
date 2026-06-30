@@ -8,6 +8,9 @@ import com.odonta.polity.api.model.ActionAvailabilityResponse;
 import com.odonta.polity.model.ActionAvailabilityResult;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.CertificationOutcomeReason;
+import com.odonta.polity.model.GovernmentReadinessDiagnostic;
+import com.odonta.polity.model.GovernmentReadinessResult;
+import com.odonta.polity.model.GovernmentReadinessStatus;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.VotingOutcomeReason;
@@ -153,6 +156,48 @@ class MapperTest {
       assertThat(response.getAvailable()).isFalse();
       assertThat(response.getReason()).isEqualTo("polity_provisional");
       assertThat(response.getReasonMessage()).isEqualTo("This polity needs more citizens.");
+    } finally {
+      LocaleContextHolder.resetLocaleContext();
+    }
+  }
+
+  @Test
+  void mapsGovernmentReadinessWithLocalizedDiagnostics() {
+    try {
+      LocaleContextHolder.setLocale(Locale.ENGLISH);
+      StaticMessageSource messages = new StaticMessageSource();
+      messages.addMessage("government_readiness.status.provisional", Locale.ENGLISH, "Provisional");
+      messages.addMessage(
+          "government_readiness.diagnostic.needs_more_standing_members",
+          Locale.ENGLISH,
+          "More citizens are needed.");
+      TransportTextResolver text =
+          new TransportTextResolver(new ConstitutionChangeTextResolver(messages), messages);
+      PolityTransportMapper mapper = Mappers.getMapper(PolityTransportMapper.class);
+      ReflectionTestUtils.setField(
+          mapper, "polityTransportConversions", new PolityTransportConversions(text));
+      ReflectionTestUtils.setField(
+          mapper, "officeTransportConversions", new OfficeTransportConversions(text));
+
+      var response =
+          mapper.toResponse(
+              new GovernmentReadinessResult(
+                  GovernmentReadinessStatus.PROVISIONAL,
+                  List.of(GovernmentReadinessDiagnostic.NEEDS_MORE_STANDING_MEMBERS)));
+
+      assertThat(response.getStatus())
+          .isEqualTo(com.odonta.polity.api.model.GovernmentReadinessStatus.PROVISIONAL);
+      assertThat(response.getStatusMessage()).isEqualTo("Provisional");
+      assertThat(response.getDiagnostics())
+          .singleElement()
+          .satisfies(
+              diagnostic -> {
+                assertThat(diagnostic.getCode())
+                    .isEqualTo(
+                        com.odonta.polity.api.model.GovernmentReadinessDiagnostic
+                            .NEEDS_MORE_STANDING_MEMBERS);
+                assertThat(diagnostic.getMessage()).isEqualTo("More citizens are needed.");
+              });
     } finally {
       LocaleContextHolder.resetLocaleContext();
     }

@@ -47,7 +47,7 @@ class ConstitutionTemplateSeederTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  void standardRepublicPaceControlsStarterOfficeTermsAndVotingWindows() {
+  void standardConstitutionalCouncilRepublicPaceControlsStarterOfficeTermsAndVotingWindows() {
     UUID polityId = UUID.randomUUID();
     Jurisdiction jurisdiction = new Jurisdiction(polityId, "Commons", JurisdictionKind.ROOT);
     ReflectionTestUtils.setField(jurisdiction, "id", UUID.randomUUID());
@@ -57,21 +57,28 @@ class ConstitutionTemplateSeederTest {
     when(institutions.saveAndFlush(any(Institution.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
 
-    service.establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
+    service.establishStandardConstitutionalCouncilRepublic(
+        jurisdiction, constitution, PolityPace.STANDARD);
 
     ArgumentCaptor<Institution> institutionCaptor = ArgumentCaptor.forClass(Institution.class);
-    verify(institutions, times(2)).saveAndFlush(institutionCaptor.capture());
+    verify(institutions, times(3)).saveAndFlush(institutionCaptor.capture());
     assertThat(institutionCaptor.getAllValues())
         .extracting(Institution::getNameKey, Institution::getKind)
         .containsExactly(
             tuple(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey(), InstitutionKind.ASSEMBLY),
+            tuple(InstitutionTemplateKey.CITIZENS_COUNCIL.nameKey(), InstitutionKind.COUNCIL),
             tuple(InstitutionTemplateKey.MAGISTRATES_COURT.nameKey(), InstitutionKind.JUDICIARY));
 
     ArgumentCaptor<List<Office>> officeCaptor = ArgumentCaptor.forClass(List.class);
     verify(offices).saveAllAndFlush(officeCaptor.capture());
     assertThat(officeCaptor.getValue())
         .extracting(Office::getCode)
-        .containsExactly(Office.STEWARD, Office.MAGISTRATE, Office.TRIBUNE);
+        .containsExactly(Office.COUNCILOR, Office.STEWARD, Office.MAGISTRATE, Office.TRIBUNE);
+    assertThat(officeCaptor.getValue())
+        .filteredOn(office -> office.getCode().equals(Office.COUNCILOR))
+        .singleElement()
+        .extracting(Office::getSeatCount)
+        .isEqualTo(5);
     assertThat(officeCaptor.getValue())
         .filteredOn(office -> office.getCode().equals(Office.STEWARD))
         .singleElement()
@@ -86,12 +93,18 @@ class ConstitutionTemplateSeederTest {
     ArgumentCaptor<List<Procedure>> procedureCaptor = ArgumentCaptor.forClass(List.class);
     verify(procedures).saveAllAndFlush(procedureCaptor.capture());
     Institution assembly = institutionCaptor.getAllValues().get(0);
-    Institution court = institutionCaptor.getAllValues().get(1);
+    Institution council = institutionCaptor.getAllValues().get(1);
+    Institution court = institutionCaptor.getAllValues().get(2);
     assertThat(procedureCaptor.getValue())
         .filteredOn(procedure -> procedure.getCode().equals(Procedure.ORDINARY_RESOLUTION))
         .singleElement()
-        .extracting(Procedure::getVotingPeriodHours)
-        .isEqualTo(48);
+        .satisfies(
+            procedure -> {
+              assertThat(procedure.getVotingPeriodHours()).isEqualTo(48);
+              assertThat(procedure.getElectorate()).isEqualTo(ProcedureElectorate.OFFICE_HOLDERS);
+              assertThat(procedure.getElectorateOfficeCode()).isEqualTo(Office.COUNCILOR);
+              assertThat(procedure.getInstitutionId()).isEqualTo(council.getId());
+            });
     assertThat(procedureCaptor.getValue())
         .filteredOn(procedure -> procedure.getCode().equals(Procedure.CONSTITUTION_AMENDMENT))
         .singleElement()
@@ -113,8 +126,7 @@ class ConstitutionTemplateSeederTest {
     assertThat(procedureCaptor.getValue())
         .filteredOn(
             procedure ->
-                procedure.getCode().equals(Procedure.ORDINARY_RESOLUTION)
-                    || procedure.getCode().equals(Procedure.OFFICE_ELECTION)
+                procedure.getCode().equals(Procedure.OFFICE_ELECTION)
                     || procedure.getCode().equals(Procedure.SANCTION)
                     || procedure.getCode().equals(Procedure.CONSTITUTION_AMENDMENT)
                     || procedure.getCode().equals(Procedure.DISBANDMENT))
@@ -142,7 +154,8 @@ class ConstitutionTemplateSeederTest {
     when(institutions.saveAndFlush(any(Institution.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
 
-    service.establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
+    service.establishStandardConstitutionalCouncilRepublic(
+        jurisdiction, constitution, PolityPace.STANDARD);
 
     ArgumentCaptor<List<ConstitutionalPower>> powerCaptor = ArgumentCaptor.forClass(List.class);
     verify(powers).saveAllAndFlush(powerCaptor.capture());
@@ -182,7 +195,7 @@ class ConstitutionTemplateSeederTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  void standardRepublicSeedsTranslationKeysForSystemConstitutionalContent() {
+  void standardConstitutionalCouncilRepublicSeedsTranslationKeysForSystemConstitutionalContent() {
     UUID polityId = UUID.randomUUID();
     Jurisdiction jurisdiction = new Jurisdiction(polityId, "Commons", JurisdictionKind.ROOT);
     ReflectionTestUtils.setField(jurisdiction, "id", UUID.randomUUID());
@@ -192,14 +205,16 @@ class ConstitutionTemplateSeederTest {
     when(institutions.saveAndFlush(any(Institution.class)))
         .thenAnswer(invocation -> withId(invocation.getArgument(0)));
 
-    service.establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
+    service.establishStandardConstitutionalCouncilRepublic(
+        jurisdiction, constitution, PolityPace.STANDARD);
 
     ArgumentCaptor<Institution> institutionCaptor = ArgumentCaptor.forClass(Institution.class);
-    verify(institutions, times(2)).saveAndFlush(institutionCaptor.capture());
+    verify(institutions, times(3)).saveAndFlush(institutionCaptor.capture());
     assertThat(institutionCaptor.getAllValues())
         .extracting(Institution::getNameKey, Institution::getKind)
         .containsExactly(
             tuple(InstitutionTemplateKey.CITIZENS_ASSEMBLY.nameKey(), InstitutionKind.ASSEMBLY),
+            tuple(InstitutionTemplateKey.CITIZENS_COUNCIL.nameKey(), InstitutionKind.COUNCIL),
             tuple(InstitutionTemplateKey.MAGISTRATES_COURT.nameKey(), InstitutionKind.JUDICIARY));
 
     ArgumentCaptor<List<Office>> officeCaptor = ArgumentCaptor.forClass(List.class);
@@ -207,6 +222,10 @@ class ConstitutionTemplateSeederTest {
     assertThat(officeCaptor.getValue())
         .extracting(Office::getCode, Office::getNameKey, Office::getDescriptionKey)
         .containsExactly(
+            tuple(
+                Office.COUNCILOR,
+                OfficeTemplateKey.COUNCILOR.nameKey(),
+                OfficeTemplateKey.COUNCILOR.descriptionKey()),
             tuple(
                 Office.STEWARD,
                 OfficeTemplateKey.STEWARD.nameKey(),
@@ -222,8 +241,8 @@ class ConstitutionTemplateSeederTest {
 
     ArgumentCaptor<List<Procedure>> procedureCaptor = ArgumentCaptor.forClass(List.class);
     verify(procedures).saveAllAndFlush(procedureCaptor.capture());
-    Institution assembly = institutionCaptor.getAllValues().get(0);
-    Institution court = institutionCaptor.getAllValues().get(1);
+    Institution council = institutionCaptor.getAllValues().get(1);
+    Institution court = institutionCaptor.getAllValues().get(2);
     assertThat(procedureCaptor.getValue())
         .extracting(Procedure::getCode, Procedure::getNameKey)
         .containsExactly(
@@ -259,7 +278,9 @@ class ConstitutionTemplateSeederTest {
         .satisfies(
             procedure -> {
               assertThat(procedure.getMinimumElectorCount()).isEqualTo(1);
-              assertThat(procedure.getInstitutionId()).isEqualTo(assembly.getId());
+              assertThat(procedure.getElectorate()).isEqualTo(ProcedureElectorate.OFFICE_HOLDERS);
+              assertThat(procedure.getElectorateOfficeCode()).isEqualTo(Office.COUNCILOR);
+              assertThat(procedure.getInstitutionId()).isEqualTo(council.getId());
             });
 
     ArgumentCaptor<List<ConstitutionalPower>> powerCaptor = ArgumentCaptor.forClass(List.class);

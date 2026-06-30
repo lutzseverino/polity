@@ -117,12 +117,14 @@ class ConstitutionAmendmentInputValidationTest {
                     null,
                     null,
                     null,
+                    null,
                     null),
                 new CreateProcedureChangeInput(
                     Procedure.ORDINARY_RESOLUTION,
                     null,
                     null,
                     VotingThreshold.TWO_THIRDS_ELIGIBLE,
+                    null,
                     null,
                     null,
                     null,
@@ -146,6 +148,7 @@ class ConstitutionAmendmentInputValidationTest {
             null,
             null,
             null,
+            null,
             ProcedureElectorate.OFFICE_HOLDERS,
             "magistrate",
             null,
@@ -160,6 +163,7 @@ class ConstitutionAmendmentInputValidationTest {
     CreateProcedureChangeInput input =
         new CreateProcedureChangeInput(
             Procedure.APPEAL,
+            null,
             null,
             null,
             null,
@@ -181,6 +185,7 @@ class ConstitutionAmendmentInputValidationTest {
     CreateProcedureChangeInput input =
         new CreateProcedureChangeInput(
             Procedure.APPEAL,
+            null,
             null,
             null,
             null,
@@ -275,9 +280,10 @@ class ConstitutionAmendmentInputValidationTest {
   }
 
   @Test
-  void rejectsCitizenRequiredPowerHeldByOffice() {
+  void rejectsDisbandmentPowerHeldByOffice() {
     CreatePowerChangeInput input =
-        new CreatePowerChangeInput(PowerCode.INTRODUCE_MOTION, PowerHolderScope.OFFICE, "steward");
+        new CreatePowerChangeInput(
+            PowerCode.INTRODUCE_DISBANDMENT, PowerHolderScope.OFFICE, "steward");
 
     assertThat(validator.validate(input))
         .anyMatch(

@@ -99,7 +99,12 @@ class OfficialRecordServiceTest {
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.POLITY_FOUNDED,
             TemplateParameters.of(
-                "polityName", "Tiny Senate", "setupPreset", "standard republic", "pace", "fast")),
+                "polityName",
+                "Tiny Senate",
+                "setupPreset",
+                "standard constitutional council republic",
+                "pace",
+                "fast")),
         NOW);
 
     ArgumentCaptor<OfficialRecordEntry> entries =
@@ -125,7 +130,12 @@ class OfficialRecordServiceTest {
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.POLITY_FOUNDED,
             TemplateParameters.of(
-                "polityName", "Tiny Senate", "setupPreset", "standard republic", "pace", "fast")),
+                "polityName",
+                "Tiny Senate",
+                "setupPreset",
+                "standard constitutional council republic",
+                "pace",
+                "fast")),
         NOW);
   }
 }

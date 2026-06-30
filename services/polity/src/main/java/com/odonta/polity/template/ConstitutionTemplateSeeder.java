@@ -9,6 +9,7 @@ import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.InstitutionTemplateKey;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.Office;
+import com.odonta.polity.model.OfficeElectionMethod;
 import com.odonta.polity.model.OfficeTemplateKey;
 import com.odonta.polity.model.PolityPace;
 import com.odonta.polity.model.PowerCode;
@@ -30,9 +31,11 @@ import org.springframework.stereotype.Component;
 public class ConstitutionTemplateSeeder {
   private static final int DEFAULT_QUORUM_NUMERATOR = 1;
   private static final int DEFAULT_QUORUM_DENOMINATOR = 2;
-  private static final int DEFAULT_MINIMUM_ELECTOR_COUNT = 1;
+  private static final int DEFAULT_OFFICE_HOLDER_MINIMUM_ELECTOR_COUNT = 1;
+  private static final int DEFAULT_ACTIVE_MEMBER_MINIMUM_ELECTOR_COUNT = 2;
   private static final int STANDARD_JUDICIAL_MINIMUM_ELECTOR_COUNT = 2;
   private static final int DEFAULT_OFFICE_SEAT_COUNT = 1;
+  private static final int STANDARD_COUNCIL_SEAT_COUNT = 5;
   private static final int STANDARD_MAGISTRATE_SEAT_COUNT = 3;
 
   private final ConstitutionalPowerRepository powers;
@@ -40,12 +43,13 @@ public class ConstitutionTemplateSeeder {
   private final OfficeRepository offices;
   private final ProcedureRepository procedures;
 
-  public Institution establishStarterRepublic(
+  public Institution establishStandardConstitutionalCouncilRepublic(
       Jurisdiction jurisdiction, ConstitutionVersion constitution) {
-    return establishStarterRepublic(jurisdiction, constitution, PolityPace.STANDARD);
+    return establishStandardConstitutionalCouncilRepublic(
+        jurisdiction, constitution, PolityPace.STANDARD);
   }
 
-  public Institution establishStarterRepublic(
+  public Institution establishStandardConstitutionalCouncilRepublic(
       Jurisdiction jurisdiction, ConstitutionVersion constitution, PolityPace pace) {
     Institution assembly =
         institutions.saveAndFlush(
@@ -56,6 +60,15 @@ public class ConstitutionTemplateSeeder {
                 InstitutionTemplateKey.CITIZENS_ASSEMBLY.storedName(),
                 InstitutionTemplateKey.CITIZENS_ASSEMBLY,
                 InstitutionKind.ASSEMBLY));
+    Institution council =
+        institutions.saveAndFlush(
+            new Institution(
+                constitution.getPolityId(),
+                jurisdiction.getId(),
+                constitution.getId(),
+                InstitutionTemplateKey.CITIZENS_COUNCIL.storedName(),
+                InstitutionTemplateKey.CITIZENS_COUNCIL,
+                InstitutionKind.COUNCIL));
     Institution court =
         institutions.saveAndFlush(
             new Institution(
@@ -65,23 +78,30 @@ public class ConstitutionTemplateSeeder {
                 InstitutionTemplateKey.MAGISTRATES_COURT.storedName(),
                 InstitutionTemplateKey.MAGISTRATES_COURT,
                 InstitutionKind.JUDICIARY));
-    seedProcedures(constitution, assembly, court, pace);
+    seedProcedures(constitution, assembly, council, court, pace);
     seedOffices(jurisdiction, constitution, pace);
     seedPowers(constitution);
     return assembly;
   }
 
   private void seedProcedures(
-      ConstitutionVersion constitution, Institution assembly, Institution court, PolityPace pace) {
+      ConstitutionVersion constitution,
+      Institution assembly,
+      Institution council,
+      Institution court,
+      PolityPace pace) {
     procedures.saveAllAndFlush(
         List.of(
             procedure(
                 constitution,
-                assembly,
+                council,
                 Procedure.ORDINARY_RESOLUTION,
                 ProcedureTemplateKey.ORDINARY_RESOLUTION,
                 EffectType.ADOPT_RESOLUTION,
                 VotingThreshold.SIMPLE_MAJORITY_CAST,
+                ProcedureElectorate.OFFICE_HOLDERS,
+                Office.COUNCILOR,
+                DEFAULT_OFFICE_HOLDER_MINIMUM_ELECTOR_COUNT,
                 0,
                 pace.ordinaryVotingPeriodHours()),
             procedure(
@@ -90,7 +110,8 @@ public class ConstitutionTemplateSeeder {
                 Procedure.OFFICE_ELECTION,
                 ProcedureTemplateKey.OFFICE_ELECTION,
                 EffectType.ELECT_OFFICE,
-                VotingThreshold.PLURALITY_CAST,
+                VotingThreshold.OFFICE_ELECTION_RESULT,
+                OfficeElectionMethod.RANKED_CHOICE,
                 pace.officeElectionMinimumNoticeHours(),
                 pace.officeElectionVotingPeriodHours()),
             procedure(
@@ -165,6 +186,7 @@ public class ConstitutionTemplateSeeder {
       ProcedureTemplateKey templateKey,
       EffectType effectType,
       VotingThreshold threshold,
+      OfficeElectionMethod officeElectionMethod,
       int minimumNoticeHours,
       int votingPeriodHours) {
     return procedure(
@@ -176,8 +198,10 @@ public class ConstitutionTemplateSeeder {
         threshold,
         ProcedureElectorate.ACTIVE_MEMBERS,
         null,
+        DEFAULT_ACTIVE_MEMBER_MINIMUM_ELECTOR_COUNT,
         minimumNoticeHours,
-        votingPeriodHours);
+        votingPeriodHours,
+        officeElectionMethod);
   }
 
   private Procedure procedure(
@@ -187,8 +211,6 @@ public class ConstitutionTemplateSeeder {
       ProcedureTemplateKey templateKey,
       EffectType effectType,
       VotingThreshold threshold,
-      ProcedureElectorate electorate,
-      String electorateOfficeCode,
       int minimumNoticeHours,
       int votingPeriodHours) {
     return procedure(
@@ -198,11 +220,12 @@ public class ConstitutionTemplateSeeder {
         templateKey,
         effectType,
         threshold,
-        electorate,
-        electorateOfficeCode,
-        DEFAULT_MINIMUM_ELECTOR_COUNT,
+        ProcedureElectorate.ACTIVE_MEMBERS,
+        null,
+        DEFAULT_ACTIVE_MEMBER_MINIMUM_ELECTOR_COUNT,
         minimumNoticeHours,
-        votingPeriodHours);
+        votingPeriodHours,
+        null);
   }
 
   private Procedure procedure(
@@ -217,6 +240,34 @@ public class ConstitutionTemplateSeeder {
       int minimumElectorCount,
       int minimumNoticeHours,
       int votingPeriodHours) {
+    return procedure(
+        constitution,
+        institution,
+        code,
+        templateKey,
+        effectType,
+        threshold,
+        electorate,
+        electorateOfficeCode,
+        minimumElectorCount,
+        minimumNoticeHours,
+        votingPeriodHours,
+        null);
+  }
+
+  private Procedure procedure(
+      ConstitutionVersion constitution,
+      Institution institution,
+      String code,
+      ProcedureTemplateKey templateKey,
+      EffectType effectType,
+      VotingThreshold threshold,
+      ProcedureElectorate electorate,
+      String electorateOfficeCode,
+      int minimumElectorCount,
+      int minimumNoticeHours,
+      int votingPeriodHours,
+      OfficeElectionMethod officeElectionMethod) {
     return new Procedure(
         constitution.getPolityId(),
         constitution.getId(),
@@ -232,13 +283,24 @@ public class ConstitutionTemplateSeeder {
         minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        officeElectionMethod);
   }
 
   private void seedOffices(
       Jurisdiction jurisdiction, ConstitutionVersion constitution, PolityPace pace) {
     offices.saveAllAndFlush(
         List.of(
+            new Office(
+                constitution.getPolityId(),
+                constitution.getId(),
+                jurisdiction.getId(),
+                Office.COUNCILOR,
+                OfficeTemplateKey.COUNCILOR.storedName(),
+                OfficeTemplateKey.COUNCILOR.storedDescription(),
+                OfficeTemplateKey.COUNCILOR,
+                pace.starterOfficeTermDays(),
+                STANDARD_COUNCIL_SEAT_COUNT),
             new Office(
                 constitution.getPolityId(),
                 constitution.getId(),

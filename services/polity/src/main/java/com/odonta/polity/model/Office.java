@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "offices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Office extends AuditedEntity {
+  public static final String COUNCILOR = "councilor";
   public static final String STEWARD = "steward";
   public static final String TRIBUNE = "tribune";
   public static final String MAGISTRATE = "magistrate";

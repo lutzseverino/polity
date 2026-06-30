@@ -77,6 +77,10 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
   @Column(name = "effect_type", nullable = false)
   private EffectType effectType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "office_election_method")
+  private OfficeElectionMethod officeElectionMethod;
+
   public Procedure(
       UUID polityId,
       UUID constitutionVersionId,
@@ -104,7 +108,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         1,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        null);
   }
 
   public Procedure(
@@ -137,7 +142,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         1,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        null);
   }
 
   public Procedure(
@@ -171,7 +177,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        null);
   }
 
   public Procedure(
@@ -202,7 +209,44 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         1,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        null);
+  }
+
+  public Procedure(
+      UUID polityId,
+      UUID constitutionVersionId,
+      UUID institutionId,
+      String code,
+      String name,
+      ProcedureTemplateKey templateKey,
+      int quorumNumerator,
+      int quorumDenominator,
+      VotingThreshold threshold,
+      ProcedureElectorate electorate,
+      String electorateOfficeCode,
+      int minimumElectorCount,
+      int minimumNoticeHours,
+      int votingPeriodHours,
+      EffectType effectType,
+      OfficeElectionMethod officeElectionMethod) {
+    this(
+        polityId,
+        constitutionVersionId,
+        institutionId,
+        code,
+        name,
+        templateKey == null ? null : templateKey.nameKey(),
+        quorumNumerator,
+        quorumDenominator,
+        threshold,
+        electorate,
+        electorateOfficeCode,
+        minimumElectorCount,
+        minimumNoticeHours,
+        votingPeriodHours,
+        effectType,
+        officeElectionMethod);
   }
 
   public Procedure copyTo(UUID constitutionVersionId, UUID institutionId) {
@@ -216,7 +260,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         electorateOfficeCode,
         minimumElectorCount,
         minimumNoticeHours,
-        votingPeriodHours);
+        votingPeriodHours,
+        officeElectionMethod);
   }
 
   public Procedure copyWithRules(
@@ -229,7 +274,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
       String electorateOfficeCode,
       int minimumElectorCount,
       int minimumNoticeHours,
-      int votingPeriodHours) {
+      int votingPeriodHours,
+      OfficeElectionMethod officeElectionMethod) {
     return new Procedure(
         polityId,
         constitutionVersionId,
@@ -245,7 +291,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
         minimumElectorCount,
         minimumNoticeHours,
         votingPeriodHours,
-        effectType);
+        effectType,
+        officeElectionMethod);
   }
 
   private Procedure(
@@ -263,7 +310,8 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
       int minimumElectorCount,
       int minimumNoticeHours,
       int votingPeriodHours,
-      EffectType effectType) {
+      EffectType effectType,
+      OfficeElectionMethod officeElectionMethod) {
     this.polityId = polityId;
     this.constitutionVersionId = constitutionVersionId;
     this.institutionId = institutionId;
@@ -279,5 +327,11 @@ public class Procedure extends AuditedEntity implements VotingProcedure {
     this.minimumNoticeHours = minimumNoticeHours;
     this.votingPeriodHours = votingPeriodHours;
     this.effectType = effectType;
+    this.officeElectionMethod =
+        effectType == EffectType.ELECT_OFFICE
+            ? officeElectionMethod == null
+                ? OfficeElectionMethod.RANKED_CHOICE
+                : officeElectionMethod
+            : null;
   }
 }

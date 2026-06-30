@@ -1,6 +1,7 @@
 package com.odonta.polity.model;
 
 public enum OfficeTemplateKey {
+  COUNCILOR("office.councilor"),
   MAGISTRATE("office.magistrate"),
   STEWARD("office.steward"),
   TRIBUNE("office.tribune");
