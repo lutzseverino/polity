@@ -41,7 +41,7 @@ export function AppCard({
   ...props
 }: AppCardProps) {
   const cardClassName = cn(
-    "rounded-none border-0 py-0 ring-0",
+    "gap-0 rounded-none border-0 py-0 ring-0",
     paddingClassName[padding],
     toneClassName[tone],
     className,
