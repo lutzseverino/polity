@@ -46,30 +46,41 @@ transport boundary, rather than storing freeform constitutional text as the enfo
 
 Procedures own quorum, thresholds, notice, and voting windows. Motions freeze the relevant procedure
 rules and electorate snapshot when introduced, so later amendments do not rewrite old proceedings.
-Plurality is reserved for office elections; yes/no procedures must use yes/no thresholds.
-Motion responses keep those modalities separate: yes/no proceedings expose a vote tally, while
-office elections expose an election tally with candidate ballot counts and any winner.
+Office-election result thresholds are reserved for office elections; yes/no procedures must use
+yes/no thresholds. Motion responses keep those modalities separate: yes/no proceedings expose a vote
+tally, while office elections expose election method, seat counts, ranked tally rounds, candidate
+vote totals, and elected winners.
 
-Founding uses a setup preset and a pace. The current preset is the Standard Republic: a starter
-constitutional republic with a root Citizens' Assembly, short starter office terms,
-provisional admission authority, elected Steward and Tribune offices, a Magistrates' Court and
-Magistrate office for appeals and review, typed constitutional powers, citizen-held initiative for
-ordinary motions and elections, office-introduced sanctions with citizen voting and appeal rights,
-disbandment, and stricter constitutional amendment rules. It is a structured republic-inspired MVP,
-not yet a full federal ontology: jurisdictions are currently root-level constitutional scoping
-metadata, and future presets may add richer federal layers or branch-specific guardrails when those
-mechanics are first class. Pace is a founding parameter that changes timing such as starter office
-term length and voting windows without changing the constitutional shape.
+Founding uses a setup preset and a pace. The current preset is the Standard Constitutional Council
+Republic: a starter constitutional republic with a root Citizens' Assembly, an elected Citizens'
+Council for ordinary resolutions, short starter office terms, provisional admission authority,
+elected Steward and Tribune offices, a Magistrates' Court and Magistrate office for appeals and
+review, typed constitutional powers, citizen-held initiative for elections, office-introduced
+sanctions with citizen voting and appeal rights, disbandment, and stricter constitutional amendment
+rules. It is intentionally scoped as a constitutional-republic engine: jurisdictions are currently
+constitutional scoping metadata, not layered sovereignty. Pace is a founding parameter that changes
+timing such as starter office term length and voting windows without changing the constitutional
+shape.
 
-A polity is provisional until it has at least three citizens with political standing. Provisional
-polities may admit members and may disband, but they cannot introduce ordinary governing motions,
-sanctions, office elections, or constitutional amendments. If the founding Steward term expires
-before the polity reaches three citizens with political standing, the founder retains only
-provisional admission authority so the polity can finish forming; that fallback ends once the polity
-reaches full government size and does not bypass missing constitutional powers or
-political-standing checks. Once full government size is reached, the initial bootstrap Steward term
-also ends; any later Steward authority must come from an elected or otherwise constitutionally
-authorized office term.
+Government assessment has two axes. Readiness reports whether the polity can mechanically operate
+right now: provisional, forming offices, ready, blocked, or disbanded. Constitutional health reports
+whether the current constitution still defines robust paths such as admission, elections, appeal,
+amendment, disbandment, and certification. Readiness is staffing-and-standing aware; health is
+structural and should not treat an empty office as constitutional degradation. Action availability
+keeps per-action reasons, but those reasons should line up with the same authority and electorate
+facts used by readiness diagnostics.
+
+A polity is provisional until it has at least three citizens with political standing. Provisional is
+not a blanket engine lock: actions are blocked only when their constitutional authority or procedure
+electorate cannot actually run. The standard preset makes active-member procedures require two
+eligible electors, so a single citizen cannot start voting machinery alone, while two citizens can
+use viable two-elector paths such as office elections or other meta procedures if the constitution
+grants them. If the founding Steward term expires before the polity reaches three citizens with
+political standing, the founder retains only provisional admission authority so the polity can finish
+forming; that fallback ends once the polity reaches full government size and does not bypass missing
+constitutional powers or political-standing checks. Once full government size is reached, the initial
+bootstrap Steward term also ends; any later Steward authority must come from an elected or otherwise
+constitutionally authorized office term.
 
 Offices, office terms, sanctions, appeals, amendments, and typed official effects are Polity-owned
 constitutional mechanics. Platform services may provide reusable access, invitation, billing,
@@ -109,7 +120,10 @@ without political standing cannot be nominated or elected into offices while the
 
 Constitutional amendments are typed domain changes, such as procedure, office, and power changes.
 They are not arbitrary payload patches, and explanatory text does not itself mutate constitutional
-state.
+state. Amendment validation should enforce engine invariants, such as known referenced offices,
+compatible procedure effects, and office seat counts that do not invalidate currently active terms.
+It should not reject risky-but-executable choices merely because they make a path hard or impossible
+to use; those choices are constitutional risk and should surface through readiness and health.
 
 Constitutional review is a voiding remedy for official acts with an active reversible effect:
 adopted resolutions, applied sanctions, and elected office terms. It does not rewrite historical
@@ -164,9 +178,11 @@ held by that member, stages revocation of the normal member access grants, and w
 to the official record. Resignation does not rewrite prior votes, certifications, office records, or
 other historical evidence.
 
-The last active citizen cannot resign and orphan an active polity. They must use disbandment instead,
-which is the constitutional mechanism for ending the whole polity. The founding citizen also cannot
-resign before bootstrap completes, because provisional admission authority is the only path for the
-polity to reach full government size. Forced member removal or expulsion is deferred due-process
-work, distinct from sanctions; if added, it should be its own constitutional mechanic rather than a
-hidden sanction variant.
+The last active citizen normally cannot resign and orphan an active polity. They should use
+disbandment when the constitutional disbandment path is available. If degradation has made formal
+disbandment unavailable, the final active citizen may resign and close the polity so the engine does
+not trap them inside dead government machinery. The founding citizen also cannot resign before
+bootstrap completes unless that same final-citizen closure applies, because provisional admission
+authority is the only path for the polity to reach full government size. Forced member removal or
+expulsion is deferred due-process work, distinct from sanctions; if added, it should be its own
+constitutional mechanic rather than a hidden sanction variant.
