@@ -4,14 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppButton } from "./app-button";
 
+type AppBadgeVariant = "outline" | "secondary";
+
 type AppBadgeProps = Readonly<
-  ComponentProps<typeof Badge> & {
+  ComponentProps<"span"> & {
     treatment?: "default" | "removable";
+    variant?: AppBadgeVariant;
   }
 >;
 
 type BadgeRemoveButtonProps = Readonly<
-  Omit<ComponentProps<typeof AppButton>, "children" | "size" | "variant">
+  Omit<
+    ComponentProps<typeof AppButton>,
+    "children" | "size" | "treatment" | "variant"
+  >
 >;
 
 export function AppBadge({

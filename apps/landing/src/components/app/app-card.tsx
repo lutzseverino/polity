@@ -41,7 +41,7 @@ export function AppCard({
   ...props
 }: AppCardProps) {
   const cardClassName = cn(
-    "gap-0 rounded-none border-0 py-0 ring-0",
+    "group/card flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-card py-0 text-sm text-card-foreground ring-0",
     paddingClassName[padding],
     toneClassName[tone],
     className,
@@ -49,7 +49,12 @@ export function AppCard({
 
   if (Element === "article") {
     return (
-      <article className={cardClassName} {...props}>
+      <article
+        data-slot="card"
+        data-size="default"
+        className={cardClassName}
+        {...props}
+      >
         {children}
       </article>
     );

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type AppInputProps = Readonly<
-  ComponentProps<typeof Input> & {
+  ComponentProps<"input"> & {
     animatedPlaceholder?: string;
   }
 >;
@@ -26,7 +26,7 @@ export function AppInput({
     currentValue !== null &&
     String(currentValue).length > 0;
   const showAnimatedPlaceholder = Boolean(animatedPlaceholder && !hasValue);
-  const handleChange: ComponentProps<typeof Input>["onChange"] = (event) => {
+  const handleChange: ComponentProps<"input">["onChange"] = (event) => {
     if (value === undefined) {
       setUncontrolledValue(event.target.value);
     }

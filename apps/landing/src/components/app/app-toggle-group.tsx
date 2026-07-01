@@ -3,10 +3,22 @@ import type { ComponentProps, ReactNode } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
-type AppToggleGroupProps = Readonly<ComponentProps<typeof ToggleGroup>>;
+type AppToggleGroupProps = Readonly<{
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  children: ReactNode;
+  className?: string;
+  onValueChange?: (value: string) => void;
+  spacing?: 0 | 2;
+  type: "single";
+  value: string;
+}>;
 type AppToggleGroupItemProps = Readonly<
-  ComponentProps<typeof ToggleGroupItem> & {
+  ComponentProps<"button"> & {
+    size?: "default" | "sm";
     treatment?: "default" | "choice";
+    value: string;
+    variant?: "default" | "outline";
   }
 >;
 
@@ -44,9 +56,9 @@ export function AppToggleChoiceContent({
 }: AppToggleChoiceContentProps) {
   return (
     <span className="grid gap-1">
-      <span className="font-display text-lg">{label}</span>
+      <span className="min-w-0 break-words font-display text-lg">{label}</span>
       <span
-        className="text-xs leading-5 text-muted-foreground"
+        className="min-w-0 text-wrap text-xs leading-5 text-muted-foreground"
         data-slot="choice-copy"
       >
         {copy}
