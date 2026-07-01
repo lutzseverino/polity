@@ -22,19 +22,21 @@ export function LandingPage() {
       data-landing-page
       ref={scope}
     >
-      {/* Tube-monitor atmosphere: scanlines, an edge vignette, and paper grain,
-          all click-through and held above the content. */}
+      {/* Printout atmosphere. Scanlines, edge burn, and grain sit on the page
+          plane rather than the viewport, so the texture scrolls with the
+          content like material running under the type. All click-through, above
+          content. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-40 opacity-[0.5] texture-scanlines"
+        className="pointer-events-none absolute inset-0 z-40 opacity-[0.5] texture-scanlines"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-40 crt-vignette"
+        className="pointer-events-none absolute inset-0 z-40 crt-vignette"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-40 opacity-[0.04] mix-blend-screen texture-grain"
+        className="pointer-events-none absolute inset-0 z-40 opacity-[0.1] mix-blend-screen texture-grain"
       />
 
       <LandingMasthead />

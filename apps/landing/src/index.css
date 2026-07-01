@@ -92,9 +92,13 @@
     background-size: 100% 3px;
   }
 
-  /* Fine paper grain laid over the page for printed-stock texture. */
+  /* Paper stock laid over the page. The noise runs many octaves from a low base
+     frequency, so it carries both a fine tooth and large soft mottle — the big
+     blotches are the landmarks that let the eye see the sheet travel as it
+     scrolls with the page (fine, uniform grain reads as static no matter what).
+     The tile is large so the repeat never announces itself. */
   .texture-grain {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
   }
 
   /* Vignette — pulls the void in at the screen edges like a tube monitor. */
