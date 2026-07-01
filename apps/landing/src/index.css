@@ -64,12 +64,19 @@
     text-transform: uppercase;
   }
 
-  /* Raw teletype art — preformatted, non-selectable, hairline leading. */
+  /* Raw teletype art — preformatted, non-selectable, hairline leading. Coding
+     ligatures and contextual alternates are forced off: the mono face would
+     otherwise fuse neighbours like "<=" or "//" into a single wider glyph,
+     buckling the fixed grid (and reflowing on every scramble tick). */
   .ascii {
     font-family: var(--font-mono);
     white-space: pre;
     line-height: 1;
     letter-spacing: 0;
+    font-variant-ligatures: none;
+    font-feature-settings:
+      "liga" 0,
+      "calt" 0;
     -webkit-user-select: none;
     user-select: none;
   }

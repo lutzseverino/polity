@@ -42,6 +42,7 @@ import { AsciiSeal } from "./ascii";
 import { useStepTransition } from "./motion";
 import type { LandingOnboarding } from "./onboarding";
 import { OnboardingStepper, StepIntro, SummaryGrid } from "./onboarding-flow";
+import { SealField } from "./seal-field";
 
 type Article = {
   body: string;
@@ -111,7 +112,7 @@ export function LandingHero({ onboarding }: LandingHeroProps) {
     <section className="relative isolate overflow-hidden border-b" data-hero>
       <div className="relative mx-auto grid max-w-7xl gap-0 lg:min-h-[calc(100dvh-3rem-1px)] lg:grid-cols-[1.05fr_0.95fr]">
         {/* Left — the proclamation and the founding command line. */}
-        <div className="relative z-0 flex flex-col justify-center gap-8 px-4 py-16 md:px-8 md:py-20 lg:border-r lg:py-24">
+        <div className="relative z-0 flex flex-col justify-center gap-8 px-4 py-16 md:px-8 md:py-20 lg:border-r lg:py-12">
           <div className="flex flex-col gap-6">
             <Eyebrow data-boot>{t("hero.eyebrow")}</Eyebrow>
             <h1 className="font-display text-[clamp(2.9rem,7.4vw,5.5rem)] leading-[0.9]">
@@ -158,53 +159,35 @@ export function LandingHero({ onboarding }: LandingHeroProps) {
           </AppButton>
         </div>
 
-        {/* Right — the console: the seal powers on, then yields to the flow. */}
-        <div className="relative flex min-h-[28rem] items-center justify-center border-t px-4 py-14 md:px-8 lg:min-h-0 lg:border-t-0">
+        {/* Right — the console: the seal field powers on, then yields to the
+            flow. The field is struck full-bleed across the pane; the console
+            crossfades in over it once a name is entered. */}
+        <div className="relative flex min-h-[28rem] items-center justify-center border-t px-4 py-10 md:px-8 lg:min-h-0 lg:border-t-0 lg:py-12">
           <div className="pointer-events-none absolute inset-0 texture-scanlines opacity-40" />
-          <div className="relative grid w-full max-w-md place-items-center">
-            {/* Seal layer — the resting state while you name the polity, framed
-                as an official plate so it crossfades cleanly into the console. */}
-            <div
-              aria-hidden={!isNaming}
-              className={cn(
-                "col-start-1 row-start-1 w-full transition-opacity duration-500",
-                isNaming
-                  ? "opacity-100"
-                  : "pointer-events-none opacity-0 duration-300",
-              )}
-              data-seal-layer
-            >
-              <TerminalPanel className="w-full bg-card/40">
-                <TerminalPanelHeader
-                  end={t("hero.plate.number")}
-                  start={
-                    <>
-                      <TerminalDot />
-                      {t("hero.plate.official")}
-                    </>
-                  }
-                />
-                <div className="grid place-items-center px-6 py-9">
-                  <AsciiSeal className="mx-auto w-fit text-[clamp(0.42rem,1.55vw,0.76rem)]" />
-                </div>
-                <div className="border-t bg-muted/40 px-3 py-2.5 text-center font-mono text-[0.62rem] leading-none tracking-[0.34em] text-primary uppercase">
-                  {t("hero.plate.founded")}
-                </div>
-              </TerminalPanel>
-            </div>
 
-            {/* Console layer — the founding flow, once a name is entered. */}
-            <div
-              aria-hidden={isNaming}
-              className={cn(
-                "col-start-1 row-start-1 w-full transition-opacity duration-500",
-                isNaming
-                  ? "pointer-events-none opacity-0 duration-300"
-                  : "opacity-100 delay-150",
-              )}
-            >
-              <OnboardingConsole onboarding={onboarding} />
-            </div>
+          {/* Seal field — the resting state while you name the polity. */}
+          <SealField
+            active={isNaming}
+            className={cn(
+              "absolute inset-0 transition-opacity duration-500",
+              isNaming
+                ? "opacity-100"
+                : "pointer-events-none opacity-0 duration-300",
+            )}
+          />
+
+          {/* Console layer — the founding flow, once a name is entered. */}
+          <div
+            aria-hidden={isNaming}
+            className={cn(
+              "relative w-full max-w-md transition-opacity duration-500",
+              isNaming
+                ? "pointer-events-none opacity-0 duration-300"
+                : "opacity-100 delay-150",
+            )}
+            inert={isNaming ? true : undefined}
+          >
+            <OnboardingConsole onboarding={onboarding} />
           </div>
         </div>
       </div>
@@ -562,7 +545,7 @@ function GovernmentStep({ onboarding }: OnboardingStepProps) {
           </AppFieldTitle>
           <AppToggleGroup
             aria-labelledby="pace-label"
-            className="grid w-full grid-cols-3 gap-3"
+            className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3"
             onValueChange={onboarding.updatePace}
             type="single"
             value={onboarding.pace}
@@ -654,6 +637,7 @@ function NameStep({ onboarding }: OnboardingStepProps) {
               autoComplete="organization"
               id="polity-name"
               maxLength={120}
+              name="polityName"
               onChange={(event) => onboarding.setPolityName(event.target.value)}
               placeholder={t("onboarding.name.placeholder")}
               value={onboarding.polityName}
@@ -692,7 +676,7 @@ function VisibilityStep({ onboarding }: OnboardingStepProps) {
           </AppFieldTitle>
           <AppToggleGroup
             aria-labelledby="visibility-label"
-            className="grid w-full grid-cols-2 gap-3"
+            className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2"
             onValueChange={onboarding.updateVisibility}
             type="single"
             value={onboarding.visibility}
@@ -750,10 +734,12 @@ function InviteStep({ onboarding }: OnboardingStepProps) {
               autoComplete="email"
               id="invite-email"
               inputMode="email"
+              name="inviteEmail"
               onChange={(event) =>
                 onboarding.setInviteEmail(event.target.value)
               }
               placeholder={t("onboarding.invites.placeholder")}
+              spellCheck={false}
               type="email"
               value={onboarding.inviteEmail}
             />
@@ -763,13 +749,17 @@ function InviteStep({ onboarding }: OnboardingStepProps) {
           </AppField>
         </AppFieldGroup>
 
-        <div className="grid grid-cols-[auto_1fr_1fr] gap-2">
+        <div className="grid grid-cols-[auto_1fr] gap-2 sm:grid-cols-[auto_1fr_1fr]">
           <BackStepButton onboarding={onboarding} />
           <AppButton type="submit" variant="secondary">
             <Plus data-icon="inline-start" />
             {t("onboarding.invites.enrol")}
           </AppButton>
-          <AppButton onClick={onboarding.finishSetup} type="button">
+          <AppButton
+            className="col-span-2 sm:col-span-1"
+            onClick={onboarding.finishSetup}
+            type="button"
+          >
             {t("onboarding.invites.finish")}
             <ArrowRight data-icon="inline-end" />
           </AppButton>

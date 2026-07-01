@@ -8,12 +8,6 @@
     "cta": "How it governs",
     "command": {
       "prompt": "decreos:~$ found --name"
-    },
-    "plate": {
-      "official": "Official",
-      "number": "No. 001",
-      "record": "Entry",
-      "founded": "Polity Founded"
     }
   },
   "method": {

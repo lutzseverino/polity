@@ -8,12 +8,6 @@
     "cta": "Cómo gobierna",
     "command": {
       "prompt": "decreos:~$ fundar --nombre"
-    },
-    "plate": {
-      "official": "Oficial",
-      "number": "No. 001",
-      "record": "Entrada",
-      "founded": "Politeia fundada"
     }
   },
   "method": {

@@ -1,9 +1,13 @@
 import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
-import { SEAL_LINES, SEAL_WIDTH } from "./seal-data";
-
-type SealTone = "ring" | "star" | "space";
+import {
+  SEAL_LINES,
+  SEAL_WIDTH,
+  type SealTone,
+  sealRadiusAt,
+  sealToneAt,
+} from "./seal-data";
 
 /** A contiguous run of identical-tone glyphs on one row. */
 type SealRun = {
@@ -20,32 +24,10 @@ type AsciiSealProps = Readonly<
   }
 >;
 
-// A monospace cell is taller than it is wide; this scales x so the round seal
-// renders round rather than stretched.
-const CELL_ASPECT = 0.6;
-// Inside this normalised radius the glyphs belong to the central star and burn
-// red; everything outside (rings, the star-band, the rim) stays bone.
-const STAR_RADIUS = 0.52;
-
 const toneClass: Record<Exclude<SealTone, "space">, string> = {
   ring: "text-foreground",
   star: "text-primary",
 };
-
-const CX = (SEAL_WIDTH - 1) / 2;
-const CY = (SEAL_LINES.length - 1) / 2;
-const MAX_R = (SEAL_LINES.length - 1) / 2;
-
-function radiusAt(x: number, y: number) {
-  return Math.hypot((x - CX) * CELL_ASPECT, y - CY) / MAX_R;
-}
-
-function toneAt(ch: string, x: number, y: number): SealTone {
-  if (ch === " ") {
-    return "space";
-  }
-  return radiusAt(x, y) < STAR_RADIUS ? "star" : "ring";
-}
 
 // Group each row into contiguous same-tone runs once, at module load. Plain
 // monospace text per run keeps the seal crisply aligned and immune to motion;
@@ -55,7 +37,7 @@ const SEAL_ROWS: SealRun[][] = SEAL_LINES.map((line, y) => {
   const runs: Array<SealRun & { startX: number }> = [];
   for (let x = 0; x < padded.length; x += 1) {
     const ch = padded[x] ?? " ";
-    const tone = toneAt(ch, x, y);
+    const tone = sealToneAt(ch, x, y);
     const last = runs.at(-1);
     if (last && last.tone === tone) {
       last.text += ch;
@@ -65,7 +47,7 @@ const SEAL_ROWS: SealRun[][] = SEAL_LINES.map((line, y) => {
   }
   return runs.map(({ startX, ...run }) => ({
     ...run,
-    r: radiusAt(startX + (run.text.length - 1) / 2, y),
+    r: sealRadiusAt(startX + (run.text.length - 1) / 2, y),
   }));
 });
 
