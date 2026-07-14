@@ -11,35 +11,42 @@ import { cn } from "@/lib/utils";
 type InboxItemLinkProps = Readonly<{
   compact?: boolean;
   item: InboxItem;
+  renderInvitationLink: RenderInvitationLink;
 }>;
+
+export type RenderInvitationLink = (
+  props: Readonly<{
+    children: ReactNode;
+    className: string;
+    invitationId: string;
+  }>,
+) => ReactNode;
 
 function InboxTargetLink({
   children,
   className,
   item,
+  renderInvitationLink,
 }: Readonly<{
   children: ReactNode;
   className: string;
   item: InboxItem;
+  renderInvitationLink: RenderInvitationLink;
 }>) {
-  if (item.target.kind === "invitation") {
-    return (
-      <Link
-        className={className}
-        params={{ invitationId: item.target.invitationId }}
-        to="/polities/invitations/$invitationId"
-      >
-        {children}
-      </Link>
-    );
+  if (item.source.kind === "membership-invitation") {
+    return renderInvitationLink({
+      children,
+      className,
+      invitationId: item.source.invitationId,
+    });
   }
 
   return (
     <Link
       className={className}
       params={{
-        motionId: item.target.motionId,
-        polityId: item.target.polityId,
+        motionId: item.source.motionId,
+        polityId: item.source.polityId,
       }}
       to="/polities/$polityId/motions/$motionId"
     >
@@ -48,7 +55,11 @@ function InboxTargetLink({
   );
 }
 
-export function InboxItemLink({ compact = false, item }: InboxItemLinkProps) {
+export function InboxItemLink({
+  compact = false,
+  item,
+  renderInvitationLink,
+}: InboxItemLinkProps) {
   return (
     <InboxTargetLink
       className={cn(
@@ -56,6 +67,7 @@ export function InboxItemLink({ compact = false, item }: InboxItemLinkProps) {
         compact ? "p-3" : "p-4",
       )}
       item={item}
+      renderInvitationLink={renderInvitationLink}
     >
       <span
         aria-hidden="true"

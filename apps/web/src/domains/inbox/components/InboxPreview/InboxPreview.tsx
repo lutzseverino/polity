@@ -9,24 +9,33 @@ import {
   AppPopoverTrigger,
 } from "@/components/app/AppPopover";
 import { AppText } from "@/components/app/AppText";
-import { InboxItemLink } from "@/domains/inbox/components/InboxItemLink";
+import {
+  InboxItemLink,
+  type RenderInvitationLink,
+} from "@/domains/inbox/components/InboxItemLink";
 import type { InboxItem } from "@/domains/inbox/lib/inbox";
+import {
+  countOpenInboxTasks,
+  selectInboxPreviewItems,
+} from "@/domains/inbox/lib/inbox-selectors";
 
 type InboxPreviewProps = Readonly<{
   items: readonly InboxItem[];
+  renderInvitationLink: RenderInvitationLink;
 }>;
 
-export function InboxPreview({ items }: InboxPreviewProps) {
+export function InboxPreview({
+  items,
+  renderInvitationLink,
+}: InboxPreviewProps) {
   const { t } = useLingui();
-  const unresolvedCount = items.filter(
-    (item) => item.category === "needs-action",
-  ).length;
-  const previewItems = items.slice(0, 3);
+  const openTaskCount = countOpenInboxTasks(items);
+  const previewItems = selectInboxPreviewItems(items);
 
   return (
     <AppPopover>
       <AppPopoverTrigger
-        aria-label={t`Open Inbox, ${unresolvedCount} items need action`}
+        aria-label={t`Open Inbox, ${openTaskCount} items need action`}
         className="relative"
         render={<AppButton size="icon-lg" variant="ghost" />}
       >
@@ -34,12 +43,14 @@ export function InboxPreview({ items }: InboxPreviewProps) {
         <span className="sr-only">
           <Trans>Open Inbox</Trans>
         </span>
-        <span
-          aria-hidden="true"
-          className="absolute -top-1 -right-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.625rem] leading-4 font-semibold text-primary-foreground"
-        >
-          {unresolvedCount}
-        </span>
+        {openTaskCount > 0 ? (
+          <span
+            aria-hidden="true"
+            className="absolute -top-1 -right-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.625rem] leading-4 font-semibold text-primary-foreground"
+          >
+            {openTaskCount}
+          </span>
+        ) : null}
       </AppPopoverTrigger>
       <AppPopoverContent
         align="end"
@@ -52,17 +63,22 @@ export function InboxPreview({ items }: InboxPreviewProps) {
             </AppText>
             <AppText className="mt-0.5" variant="caption">
               <Plural
-                value={unresolvedCount}
+                value={openTaskCount}
                 one="# item needs action"
                 other="# items need action"
               />
             </AppText>
           </div>
-          <AppBadge>{unresolvedCount}</AppBadge>
+          <AppBadge>{openTaskCount}</AppBadge>
         </div>
         <div className="space-y-2">
           {previewItems.map((item) => (
-            <InboxItemLink compact item={item} key={item.id} />
+            <InboxItemLink
+              compact
+              item={item}
+              key={item.id}
+              renderInvitationLink={renderInvitationLink}
+            />
           ))}
         </div>
         <AppLinkButton className="mt-3 w-full" to="/inbox" variant="outline">

@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -6,10 +7,12 @@ import { AppButton } from "@/components/app/AppButton";
 import { AppPageHeader } from "@/components/app/AppPageHeader";
 import { AppText } from "@/components/app/AppText";
 import {
+  filterInboxItemsByCategory,
   type InboxCategory,
   InboxItemLink,
   useInboxItems,
 } from "@/domains/inbox";
+import { InvitationTaskLink } from "@/features/accept-invitation";
 
 type InboxSearch = Readonly<{
   category?: InboxCategory;
@@ -17,6 +20,14 @@ type InboxSearch = Readonly<{
 
 export const Route = createFileRoute("/inbox/")({
   component: InboxRoute,
+  staticData: {
+    shell: {
+      label: msg`Inbox`,
+      level: "root",
+      section: "inbox",
+      target: { to: "/inbox" },
+    },
+  },
   validateSearch: (search): InboxSearch => ({
     category: search.category === "updates" ? "updates" : undefined,
   }),
@@ -35,18 +46,17 @@ function InboxRoute() {
   const { category } = Route.useSearch();
   const activeCategory = category ?? "needs-action";
   const { data: items } = useInboxItems({ locale: i18n.locale });
-  const visibleItems = items.filter((item) => item.category === activeCategory);
+  const visibleItems = filterInboxItemsByCategory(items, activeCategory);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <AppPageHeader
         description={
           <Trans>
-            Find everything that needs your attention here. Each item opens
-            where that decision belongs.
+            Review actions and updates from across your polities. Each item
+            opens where that decision belongs.
           </Trans>
         }
-        eyebrow={<Trans>Your Attention</Trans>}
         title={<Trans>Inbox</Trans>}
       />
 
@@ -55,8 +65,9 @@ function InboxRoute() {
           <Trans>Inbox Categories</Trans>
         </legend>
         {categories.map((category) => {
-          const count = items.filter(
-            (item) => item.category === category.value,
+          const count = filterInboxItemsByCategory(
+            items,
+            category.value,
           ).length;
           const isActive = activeCategory === category.value;
 
@@ -94,7 +105,22 @@ function InboxRoute() {
         {visibleItems.length > 0 ? (
           <div className="space-y-3">
             {visibleItems.map((item) => (
-              <InboxItemLink item={item} key={item.id} />
+              <InboxItemLink
+                item={item}
+                key={item.id}
+                renderInvitationLink={({
+                  children,
+                  className,
+                  invitationId,
+                }) => (
+                  <InvitationTaskLink
+                    className={className}
+                    invitationId={invitationId}
+                  >
+                    {children}
+                  </InvitationTaskLink>
+                )}
+              />
             ))}
           </div>
         ) : (

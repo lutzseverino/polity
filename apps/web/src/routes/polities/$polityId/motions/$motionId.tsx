@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Info } from "lucide-react";
@@ -6,7 +7,6 @@ import {
   AppAlertDescription,
   AppAlertTitle,
 } from "@/components/app/AppAlert";
-import { AppBackLink } from "@/components/app/AppBackLink";
 import { AppBadge } from "@/components/app/AppBadge";
 import {
   AppCard,
@@ -19,11 +19,7 @@ import {
 import { AppProgress, AppProgressLabel } from "@/components/app/AppProgress";
 import { AppText } from "@/components/app/AppText";
 import type { Motion } from "@/domains/motion";
-import {
-  polityMotionQueryOptions,
-  usePolity,
-  usePolityMotion,
-} from "@/domains/polity";
+import { polityMotionQueryOptions, usePolityMotion } from "@/domains/polity";
 import { CastVotePanel } from "@/features/cast-vote";
 import { NominationResponsePanel } from "@/features/respond-to-nomination";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
@@ -32,13 +28,15 @@ export const Route = createFileRoute("/polities/$polityId/motions/$motionId")({
   component: MotionDetailRoute,
   loader: async ({ context, params }) => {
     try {
-      await context.queryClient.ensureQueryData(
+      const motion = await context.queryClient.ensureQueryData(
         polityMotionQueryOptions({
           locale: context.getLocale(),
           motionId: params.motionId,
           polityId: params.polityId,
         }),
       );
+
+      return { shellLabel: motion.title };
     } catch (error) {
       if (isResourceNotFoundError(error)) {
         throw notFound();
@@ -46,6 +44,19 @@ export const Route = createFileRoute("/polities/$polityId/motions/$motionId")({
 
       throw error;
     }
+  },
+  staticData: {
+    shell: {
+      back: {
+        label: msg`All motions`,
+        target: { params: "polityId", to: "/polities/$polityId/motions" },
+      },
+      compactLabel: msg`Motion`,
+      compactNavigation: "hidden",
+      compactWorkspaceChrome: "hidden",
+      level: "detail",
+      showPrimaryAction: false,
+    },
   },
 });
 
@@ -121,28 +132,12 @@ function MotionDetailRoute() {
     motionId,
     polityId,
   });
-  const { data: polity } = usePolity({
-    locale: i18n.locale,
-    polityId,
-  });
   const participationPercent = Math.round(
     (motion.participation.cast / motion.participation.eligible) * 100,
   );
 
   return (
     <div className="space-y-5">
-      <div>
-        <AppText className="mb-1 md:hidden" variant="captionStrong">
-          {polity.name}
-        </AppText>
-        <AppBackLink
-          params={{ polityId: polity.id }}
-          to="/polities/$polityId/motions"
-        >
-          <Trans>All motions</Trans>
-        </AppBackLink>
-      </div>
-
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
         <div className="min-w-0 space-y-5">
           <article>
@@ -165,7 +160,7 @@ function MotionDetailRoute() {
                 )}
               </AppText>
             </div>
-            <AppText as="h2" variant="pageTitle">
+            <AppText as="h1" variant="pageTitle">
               {motion.title}
             </AppText>
             <AppText className="mt-2" variant="supporting">
@@ -176,7 +171,7 @@ function MotionDetailRoute() {
             </AppText>
           </article>
 
-          <MotionDecision motion={motion} polityId={polity.id} />
+          <MotionDecision motion={motion} polityId={polityId} />
 
           <AppAlert>
             <Info aria-hidden="true" />

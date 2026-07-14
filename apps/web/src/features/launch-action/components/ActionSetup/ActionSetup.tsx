@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ShieldCheck } from "lucide-react";
 
-import { AppBackLink } from "@/components/app/AppBackLink";
 import { AppBadge } from "@/components/app/AppBadge";
 import {
   AppCard,
@@ -32,9 +31,6 @@ export function ActionSetup({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <AppBackLink to="/home">
-        <Trans>Back to Home</Trans>
-      </AppBackLink>
       <AppPageHeader
         description={
           action ? (

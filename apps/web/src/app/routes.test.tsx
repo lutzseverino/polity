@@ -1,5 +1,5 @@
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
@@ -32,6 +32,9 @@ describe("first governing journey", () => {
     expect(
       await screen.findByRole("heading", { name: "Shared Thursday Dinner" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Current location" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Official vote")).toBeInTheDocument();
     expect(
       screen.getByText(/reactions and comments never count/i),
@@ -52,78 +55,158 @@ describe("first governing journey", () => {
     renderRouter(router);
 
     expect(
-      await screen.findByRole("heading", { name: "Your Polities", level: 1 }),
+      await screen.findByRole("heading", {
+        name: "Polities",
+        level: 1,
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /the thursday assembly/i }),
     ).toHaveAttribute("href", "/polities/thursday-assembly");
     expect(
-      screen.getAllByRole("navigation", { name: "Primary Navigation" }),
-    ).toHaveLength(2);
-  });
-
-  it("scales invitations separately from existing memberships", async () => {
-    const user = userEvent.setup();
-    const router = createTestRouter("/polities");
-
-    renderRouter(router);
-
-    expect(
-      await screen.findByRole("region", { name: "Invitations" }),
+      screen.getByRole("navigation", { name: "Primary Navigation" }),
     ).toBeInTheDocument();
-    const politySection = screen.getByRole("region", { name: "Your Polities" });
-    expect(politySection).toBeInTheDocument();
     expect(
-      within(politySection).getByRole("link", { name: /found a polity/i }),
-    ).toHaveAttribute("href", "/polities/new");
-    expect(politySection.querySelector('[data-slot="empty"]')).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: /sunday supper club/i }),
-    ).toHaveAttribute("href", "/polities/invitations/invitation-supper-club");
-    expect(screen.getByText("Garden Cooperative")).toBeInTheDocument();
-    expect(screen.getByText("Local Book Circle")).toBeInTheDocument();
-    expect(screen.queryByText("Nothing Needs You")).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("Government is operating normally."),
+      screen.queryByRole("navigation", { name: "Current location" }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(
-        "One more standing member is needed for full government.",
-      ),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getAllByRole("link", { name: "View 1 More Invitation" }),
-    ).toHaveLength(2);
-    expect(screen.queryByText("Cabin Council")).not.toBeInTheDocument();
-
-    await user.click(
-      screen.getAllByRole("link", { name: "View 1 More Invitation" })[0],
-    );
-
-    expect(router.state.location.searchStr).toBe("?invitations=all");
-    expect(screen.getByText("Cabin Council")).toBeInTheDocument();
+    const accountLink = screen.getByRole("link", { name: "Open account" });
+    expect(accountLink).toHaveAttribute("href", "/me");
+    expect(accountLink.querySelector('[data-slot="avatar"]')).not.toBeNull();
+    expect(within(accountLink).getByText("Account")).toBeInTheDocument();
   });
 
-  it("keeps invitation review and acceptance under polities", async () => {
-    const user = userEvent.setup();
+  it("keeps the polity directory focused on existing memberships", async () => {
     const router = createTestRouter("/polities");
 
     renderRouter(router);
 
+    expect(
+      await screen.findByRole("heading", {
+        name: "Polities",
+        level: 1,
+      }),
+    ).toBeInTheDocument();
+    const politySection = screen.getByRole("region", { name: "Polities" });
+    expect(politySection).toBeInTheDocument();
+    const foundPolityLink = within(politySection).getByRole("link", {
+      name: /found a polity/i,
+    });
+    expect(foundPolityLink).toHaveAttribute("href", "/polities/new");
+    const separators = politySection.querySelectorAll(
+      '[data-slot="separator"]',
+    );
+    expect(separators).toHaveLength(2);
+    expect(separators[0]).toHaveClass("hidden", "md:block");
+    expect(separators[1]).toHaveClass("md:hidden");
+    expect(foundPolityLink.nextElementSibling).toBe(separators[1]);
+    expect(politySection.querySelector('[data-slot="empty"]')).toBeVisible();
+    expect(screen.queryByRole("region", { name: "Invitations" })).toBeNull();
+    expect(screen.queryByText("Sunday Supper Club")).toBeNull();
+    expect(screen.getByText("The Thursday Assembly")).toBeInTheDocument();
+  });
+
+  it("resolves an invitation from Inbox as an open task", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/inbox");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("link", {
+        name: "Inbox, 6 items need action",
+      }),
+    ).toBeInTheDocument();
     await user.click(
-      await screen.findByRole("link", { name: /sunday supper club/i }),
+      screen.getByRole("link", {
+        name: /invitation to join sunday supper club/i,
+      }),
     );
 
-    expect(router.state.location.pathname).toBe(
+    expect(router.state.location.pathname).toBe("/inbox");
+    expect(router.state.location.maskedLocation?.pathname).toBe(
       "/polities/invitations/invitation-supper-club",
     );
+    expect(router.history.location.pathname).toBe(
+      "/polities/invitations/invitation-supper-club",
+    );
+    const invitationDialog = await screen.findByRole("dialog");
     expect(
-      await screen.findByRole("heading", { name: "Sunday Supper Club" }),
+      within(invitationDialog).getByRole("heading", {
+        name: "Join Sunday Supper Club?",
+        level: 2,
+      }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Accept Invitation" }));
+    await user.click(
+      within(invitationDialog).getByRole("button", {
+        name: "Join polity",
+      }),
+    );
 
-    expect(screen.getByText("Invitation Accepted")).toBeInTheDocument();
+    expect(
+      within(invitationDialog).getByText("You joined Sunday Supper Club"),
+    ).toBeInTheDocument();
+    await user.click(
+      within(invitationDialog).getByRole("button", { name: "Done" }),
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+    expect(
+      screen.queryByText("Invitation to join Sunday Supper Club"),
+    ).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Inbox, 5 items need action" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Open Inbox, 5 items need action",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Needs Action\s*5/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("dismisses an invitation back to the exact Inbox state", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/inbox");
+
+    renderRouter(router);
+
+    await user.click(
+      await screen.findByRole("link", {
+        name: /invitation to join cabin council/i,
+      }),
+    );
+    const invitationDialog = await screen.findByRole("dialog");
+    await user.click(
+      within(invitationDialog).getByRole("button", { name: "Not Now" }),
+    );
+    await waitFor(() => {
+      expect(router.state.location.search.task).toBeUndefined();
+    });
+
+    expect(router.state.location.pathname).toBe("/inbox");
+    expect(
+      screen.getByText("Invitation to join Cabin Council"),
+    ).toBeInTheDocument();
+  });
+
+  it("renders a direct invitation URL as the standalone fallback", async () => {
+    const router = createTestRouter(
+      "/polities/invitations/invitation-supper-club",
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Join Sunday Supper Club?",
+        level: 1,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("keeps inbox categories in the URL and separates updates", async () => {
@@ -136,13 +219,31 @@ describe("first governing journey", () => {
       await screen.findByRole("heading", { name: "Inbox" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Invitation to Sunday Supper Club"),
+      screen.getByText("Invitation to join Sunday Supper Club"),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", {
-        name: /invitation to sunday supper club/i,
-      }),
-    ).toHaveAttribute("href", "/polities/invitations/invitation-supper-club");
+    const invitationLink = screen.getByRole("link", {
+      name: /invitation to join sunday supper club/i,
+    });
+    expect(invitationLink).toHaveAttribute(
+      "href",
+      "/polities/invitations/invitation-supper-club",
+    );
+
+    await user.click(invitationLink);
+
+    const invitationDialog = await screen.findByRole("dialog");
+    expect(router.state.location.pathname).toBe("/inbox");
+    await user.click(
+      within(invitationDialog).getByRole("button", { name: "Not Now" }),
+    );
+    await waitFor(() => {
+      expect(router.state.location.search.task).toBeUndefined();
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    expect(router.state.location.pathname).toBe("/inbox");
 
     await user.click(screen.getByRole("button", { name: /updates/i }));
 
@@ -151,7 +252,7 @@ describe("first governing journey", () => {
       screen.getByText("Autumn Cabin Budget Was Adopted"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Invitation to Sunday Supper Club"),
+      screen.queryByText("Invitation to join Sunday Supper Club"),
     ).not.toBeInTheDocument();
   });
 

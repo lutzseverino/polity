@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/components/app/AppTaskSurface/AppTaskSurface.tsx:50
+msgid "Close"
+msgstr ""
+
 #: src/components/app/AppPlannedDestination/AppPlannedDestination.tsx:34
 msgid "Planned destination"
 msgstr ""

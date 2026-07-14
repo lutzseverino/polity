@@ -32,4 +32,6 @@ Use the [decision template](../_templates/decision.template.md) for new decision
 
 - [API mocking for tests](api-mocking-for-tests.md)
 - [Data access and server state](data-access-and-server-state.md)
+- [Inbox as a user-attention read model](inbox-attention-model.md)
 - [Routing and localization](routing-and-localization.md)
+- [Shell context and page headings](shell-context-and-page-headings.md)
