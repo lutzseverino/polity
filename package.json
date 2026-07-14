@@ -8,29 +8,33 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "node scripts/run-package-script.mjs root build:landing",
+    "build": "node scripts/run-package-script.mjs root build:web && node scripts/run-package-script.mjs root build:landing",
     "build:landing": "node scripts/run-package-script.mjs workspace apps/landing build",
+    "build:web": "node scripts/run-package-script.mjs workspace apps/web build",
     "check": "node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service",
     "check:deps": "knip",
-    "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root lint:ts && node scripts/run-package-script.mjs root check:ts:architecture",
+    "check:js": "biome check . && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root lint:ts && node scripts/run-package-script.mjs root check:ts:architecture && node scripts/run-package-script.mjs root test:web",
     "check:service": "node scripts/run-package-script.mjs root test:service && node scripts/run-package-script.mjs root check:service:static",
     "check:service:architecture": "mvn -f services/polity/pom.xml -Dtest=PolityArchitectureTest,PolityRepositoryBoundaryTest,PolityApplicationBoundaryTest test",
     "check:service:static": "mvn -f services/polity/pom.xml compile spotbugs:check",
-    "check:ts:architecture": "node scripts/run-package-script.mjs root check:ts:architecture:landing && node scripts/run-package-script.mjs root check:ts:architecture:mobile && node scripts/run-package-script.mjs root check:ts:architecture:design",
+    "check:ts:architecture": "node scripts/run-package-script.mjs root check:ts:architecture:web && node scripts/run-package-script.mjs root check:ts:architecture:landing && node scripts/run-package-script.mjs root check:ts:architecture:mobile && node scripts/run-package-script.mjs root check:ts:architecture:design",
     "check:ts:architecture:design": "node scripts/run-package-script.mjs workspace packages/design check:architecture",
     "check:ts:architecture:landing": "node scripts/run-package-script.mjs workspace apps/landing check:architecture",
     "check:ts:architecture:mobile": "node scripts/run-package-script.mjs workspace apps/mobile check:architecture",
+    "check:ts:architecture:web": "node scripts/run-package-script.mjs workspace apps/web check:architecture",
     "compile:service": "mvn -f services/polity/pom.xml compile",
-    "dev": "node scripts/run-package-script.mjs root dev:mobile",
+    "dev": "node scripts/run-package-script.mjs root dev:web",
     "dev:landing": "node scripts/run-package-script.mjs workspace apps/landing dev",
     "dev:mobile": "node scripts/run-package-script.mjs workspace apps/mobile start",
+    "dev:web": "node scripts/run-package-script.mjs workspace apps/web dev",
     "format": "biome check . --write",
     "generate:api": "node scripts/run-package-script.mjs workspace apps/landing generate:api",
     "lint": "biome check .",
     "lint:ts": "eslint --config eslint.config.mjs .",
     "quality": "node scripts/run-package-script.mjs root check && node scripts/run-package-script.mjs root check:deps",
     "test:service": "mvn -f services/polity/pom.xml test",
-    "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"
+    "test:web": "node scripts/run-package-script.mjs workspace apps/web test:run",
+    "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace apps/web typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"
   },
   "engines": {
     "node": ">=20"

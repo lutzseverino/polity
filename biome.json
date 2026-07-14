@@ -25,6 +25,16 @@
       "apps/landing/src/**/*.tsx",
       "apps/landing/tsconfig*.json",
       "apps/landing/vite.config.ts",
+      "apps/web/components.json",
+      "apps/web/index.html",
+      "apps/web/package.json",
+      "apps/web/lingui.config.ts",
+      "apps/web/src/**/*.css",
+      "apps/web/src/**/*.ts",
+      "apps/web/src/**/*.tsx",
+      "apps/web/tsconfig*.json",
+      "apps/web/vitest.config.ts",
+      "apps/web/vite.config.ts",
       "apps/mobile/app.json",
       "apps/mobile/eslint.config.js",
       "apps/mobile/package.json",
@@ -39,7 +49,10 @@
       "packages/*/tsconfig.depcruise.json",
       "packages/*/tsconfig.json",
       "!apps/landing/src/api/generated",
-      "!apps/landing/src/design/tokens/shadcn-theme.css"
+      "!apps/landing/src/design/tokens/shadcn-theme.css",
+      "!apps/web/src/app/i18n/generated",
+      "!apps/web/src/components/ui",
+      "!apps/web/src/routeTree.gen.ts"
     ]
   },
   "formatter": {

@@ -10,9 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@/assets/*": ["assets/*"],
-      "@polity/design": ["../../packages/design/src/index.ts"],
-      "@polity/design/*": ["../../packages/design/src/*"]
+      "@/assets/*": ["assets/*"]
     },
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -21,5 +19,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "../../packages/design/src"]
+  "include": ["src"]
 }

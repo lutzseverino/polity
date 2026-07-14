@@ -1,6 +1,8 @@
 # Polity Mobile
 
-Mobile app for the native Polity product experience.
+Dormant Expo shell reserved for a future native Polity product experience. Product development is
+currently web-first; this workspace intentionally contains no product features or shared design-system
+dependency.
 
 ## Development
 
@@ -19,12 +21,11 @@ pnpm android
 pnpm web
 ```
 
-## Structure
+## Scope
 
-- `src/app/` owns Expo Router routes and should stay thin.
-- `src/features/` owns product feature screens, hooks, and local logic.
-- `src/components/ui/` owns reusable native UI primitives.
-- `src/design/` owns native design tokens and theme helpers.
+- `src/app/` owns the minimum Expo Router shell.
+- Product features and design dependencies should not be added until native development resumes.
+- Shared packages should be introduced only after both clients demonstrate stable, genuine reuse.
 
 ## Documentation
 

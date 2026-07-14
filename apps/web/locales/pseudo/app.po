@@ -1,0 +1,73 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-13 19:09+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: pseudo\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/app/shell/AppShell.tsx:67
+msgid "Explore"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:66
+msgid "Home"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:72
+msgid "Inbox"
+msgstr ""
+
+#: src/app/shell/RouteLoadingPage.tsx:8
+#: src/app/shell/RouteLoadingPage.tsx:13
+msgid "Loading page"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:73
+msgid "Me"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:47
+msgid "Open profile"
+msgstr ""
+
+#: src/app/shell/RouteNotFoundPage.tsx:18
+msgid "Page not found"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:68
+msgid "Polities"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:100
+#: src/app/shell/AppShell.tsx:129
+msgid "Primary Navigation"
+msgstr ""
+
+#: src/app/shell/AppShell.tsx:82
+msgid "Skip to main content"
+msgstr ""
+
+#: src/app/shell/RouteErrorPage.tsx:17
+msgid "Something went wrong while opening this page."
+msgstr ""
+
+#: src/app/shell/RouteNotFoundPage.tsx:21
+msgid "The destination you requested does not exist."
+msgstr ""
+
+#: src/app/shell/RouteErrorPage.tsx:30
+#: src/app/shell/RouteNotFoundPage.tsx:25
+msgid "View my polities"
+msgstr ""
+
+#: src/app/shell/RouteErrorPage.tsx:25
+msgid "We couldn’t open that page"
+msgstr ""

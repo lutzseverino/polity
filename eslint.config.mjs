@@ -4,12 +4,14 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 const tsFiles = [
+  "apps/web/src/**/*.{ts,tsx}",
   "apps/landing/src/**/*.{ts,tsx}",
   "apps/mobile/src/**/*.{ts,tsx}",
   "packages/design/src/**/*.ts",
 ];
 
 const projectFiles = [
+  "./apps/web/tsconfig.app.json",
   "./apps/landing/tsconfig.app.json",
   "./apps/mobile/tsconfig.json",
   "./packages/design/tsconfig.json",
@@ -22,6 +24,9 @@ export default [
       "**/dist/**",
       "**/target/**",
       "apps/landing/src/api/generated/**",
+      "apps/web/src/app/i18n/generated/**",
+      "apps/web/src/components/ui/**",
+      "apps/web/src/routeTree.gen.ts",
       "apps/mobile/.expo/**",
     ],
   },
@@ -82,7 +87,7 @@ export default [
     },
   },
   {
-    files: ["apps/landing/src/**/*.{ts,tsx}"],
+    files: ["apps/{landing,web}/src/**/*.{ts,tsx}"],
     plugins: {
       "react-refresh": reactRefresh,
     },
@@ -91,6 +96,12 @@ export default [
         "warn",
         { allowConstantExport: true },
       ],
+    },
+  },
+  {
+    files: ["apps/web/src/routes/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
     },
   },
 ];

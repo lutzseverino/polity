@@ -23,7 +23,9 @@ Repository documentation is organized by reader intent.
 ## Area Docs
 
 - [Landing app](../apps/landing/docs/README.md)
+- [Web app](../apps/web/docs/README.md)
 - [Mobile app](../apps/mobile/docs/README.md)
+- [Design package](../packages/design/docs/README.md)
 - [Polity service](../services/polity/docs/README.md)
 
 ## Documents

@@ -1,1 +1,5 @@
-export { HomeScreen as default } from "@/features/home/HomeScreen";
+import { View } from "react-native";
+
+export default function IndexScreen() {
+  return <View />;
+}

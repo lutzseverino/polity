@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "react-component-governance": {
+      "source": "lutzseverino/governance-skills",
+      "sourceType": "github",
+      "skillPath": "react-component-governance/SKILL.md",
+      "computedHash": "6b8199ae249b235d88daf7c6a698c0b8f03ae1365161ebde490ac2998644806a"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    }
+  }
+}
