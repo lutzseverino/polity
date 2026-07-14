@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- the provider, hook, and modes form one theme API */
 import {
   createContext,
   type ReactNode,

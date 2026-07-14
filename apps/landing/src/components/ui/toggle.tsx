@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- component variants share the generated UI module API */
 import { cva, type VariantProps } from "class-variance-authority";
 import { Toggle as TogglePrimitive } from "radix-ui";
 import type * as React from "react";
