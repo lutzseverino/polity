@@ -13,7 +13,11 @@
   "ignoreBinaries": ["mvn"],
   "ignoreIssues": {
     "apps/landing/src/components/app/**": ["exports", "types"],
-    "apps/landing/src/components/ui/**": ["exports", "types"]
+    "apps/landing/src/components/ui/**": ["exports", "types"],
+    "apps/web/src/app/i18n/i18n.ts": ["exports"],
+    "apps/web/src/app/i18n/supported-locales.ts": ["exports"],
+    "apps/web/src/components/app/**": ["exports", "types"],
+    "apps/web/src/domains/**": ["types"]
   },
   "workspaces": {
     ".": {
@@ -29,6 +33,14 @@
       "entry": ["src/App.tsx"],
       "project": ["src/**/*.{ts,tsx}"],
       "ignore": ["src/api/generated/**"]
+    },
+    "apps/web": {
+      "entry": [
+        "lingui.config.ts",
+        "src/components/ui/**/*.{ts,tsx}",
+        "src/**/*.test.{ts,tsx}"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
     },
     "apps/mobile": {
       "entry": ["src/app/**/*.{ts,tsx}", "app.json"],

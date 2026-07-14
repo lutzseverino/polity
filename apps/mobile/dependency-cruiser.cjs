@@ -5,22 +5,12 @@ module.exports = {
   forbidden: [
     ...base.forbidden,
     {
-      name: "mobile-does-not-import-landing",
+      name: "mobile-does-not-import-other-apps",
       severity: "error",
       comment:
-        "Apps may share code through packages, not by importing from each other.",
+        "Applications must not import implementation from sibling applications.",
       from: { path: "^src/" },
-      to: { path: "^../landing/" },
-    },
-    {
-      name: "mobile-uses-design-public-entrypoints",
-      severity: "error",
-      comment:
-        "Mobile should import @polity/design entrypoints instead of package internals.",
-      from: { path: "^src/" },
-      to: {
-        path: "^../../packages/design/(?:bin|src/(?!index[.]ts$|tokens[.]ts$|tokens[.]json$))",
-      },
+      to: { path: "^../(?:landing|web)/" },
     },
     {
       name: "shared-components-do-not-reach-features",
@@ -33,10 +23,6 @@ module.exports = {
   ],
   options: {
     ...base.options,
-    doNotFollow: {
-      ...base.options.doNotFollow,
-      path: `${base.options.doNotFollow.path}|^../../packages/design/`,
-    },
     tsConfig: {
       fileName: "tsconfig.depcruise.json",
     },

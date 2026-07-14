@@ -4,6 +4,7 @@
     <p>
         <img alt="workspace" src="https://img.shields.io/badge/workspace-product-0f172a">
         <img alt="landing" src="https://img.shields.io/badge/landing-vite-111827">
+        <img alt="web" src="https://img.shields.io/badge/web-vite-111827">
         <img alt="mobile" src="https://img.shields.io/badge/mobile-expo-111827">
         <img alt="service" src="https://img.shields.io/badge/service-spring_boot-1f2937">
         <img alt="docs" src="https://img.shields.io/badge/docs-diataxis-374151">
@@ -29,6 +30,7 @@ Run the surface you are working on:
 
 ```bash
 pnpm dev:landing
+pnpm dev:web
 pnpm dev:mobile
 pnpm test:service
 ```
@@ -82,5 +84,7 @@ Start at the nearest owner:
 
 - [Repository docs](docs/README.md)
 - [Landing app](apps/landing/README.md)
+- [Web app](apps/web/README.md)
 - [Mobile app](apps/mobile/README.md)
+- [Design package](packages/design/README.md)
 - [Polity service](services/polity/README.md)

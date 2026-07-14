@@ -1,0 +1,219 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-13 19:09+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: pseudo\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/features/launch-action/lib/action-definitions.ts:38
+msgid "Amend the Constitution"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:43
+msgid "appeal"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:29
+msgid "Ask someone to become a member of this polity."
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:36
+msgid "Back to Home"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:23
+msgid "candidate"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:43
+msgid "challenge"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:259
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:49
+msgid "Choose an Action"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:31
+msgid "citizen"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:43
+msgid "constitutional"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:17
+msgid "decision"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:230
+msgid "Describe your intent, then review the official action before anything is submitted."
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:57
+msgid "Draft"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:23
+msgid "elect"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:148
+msgid "Find an Action"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:26
+msgid "Finish forming this polity before starting an election."
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:37
+msgid "government"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:32
+msgid "Invite a Member"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:31
+msgid "join"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:43
+msgid "justice"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:31
+msgid "membership"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:17
+msgid "motion"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:250
+msgid "New Action"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:203
+msgid "No Matching Actions"
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:55
+msgid "No polity selected"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:23
+msgid "nomination"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:23
+msgid "office"
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:48
+msgid "Official Action"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:21
+msgid "Open nominations and elect someone to an office."
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:31
+msgid "person"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:171
+msgid "Polity"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:37
+msgid "power"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:37
+msgid "procedure"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:17
+msgid "proposal"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:35
+msgid "Propose a change to the polity’s governing rules."
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:18
+msgid "Propose a Resolution"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:15
+msgid "Put a decision before the polity for an official vote."
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:44
+msgid "Request Constitutional Review"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:41
+msgid "Request review of whether an act follows the constitution."
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:43
+msgid "Return to the launcher and choose a valid action to continue."
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:61
+msgid "Review Before You Submit"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:37
+msgid "rules"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:161
+msgid "Search by goal or action…"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:227
+msgid "Start an Action"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:24
+msgid "Start an Election"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:262
+msgid "Start with your goal. You’ll review the formal action before anything is submitted."
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:64
+msgid "This handoff reserves space for the structured form required by the selected action."
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:46
+msgid "This polity has no active constitutional review procedure."
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:206
+msgid "Try a broader phrase such as “vote,” “invite,” or “rules.”"
+msgstr ""
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:81
+msgid "Unavailable"
+msgstr ""
+
+#: src/features/launch-action/lib/action-definitions.ts:17
+msgid "vote"
+msgstr ""
+
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:73
+msgid "Your words will never become a binding government action automatically. You will review the action type, polity, formal content, eligibility, and consequences first."
+msgstr ""
