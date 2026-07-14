@@ -1,13 +1,18 @@
 import { listInboxItemFixtures } from "@/domains/inbox/lib/inbox-fixtures";
+import { projectPendingInvitationToInboxTask } from "@/domains/inbox/lib/inbox-projectors";
+import { listInvitations } from "@/domains/membership";
 
 type RequestOptions = Readonly<{
   signal?: AbortSignal;
 }>;
 
-export function listInboxItems({
-  signal,
-}: RequestOptions = {}): Promise<ReturnType<typeof listInboxItemFixtures>> {
+export async function listInboxItems({ signal }: RequestOptions = {}) {
   signal?.throwIfAborted();
 
-  return Promise.resolve(listInboxItemFixtures());
+  const invitations = await listInvitations({ signal });
+
+  return [
+    ...listInboxItemFixtures(),
+    ...invitations.map(projectPendingInvitationToInboxTask),
+  ];
 }

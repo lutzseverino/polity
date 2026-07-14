@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -57,6 +58,13 @@ function MotionSection({
 
 export const Route = createFileRoute("/polities/$polityId/motions/")({
   component: MotionListRoute,
+  staticData: {
+    shell: {
+      label: msg`Motions`,
+      level: "workspace",
+      target: { params: "polityId", to: "/polities/$polityId/motions" },
+    },
+  },
 });
 
 function MotionListRoute() {

@@ -6,17 +6,38 @@ import { RouteErrorPage } from "@/app/shell/RouteErrorPage";
 import { RouteLoadingPage } from "@/app/shell/RouteLoadingPage";
 import { RouteNotFoundPage } from "@/app/shell/RouteNotFoundPage";
 import { inboxItemsQueryOptions } from "@/domains/inbox";
+import { invitationQueryOptions } from "@/domains/membership";
 import { politiesQueryOptions } from "@/domains/polity";
+import {
+  type InvitationTask,
+  readInvitationTask,
+} from "@/features/accept-invitation";
+
+type AppSearch = Readonly<{
+  task?: InvitationTask;
+}>;
 
 export const Route = createRootRouteWithContext<AppRouterContext>()({
   component: AppShell,
   errorComponent: RouteErrorPage,
-  loader: ({ context }) => {
+  validateSearch: (search): AppSearch => ({
+    task: readInvitationTask(search.task),
+  }),
+  loaderDeps: ({ search }) => ({ task: search.task }),
+  loader: ({ context, deps }) => {
     const locale = context.getLocale();
 
     return Promise.all([
       context.queryClient.ensureQueryData(inboxItemsQueryOptions({ locale })),
       context.queryClient.ensureQueryData(politiesQueryOptions({ locale })),
+      deps.task
+        ? context.queryClient.ensureQueryData(
+            invitationQueryOptions({
+              invitationId: deps.task.invitationId,
+              locale,
+            }),
+          )
+        : Promise.resolve(),
     ]);
   },
   notFoundComponent: RouteNotFoundPage,

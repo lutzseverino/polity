@@ -12,3 +12,12 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#: src/routes/actions/new.tsx:17
+msgid "Back to Home"
+msgstr ""
+
+#: src/routes/actions/new.tsx:18
+#: src/routes/actions/new.tsx:20
+msgid "New Action"
+msgstr ""

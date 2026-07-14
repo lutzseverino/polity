@@ -1,13 +1,13 @@
+import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   createFileRoute,
   Link,
   notFound,
   Outlet,
-  useRouterState,
+  useMatches,
 } from "@tanstack/react-router";
 
-import { AppBackLink } from "@/components/app/AppBackLink";
 import { AppBadge } from "@/components/app/AppBadge";
 import {
   AppNativeSelect,
@@ -30,10 +30,12 @@ export const Route = createFileRoute("/polities/$polityId")({
     const input = { locale: context.getLocale(), polityId: params.polityId };
 
     try {
-      await Promise.all([
+      const [, polity] = await Promise.all([
         context.queryClient.ensureQueryData(politiesQueryOptions(input)),
         context.queryClient.ensureQueryData(polityQueryOptions(input)),
       ]);
+
+      return { shellLabel: polity.name };
     } catch (error) {
       if (isResourceNotFoundError(error)) {
         throw notFound();
@@ -41,6 +43,14 @@ export const Route = createFileRoute("/polities/$polityId")({
 
       throw error;
     }
+  },
+  staticData: {
+    shell: {
+      back: { label: msg`All polities`, target: { to: "/polities" } },
+      level: "workspace",
+      section: "polities",
+      target: { params: "polityId", to: "/polities/$polityId" },
+    },
   },
 });
 
@@ -53,10 +63,11 @@ function PolityWorkspaceRoute() {
     polityId,
   });
   const navigate = Route.useNavigate();
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
+  const compactWorkspaceChrome = useMatches({
+    select: (matches) =>
+      matches.at(-1)?.staticData.shell?.compactWorkspaceChrome ?? "visible",
   });
-  const isMotionDetail = /^\/polities\/[^/]+\/motions\/[^/]+$/.test(pathname);
+  const hideCompactWorkspaceChrome = compactWorkspaceChrome === "hidden";
   const workspaceNavigation = [
     { exact: true, label: t`Overview`, to: "/polities/$polityId" },
     { exact: false, label: t`Motions`, to: "/polities/$polityId/motions" },
@@ -70,10 +81,12 @@ function PolityWorkspaceRoute() {
 
   return (
     <div className="space-y-6">
-      <header className={cn("space-y-4", isMotionDetail && "hidden md:block")}>
-        <AppBackLink to="/polities">
-          <Trans>All polities</Trans>
-        </AppBackLink>
+      <header
+        className={cn(
+          "space-y-4",
+          hideCompactWorkspaceChrome && "hidden md:block",
+        )}
+      >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -89,7 +102,11 @@ function PolityWorkspaceRoute() {
                 <Trans>Constitution v{polity.constitutionVersion}</Trans>
               </AppText>
             </div>
-            <AppText as="h1" className="truncate" variant="pageTitle">
+            <AppText
+              as={hideCompactWorkspaceChrome ? "div" : "h1"}
+              className="sr-only md:not-sr-only md:truncate"
+              variant="pageTitle"
+            >
               {polity.name}
             </AppText>
             <AppText className="mt-2" variant="supporting">
@@ -133,7 +150,7 @@ function PolityWorkspaceRoute() {
         aria-label={t`${polity.name} navigation`}
         className={cn(
           "no-scrollbar -mx-4 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0",
-          isMotionDetail && "hidden md:block",
+          hideCompactWorkspaceChrome && "hidden md:block",
         )}
       >
         <div className="flex min-w-max gap-1">

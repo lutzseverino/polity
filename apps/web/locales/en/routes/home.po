@@ -13,14 +13,14 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/home/index.tsx:24
+#: src/routes/home/index.tsx:13
 msgid "Home"
 msgstr "Home"
 
-#: src/routes/home/index.tsx:18
+#: src/routes/home/index.tsx:29
 msgid "Start an official action now. Your cross-polity feed and followed-polity updates will grow around this workspace later."
 msgstr "Start an official action now. Your cross-polity feed and followed-polity updates will grow around this workspace later."
 
-#: src/routes/home/index.tsx:23
+#: src/routes/home/index.tsx:34
 msgid "Your Work Across Polities"
 msgstr "Your Work Across Polities"

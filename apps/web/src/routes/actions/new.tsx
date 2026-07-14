@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -11,6 +12,17 @@ type ActionSearch = Readonly<{
 
 export const Route = createFileRoute("/actions/new")({
   component: ActionSetupRoute,
+  staticData: {
+    shell: {
+      back: { label: msg`Back to Home`, target: { to: "/home" } },
+      compactLabel: msg`New Action`,
+      compactNavigation: "hidden",
+      label: msg`New Action`,
+      level: "task",
+      section: "home",
+      showPrimaryAction: false,
+    },
+  },
   validateSearch: (search): ActionSearch => ({
     action: typeof search.action === "string" ? search.action : undefined,
     polity: typeof search.polity === "string" ? search.polity : undefined,

@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -5,6 +6,13 @@ import { AppPlannedDestination } from "@/components/app/AppPlannedDestination";
 
 export const Route = createFileRoute("/polities/$polityId/government")({
   component: GovernmentRoute,
+  staticData: {
+    shell: {
+      label: msg`Government`,
+      level: "workspace",
+      target: { params: "polityId", to: "/polities/$polityId/government" },
+    },
+  },
 });
 
 function GovernmentRoute() {

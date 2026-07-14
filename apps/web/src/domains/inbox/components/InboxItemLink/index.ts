@@ -1,1 +1,4 @@
-export { InboxItemLink } from "@/domains/inbox/components/InboxItemLink/InboxItemLink";
+export {
+  InboxItemLink,
+  type RenderInvitationLink,
+} from "@/domains/inbox/components/InboxItemLink/InboxItemLink";

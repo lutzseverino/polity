@@ -13,10 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/explore/index.tsx:20
+#: src/routes/explore/index.tsx:11
+#: src/routes/explore/index.tsx:29
 msgid "Explore"
 msgstr ""
 
-#: src/routes/explore/index.tsx:15
+#: src/routes/explore/index.tsx:24
 msgid "Public polity discovery will be designed after the core governing journey is proven."
 msgstr ""

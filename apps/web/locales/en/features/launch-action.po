@@ -26,8 +26,8 @@ msgid "Ask someone to become a member of this polity."
 msgstr "Ask someone to become a member of this polity."
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:36
-msgid "Back to Home"
-msgstr "Back to Home"
+#~ msgid "Back to Home"
+#~ msgstr "Back to Home"
 
 #: src/features/launch-action/lib/action-definitions.ts:23
 msgid "candidate"
@@ -37,8 +37,8 @@ msgstr "candidate"
 msgid "challenge"
 msgstr "challenge"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:259
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:49
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:270
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:45
 msgid "Choose an Action"
 msgstr "Choose an Action"
 
@@ -54,11 +54,11 @@ msgstr "constitutional"
 msgid "decision"
 msgstr "decision"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:230
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:232
 msgid "Describe your intent, then review the official action before anything is submitted."
 msgstr "Describe your intent, then review the official action before anything is submitted."
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:57
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:53
 msgid "Draft"
 msgstr "Draft"
 
@@ -66,7 +66,7 @@ msgstr "Draft"
 msgid "elect"
 msgstr "elect"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:148
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:149
 msgid "Find an Action"
 msgstr "Find an Action"
 
@@ -98,15 +98,16 @@ msgstr "membership"
 msgid "motion"
 msgstr "motion"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:250
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:254
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:260
 msgid "New Action"
 msgstr "New Action"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:203
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:204
 msgid "No Matching Actions"
 msgstr "No Matching Actions"
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:55
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:51
 msgid "No polity selected"
 msgstr "No polity selected"
 
@@ -118,7 +119,7 @@ msgstr "nomination"
 msgid "office"
 msgstr "office"
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:48
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:44
 msgid "Official Action"
 msgstr "Official Action"
 
@@ -130,7 +131,7 @@ msgstr "Open nominations and elect someone to an office."
 msgid "person"
 msgstr "person"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:171
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:172
 msgid "Polity"
 msgstr "Polity"
 
@@ -166,11 +167,11 @@ msgstr "Request Constitutional Review"
 msgid "Request review of whether an act follows the constitution."
 msgstr "Request review of whether an act follows the constitution."
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:43
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:39
 msgid "Return to the launcher and choose a valid action to continue."
 msgstr "Return to the launcher and choose a valid action to continue."
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:61
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:57
 msgid "Review Before You Submit"
 msgstr "Review Before You Submit"
 
@@ -178,11 +179,11 @@ msgstr "Review Before You Submit"
 msgid "rules"
 msgstr "rules"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:161
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:162
 msgid "Search by goal or action…"
 msgstr "Search by goal or action…"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:227
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:229
 msgid "Start an Action"
 msgstr "Start an Action"
 
@@ -190,11 +191,11 @@ msgstr "Start an Action"
 msgid "Start an Election"
 msgstr "Start an Election"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:262
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:273
 msgid "Start with your goal. You’ll review the formal action before anything is submitted."
 msgstr "Start with your goal. You’ll review the formal action before anything is submitted."
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:64
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:60
 msgid "This handoff reserves space for the structured form required by the selected action."
 msgstr "This handoff reserves space for the structured form required by the selected action."
 
@@ -202,11 +203,11 @@ msgstr "This handoff reserves space for the structured form required by the sele
 msgid "This polity has no active constitutional review procedure."
 msgstr "This polity has no active constitutional review procedure."
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:206
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:207
 msgid "Try a broader phrase such as “vote,” “invite,” or “rules.”"
 msgstr "Try a broader phrase such as “vote,” “invite,” or “rules.”"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:81
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:82
 msgid "Unavailable"
 msgstr "Unavailable"
 
@@ -214,6 +215,6 @@ msgstr "Unavailable"
 msgid "vote"
 msgstr "vote"
 
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:73
+#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:69
 msgid "Your words will never become a binding government action automatically. You will review the action type, polity, formal content, eligibility, and consequences first."
 msgstr "Your words will never become a binding government action automatically. You will review the action type, polity, formal content, eligibility, and consequences first."

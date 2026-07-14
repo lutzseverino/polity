@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils";
 type ActionLauncherProps = Readonly<{
   defaultPolityId?: string;
   polities: readonly PolityOption[];
+  triggerPresentation?: "icon" | "labelled";
   variant?: ActionLauncherVariant;
 }>;
 
@@ -217,6 +218,7 @@ function ActionLauncherContent({
 export function ActionLauncher({
   defaultPolityId,
   polities,
+  triggerPresentation = "labelled",
   variant = "compact",
 }: ActionLauncherProps) {
   if (variant === "surface") {
@@ -245,10 +247,19 @@ export function ActionLauncher({
 
   return (
     <AppPopover>
-      <AppPopoverTrigger render={<AppButton size="lg" />}>
-        <Plus aria-hidden="true" data-icon="inline-start" />
-        <Trans>New Action</Trans>
-      </AppPopoverTrigger>
+      {triggerPresentation === "icon" ? (
+        <AppPopoverTrigger render={<AppButton size="icon-lg" />}>
+          <Plus aria-hidden="true" />
+          <span className="sr-only">
+            <Trans>New Action</Trans>
+          </span>
+        </AppPopoverTrigger>
+      ) : (
+        <AppPopoverTrigger render={<AppButton size="lg" />}>
+          <Plus aria-hidden="true" data-icon="inline-start" />
+          <Trans>New Action</Trans>
+        </AppPopoverTrigger>
+      )}
       <AppPopoverContent
         align="end"
         className="w-[min(52rem,calc(100vw-2rem))] overscroll-contain p-4"

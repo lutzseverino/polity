@@ -24,6 +24,7 @@ export function createAppRouter(
     defaultPreloadStaleTime: 0,
     history,
     routeTree,
+    scrollRestoration: true,
     Wrap: ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),

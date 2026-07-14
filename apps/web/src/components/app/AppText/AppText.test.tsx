@@ -7,12 +7,12 @@ describe("AppText", () => {
   it("keeps semantic markup independent from the visual variant", () => {
     render(
       <AppText as="h1" variant="pageTitle">
-        Your polities
+        Polities
       </AppText>,
     );
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Your polities" }),
+      screen.getByRole("heading", { level: 1, name: "Polities" }),
     ).toBeInTheDocument();
   });
 

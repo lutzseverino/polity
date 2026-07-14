@@ -13,36 +13,36 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/inbox/index.tsx:44
+#: src/routes/inbox/index.tsx:55
 msgid "Find everything that needs your attention here. Each item opens where that decision belongs."
 msgstr ""
 
-#: src/routes/inbox/index.tsx:50
+#: src/routes/inbox/index.tsx:25
 msgid "Inbox"
 msgstr ""
 
-#: src/routes/inbox/index.tsx:55
+#: src/routes/inbox/index.tsx:65
 msgid "Inbox Categories"
 msgstr ""
 
-#: src/routes/inbox/index.tsx:31
-#: src/routes/inbox/index.tsx:89
+#: src/routes/inbox/index.tsx:42
+#: src/routes/inbox/index.tsx:100
 msgid "Needs Action"
 msgstr ""
 
-#: src/routes/inbox/index.tsx:106
+#: src/routes/inbox/index.tsx:132
 msgid "New items will appear here when they need your attention."
 msgstr ""
 
-#: src/routes/inbox/index.tsx:103
+#: src/routes/inbox/index.tsx:129
 msgid "Nothing Here Right Now"
 msgstr ""
 
-#: src/routes/inbox/index.tsx:32
-#: src/routes/inbox/index.tsx:91
+#: src/routes/inbox/index.tsx:43
+#: src/routes/inbox/index.tsx:102
 msgid "Updates"
 msgstr ""
 
-#: src/routes/inbox/index.tsx:49
+#: src/routes/inbox/index.tsx:60
 msgid "Your Attention"
 msgstr ""

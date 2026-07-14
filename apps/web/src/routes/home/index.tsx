@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -5,7 +6,17 @@ import { AppPageHeader } from "@/components/app/AppPageHeader";
 import { usePolityOptions } from "@/domains/polity";
 import { ActionLauncher } from "@/features/launch-action";
 
-export const Route = createFileRoute("/home/")({ component: HomeRoute });
+export const Route = createFileRoute("/home/")({
+  component: HomeRoute,
+  staticData: {
+    shell: {
+      label: msg`Home`,
+      level: "root",
+      section: "home",
+      target: { to: "/home" },
+    },
+  },
+});
 
 function HomeRoute() {
   const { i18n } = useLingui();
@@ -20,8 +31,7 @@ function HomeRoute() {
             followed-polity updates will grow around this workspace later.
           </Trans>
         }
-        eyebrow={<Trans>Your Work Across Polities</Trans>}
-        title={<Trans>Home</Trans>}
+        title={<Trans>Your Work Across Polities</Trans>}
       />
       <ActionLauncher polities={polityOptions} variant="surface" />
     </div>

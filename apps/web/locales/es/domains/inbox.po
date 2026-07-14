@@ -13,26 +13,34 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:54
-msgid "{unresolvedCount, plural, one {# item needs action} other {# items need action}}"
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:65
+msgid "{openTaskCount, plural, one {# item needs action} other {# items need action}}"
 msgstr ""
 
-#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:51
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:61
+#~ msgid "{unresolvedCount, plural, one {# item needs action} other {# items need action}}"
+#~ msgstr ""
+
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:62
 msgid "Inbox"
 msgstr ""
 
-#: src/domains/inbox/components/InboxItemLink/InboxItemLink.tsx:74
+#: src/domains/inbox/components/InboxItemLink/InboxItemLink.tsx:86
 msgid "Needs Action"
 msgstr ""
 
-#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:35
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:44
 msgid "Open Inbox"
 msgstr ""
 
-#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:29
-msgid "Open Inbox, {unresolvedCount} items need action"
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:38
+msgid "Open Inbox, {openTaskCount} items need action"
 msgstr ""
 
-#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:69
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:36
+#~ msgid "Open Inbox, {unresolvedCount} items need action"
+#~ msgstr ""
+
+#: src/domains/inbox/components/InboxPreview/InboxPreview.tsx:85
 msgid "View All Inbox Items"
 msgstr ""

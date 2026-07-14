@@ -13,51 +13,131 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:118
-msgid "Accept Invitation"
+#. placeholder {0}: invitation.invitedBy
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:75
+#~ msgid "{0} invited you to become a citizen."
+#~ msgstr ""
+
+#. placeholder {0}: invitation.invitedBy
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:74
+msgid "{0} invited you to join this polity."
 msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:182
+#~ msgid "Accept Invitation"
+#~ msgstr ""
 
 #: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:107
-msgid "Accepting adds this polity to your workspace. Its constitution determines which proposals, votes, and other government actions are available to you."
-msgstr ""
+#~ msgid "Accepting adds this polity to your workspace. Its constitution determines which proposals, votes, and other government actions are available to you."
+#~ msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:96
-msgid "Citizen"
-msgstr ""
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:129
+#~ msgid "Citizen"
+#~ msgstr ""
 
 #: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:116
-msgid "Decide Later"
+#~ msgid "Decide Later"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:153
+msgid "Done"
 msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:62
-msgid "Invitation"
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:99
+#~ msgid "Invitation"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:49
+msgid "Invitation accepted"
 msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:46
-msgid "Invitation Accepted"
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:62
+#~ msgid "Invitation Accepted"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:51
+msgid "Invitation to join"
 msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:79
-msgid "Invited By"
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:104
+msgid "Invited by"
+msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:112
+#~ msgid "Invited By"
+#~ msgstr ""
+
+#. placeholder {0}: invitation.polityName
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:63
+msgid "Join {0}?"
 msgstr ""
 
 #: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:67
-msgid "Join as a Citizen"
+#~ msgid "Join as a Citizen"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:174
+msgid "Join polity"
 msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:93
-msgid "Membership"
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:126
+#~ msgid "Membership"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:52
+#~ msgid "Membership Invitation"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:50
+#~ msgid "Membership Updated"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:166
+msgid "Not Now"
 msgstr ""
 
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:52
-msgid "Return to Your Polities"
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:118
+msgid "Received"
+msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:132
+msgid "This polity will be added to your workspace. Its constitution determines which proposals, votes, and other government actions are available to you."
+msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:156
+msgid "View My Polities"
 msgstr ""
 
 #: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:104
-msgid "What Happens Next"
+#~ msgid "What Happens Next"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:129
+msgid "What joining changes"
+msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:89
+msgid "You can now participate according to the polity’s constitution."
 msgstr ""
 
 #. placeholder {0}: invitation.polityName
-#: src/features/accept-invitation/components/InvitationResponseCard/InvitationResponseCard.tsx:49
-msgid "You joined {0} as a citizen."
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:61
+msgid "You joined {0}"
+msgstr ""
+
+#. placeholder {0}: invitation.polityName
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:73
+#~ msgid "You joined {0} as a citizen."
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:86
+msgid "You’re now a member"
+msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:87
+#~ msgid "Your membership is active"
+#~ msgstr ""
+
+#: src/features/accept-invitation/components/InvitationResponse/InvitationResponse.tsx:72
+msgid "Your membership is now active."
 msgstr ""

@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -5,6 +6,14 @@ import { AppPlannedDestination } from "@/components/app/AppPlannedDestination";
 
 export const Route = createFileRoute("/me/")({
   component: MeRoute,
+  staticData: {
+    shell: {
+      label: msg`Me`,
+      level: "root",
+      section: "me",
+      target: { to: "/me" },
+    },
+  },
 });
 
 function MeRoute() {
