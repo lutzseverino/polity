@@ -14,10 +14,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: src/routes/inbox/index.tsx:55
-msgid "Find everything that needs your attention here. Each item opens where that decision belongs."
-msgstr "Find everything that needs your attention here. Each item opens where that decision belongs."
+#~ msgid "Find everything that needs your attention here. Each item opens where that decision belongs."
+#~ msgstr "Find everything that needs your attention here. Each item opens where that decision belongs."
 
 #: src/routes/inbox/index.tsx:25
+#: src/routes/inbox/index.tsx:60
 msgid "Inbox"
 msgstr "Inbox"
 
@@ -38,11 +39,15 @@ msgstr "New items will appear here when they need your attention."
 msgid "Nothing Here Right Now"
 msgstr "Nothing Here Right Now"
 
+#: src/routes/inbox/index.tsx:55
+msgid "Review actions and updates from across your polities. Each item opens where that decision belongs."
+msgstr "Review actions and updates from across your polities. Each item opens where that decision belongs."
+
 #: src/routes/inbox/index.tsx:43
 #: src/routes/inbox/index.tsx:102
 msgid "Updates"
 msgstr "Updates"
 
 #: src/routes/inbox/index.tsx:60
-msgid "Your Attention"
-msgstr "Your Attention"
+#~ msgid "Your Attention"
+#~ msgstr "Your Attention"

@@ -216,7 +216,7 @@ describe("first governing journey", () => {
     renderRouter(router);
 
     expect(
-      await screen.findByRole("heading", { name: "Your Attention" }),
+      await screen.findByRole("heading", { name: "Inbox" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Invitation to join Sunday Supper Club"),

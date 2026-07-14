@@ -53,11 +53,11 @@ function InboxRoute() {
       <AppPageHeader
         description={
           <Trans>
-            Find everything that needs your attention here. Each item opens
-            where that decision belongs.
+            Review actions and updates from across your polities. Each item
+            opens where that decision belongs.
           </Trans>
         }
-        title={<Trans>Your Attention</Trans>}
+        title={<Trans>Inbox</Trans>}
       />
 
       <fieldset className="flex gap-2">
