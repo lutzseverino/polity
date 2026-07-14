@@ -25,16 +25,17 @@ type SummaryGridProps = Readonly<{
 }>;
 
 const flowSteps = [
-  { key: "name", target: null },
-  { key: "government", target: "government" },
-  { key: "visibility", target: "visibility" },
   { key: "invites", target: "invites" },
+  { key: "visibility", target: "visibility" },
+  { key: "preset", target: "preset" },
+  { key: "pace", target: "pace" },
 ] as const;
 const stepIndex = {
-  government: 1,
-  invites: 3,
+  invites: 0,
+  pace: 3,
+  preset: 2,
   ready: 4,
-  visibility: 2,
+  visibility: 1,
 } satisfies Record<OnboardingStep, number>;
 
 export function OnboardingStepper({
@@ -73,7 +74,7 @@ export function OnboardingStepper({
 
 export function StepIntro({ description, title }: StepIntroProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       <h2 className="font-display text-2xl">{title}</h2>
       <p className="text-sm leading-6 text-muted-foreground">{description}</p>
     </div>

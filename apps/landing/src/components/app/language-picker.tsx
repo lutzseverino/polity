@@ -1,14 +1,14 @@
 import { useTranslation } from "react-i18next";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { type Language, languageNames, languages } from "@/i18n";
+import {
+  AppSelect,
+  AppSelectContent,
+  AppSelectGroup,
+  AppSelectItem,
+  AppSelectLabel,
+  AppSelectTrigger,
+  AppSelectValue,
+} from "./app-select";
 
 export function LanguagePicker() {
   const { i18n, t } = useTranslation("common");
@@ -23,28 +23,25 @@ export function LanguagePicker() {
   }
 
   return (
-    <Select onValueChange={updateLanguage} value={currentLanguage}>
-      <SelectTrigger
+    <AppSelect onValueChange={updateLanguage} value={currentLanguage}>
+      <AppSelectTrigger
         aria-label={t("language.label")}
-        className="w-[7.5rem] bg-background/75 font-mono text-[0.65rem] tracking-[0.16em]"
+        className="w-[7.5rem]"
         size="sm"
+        treatment="utility"
       >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent align="end" position="popper">
-        <SelectGroup>
-          <SelectLabel>{t("language.label")}</SelectLabel>
+        <AppSelectValue />
+      </AppSelectTrigger>
+      <AppSelectContent align="end" position="popper">
+        <AppSelectGroup>
+          <AppSelectLabel>{t("language.label")}</AppSelectLabel>
           {languages.map((language) => (
-            <SelectItem
-              className="font-mono text-[0.65rem] tracking-[0.16em]"
-              key={language}
-              value={language}
-            >
+            <AppSelectItem key={language} treatment="utility" value={language}>
               {languageNames[language]}
-            </SelectItem>
+            </AppSelectItem>
           ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+        </AppSelectGroup>
+      </AppSelectContent>
+    </AppSelect>
   );
 }
