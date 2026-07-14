@@ -76,12 +76,21 @@ describe("first governing journey", () => {
     expect(
       within(politySection).getByRole("link", { name: /found a polity/i }),
     ).toHaveAttribute("href", "/polities/new");
+    expect(politySection.querySelector('[data-slot="empty"]')).toBeVisible();
     expect(
       screen.getByRole("link", { name: /sunday supper club/i }),
     ).toHaveAttribute("href", "/polities/invitations/invitation-supper-club");
     expect(screen.getByText("Garden Cooperative")).toBeInTheDocument();
     expect(screen.getByText("Local Book Circle")).toBeInTheDocument();
     expect(screen.queryByText("Nothing Needs You")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Government is operating normally."),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "One more standing member is needed for full government.",
+      ),
+    ).not.toBeInTheDocument();
     expect(
       screen.getAllByRole("link", { name: "View 1 More Invitation" }),
     ).toHaveLength(2);

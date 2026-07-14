@@ -5,13 +5,19 @@ import { ArrowRight, Landmark, Plus } from "lucide-react";
 import { AppBadge } from "@/components/app/AppBadge";
 import {
   AppCard,
-  AppCardContent,
   AppCardDescription,
   AppCardHeader,
   AppCardTitle,
 } from "@/components/app/AppCard";
 import { AppPageHeader } from "@/components/app/AppPageHeader";
 import { AppText } from "@/components/app/AppText";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { invitationsQueryOptions, useInvitations } from "@/domains/membership";
 import {
   PolityCard,
@@ -99,9 +105,9 @@ function PolityDirectoryRoute() {
               <AppCard className="h-full min-w-0 transition-colors group-hover:bg-muted/40">
                 <AppCardHeader>
                   <div className="mb-2 flex items-center justify-between gap-3">
-                    <AppBadge variant="outline">
+                    <AppText as="span" variant="eyebrow">
                       <Trans>Invitation</Trans>
-                    </AppBadge>
+                    </AppText>
                     <AppText as="span" variant="caption">
                       {invitation.receivedLabel}
                     </AppText>
@@ -142,24 +148,27 @@ function PolityDirectoryRoute() {
         />
         <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
           <Link
-            className="group rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="group h-full rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             to="/polities/new"
           >
-            <AppCard className="h-full border border-dashed bg-transparent ring-0 transition-colors group-hover:border-foreground/30 group-hover:bg-muted/50">
-              <AppCardContent className="flex h-full min-h-44 flex-col items-center justify-center py-6 text-center">
-                <span className="mb-3 flex size-10 items-center justify-center rounded-full border border-dashed">
-                  <Plus aria-hidden="true" className="size-5" />
-                </span>
-                <AppText variant="subsectionTitle">
+            <Empty className="h-full flex-row justify-start gap-3 border bg-transparent p-4 text-left transition-colors group-hover:border-foreground/30 group-hover:bg-muted/50">
+              <EmptyMedia
+                className="mb-0 size-10 rounded-full border border-dashed bg-transparent"
+                variant="icon"
+              >
+                <Plus aria-hidden="true" className="size-5" />
+              </EmptyMedia>
+              <EmptyHeader className="min-w-0 max-w-none items-start gap-1 text-left">
+                <EmptyTitle className="text-base font-semibold">
                   <Trans>Found a Polity</Trans>
-                </AppText>
-                <AppText className="mt-1 max-w-56" variant="supporting">
+                </EmptyTitle>
+                <EmptyDescription>
                   <Trans>
                     Create a new space and establish how it will govern itself.
                   </Trans>
-                </AppText>
-              </AppCardContent>
-            </AppCard>
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           </Link>
 
           {polities.map((polity) => (
@@ -201,10 +210,7 @@ function PolityDirectoryRoute() {
                     </PolityCard.Description>
                   </PolityCard.Identity>
                 </PolityCard.Header>
-                <PolityCard.Content className="flex flex-1 flex-col justify-between gap-4 space-y-0">
-                  <AppText variant="supporting">
-                    {polity.readinessMessage}
-                  </AppText>
+                <PolityCard.Content className="flex flex-1 flex-col justify-end">
                   <PolityCard.Meta>
                     <AppText as="span">
                       <Plural
