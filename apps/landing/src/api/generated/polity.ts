@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/polity/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Provision baseline Polity grants for the current account. */
+        post: operations["provisionPolityAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/polities": {
         parameters: {
             query?: never;
@@ -56,6 +73,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/polities/{polityId}/government": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        /** Return the current government structure, including its constitution, jurisdiction scope, and live formation state. */
+        get: operations["getPolityGovernment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/polities/{polityId}/actions": {
         parameters: {
             query?: never;
@@ -86,6 +122,25 @@ export interface paths {
         get: operations["listPolityMembers"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/polities/{polityId}/members/me/resignation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resign the current user's polity membership. */
+        post: operations["resignPolityMembership"];
         delete?: never;
         options?: never;
         head?: never;
@@ -210,6 +265,42 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["createPolityAppealMotion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/polities/{polityId}/motions/office-term-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createPolityOfficeTermReviewMotion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/polities/{polityId}/motions/constitutional-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createPolityConstitutionalReviewMotion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -419,6 +510,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/polities/{polityId}/office-term-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        get: operations["listPolityOfficeTermReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/polities/{polityId}/constitutional-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        get: operations["listPolityConstitutionalReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/polities/{polityId}/record": {
         parameters: {
             query?: never;
@@ -479,6 +606,7 @@ export interface components {
             targetMembershipId: string;
             type: components["schemas"]["SanctionType"];
             reason: string;
+            /** @description Must be long enough for the current appeal procedure to complete. */
             durationDays: number;
         };
         CreateAppealMotionRequest: {
@@ -486,27 +614,60 @@ export interface components {
             sanctionId: string;
             reason: string;
         };
+        CreateOfficeTermReviewMotionRequest: {
+            /** Format: uuid */
+            officeTermId: string;
+            reason: string;
+        };
+        /** @description Opens a constitutional-review motion for an official record with an active void remedy. */
+        CreateConstitutionalReviewMotionRequest: {
+            /**
+             * Format: uuid
+             * @description Official record entry to void. The entry must be a resolution adoption, sanction application, or office election with an active remedy.
+             */
+            targetRecordId: string;
+            reason: string;
+        };
         CreateConstitutionAmendmentMotionRequest: {
             title: string;
             body: string;
+            institutionChanges?: components["schemas"]["CreateInstitutionChangeRequest"][];
             procedureChanges?: components["schemas"]["CreateProcedureChangeRequest"][];
             officeChanges?: components["schemas"]["CreateOfficeChangeRequest"][];
             powerChanges?: components["schemas"]["CreatePowerChangeRequest"][];
         };
+        CreateInstitutionChangeRequest: {
+            action: components["schemas"]["ConstitutionInstitutionChangeAction"];
+            /** Format: uuid */
+            institutionId?: string;
+            /** Format: uuid */
+            jurisdictionId?: string;
+            name?: string;
+            kind?: components["schemas"]["InstitutionKind"];
+        };
         CreateProcedureChangeRequest: {
             procedureCode: string;
+            /** Format: uuid */
+            institutionId?: string;
             quorumNumerator?: number;
             quorumDenominator?: number;
             threshold?: components["schemas"]["VotingThreshold"];
+            officeElectionMethod?: components["schemas"]["OfficeElectionMethod"];
+            electorate?: components["schemas"]["ProcedureElectorate"];
+            electorateOfficeCode?: string;
+            minimumElectorCount?: number;
             minimumNoticeHours?: number;
             votingPeriodHours?: number;
         };
         CreateOfficeChangeRequest: {
             action: components["schemas"]["ConstitutionOfficeChangeAction"];
             code: string;
+            /** Format: uuid */
+            jurisdictionId?: string;
             name?: string;
             description?: string;
             termLengthDays?: number;
+            seatCount?: number;
         };
         CreatePowerChangeRequest: {
             powerCode: components["schemas"]["AmendablePowerCode"];
@@ -517,8 +678,7 @@ export interface components {
             choice: components["schemas"]["VoteChoice"];
         };
         CastOfficeElectionBallotRequest: {
-            /** Format: uuid */
-            candidateMembershipId: string;
+            candidateMembershipIds: string[];
         };
         RespondOfficeElectionCandidacyRequest: {
             accepted: boolean;
@@ -532,15 +692,21 @@ export interface components {
         /** @enum {string} */
         ConstitutionStatus: "ratified" | "superseded";
         /** @enum {string} */
-        InstitutionKind: "assembly";
+        JurisdictionKind: "root";
         /** @enum {string} */
-        PolitySetupPreset: "standard_republic";
+        InstitutionKind: "assembly" | "council" | "judiciary";
+        /** @enum {string} */
+        PolitySetupPreset: "standard_constitutional_council_republic";
         /** @enum {string} */
         PolityPace: "fast" | "standard" | "deliberate";
         /** @enum {string} */
         InvitationStatus: "pending" | "accepted";
         /** @enum {string} */
-        VotingThreshold: "simple_majority_cast" | "majority_of_eligible" | "two_thirds_cast" | "two_thirds_eligible" | "plurality_cast";
+        VotingThreshold: "simple_majority_cast" | "majority_of_eligible" | "two_thirds_cast" | "two_thirds_eligible" | "office_election_result";
+        /** @enum {string} */
+        OfficeElectionMethod: "plurality" | "ranked_choice";
+        /** @enum {string} */
+        ProcedureElectorate: "active_members" | "office_holders";
         /** @enum {string} */
         SanctionType: "warning" | "suspension";
         /** @enum {string} */
@@ -548,19 +714,25 @@ export interface components {
         /** @enum {string} */
         AppealStatus: "granted";
         /** @enum {string} */
+        OfficeTermReviewStatus: "granted";
+        /** @enum {string} */
+        ConstitutionalReviewStatus: "granted";
+        /** @enum {string} */
         OfficeTermStatus: "active" | "ended";
         /** @enum {string} */
         ConstitutionOfficeChangeAction: "create" | "revise" | "retire";
         /** @enum {string} */
+        ConstitutionInstitutionChangeAction: "create" | "revise" | "retire";
+        /** @enum {string} */
         PowerHolderScope: "active_member" | "office";
         /** @enum {string} */
-        OfficialRecordType: "polity_founded" | "constitution_ratified" | "member_invited" | "member_admitted" | "motion_introduced" | "candidacy_responded" | "vote_cast" | "motion_certified" | "resolution_adopted" | "office_assigned" | "office_elected" | "sanction_applied" | "appeal_granted" | "constitution_amended" | "polity_disbanded" | "motion_rejected";
+        OfficialRecordType: "polity_founded" | "constitution_ratified" | "member_invited" | "member_admitted" | "member_resigned" | "motion_introduced" | "candidacy_responded" | "vote_cast" | "motion_certified" | "resolution_adopted" | "office_assigned" | "office_elected" | "office_term_vacated" | "sanction_applied" | "appeal_granted" | "official_act_voided" | "constitution_amended" | "polity_disbanded" | "motion_rejected";
         /** @enum {string} */
-        EffectType: "adopt_resolution" | "assign_office" | "elect_office" | "apply_sanction" | "grant_appeal" | "amend_constitution" | "disband_polity";
+        EffectType: "adopt_resolution" | "elect_office" | "apply_sanction" | "grant_appeal" | "vacate_office_term" | "void_official_act" | "amend_constitution" | "disband_polity";
         /** @enum {string} */
-        PowerCode: "admit_member" | "introduce_motion" | "introduce_office_election" | "introduce_sanction" | "introduce_appeal" | "introduce_amendment" | "introduce_disbandment" | "request_certification";
+        PowerCode: "admit_member" | "introduce_motion" | "introduce_office_election" | "introduce_sanction" | "introduce_appeal" | "introduce_office_term_review" | "introduce_constitutional_review" | "introduce_amendment" | "introduce_disbandment" | "request_certification";
         /** @enum {string} */
-        AmendablePowerCode: "admit_member" | "introduce_motion" | "introduce_office_election" | "introduce_sanction" | "introduce_appeal" | "introduce_amendment" | "introduce_disbandment" | "request_certification";
+        AmendablePowerCode: "admit_member" | "introduce_motion" | "introduce_office_election" | "introduce_sanction" | "introduce_appeal" | "introduce_office_term_review" | "introduce_constitutional_review" | "introduce_amendment" | "introduce_disbandment" | "request_certification";
         PolityResponse: {
             /** Format: uuid */
             id: string;
@@ -570,64 +742,122 @@ export interface components {
             constitutionVersion: number;
             jurisdictionName: string;
             institutionName: string;
+            institutionNameKey?: string;
             /** Format: date-time */
             createdAt: string;
         };
         ActionAvailabilityResponse: {
             available: boolean;
             reason?: string;
+            reasonMessage?: string;
+        };
+        /** @enum {string} */
+        GovernmentReadinessStatus: "provisional" | "forming_offices" | "ready" | "blocked" | "disbanded";
+        /** @enum {string} */
+        GovernmentReadinessDiagnostic: "needs_more_standing_members" | "ordinary_governance_authority_unavailable" | "ordinary_governance_electorate_unavailable" | "office_election_authority_unavailable" | "office_election_electorate_unavailable" | "certification_authority_unavailable" | "appeal_authority_unavailable" | "appeal_electorate_unavailable" | "constitutional_review_authority_unavailable" | "constitutional_review_electorate_unavailable" | "polity_disbanded";
+        GovernmentReadinessDiagnosticResponse: {
+            code: components["schemas"]["GovernmentReadinessDiagnostic"];
+            message: string;
+        };
+        GovernmentReadinessResponse: {
+            status: components["schemas"]["GovernmentReadinessStatus"];
+            statusMessage: string;
+            diagnostics: components["schemas"]["GovernmentReadinessDiagnosticResponse"][];
+        };
+        /** @enum {string} */
+        ConstitutionalHealthStatus: "healthy" | "degraded" | "critical";
+        /** @enum {string} */
+        ConstitutionalHealthDiagnostic: "admission_path_unavailable" | "ordinary_governance_unavailable" | "sanction_path_unavailable" | "appeal_path_unavailable" | "office_term_review_path_unavailable" | "constitutional_review_path_unavailable" | "office_election_path_unavailable" | "amendment_path_unavailable" | "disbandment_path_unavailable" | "certification_path_unavailable" | "polity_disbanded";
+        ConstitutionalHealthDiagnosticResponse: {
+            code: components["schemas"]["ConstitutionalHealthDiagnostic"];
+            message: string;
+        };
+        ConstitutionalHealthResponse: {
+            status: components["schemas"]["ConstitutionalHealthStatus"];
+            statusMessage: string;
+            diagnostics: components["schemas"]["ConstitutionalHealthDiagnosticResponse"][];
         };
         PolityActionAvailabilityResponse: {
+            readiness: components["schemas"]["GovernmentReadinessResponse"];
+            constitutionalHealth: components["schemas"]["ConstitutionalHealthResponse"];
             inviteMembers: components["schemas"]["ActionAvailabilityResponse"];
             introduceMotion: components["schemas"]["ActionAvailabilityResponse"];
             introduceOfficeElection: components["schemas"]["ActionAvailabilityResponse"];
             introduceSanction: components["schemas"]["ActionAvailabilityResponse"];
             introduceAppeal: components["schemas"]["ActionAvailabilityResponse"];
+            introduceOfficeTermReview: components["schemas"]["ActionAvailabilityResponse"];
+            introduceConstitutionalReview: components["schemas"]["ActionAvailabilityResponse"];
             introduceAmendment: components["schemas"]["ActionAvailabilityResponse"];
             introduceDisbandment: components["schemas"]["ActionAvailabilityResponse"];
             requestCertification: components["schemas"]["ActionAvailabilityResponse"];
+            resignMembership: components["schemas"]["ActionAvailabilityResponse"];
         };
         ConstitutionResponse: {
             /** Format: uuid */
             id: string;
             version: number;
+            title: string;
+            body: string;
+            titleKey?: string;
+            bodyKey?: string;
+            templateParams: {
+                [key: string]: unknown;
+            };
             status: components["schemas"]["ConstitutionStatus"];
             /** Format: date-time */
             ratifiedAt: string;
-            institutions: components["schemas"]["ConstitutionInstitutionResponse"][];
-            procedures: components["schemas"]["ConstitutionProcedureResponse"][];
+            institutions: components["schemas"]["InstitutionResponse"][];
+            procedures: components["schemas"]["ProcedureResponse"][];
             offices: components["schemas"]["OfficeResponse"][];
-            powers: components["schemas"]["ConstitutionPowerResponse"][];
-            bootstrap: components["schemas"]["ConstitutionBootstrapResponse"];
+            powers: components["schemas"]["ConstitutionalPowerResponse"][];
         };
-        ConstitutionInstitutionResponse: {
+        GovernmentStructureResponse: {
+            constitution: components["schemas"]["ConstitutionResponse"];
+            jurisdictions: components["schemas"]["JurisdictionResponse"][];
+            formation: components["schemas"]["GovernmentFormationResponse"];
+        };
+        JurisdictionResponse: {
             /** Format: uuid */
             id: string;
+            name: string;
+            kind: components["schemas"]["JurisdictionKind"];
+        };
+        InstitutionResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            jurisdictionId: string;
             name: string;
             nameKey?: string;
             kind: components["schemas"]["InstitutionKind"];
         };
-        ConstitutionProcedureResponse: {
+        ProcedureResponse: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            institutionId: string;
             code: string;
             name: string;
             nameKey?: string;
             quorumNumerator: number;
             quorumDenominator: number;
             threshold: components["schemas"]["VotingThreshold"];
+            officeElectionMethod?: components["schemas"]["OfficeElectionMethod"];
+            electorate: components["schemas"]["ProcedureElectorate"];
+            electorateOfficeCode?: string;
+            minimumElectorCount: number;
             minimumNoticeHours: number;
             votingPeriodHours: number;
             effectType: components["schemas"]["EffectType"];
         };
-        ConstitutionPowerResponse: {
+        ConstitutionalPowerResponse: {
             code: components["schemas"]["PowerCode"];
             name: string;
             nameKey?: string;
             holderScope: components["schemas"]["PowerHolderScope"];
             holderOfficeCode?: string;
         };
-        ConstitutionBootstrapResponse: {
+        GovernmentFormationResponse: {
             complete: boolean;
             /** Format: date-time */
             completedAt?: string;
@@ -646,7 +876,7 @@ export interface components {
             /** Format: email */
             email: string;
             /** @enum {string} */
-            status: "active";
+            status: "active" | "resigned";
             /** Format: date-time */
             admittedAt: string;
         };
@@ -674,18 +904,32 @@ export interface components {
             quorumMet: boolean;
             outcomeReason: components["schemas"]["VotingOutcomeReason"];
         };
+        /** @description Durable evidence captured when the motion was certified. Modality-specific counts are present only for their corresponding modality. */
         CertificationResponse: {
+            modality: components["schemas"]["CertificationModality"];
+            eligibleCount: number;
+            yesCount?: number;
+            noCount?: number;
+            abstainCount?: number;
+            electionParticipationCount?: number;
+            electionDecisive?: boolean;
+            electionWinnerCount?: number;
+            quorumRequired: number;
+            quorumMet: boolean;
+            thresholdMet: boolean;
             passed: boolean;
             outcomeReason: components["schemas"]["CertificationOutcomeReason"];
             /** Format: date-time */
             certifiedAt: string;
         };
         /** @enum {string} */
-        CertificationOutcomeReason: "passed" | "quorum_not_met" | "threshold_not_met" | "no_decisive_plurality";
+        CertificationModality: "yes_no" | "office_election";
+        /** @enum {string} */
+        CertificationOutcomeReason: "passed" | "quorum_not_met" | "threshold_not_met" | "no_decisive_result";
         /** @enum {string} */
         VotingOutcomeReason: "passed" | "quorum_not_met" | "threshold_not_met";
         /** @enum {string} */
-        OfficeElectionOutcomeReason: "passed" | "quorum_not_met" | "no_decisive_plurality";
+        OfficeElectionOutcomeReason: "passed" | "quorum_not_met" | "no_decisive_result";
         MotionResponse: {
             /** Format: uuid */
             id: string;
@@ -711,10 +955,67 @@ export interface components {
             votingClosesAt: string;
             /** Format: date-time */
             certificationOpensAt: string;
+            /** @description Live tally before certification; the durable certified tally after certification. */
             tally?: components["schemas"]["VoteTallyResponse"];
             officeElection?: components["schemas"]["OfficeElectionResponse"];
+            /** @description Live election tally before certification; the durable certified snapshot after certification. */
             electionTally?: components["schemas"]["OfficeElectionTallyResponse"];
             certification?: components["schemas"]["CertificationResponse"];
+            currentVote?: components["schemas"]["VoteChoice"];
+            actions: components["schemas"]["MotionActionAvailabilityResponse"];
+            amendmentProposal?: components["schemas"]["ConstitutionAmendmentProposalResponse"];
+        };
+        MotionActionAvailabilityResponse: {
+            castVote: components["schemas"]["ActionAvailabilityResponse"];
+            castElectionBallot: components["schemas"]["ActionAvailabilityResponse"];
+            respondCandidacy: components["schemas"]["ActionAvailabilityResponse"];
+            requestCertification: components["schemas"]["ActionAvailabilityResponse"];
+        };
+        ConstitutionAmendmentProposalResponse: {
+            title: string;
+            body: string;
+            institutionChanges: components["schemas"]["ConstitutionInstitutionChangeResponse"][];
+            procedureChanges: components["schemas"]["ConstitutionProcedureChangeResponse"][];
+            officeChanges: components["schemas"]["ConstitutionOfficeChangeResponse"][];
+            powerChanges: components["schemas"]["ConstitutionPowerChangeResponse"][];
+        };
+        ConstitutionInstitutionChangeResponse: {
+            action: components["schemas"]["ConstitutionInstitutionChangeAction"];
+            /** Format: uuid */
+            institutionId?: string;
+            /** Format: uuid */
+            jurisdictionId?: string;
+            name?: string;
+            kind?: components["schemas"]["InstitutionKind"];
+        };
+        ConstitutionProcedureChangeResponse: {
+            procedureCode: string;
+            /** Format: uuid */
+            institutionId?: string;
+            quorumNumerator?: number;
+            quorumDenominator?: number;
+            threshold?: components["schemas"]["VotingThreshold"];
+            officeElectionMethod?: components["schemas"]["OfficeElectionMethod"];
+            electorate?: components["schemas"]["ProcedureElectorate"];
+            electorateOfficeCode?: string;
+            minimumElectorCount?: number;
+            minimumNoticeHours?: number;
+            votingPeriodHours?: number;
+        };
+        ConstitutionOfficeChangeResponse: {
+            action: components["schemas"]["ConstitutionOfficeChangeAction"];
+            code: string;
+            /** Format: uuid */
+            jurisdictionId?: string;
+            name?: string;
+            description?: string;
+            termLengthDays?: number;
+            seatCount?: number;
+        };
+        ConstitutionPowerChangeResponse: {
+            powerCode: components["schemas"]["AmendablePowerCode"];
+            holderScope: components["schemas"]["PowerHolderScope"];
+            holderOfficeCode?: string;
         };
         /** @enum {string} */
         OfficeElectionCandidateStatus: "pending" | "accepted" | "declined" | "disqualified";
@@ -724,7 +1025,15 @@ export interface components {
             officeCode: string;
             officeName: string;
             officeNameKey?: string;
+            seatsAvailable: number;
+            method: components["schemas"]["OfficeElectionMethod"];
+            currentBallot?: components["schemas"]["OfficeElectionBallotResponse"];
             candidates: components["schemas"]["OfficeElectionCandidateResponse"][];
+        };
+        OfficeElectionBallotResponse: {
+            /** Format: date-time */
+            castAt: string;
+            candidateMembershipIds: string[];
         };
         OfficeElectionCandidateResponse: {
             /** Format: uuid */
@@ -739,29 +1048,55 @@ export interface components {
             participation: number;
             quorumRequired: number;
             quorumMet: boolean;
+            seatsAvailable: number;
+            seatsFilled: number;
+            method: components["schemas"]["OfficeElectionMethod"];
+            quota?: number;
             decisive: boolean;
             passed: boolean;
-            /** Format: uuid */
-            winnerMembershipId?: string;
-            winnerName?: string;
             outcomeReason: components["schemas"]["OfficeElectionOutcomeReason"];
+            winners: components["schemas"]["OfficeElectionCandidateTallyResponse"][];
             candidates: components["schemas"]["OfficeElectionCandidateTallyResponse"][];
+            rounds: components["schemas"]["OfficeElectionRoundResponse"][];
         };
         OfficeElectionCandidateTallyResponse: {
             /** Format: uuid */
             membershipId: string;
             name: string;
-            ballots: number;
+            voteTotal: number;
+        };
+        /** @enum {string} */
+        OfficeElectionRoundAction: "elected" | "eliminated" | "elected_remaining" | "no_continuing_candidates" | "no_countable_ballots";
+        /** @enum {string} */
+        OfficeElectionTieBreakReason: "deterministic";
+        OfficeElectionRoundResponse: {
+            roundNumber: number;
+            action: components["schemas"]["OfficeElectionRoundAction"];
+            /** Format: uuid */
+            candidateMembershipId?: string;
+            exhaustedVoteTotal: number;
+            transferFactor?: number;
+            tieBreakReason?: components["schemas"]["OfficeElectionTieBreakReason"];
+            candidates: components["schemas"]["OfficeElectionCandidateRoundTallyResponse"][];
+        };
+        OfficeElectionCandidateRoundTallyResponse: {
+            /** Format: uuid */
+            membershipId: string;
+            name: string;
+            voteTotal: number;
         };
         OfficeResponse: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            jurisdictionId: string;
             code: string;
             name: string;
             description: string;
             nameKey?: string;
             descriptionKey?: string;
             termLengthDays: number;
+            seatCount: number;
         };
         OfficeTermResponse: {
             /** Format: uuid */
@@ -802,6 +1137,39 @@ export interface components {
             appellantMembershipId: string;
             appellantName: string;
             status: components["schemas"]["AppealStatus"];
+            reason: string;
+            /** Format: date-time */
+            decidedAt: string;
+        };
+        OfficeTermReviewResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            officeTermId: string;
+            /** Format: uuid */
+            petitionerMembershipId: string;
+            petitionerName: string;
+            /** Format: uuid */
+            vacatedMembershipId: string;
+            vacatedMemberName: string;
+            officeName: string;
+            officeNameKey?: string;
+            status: components["schemas"]["OfficeTermReviewStatus"];
+            reason: string;
+            /** Format: date-time */
+            decidedAt: string;
+        };
+        ConstitutionalReviewResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            targetRecordId: string;
+            targetEntryNumber: number;
+            targetType: components["schemas"]["OfficialRecordType"];
+            /** Format: uuid */
+            petitionerMembershipId: string;
+            petitionerName: string;
+            status: components["schemas"]["ConstitutionalReviewStatus"];
             reason: string;
             /** Format: date-time */
             decidedAt: string;
@@ -879,16 +1247,51 @@ export interface components {
         PolityId: string;
         MotionId: string;
         InvitationId: string;
+        /** @description Zero-based page index. */
+        Page: number;
+        /** @description Number of items per page. */
+        PageSize: number;
     };
     requestBodies: never;
-    headers: never;
+    headers: {
+        /** @description Zero-based page index returned. */
+        XPage: number;
+        /** @description Requested page size. */
+        XPageSize: number;
+        /** @description Total number of matching items across all pages. */
+        XTotalCount: number;
+    };
     pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    listPolities: {
+    provisionPolityAccount: {
         parameters: {
             query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Baseline account grants were staged. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listPolities: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -898,6 +1301,9 @@ export interface operations {
             /** @description Polities */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -929,6 +1335,8 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
         };
     };
     getPolity: {
@@ -977,6 +1385,29 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    getPolityGovernment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current government structure */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernmentStructureResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
     getPolityActions: {
         parameters: {
             query?: never;
@@ -1002,7 +1433,12 @@ export interface operations {
     };
     listPolityMembers: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1014,6 +1450,9 @@ export interface operations {
             /** @description Members */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1022,9 +1461,37 @@ export interface operations {
             };
         };
     };
-    listPolityInvitations: {
+    resignPolityMembership: {
         parameters: {
             query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership resigned and polity access revocation staged. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    listPolityInvitations: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1036,6 +1503,9 @@ export interface operations {
             /** @description Membership invitations */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1074,7 +1544,12 @@ export interface operations {
     };
     listCurrentUserInvitations: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1084,6 +1559,9 @@ export interface operations {
             /** @description Pending invitations for the current user */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1118,7 +1596,12 @@ export interface operations {
     };
     listPolityMotions: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1130,6 +1613,9 @@ export interface operations {
             /** @description Motions */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1247,6 +1733,64 @@ export interface operations {
             };
             400: components["responses"]["BadRequest"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    createPolityOfficeTermReviewMotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOfficeTermReviewMotionRequest"];
+            };
+        };
+        responses: {
+            /** @description Office term review motion introduced */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MotionResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    createPolityConstitutionalReviewMotion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConstitutionalReviewMotionRequest"];
+            };
+        };
+        responses: {
+            /** @description Constitutional review motion introduced */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MotionResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     createPolityConstitutionAmendmentMotion: {
@@ -1442,7 +1986,12 @@ export interface operations {
     };
     listPolityOffices: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1454,6 +2003,9 @@ export interface operations {
             /** @description Offices */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1464,7 +2016,12 @@ export interface operations {
     };
     listPolityOfficeTerms: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1476,6 +2033,9 @@ export interface operations {
             /** @description Office terms */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1486,7 +2046,12 @@ export interface operations {
     };
     listPolitySanctions: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1498,6 +2063,9 @@ export interface operations {
             /** @description Sanctions */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1508,7 +2076,12 @@ export interface operations {
     };
     listPolityAppeals: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1520,6 +2093,9 @@ export interface operations {
             /** @description Appeals */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -1528,9 +2104,74 @@ export interface operations {
             };
         };
     };
+    listPolityOfficeTermReviews: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Office term reviews */
+            200: {
+                headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfficeTermReviewResponse"][];
+                };
+            };
+        };
+    };
+    listPolityConstitutionalReviews: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                polityId: components["parameters"]["PolityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Constitutional reviews */
+            200: {
+                headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConstitutionalReviewResponse"][];
+                };
+            };
+        };
+    };
     listPolityOfficialRecord: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index. */
+                page?: components["parameters"]["Page"];
+                /** @description Number of items per page. */
+                size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 polityId: components["parameters"]["PolityId"];
@@ -1542,6 +2183,9 @@ export interface operations {
             /** @description Official record */
             200: {
                 headers: {
+                    "X-Page": components["headers"]["XPage"];
+                    "X-Page-Size": components["headers"]["XPageSize"];
+                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {

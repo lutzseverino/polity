@@ -4,6 +4,8 @@ import com.odonta.polity.model.OfficeElectionMethod;
 import java.util.UUID;
 
 public interface OfficeElectionProposalProjection {
+  UUID getMotionId();
+
   UUID getPolityId();
 
   UUID getOfficeId();

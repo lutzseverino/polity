@@ -2,6 +2,7 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.OfficeElectionCandidate;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,4 +22,7 @@ public interface OfficeElectionCandidateRepository
 
   boolean existsByMotionIdAndMembershipIdAndStatus(
       UUID motionId, UUID membershipId, OfficeElectionCandidateStatus status);
+
+  List<OfficeElectionCandidateProjection> findProjectionsByPolityIdAndMotionIdIn(
+      UUID polityId, Collection<UUID> motionIds);
 }

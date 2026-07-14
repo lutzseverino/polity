@@ -9,16 +9,14 @@ import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
+import com.odonta.polity.input.CreateMemberInvitationInput;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
 import com.odonta.polity.mapper.MembershipInvitationApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipInvitation;
-import com.odonta.polity.model.MembershipInvitationResult;
-import com.odonta.polity.model.MembershipResult;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficialRecordContext;
 import com.odonta.polity.model.OfficialRecordTemplate;
@@ -29,6 +27,10 @@ import com.odonta.polity.model.TemplateParameters;
 import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipRepository;
+import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
+import com.odonta.polity.result.MembershipInvitationResult;
+import com.odonta.polity.result.MembershipResult;
+import com.odonta.polity.result.PageResult;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;
@@ -36,6 +38,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +60,7 @@ public class InvitationService {
   private final MembershipApplicationMapper memberMapper;
   private final PolityGrantPlanner grantPlanner;
   private final PolityService polities;
+  private final PolityActionAvailabilityResolver actionAvailability;
   private final OfficialRecordService officialRecords;
 
   @Transactional
@@ -113,21 +118,33 @@ public class InvitationService {
   }
 
   @PreAuthorize(PolityPermissions.HAS_POLITY_READ)
-  public List<MembershipInvitationResult> listPolityInvitations(UUID polityId, UUID userId) {
+  public PageResult<MembershipInvitationResult> listPolityInvitations(
+      UUID polityId, UUID userId, int page, int size) {
     membershipService.active(polityId, userId);
-    return invitations.findProjectionsByPolityIdOrderByInvitedAtDesc(polityId).stream()
-        .map(this::result)
-        .toList();
+    Page<MembershipInvitationProjection> projections =
+        invitations.findProjectionsByPolityIdOrderByInvitedAtDescIdAsc(
+            polityId, PageRequest.of(page, size));
+    return new PageResult<>(
+        projections.stream().map(this::result).toList(),
+        projections.getNumber(),
+        projections.getSize(),
+        projections.getTotalElements());
   }
 
-  public List<MembershipInvitationResult> listCurrentUserInvitations(AuthenticatedUser actor) {
+  public PageResult<MembershipInvitationResult> listCurrentUserInvitations(
+      AuthenticatedUser actor, int page, int size) {
     IdentityUser user = identityUsers.get(actor.id());
-    return invitations
-        .findPendingProjectionsForInvitee(
-            user.id(), List.of(normalize(user.email())), InvitationStatus.PENDING)
-        .stream()
-        .map(this::result)
-        .toList();
+    Page<MembershipInvitationProjection> projections =
+        invitations.findPendingProjectionsForInvitee(
+            user.id(),
+            List.of(normalize(user.email())),
+            InvitationStatus.PENDING,
+            PageRequest.of(page, size));
+    return new PageResult<>(
+        projections.stream().map(this::result).toList(),
+        projections.getNumber(),
+        projections.getSize(),
+        projections.getTotalElements());
   }
 
   @Transactional
@@ -213,7 +230,7 @@ public class InvitationService {
       authority.require(inviter, constitution, PowerCode.ADMIT_MEMBER);
     } catch (ApiException exception) {
       if (!exception.code().equals("constitutional_authority_missing")
-          || !polities.hasProvisionalFounderAdmissionAuthority(inviter)) {
+          || !actionAvailability.hasProvisionalFounderAdmissionAuthority(inviter)) {
         throw exception;
       }
     }

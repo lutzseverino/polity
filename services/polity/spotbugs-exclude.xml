@@ -8,7 +8,24 @@
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
   </Match>
   <Match>
+    <!-- These records defensively copy their nullable lists or template-parameter maps. SpotBugs
+         does not infer immutability through the shared copy helper or unmodifiable map wrapper. -->
+    <Or>
+      <Class name="com.odonta.polity.input.CreateConstitutionAmendmentMotionInput" />
+      <Class name="com.odonta.polity.result.ConstitutionResult" />
+      <Class name="com.odonta.polity.result.MotionResult" />
+      <Class name="com.odonta.polity.result.OfficialRecordResult" />
+    </Or>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
     <Package name="~com[.]odonta[.]polity[.]model([.].*)?" />
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+  </Match>
+  <Match>
+    <!-- Constructor validation is intentional; this Spring component has no finalizer and must
+         reject incomplete or duplicate effect registries before it can be published as a bean. -->
+    <Class name="com.odonta.polity.effect.MotionEffectApplier" />
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
 </FindBugsFilter>

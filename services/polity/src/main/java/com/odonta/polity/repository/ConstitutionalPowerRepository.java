@@ -2,6 +2,7 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.PowerCode;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +14,9 @@ public interface ConstitutionalPowerRepository extends JpaRepository<Constitutio
 
   List<ConstitutionalPower> findEntitiesByConstitutionVersionId(UUID constitutionVersionId);
 
-  List<ConstitutionPowerProjection> findProjectionsByConstitutionVersionId(
+  List<ConstitutionalPowerProjection> findProjectionsByConstitutionVersionId(
       UUID constitutionVersionId);
+
+  List<ConstitutionalPowerProjection> findProjectionsByPolityIdAndConstitutionVersionIdInAndCode(
+      UUID polityId, Collection<UUID> constitutionVersionIds, PowerCode code);
 }

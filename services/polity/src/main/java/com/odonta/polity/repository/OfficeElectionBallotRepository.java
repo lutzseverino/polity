@@ -1,6 +1,7 @@
 package com.odonta.polity.repository;
 
 import com.odonta.polity.model.OfficeElectionBallot;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,4 +12,7 @@ public interface OfficeElectionBallotRepository extends JpaRepository<OfficeElec
       UUID motionId, UUID membershipId);
 
   List<OfficeElectionBallot> findEntitiesByMotionId(UUID motionId);
+
+  List<OfficeElectionBallotProjection> findProjectionsByPolityIdAndMotionIdIn(
+      UUID polityId, Collection<UUID> motionIds);
 }

@@ -1,6 +1,6 @@
 package com.odonta.polity.validation;
 
-import com.odonta.polity.model.CreateProcedureChangeInput;
+import com.odonta.polity.input.CreateProcedureChangeInput;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

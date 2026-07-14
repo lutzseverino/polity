@@ -5,15 +5,21 @@ import com.odonta.polity.model.VoteChoice;
 import com.odonta.polity.model.VotingOutcomeReason;
 import com.odonta.polity.model.VotingProcedure;
 import com.odonta.polity.model.VotingResult;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VotingEvaluator {
   public VotingResult evaluate(VotingProcedure procedure, int eligible, List<Vote> votes) {
-    int yes = count(votes, VoteChoice.YES);
-    int no = count(votes, VoteChoice.NO);
-    int abstain = count(votes, VoteChoice.ABSTAIN);
+    return evaluateChoices(procedure, eligible, votes.stream().map(Vote::getChoice).toList());
+  }
+
+  public VotingResult evaluateChoices(
+      VotingProcedure procedure, int eligible, Collection<VoteChoice> choices) {
+    int yes = count(choices, VoteChoice.YES);
+    int no = count(choices, VoteChoice.NO);
+    int abstain = count(choices, VoteChoice.ABSTAIN);
     int participation = yes + no + abstain;
     int quorumRequired =
         (eligible * procedure.getQuorumNumerator() + procedure.getQuorumDenominator() - 1)
@@ -43,7 +49,7 @@ public class VotingEvaluator {
     };
   }
 
-  private int count(List<Vote> votes, VoteChoice choice) {
-    return (int) votes.stream().filter(vote -> vote.getChoice() == choice).count();
+  private int count(Collection<VoteChoice> choices, VoteChoice choice) {
+    return (int) choices.stream().filter(vote -> vote == choice).count();
   }
 }

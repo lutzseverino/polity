@@ -1,6 +1,6 @@
 package com.odonta.polity.validation;
 
-import com.odonta.polity.model.CreatePowerChangeInput;
+import com.odonta.polity.input.CreatePowerChangeInput;
 import com.odonta.polity.model.PowerHolderScope;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

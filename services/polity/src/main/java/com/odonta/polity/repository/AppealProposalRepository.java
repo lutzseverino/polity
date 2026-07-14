@@ -1,6 +1,7 @@
 package com.odonta.polity.repository;
 
 import com.odonta.polity.model.AppealProposal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,4 +15,7 @@ public interface AppealProposalRepository extends JpaRepository<AppealProposal, 
 
   List<AppealProposalProjection> findProjectionsByPolityIdAndAppellantMembershipId(
       UUID polityId, UUID appellantMembershipId);
+
+  List<AppealProposalProjection> findProjectionsByPolityIdAndMotionIdIn(
+      UUID polityId, Collection<UUID> motionIds);
 }

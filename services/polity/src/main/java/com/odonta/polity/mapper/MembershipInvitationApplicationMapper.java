@@ -1,7 +1,7 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.model.MembershipInvitationResult;
 import com.odonta.polity.repository.MembershipInvitationProjection;
+import com.odonta.polity.result.MembershipInvitationResult;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 

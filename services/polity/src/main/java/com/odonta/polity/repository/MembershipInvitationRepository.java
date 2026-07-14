@@ -3,9 +3,10 @@ package com.odonta.polity.repository;
 import com.odonta.polity.model.InvitationStatus;
 import com.odonta.polity.model.MembershipInvitation;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,7 +20,8 @@ public interface MembershipInvitationRepository extends JpaRepository<Membership
 
   Optional<MembershipInvitation> findEntityByIdAndStatus(UUID id, InvitationStatus status);
 
-  List<MembershipInvitationProjection> findProjectionsByPolityIdOrderByInvitedAtDesc(UUID polityId);
+  Page<MembershipInvitationProjection> findProjectionsByPolityIdOrderByInvitedAtDescIdAsc(
+      UUID polityId, Pageable pageable);
 
   @Query(
       """
@@ -34,10 +36,10 @@ public interface MembershipInvitationRepository extends JpaRepository<Membership
       from MembershipInvitation invitation
       where invitation.status = :status
         and (invitation.invitedUserId = :userId or lower(invitation.email) in :emails)
-      order by invitation.invitedAt desc
+      order by invitation.invitedAt desc, invitation.id asc
       """)
-  List<MembershipInvitationProjection> findPendingProjectionsForInvitee(
-      UUID userId, Collection<String> emails, InvitationStatus status);
+  Page<MembershipInvitationProjection> findPendingProjectionsForInvitee(
+      UUID userId, Collection<String> emails, InvitationStatus status, Pageable pageable);
 
   Optional<MembershipInvitationProjection> findProjectedById(UUID id);
 }

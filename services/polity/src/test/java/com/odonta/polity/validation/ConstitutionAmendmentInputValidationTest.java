@@ -2,13 +2,13 @@ package com.odonta.polity.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.odonta.polity.input.CreateConstitutionAmendmentMotionInput;
+import com.odonta.polity.input.CreateInstitutionChangeInput;
+import com.odonta.polity.input.CreateOfficeChangeInput;
+import com.odonta.polity.input.CreatePowerChangeInput;
+import com.odonta.polity.input.CreateProcedureChangeInput;
 import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
 import com.odonta.polity.model.ConstitutionOfficeChangeAction;
-import com.odonta.polity.model.CreateConstitutionAmendmentMotionInput;
-import com.odonta.polity.model.CreateInstitutionChangeInput;
-import com.odonta.polity.model.CreateOfficeChangeInput;
-import com.odonta.polity.model.CreatePowerChangeInput;
-import com.odonta.polity.model.CreateProcedureChangeInput;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.model.PowerHolderScope;

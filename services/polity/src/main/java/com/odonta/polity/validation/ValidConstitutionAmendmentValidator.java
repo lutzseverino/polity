@@ -1,10 +1,10 @@
 package com.odonta.polity.validation;
 
-import com.odonta.polity.model.CreateConstitutionAmendmentMotionInput;
-import com.odonta.polity.model.CreateInstitutionChangeInput;
-import com.odonta.polity.model.CreateOfficeChangeInput;
-import com.odonta.polity.model.CreatePowerChangeInput;
-import com.odonta.polity.model.CreateProcedureChangeInput;
+import com.odonta.polity.input.CreateConstitutionAmendmentMotionInput;
+import com.odonta.polity.input.CreateInstitutionChangeInput;
+import com.odonta.polity.input.CreateOfficeChangeInput;
+import com.odonta.polity.input.CreatePowerChangeInput;
+import com.odonta.polity.input.CreateProcedureChangeInput;
 import com.odonta.polity.model.PowerCode;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

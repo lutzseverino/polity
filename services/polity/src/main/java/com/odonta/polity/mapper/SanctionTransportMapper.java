@@ -1,7 +1,7 @@
 package com.odonta.polity.mapper;
 
 import com.odonta.polity.api.model.SanctionResponse;
-import com.odonta.polity.model.SanctionResult;
+import com.odonta.polity.result.SanctionResult;
 import java.util.List;
 import org.mapstruct.Mapper;
 

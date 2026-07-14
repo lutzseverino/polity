@@ -6,6 +6,8 @@ import com.odonta.polity.model.VotingThreshold;
 import java.util.UUID;
 
 public interface ConstitutionProcedureChangeProposalProjection {
+  UUID getAmendmentProposalId();
+
   String getProcedureCode();
 
   UUID getInstitutionId();

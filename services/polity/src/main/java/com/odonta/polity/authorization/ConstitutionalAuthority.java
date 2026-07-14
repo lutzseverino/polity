@@ -6,11 +6,15 @@ import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.OfficeTermStatus;
 import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.model.PowerHolderScope;
+import com.odonta.polity.repository.ConstitutionalPowerProjection;
 import com.odonta.polity.repository.ConstitutionalPowerRepository;
+import com.odonta.polity.repository.MembershipProjection;
+import com.odonta.polity.repository.OfficeTermProjection;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.service.MembershipService;
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +48,36 @@ public class ConstitutionalAuthority {
 
   public boolean allowsAppealCertification(Membership member, ConstitutionVersion constitution) {
     return allows(member, constitution, PowerCode.REQUEST_CERTIFICATION, false);
+  }
+
+  public boolean allows(
+      MembershipProjection member,
+      ConstitutionalPowerProjection power,
+      Collection<OfficeTermProjection> heldTerms,
+      boolean hasPoliticalStanding,
+      boolean requireStanding,
+      OffsetDateTime now) {
+    if (power == null) {
+      throw ApiException.forbidden(
+          "constitutional_power_missing",
+          "The governing constitution does not authorize this action.");
+    }
+    if (requireStanding && !hasPoliticalStanding) {
+      throw ApiException.forbidden(
+          "political_standing_required",
+          "This member lacks political standing for this constitutional action.");
+    }
+    if (power.getHolderScope() == PowerHolderScope.ACTIVE_MEMBER) {
+      return true;
+    }
+    return power.getHolderScope() == PowerHolderScope.OFFICE
+        && heldTerms.stream()
+            .anyMatch(
+                term ->
+                    term.getMembershipId().equals(member.getId())
+                        && term.getStatus() == OfficeTermStatus.ACTIVE
+                        && term.getEndsAt().isAfter(now)
+                        && power.getHolderOfficeCode().equals(term.getOfficeCode()));
   }
 
   private void require(

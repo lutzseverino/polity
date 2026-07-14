@@ -260,6 +260,35 @@ class MembershipResignationServiceTest {
             eq(NOW));
   }
 
+  @Test
+  void lastActiveMemberResignationClosesPolityWhenDisbandmentNeedsTwoElectors() {
+    UUID polityId = UUID.randomUUID();
+    UUID userId = UUID.randomUUID();
+    UUID memberId = UUID.randomUUID();
+    Membership member = member(polityId, userId, memberId);
+    Polity polity = polity(polityId);
+    polity.completeBootstrap(NOW.minusDays(1));
+    ConstitutionVersion constitution = constitution(polityId);
+    Jurisdiction jurisdiction = jurisdiction(polityId);
+
+    when(polities.findEntityByIdForUpdate(polityId)).thenReturn(Optional.of(polity));
+    when(memberships.findEntityByPolityIdAndUserIdAndStatus(
+            polityId, userId, MembershipStatus.ACTIVE))
+        .thenReturn(Optional.of(member));
+    when(constitutions.findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED))
+        .thenReturn(Optional.of(constitution));
+    when(memberships.countByPolityIdAndStatus(polityId, MembershipStatus.ACTIVE)).thenReturn(1L);
+    stubDisbandmentAvailable(constitution, member, 2);
+    when(jurisdictions.findEntityByPolityIdAndKind(polityId, JurisdictionKind.ROOT))
+        .thenReturn(Optional.of(jurisdiction));
+
+    service.resign(polityId, new AuthenticatedUser(userId, "subject:member", "Bea"));
+
+    assertThat(member.getStatus()).isEqualTo(MembershipStatus.RESIGNED);
+    assertThat(polity.isDisbanded()).isTrue();
+    verify(polities).saveAndFlush(polity);
+  }
+
   private Membership member(UUID polityId, UUID userId, UUID membershipId) {
     Membership member =
         new Membership(
@@ -292,6 +321,11 @@ class MembershipResignationServiceTest {
   }
 
   private void stubDisbandmentAvailable(ConstitutionVersion constitution, Membership member) {
+    stubDisbandmentAvailable(constitution, member, 1);
+  }
+
+  private void stubDisbandmentAvailable(
+      ConstitutionVersion constitution, Membership member, int minimumElectorCount) {
     ConstitutionalPower power =
         new ConstitutionalPower(
             constitution.getPolityId(),
@@ -312,7 +346,7 @@ class MembershipResignationServiceTest {
             com.odonta.polity.model.VotingThreshold.TWO_THIRDS_ELIGIBLE,
             ProcedureElectorate.ACTIVE_MEMBERS,
             null,
-            1,
+            minimumElectorCount,
             0,
             24,
             EffectType.DISBAND_POLITY);

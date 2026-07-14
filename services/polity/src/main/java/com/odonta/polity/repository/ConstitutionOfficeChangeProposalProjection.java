@@ -4,6 +4,8 @@ import com.odonta.polity.model.ConstitutionOfficeChangeAction;
 import java.util.UUID;
 
 public interface ConstitutionOfficeChangeProposalProjection {
+  UUID getAmendmentProposalId();
+
   ConstitutionOfficeChangeAction getAction();
 
   String getOfficeCode();

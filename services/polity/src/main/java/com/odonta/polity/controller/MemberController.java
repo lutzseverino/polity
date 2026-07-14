@@ -23,9 +23,10 @@ public class MemberController implements MembersApi {
   private final AuthenticatedUserReader users;
 
   @Override
-  public ResponseEntity<List<MemberResponse>> listPolityMembers(UUID polityId) {
-    return ResponseEntity.ok(
-        mapper.toResponses(memberships.list(polityId, users.currentUser().id())));
+  public ResponseEntity<List<MemberResponse>> listPolityMembers(
+      UUID polityId, Integer page, Integer size) {
+    return PageResponses.ok(
+        memberships.list(polityId, users.currentUser().id(), page, size), mapper::toResponses);
   }
 
   @Override

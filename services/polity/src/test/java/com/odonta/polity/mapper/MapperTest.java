@@ -5,19 +5,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odonta.polity.api.model.ActionAvailabilityResponse;
-import com.odonta.polity.model.ActionAvailabilityResult;
-import com.odonta.polity.model.Certification;
+import com.odonta.polity.model.CertificationModality;
 import com.odonta.polity.model.CertificationOutcomeReason;
 import com.odonta.polity.model.GovernmentReadinessDiagnostic;
-import com.odonta.polity.model.GovernmentReadinessResult;
 import com.odonta.polity.model.GovernmentReadinessStatus;
 import com.odonta.polity.model.MembershipStatus;
+import com.odonta.polity.model.OfficeTermStatus;
 import com.odonta.polity.model.OfficialRecordType;
-import com.odonta.polity.model.VotingOutcomeReason;
-import com.odonta.polity.model.VotingResult;
+import com.odonta.polity.repository.CertificationProjection;
 import com.odonta.polity.repository.MembershipProjection;
 import com.odonta.polity.repository.OfficeProjection;
+import com.odonta.polity.repository.OfficeTermProjection;
 import com.odonta.polity.repository.OfficialRecordProjection;
+import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.CertificationResult;
+import com.odonta.polity.result.GovernmentReadinessResult;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +34,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 class MapperTest {
   private static final OffsetDateTime NOW = OffsetDateTime.parse("2026-06-16T12:00:00Z");
 
-  private final MotionApplicationMapper motions = Mappers.getMapper(MotionApplicationMapper.class);
+  private final CertificationApplicationMapper certifications =
+      Mappers.getMapper(CertificationApplicationMapper.class);
   private final OfficeApplicationMapper offices = Mappers.getMapper(OfficeApplicationMapper.class);
+  private final OfficeTermApplicationMapper officeTerms =
+      Mappers.getMapper(OfficeTermApplicationMapper.class);
   private final OfficialRecordApplicationMapper officialRecords =
       Mappers.getMapper(OfficialRecordApplicationMapper.class);
   private final MembershipApplicationMapper memberships =
@@ -92,20 +97,78 @@ class MapperTest {
   }
 
   @Test
+  void mapsOfficeTermPersistedOfficeIdentity() {
+    UUID officeId = UUID.randomUUID();
+    OfficeTermProjection projection = mock(OfficeTermProjection.class);
+    when(projection.getId()).thenReturn(UUID.randomUUID());
+    when(projection.getOfficeId()).thenReturn(officeId);
+    when(projection.getMembershipId()).thenReturn(UUID.randomUUID());
+    when(projection.getStatus()).thenReturn(OfficeTermStatus.ACTIVE);
+    when(projection.getStartedAt()).thenReturn(NOW.minusDays(1));
+    when(projection.getEndsAt()).thenReturn(NOW.plusDays(1));
+
+    var result =
+        officeTerms.toResult(
+            projection, "Steward", "office.steward.name", "Ada", OfficeTermStatus.ACTIVE);
+
+    assertThat(result.officeId()).isEqualTo(officeId);
+  }
+
+  @Test
   void mapsCertificationResult() {
-    Certification certification =
-        new Certification(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            new VotingResult(3, 2, 1, 0, 2, true, true, true, VotingOutcomeReason.PASSED),
-            NOW);
+    CertificationProjection certification = mock(CertificationProjection.class);
+    when(certification.getModality()).thenReturn(CertificationModality.YES_NO);
+    when(certification.getEligibleCount()).thenReturn(3);
+    when(certification.getYesCount()).thenReturn(2);
+    when(certification.getNoCount()).thenReturn(1);
+    when(certification.getAbstainCount()).thenReturn(0);
+    when(certification.getQuorumRequired()).thenReturn(2);
+    when(certification.isQuorumMet()).thenReturn(true);
+    when(certification.isThresholdMet()).thenReturn(true);
+    when(certification.isPassed()).thenReturn(true);
+    when(certification.getOutcomeReason()).thenReturn(CertificationOutcomeReason.PASSED);
+    when(certification.getCertifiedAt()).thenReturn(NOW);
 
-    var result = motions.toResult(certification);
+    var result = certifications.toResult(certification);
 
+    assertThat(result.modality()).isEqualTo(CertificationModality.YES_NO);
+    assertThat(result.eligibleCount()).isEqualTo(3);
+    assertThat(result.yesCount()).isEqualTo(2);
+    assertThat(result.quorumRequired()).isEqualTo(2);
     assertThat(result.passed()).isTrue();
     assertThat(result.outcomeReason()).isEqualTo(CertificationOutcomeReason.PASSED);
     assertThat(result.certifiedAt()).isEqualTo(NOW);
+  }
+
+  @Test
+  void mapsDurableCertificationEvidenceToTransport() {
+    CertificationTransportMapper mapper = Mappers.getMapper(CertificationTransportMapper.class);
+    CertificationResult result =
+        new CertificationResult(
+            CertificationModality.OFFICE_ELECTION,
+            7,
+            null,
+            null,
+            null,
+            6,
+            true,
+            2,
+            4,
+            true,
+            true,
+            true,
+            CertificationOutcomeReason.PASSED,
+            NOW);
+
+    var response = mapper.toResponse(result);
+
+    assertThat(response.getModality())
+        .isEqualTo(com.odonta.polity.api.model.CertificationModality.OFFICE_ELECTION);
+    assertThat(response.getEligibleCount()).isEqualTo(7);
+    assertThat(response.getElectionParticipationCount()).isEqualTo(6);
+    assertThat(response.getElectionDecisive()).isTrue();
+    assertThat(response.getElectionWinnerCount()).isEqualTo(2);
+    assertThat(response.getYesCount()).isNull();
   }
 
   @Test
@@ -136,6 +199,16 @@ class MapperTest {
   }
 
   @Test
+  void mapsEveryOfficialRecordTypeThroughItsOwnedTransportMapper() {
+    OfficialRecordTypeTransportMapper mapper =
+        Mappers.getMapper(OfficialRecordTypeTransportMapper.class);
+
+    assertThat(OfficialRecordType.values())
+        .allSatisfy(
+            type -> assertThat(mapper.toTransport(type).getValue()).isEqualTo(type.wireValue()));
+  }
+
+  @Test
   void mapsActionAvailabilityWithLocalizedReasonMessage() {
     try {
       LocaleContextHolder.setLocale(Locale.ENGLISH);
@@ -144,11 +217,10 @@ class MapperTest {
           "api_error.polity_provisional", Locale.ENGLISH, "This polity needs more citizens.");
       TransportTextResolver text =
           new TransportTextResolver(new ConstitutionChangeTextResolver(messages), messages);
-      PolityTransportMapper mapper = Mappers.getMapper(PolityTransportMapper.class);
+      ActionAvailabilityTransportMapper mapper =
+          Mappers.getMapper(ActionAvailabilityTransportMapper.class);
       ReflectionTestUtils.setField(
-          mapper, "polityTransportConversions", new PolityTransportConversions(text));
-      ReflectionTestUtils.setField(
-          mapper, "officeTransportConversions", new OfficeTransportConversions(text));
+          mapper, "actionAvailabilityTransportText", new ActionAvailabilityTransportText(text));
 
       ActionAvailabilityResponse response =
           mapper.toResponse(ActionAvailabilityResult.blocked("polity_provisional"));
@@ -173,11 +245,10 @@ class MapperTest {
           "More citizens are needed.");
       TransportTextResolver text =
           new TransportTextResolver(new ConstitutionChangeTextResolver(messages), messages);
-      PolityTransportMapper mapper = Mappers.getMapper(PolityTransportMapper.class);
+      GovernmentReadinessTransportMapper mapper =
+          Mappers.getMapper(GovernmentReadinessTransportMapper.class);
       ReflectionTestUtils.setField(
-          mapper, "polityTransportConversions", new PolityTransportConversions(text));
-      ReflectionTestUtils.setField(
-          mapper, "officeTransportConversions", new OfficeTransportConversions(text));
+          mapper, "governmentAssessmentTransportText", new GovernmentAssessmentTransportText(text));
 
       var response =
           mapper.toResponse(
