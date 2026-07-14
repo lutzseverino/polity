@@ -10,13 +10,6 @@ const tsFiles = [
   "packages/design/src/**/*.ts",
 ];
 
-const projectFiles = [
-  "./apps/web/tsconfig.app.json",
-  "./apps/landing/tsconfig.app.json",
-  "./apps/mobile/tsconfig.json",
-  "./packages/design/tsconfig.json",
-];
-
 export default [
   {
     ignores: [
@@ -35,7 +28,7 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: projectFiles,
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },

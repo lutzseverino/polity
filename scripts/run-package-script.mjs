@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const SUPPORTED_MANAGERS = new Set(["npm", "pnpm"]);
+const workspaceRoot = fileURLToPath(new URL("..", import.meta.url));
 
 function detectPackageManager() {
   const configuredManager = process.env.POLITY_PACKAGE_MANAGER;
@@ -78,6 +80,7 @@ if (scope === "root") {
 }
 
 const result = spawnSync(command, args, {
+  cwd: workspaceRoot,
   shell: process.platform === "win32",
   stdio: "inherit",
 });
