@@ -9,15 +9,15 @@ import {
   AppCardHeader,
   AppCardTitle,
 } from "@/components/app/AppCard";
+import {
+  AppEmpty,
+  AppEmptyDescription,
+  AppEmptyHeader,
+  AppEmptyMedia,
+  AppEmptyTitle,
+} from "@/components/app/AppEmpty";
 import { AppPageHeader } from "@/components/app/AppPageHeader";
 import { AppText } from "@/components/app/AppText";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { invitationsQueryOptions, useInvitations } from "@/domains/membership";
 import {
   PolityCard,
@@ -151,24 +151,24 @@ function PolityDirectoryRoute() {
             className="group h-full rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             to="/polities/new"
           >
-            <Empty className="h-full flex-row justify-start gap-3 border bg-transparent p-4 text-left transition-colors group-hover:border-foreground/30 group-hover:bg-muted/50">
-              <EmptyMedia
+            <AppEmpty className="h-full flex-row justify-start gap-3 border bg-transparent p-4 text-left transition-colors group-hover:border-foreground/30 group-hover:bg-muted/50">
+              <AppEmptyMedia
                 className="mb-0 size-10 rounded-full border border-dashed bg-transparent"
                 variant="icon"
               >
                 <Plus aria-hidden="true" className="size-5" />
-              </EmptyMedia>
-              <EmptyHeader className="min-w-0 max-w-none items-start gap-1 text-left">
-                <EmptyTitle className="text-base font-semibold">
+              </AppEmptyMedia>
+              <AppEmptyHeader className="min-w-0 max-w-none items-start gap-1 text-left">
+                <AppEmptyTitle className="text-base font-semibold">
                   <Trans>Found a Polity</Trans>
-                </EmptyTitle>
-                <EmptyDescription>
+                </AppEmptyTitle>
+                <AppEmptyDescription>
                   <Trans>
                     Create a new space and establish how it will govern itself.
                   </Trans>
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+                </AppEmptyDescription>
+              </AppEmptyHeader>
+            </AppEmpty>
           </Link>
 
           {polities.map((polity) => (
