@@ -3,31 +3,39 @@ import { useTranslation } from "react-i18next";
 
 export type Visibility = "public" | "private";
 
-export type SetupPreset = "standard_republic";
+export type SetupPreset = "standard_constitutional_council_republic";
 
-type SetupPresetCopyKey = "standardRepublic";
+type SetupPresetCopyKey = "standardConstitutionalCouncilRepublic";
 
 export type Pace = "fast" | "standard" | "deliberate";
 
-export type OnboardingStep = "government" | "visibility" | "invites" | "ready";
+export type OnboardingStep =
+  | "invites"
+  | "pace"
+  | "preset"
+  | "ready"
+  | "visibility";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type NameError = "nameRequired";
 type InviteError = "emailRequired" | "emailInvalid" | "emailDuplicate";
 const stepIndex = {
-  government: 0,
-  invites: 2,
-  ready: 3,
+  invites: 0,
+  pace: 3,
+  preset: 2,
+  ready: 4,
   visibility: 1,
 } satisfies Record<OnboardingStep, number>;
 const previousStep = {
-  government: null,
-  invites: "visibility",
-  ready: "invites",
-  visibility: "government",
+  invites: null,
+  pace: "preset",
+  preset: "visibility",
+  ready: "pace",
+  visibility: "invites",
 } satisfies Record<OnboardingStep, OnboardingStep | null>;
 const setupPresetCopyKeys = {
-  standard_republic: "standardRepublic",
+  standard_constitutional_council_republic:
+    "standardConstitutionalCouncilRepublic",
 } satisfies Record<SetupPreset, SetupPresetCopyKey>;
 
 function isVisibility(value: string): value is Visibility {
@@ -41,7 +49,9 @@ function isPace(value: string): value is Pace {
 export function useLandingOnboarding() {
   const { t } = useTranslation("landing");
   const [polityName, setPolityName] = useState("");
-  const [setupPreset] = useState<SetupPreset>("standard_republic");
+  const [setupPreset] = useState<SetupPreset>(
+    "standard_constitutional_council_republic",
+  );
   const [pace, setPace] = useState<Pace>("standard");
   const [visibility, setVisibility] = useState<Visibility>("public");
   const [step, setStep] = useState<OnboardingStep | null>(null);
@@ -56,7 +66,7 @@ export function useLandingOnboarding() {
   const visibilityCopy = t(
     `onboarding.visibility.options.${visibility}.description`,
   );
-  const paceCopy = t(`onboarding.government.pace.options.${pace}.description`);
+  const paceCopy = t(`onboarding.pace.options.${pace}.description`);
 
   const updateVisibility = useCallback((value: string) => {
     if (isVisibility(value)) {
@@ -70,7 +80,7 @@ export function useLandingOnboarding() {
     }
   }, []);
 
-  const startGovernment = useCallback(() => {
+  const startInvites = useCallback(() => {
     setNameError(null);
 
     if (!trimmedName) {
@@ -78,15 +88,19 @@ export function useLandingOnboarding() {
       return;
     }
 
-    setStep("government");
+    setStep("invites");
   }, [trimmedName]);
+
+  const continueToPace = useCallback(() => {
+    setStep("pace");
+  }, []);
+
+  const continueToPreset = useCallback(() => {
+    setStep("preset");
+  }, []);
 
   const continueToVisibility = useCallback(() => {
     setStep("visibility");
-  }, []);
-
-  const continueToInvites = useCallback(() => {
-    setStep("invites");
   }, []);
 
   const addInvite = useCallback(() => {
@@ -146,7 +160,8 @@ export function useLandingOnboarding() {
   return {
     addInvite,
     canStart,
-    continueToInvites,
+    continueToPace,
+    continueToPreset,
     continueToVisibility,
     displayName,
     finishSetup,
@@ -164,7 +179,7 @@ export function useLandingOnboarding() {
     setInviteEmail,
     setupPreset,
     setupPresetCopyKey: setupPresetCopyKeys[setupPreset],
-    startGovernment,
+    startInvites,
     step,
     updatePace,
     updateVisibility,

@@ -4,7 +4,7 @@
     "titleLine1": "Todo grupo",
     "titleLine2": "merece una",
     "titleEmphasis": "constitución.",
-    "body": "decreos convierte un chat de grupo en una politeia: votos, cargos, invitaciones y un registro oficial que sobrevive al feed.",
+    "body": "decreos convierte un chat de grupo en una república constitucional de consejo: ciudadanía, cargos del consejo, votos, invitaciones y un registro oficial que sobrevive al feed.",
     "cta": "Cómo gobierna",
     "command": {
       "prompt": "decreos:~$ fundar --nombre"
@@ -31,7 +31,7 @@
       {
         "no": "03",
         "title": "Una memoria",
-        "body": "Cargos, votos y enmiendas quedan lo bastante visibles para importar."
+        "body": "Cargos del consejo, votos y cambios constitucionales quedan lo bastante visibles para importar."
       },
       {
         "no": "04",
@@ -43,7 +43,7 @@
   "record": {
     "eyebrow": "El registro oficial",
     "title": "Las redes olvidan. El registro no.",
-    "body": "Mociones, votos, cargos, invitaciones, admisiones y enmiendas se inscriben, se numeran y se conservan. Algunas cosas deberían sobrevivir al feed.",
+    "body": "Mociones, votos, cargos, invitaciones, admisiones, remedios judiciales y cambios constitucionales se inscriben, se numeran y se conservan. Algunas cosas deberían sobrevivir al feed.",
     "ledger": "Libro oficial",
     "selectedEntries": "Entradas seleccionadas",
     "append": "esperando entrada No. 042",
@@ -55,7 +55,7 @@
       },
       {
         "entry": "002",
-        "detail": "Steward inicial asignado",
+        "detail": "Steward fundacional asignado",
         "kind": "OFC"
       },
       {
@@ -75,16 +75,16 @@
       },
       {
         "entry": "041",
-        "detail": "Constitución enmendada",
+        "detail": "Cambio constitucional tipado adoptado",
         "kind": "ENM"
       }
     ]
   },
   "social": {
-    "eyebrow": "En cada moción",
-    "titleLine1": "El voto cuenta.",
-    "titleLine2": "El comentario no.",
-    "body": "Cada moción trae su hilo. Dale like, responde, debátelo - y luego emite tu voto. La charla es solo charla; el voto es lo que mueve las cosas. Los likes y las respuestas nunca tocan el recuento.",
+    "eyebrow": "Alrededor de cada moción",
+    "titleLine1": "Las reacciones hablan.",
+    "titleLine2": "Los votos gobiernan.",
+    "body": "Comentarios, likes y reacciones pueden rodear una moción sin convertirse en mecánica constitucional. La capa social sostiene el debate; los votos, los remedios judiciales y el registro oficial conservan el rastro constitucional.",
     "motion": {
       "label": "Moción No. 027",
       "author": "presentada por @mira",
@@ -93,14 +93,14 @@
       "vote": "Emite tu voto",
       "tally": "12 a favor · 3 en contra",
       "quorum": "quórum alcanzado",
-      "discussion": "Conversación",
-      "likes": "18 likes",
+      "discussion": "Capa social",
+      "likes": "18 reacciones",
       "comments": "7 comentarios"
     },
-    "caption": "Los likes y respuestas nunca mueven el recuento - solo los votos"
+    "caption": "Reacciones y respuestas dan forma a la sala; los votos deciden y el registro oficial conserva la república"
   },
   "colophon": {
-    "tagline": "Software constitucional para gobiernos de grupos de amigos",
+    "tagline": "Software de república constitucional para gobiernos de grupos de amigos",
     "edition": "Edición",
     "editionValue": "No. 001",
     "established": "Fundación",
@@ -114,10 +114,10 @@
     "back": "Volver",
     "defaultPolityName": "Tu primera politeia",
     "flow": {
-      "name": "Nombre",
-      "government": "Gobierno",
+      "invites": "Personas",
       "visibility": "Acceso",
-      "invites": "Personas"
+      "preset": "Preset",
+      "pace": "Ritmo"
     },
     "panel": {
       "title": "Entrada fundacional",
@@ -134,47 +134,48 @@
         "Consejo de Decisiones Muy Menores",
         "Comité para Elegir Dónde Comemos",
         "Oficina de Agendar Side Quests",
-        "República en Soft Launch",
+        "Consejo en Soft Launch",
         "Sociedad para Conservar el Lore",
-        "Senado de Hangouts de Emergencia"
+        "Consejo de Hangouts de Emergencia"
       ],
       "submit": "Fundar",
       "description": "Esto abre el registro oficial."
     },
-    "government": {
-      "title": "Empieza con la república estándar.",
-      "description": "Un gobierno rápido por defecto, con cargos electos, poderes tipados y sin mando permanente del fundador.",
-      "preset": {
-        "label": "Preset",
-        "options": {
-          "standardRepublic": {
-            "label": "República estándar",
-            "copy": "Asamblea, cargos electos, derecho de apelación y un Steward fundacional breve.",
-            "description": "La configuración recomendada mantiene el gobierno en marcha con elecciones, apelaciones y autoridad fundacional limitada."
-          }
-        }
-      },
-      "pace": {
-        "label": "Ritmo",
-        "options": {
-          "fast": {
-            "label": "Rápido",
-            "copy": "Plazos cortos.",
-            "description": "Un arranque de 7 días y votaciones ordinarias de un día para grupos que se reúnen a menudo."
-          },
-          "standard": {
-            "label": "Estándar",
-            "copy": "Recomendado.",
-            "description": "Un arranque de 14 días con votaciones ordinarias de dos días, ágiles sin pillar por sorpresa a los miembros."
-          },
-          "deliberate": {
-            "label": "Deliberado",
-            "copy": "Más aviso.",
-            "description": "Un arranque de 30 días y votaciones ordinarias de cuatro días para grupos que necesitan deliberar más."
-          }
+    "preset": {
+      "title": "Usa el preset de república de consejo.",
+      "description": "Una república constitucional de una sola politeia con consejo ciudadano, cargos electos y remedios judiciales.",
+      "label": "Preset",
+      "options": {
+        "standardConstitutionalCouncilRepublic": {
+          "label": "República Constitucional de Consejo Estándar",
+          "copy": "Ciudadanía, consejeros, steward, tribune, tribunal de magistrados, registro oficial y cambios constitucionales tipados.",
+          "description": "La configuración recomendada limita la autoridad con procedimientos del consejo, remedios judiciales, cargos electos y un steward fundacional breve."
         }
       },
       "continue": "Continuar"
+    },
+    "pace": {
+      "title": "Define el ritmo.",
+      "description": "Elige cuánto aviso deberían tener las votaciones ordinarias.",
+      "label": "Ritmo",
+      "options": {
+        "fast": {
+          "label": "Rápido",
+          "copy": "Plazos cortos.",
+          "description": "Un arranque de 7 días y votaciones ordinarias de un día para grupos que se reúnen a menudo."
+        },
+        "standard": {
+          "label": "Estándar",
+          "copy": "Recomendado.",
+          "description": "Un arranque de 14 días con votaciones ordinarias de dos días, ágiles sin pillar por sorpresa a la ciudadanía."
+        },
+        "deliberate": {
+          "label": "Deliberado",
+          "copy": "Más aviso.",
+          "description": "Un arranque de 30 días y votaciones ordinarias de cuatro días para grupos que necesitan deliberar más."
+        }
+      },
+      "finish": "Fundar"
     },
     "visibility": {
       "title": "Elige la puerta.",
@@ -200,14 +201,15 @@
       "label": "Persona a invitar",
       "placeholder": "mira@example.com",
       "enrol": "Invitar",
-      "finish": "Fundar",
+      "continue": "Continuar",
+      "skip": "Omitir por ahora",
       "remove": "Quitar {{email}}",
       "empty": "Aún no hay invitaciones pendientes."
     },
     "ready": {
       "title": "{{name}} está lista.",
       "description": "La sala fundacional está preparada. Entra y convoca.",
-      "government": "Gobierno",
+      "government": "Preset",
       "pace": "Ritmo",
       "access": "Acceso",
       "members": "Invitaciones",

@@ -4,7 +4,7 @@
     "titleLine1": "Every group",
     "titleLine2": "deserves a",
     "titleEmphasis": "constitution.",
-    "body": "decreos turns a group chat into a polity - votes, offices, invitations, and an official record that outlives the feed.",
+    "body": "decreos turns a group chat into a constitutional council republic - citizens, council offices, votes, invitations, and an official record that outlives the feed.",
     "cta": "How it governs",
     "command": {
       "prompt": "decreos:~$ found --name"
@@ -31,7 +31,7 @@
       {
         "no": "03",
         "title": "A memory",
-        "body": "Offices, votes, and amendments stay visible enough to matter."
+        "body": "Council offices, votes, and constitution changes stay visible enough to matter."
       },
       {
         "no": "04",
@@ -43,7 +43,7 @@
   "record": {
     "eyebrow": "The official record",
     "title": "Social media forgets. The record does not.",
-    "body": "Motions, votes, offices, invitations, admissions, and amendments are entered, numbered, and kept. Some things should survive the feed.",
+    "body": "Motions, votes, offices, invitations, admissions, court remedies, and constitution changes are entered, numbered, and kept. Some things should survive the feed.",
     "ledger": "Official Ledger",
     "selectedEntries": "Selected entries",
     "append": "awaiting entry No. 042",
@@ -55,12 +55,12 @@
       },
       {
         "entry": "002",
-        "detail": "Bootstrap Steward assigned",
+        "detail": "Bootstrap steward assigned",
         "kind": "OFC"
       },
       {
         "entry": "003",
-        "detail": "Starter Constitution ratified",
+        "detail": "Starter constitution ratified",
         "kind": "RAT"
       },
       {
@@ -75,16 +75,16 @@
       },
       {
         "entry": "041",
-        "detail": "Constitution amended",
+        "detail": "Typed constitution change adopted",
         "kind": "AMD"
       }
     ]
   },
   "social": {
-    "eyebrow": "On every motion",
-    "titleLine1": "Votes count.",
-    "titleLine2": "Comments don't.",
-    "body": "Every motion comes with a thread. Like it, reply, argue it out - then cast your vote. The talk is just talk; the vote is what moves things. Likes and replies never touch the tally.",
+    "eyebrow": "Around every motion",
+    "titleLine1": "Reactions talk.",
+    "titleLine2": "Votes govern.",
+    "body": "Comments, likes, and reactions can surround a motion without becoming constitutional mechanics. The social layer carries the argument; votes, court remedies, and official records preserve the constitutional trail.",
     "motion": {
       "label": "Motion No. 027",
       "author": "introduced by @mira",
@@ -93,14 +93,14 @@
       "vote": "Cast your vote",
       "tally": "12 aye · 3 nay",
       "quorum": "quorum met",
-      "discussion": "Discussion",
-      "likes": "18 likes",
+      "discussion": "Social layer",
+      "likes": "18 reactions",
       "comments": "7 comments"
     },
-    "caption": "Likes and replies never move the tally - only votes do"
+    "caption": "Reactions and replies shape the room; votes decide and official records preserve the republic"
   },
   "colophon": {
-    "tagline": "Constitutional software for friend-group government",
+    "tagline": "Constitutional-republic software for friend-group government",
     "edition": "Edition",
     "editionValue": "No. 001",
     "established": "Established",
@@ -114,10 +114,10 @@
     "back": "Go back",
     "defaultPolityName": "Your first polity",
     "flow": {
-      "name": "Name",
-      "government": "Government",
+      "invites": "People",
       "visibility": "Access",
-      "invites": "People"
+      "preset": "Preset",
+      "pace": "Pace"
     },
     "panel": {
       "title": "Founding Entry",
@@ -134,47 +134,48 @@
         "The Council for Very Minor Decisions",
         "The Committee to Decide Where We Eat",
         "The Side Quest Scheduling Office",
-        "The Soft Launch Republic",
+        "The Soft Launch Council",
         "The Lore Preservation Society",
-        "The Emergency Hangout Senate"
+        "The Emergency Hangout Council"
       ],
       "submit": "Found",
       "description": "This opens the official record."
     },
-    "government": {
-      "title": "Start with the standard republic.",
-      "description": "A fast default government with elected offices, typed powers, and no permanent founder rule.",
-      "preset": {
-        "label": "Preset",
-        "options": {
-          "standardRepublic": {
-            "label": "Standard Republic",
-            "copy": "Assembly rule, elected offices, appeal rights, and a short bootstrap Steward.",
-            "description": "The recommended setup keeps the government moving with elections, appeals, and bounded bootstrap authority."
-          }
-        }
-      },
-      "pace": {
-        "label": "Pace",
-        "options": {
-          "fast": {
-            "label": "Fast",
-            "copy": "Short windows.",
-            "description": "A 7-day bootstrap and one-day ordinary votes for groups that meet often."
-          },
-          "standard": {
-            "label": "Standard",
-            "copy": "Recommended.",
-            "description": "A 14-day bootstrap with two-day ordinary votes that move quickly without surprising members."
-          },
-          "deliberate": {
-            "label": "Deliberate",
-            "copy": "More notice.",
-            "description": "A 30-day bootstrap and four-day ordinary votes for groups that need slower proceedings."
-          }
+    "preset": {
+      "title": "Use the council republic preset.",
+      "description": "A single-polity constitutional republic with a citizens' council, elected offices, and court remedies.",
+      "label": "Preset",
+      "options": {
+        "standardConstitutionalCouncilRepublic": {
+          "label": "Standard Constitutional Council Republic",
+          "copy": "Citizens, councilors, steward, tribune, magistrates' court, official records, and typed constitution changes.",
+          "description": "The recommended setup keeps authority bounded through council proceedings, court remedies, elected offices, and a short bootstrap steward."
         }
       },
       "continue": "Continue"
+    },
+    "pace": {
+      "title": "Set the pace.",
+      "description": "Choose how much notice ordinary votes should have.",
+      "label": "Pace",
+      "options": {
+        "fast": {
+          "label": "Fast",
+          "copy": "Short windows.",
+          "description": "A 7-day bootstrap and one-day ordinary votes for groups that meet often."
+        },
+        "standard": {
+          "label": "Standard",
+          "copy": "Recommended.",
+          "description": "A 14-day bootstrap with two-day ordinary votes that move quickly without surprising citizens."
+        },
+        "deliberate": {
+          "label": "Deliberate",
+          "copy": "More notice.",
+          "description": "A 30-day bootstrap and four-day ordinary votes for groups that need slower proceedings."
+        }
+      },
+      "finish": "Found"
     },
     "visibility": {
       "title": "Choose the door.",
@@ -200,14 +201,15 @@
       "label": "Person to invite",
       "placeholder": "mira@example.com",
       "enrol": "Invite",
-      "finish": "Found",
+      "continue": "Continue",
+      "skip": "Skip for now",
       "remove": "Remove {{email}}",
       "empty": "No invitations queued yet."
     },
     "ready": {
       "title": "{{name}} is ready.",
       "description": "The founding room is prepared. Enter and convene.",
-      "government": "Government",
+      "government": "Preset",
       "pace": "Pace",
       "access": "Access",
       "members": "Invites",

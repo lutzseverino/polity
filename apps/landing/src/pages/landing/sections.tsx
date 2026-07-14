@@ -347,8 +347,8 @@ export function SocialSection() {
           <span className="text-primary">{t("social.titleLine2")}</span>
         </SectionHeading>
 
-        {/* One motion carrying both the vote that decides it and the thread of
-            likes and replies beside it — the same item, separated rows. */}
+        {/* One motion carrying the vote that decides it and the social layer
+            beside it. */}
         <figure className="flex flex-col gap-0" data-reveal>
           <TerminalPanel>
             <TerminalPanelHeader
@@ -372,7 +372,7 @@ export function SocialSection() {
                 {t("social.motion.author")}
               </p>
             </div>
-            {/* The vote — what actually decides the motion. */}
+            {/* The vote - what actually decides the motion. */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-primary/40 bg-primary/10 px-4 py-3 font-mono text-xs">
               <span className="text-[0.58rem] tracking-[0.2em] text-primary uppercase">
                 {t("social.motion.vote")}
@@ -385,7 +385,7 @@ export function SocialSection() {
                 {t("social.motion.quorum")}
               </span>
             </div>
-            {/* The thread — likes and replies that sit beside the vote. */}
+            {/* The social layer - conversation around the motion. */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t px-4 py-3 font-mono text-xs text-muted-foreground">
               <span className="text-[0.58rem] tracking-[0.2em] text-muted-foreground/70 uppercase">
                 {t("social.motion.discussion")}
@@ -478,15 +478,16 @@ function OnboardingConsole({ onboarding }: OnboardingStepProps) {
           step={displayStep}
         />
         <div className="grid" data-onboarding-step={displayStep} ref={stepRef}>
-          {displayStep === "government" ? (
-            <GovernmentStep onboarding={onboarding} />
+          {displayStep === "invites" ? (
+            <InviteStep onboarding={onboarding} />
           ) : null}
           {displayStep === "visibility" ? (
             <VisibilityStep onboarding={onboarding} />
           ) : null}
-          {displayStep === "invites" ? (
-            <InviteStep onboarding={onboarding} />
+          {displayStep === "preset" ? (
+            <PresetStep onboarding={onboarding} />
           ) : null}
+          {displayStep === "pace" ? <PaceStep onboarding={onboarding} /> : null}
           {displayStep === "ready" ? (
             <ReadyStep onboarding={onboarding} />
           ) : null}
@@ -496,20 +497,20 @@ function OnboardingConsole({ onboarding }: OnboardingStepProps) {
   );
 }
 
-function GovernmentStep({ onboarding }: OnboardingStepProps) {
+function PresetStep({ onboarding }: OnboardingStepProps) {
   const { t } = useTranslation("landing");
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4">
       <StepIntro
-        description={t("onboarding.government.description")}
-        title={t("onboarding.government.title")}
+        description={t("onboarding.preset.description")}
+        title={t("onboarding.preset.title")}
       />
 
       <AppFieldGroup>
         <AppField>
           <AppFieldTitle className="type-mono-label" id="setup-label">
-            {t("onboarding.government.preset.label")}
+            {t("onboarding.preset.label")}
           </AppFieldTitle>
           <div className="grid border-2 border-primary bg-primary p-4 text-primary-foreground">
             <div className="flex items-start gap-3">
@@ -521,12 +522,12 @@ function GovernmentStep({ onboarding }: OnboardingStepProps) {
               <span className="grid gap-1">
                 <span className="font-display text-xl">
                   {t(
-                    "onboarding.government.preset.options.standardRepublic.label",
+                    `onboarding.preset.options.${onboarding.setupPresetCopyKey}.label`,
                   )}
                 </span>
                 <span className="text-xs leading-5 text-primary-foreground/82">
                   {t(
-                    "onboarding.government.preset.options.standardRepublic.copy",
+                    `onboarding.preset.options.${onboarding.setupPresetCopyKey}.copy`,
                   )}
                 </span>
               </span>
@@ -534,14 +535,36 @@ function GovernmentStep({ onboarding }: OnboardingStepProps) {
           </div>
           <AppFieldDescription>
             {t(
-              "onboarding.government.preset.options.standardRepublic.description",
+              `onboarding.preset.options.${onboarding.setupPresetCopyKey}.description`,
             )}
           </AppFieldDescription>
         </AppField>
+      </AppFieldGroup>
 
+      <StepActions onboarding={onboarding}>
+        <AppButton onClick={onboarding.continueToPace} type="button">
+          {t("onboarding.preset.continue")}
+          <ArrowRight data-icon="inline-end" />
+        </AppButton>
+      </StepActions>
+    </div>
+  );
+}
+
+function PaceStep({ onboarding }: OnboardingStepProps) {
+  const { t } = useTranslation("landing");
+
+  return (
+    <div className="grid gap-4">
+      <StepIntro
+        description={t("onboarding.pace.description")}
+        title={t("onboarding.pace.title")}
+      />
+
+      <AppFieldGroup>
         <AppField>
           <AppFieldTitle className="type-mono-label" id="pace-label">
-            {t("onboarding.government.pace.label")}
+            {t("onboarding.pace.label")}
           </AppFieldTitle>
           <AppToggleGroup
             aria-labelledby="pace-label"
@@ -558,10 +581,8 @@ function GovernmentStep({ onboarding }: OnboardingStepProps) {
                 value={choice}
               >
                 <AppToggleChoiceContent
-                  copy={t(`onboarding.government.pace.options.${choice}.copy`)}
-                  label={t(
-                    `onboarding.government.pace.options.${choice}.label`,
-                  )}
+                  copy={t(`onboarding.pace.options.${choice}.copy`)}
+                  label={t(`onboarding.pace.options.${choice}.label`)}
                 />
               </AppToggleGroupItem>
             ))}
@@ -571,8 +592,8 @@ function GovernmentStep({ onboarding }: OnboardingStepProps) {
       </AppFieldGroup>
 
       <StepActions onboarding={onboarding}>
-        <AppButton onClick={onboarding.continueToVisibility} type="button">
-          {t("onboarding.government.continue")}
+        <AppButton onClick={onboarding.finishSetup} type="button">
+          {t("onboarding.pace.finish")}
           <ArrowRight data-icon="inline-end" />
         </AppButton>
       </StepActions>
@@ -616,7 +637,7 @@ function NameStep({ onboarding }: OnboardingStepProps) {
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onboarding.startGovernment();
+    onboarding.startInvites();
   }
 
   return (
@@ -699,7 +720,7 @@ function VisibilityStep({ onboarding }: OnboardingStepProps) {
       </AppFieldGroup>
 
       <StepActions onboarding={onboarding}>
-        <AppButton onClick={onboarding.continueToInvites} type="button">
+        <AppButton onClick={onboarding.continueToPreset} type="button">
           {t("onboarding.visibility.continue")}
           <ArrowRight data-icon="inline-end" />
         </AppButton>
@@ -717,7 +738,7 @@ function InviteStep({ onboarding }: OnboardingStepProps) {
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4">
       <StepIntro
         description={t("onboarding.invites.description")}
         title={t("onboarding.invites.title")}
@@ -751,16 +772,21 @@ function InviteStep({ onboarding }: OnboardingStepProps) {
 
         <div className="grid grid-cols-[auto_1fr] gap-2 sm:grid-cols-[auto_1fr_1fr]">
           <BackStepButton onboarding={onboarding} />
-          <AppButton type="submit" variant="secondary">
+          <AppButton type="submit">
             <Plus data-icon="inline-start" />
             {t("onboarding.invites.enrol")}
           </AppButton>
           <AppButton
             className="col-span-2 sm:col-span-1"
-            onClick={onboarding.finishSetup}
+            onClick={onboarding.continueToVisibility}
             type="button"
+            variant="secondary"
           >
-            {t("onboarding.invites.finish")}
+            {t(
+              onboarding.invites.length
+                ? "onboarding.invites.continue"
+                : "onboarding.invites.skip",
+            )}
             <ArrowRight data-icon="inline-end" />
           </AppButton>
         </div>
@@ -835,14 +861,12 @@ function ReadyStep({ onboarding }: OnboardingStepProps) {
           {
             label: t("onboarding.ready.government"),
             value: t(
-              `onboarding.government.preset.options.${onboarding.setupPresetCopyKey}.label`,
+              `onboarding.preset.options.${onboarding.setupPresetCopyKey}.label`,
             ),
           },
           {
             label: t("onboarding.ready.pace"),
-            value: t(
-              `onboarding.government.pace.options.${onboarding.pace}.label`,
-            ),
+            value: t(`onboarding.pace.options.${onboarding.pace}.label`),
           },
           {
             label: t("onboarding.ready.access"),
