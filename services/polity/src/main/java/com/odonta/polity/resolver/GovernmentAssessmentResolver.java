@@ -1,15 +1,11 @@
 package com.odonta.polity.resolver;
 
 import com.odonta.common.api.ApiException;
-import com.odonta.polity.model.ActionAvailabilityResult;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalHealthDiagnostic;
-import com.odonta.polity.model.ConstitutionalHealthResult;
 import com.odonta.polity.model.ConstitutionalHealthStatus;
 import com.odonta.polity.model.ConstitutionalPower;
-import com.odonta.polity.model.GovernmentAssessmentResult;
 import com.odonta.polity.model.GovernmentReadinessDiagnostic;
-import com.odonta.polity.model.GovernmentReadinessResult;
 import com.odonta.polity.model.GovernmentReadinessStatus;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
@@ -24,6 +20,10 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.ProcedureRepository;
+import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ConstitutionalHealthResult;
+import com.odonta.polity.result.GovernmentAssessmentResult;
+import com.odonta.polity.result.GovernmentReadinessResult;
 import com.odonta.polity.service.MembershipService;
 import java.time.Clock;
 import java.time.OffsetDateTime;
@@ -245,6 +245,14 @@ public class GovernmentAssessmentResolver {
         .findEntityByConstitutionVersionIdAndCode(constitution.getId(), procedureCode)
         .map(this::procedureElectorateAvailability)
         .orElse(ActionAvailabilityResult.blocked("procedure_missing"));
+  }
+
+  public boolean lastMemberResignationClosesPolity(
+      Polity polity, ConstitutionVersion constitution) {
+    return !pathStructurallyAvailable(
+            constitution, PowerCode.INTRODUCE_DISBANDMENT, Procedure.DISBANDMENT)
+        || !holderAvailable(polity.getId(), constitution, PowerCode.INTRODUCE_DISBANDMENT)
+        || !procedureAvailability(polity.getId(), constitution, Procedure.DISBANDMENT).available();
   }
 
   private boolean holderAvailable(UUID polityId, ConstitutionVersion constitution, PowerCode code) {

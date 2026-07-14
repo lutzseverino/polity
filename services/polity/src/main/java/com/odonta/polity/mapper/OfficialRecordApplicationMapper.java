@@ -1,7 +1,7 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.model.OfficialRecordResult;
 import com.odonta.polity.repository.OfficialRecordProjection;
+import com.odonta.polity.result.OfficialRecordResult;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -3,9 +3,12 @@ package com.odonta.polity.repository;
 import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficeTermStatus;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
@@ -16,9 +19,6 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
       OfficeTermStatus status,
       OffsetDateTime now);
 
-  boolean existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndAssignedByMotionIdIsNull(
-      UUID polityId, String officeCode, UUID membershipId, OfficeTermStatus status);
-
   boolean existsByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
       UUID polityId, String officeCode, OfficeTermStatus status, OffsetDateTime now);
 
@@ -28,6 +28,14 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
   Optional<OfficeTerm> findEntityByIdAndPolityId(UUID id, UUID polityId);
 
   Optional<OfficeTermProjection> findProjectedByIdAndPolityId(UUID id, UUID polityId);
+
+  List<OfficeTermProjection> findProjectionsByPolityIdAndIdIn(UUID polityId, Collection<UUID> ids);
+
+  List<OfficeTermProjection> findProjectionsByPolityIdAndMembershipIdAndStatusAndEndsAtAfter(
+      UUID polityId, UUID membershipId, OfficeTermStatus status, OffsetDateTime now);
+
+  List<OfficeTermProjection> findProjectionsByPolityIdAndOfficeCodeInAndStatusAndEndsAtAfter(
+      UUID polityId, Collection<String> officeCodes, OfficeTermStatus status, OffsetDateTime now);
 
   List<OfficeTerm> findEntitiesByPolityIdAndOfficeCodeAndStatus(
       UUID polityId, String officeCode, OfficeTermStatus status);
@@ -43,5 +51,6 @@ public interface OfficeTermRepository extends JpaRepository<OfficeTerm, UUID> {
 
   List<OfficeTerm> findEntitiesByPolityIdAndStatus(UUID polityId, OfficeTermStatus status);
 
-  List<OfficeTermProjection> findProjectionsByPolityIdOrderByStartedAtDesc(UUID polityId);
+  Page<OfficeTermProjection> findProjectionsByPolityIdOrderByStartedAtDescIdAsc(
+      UUID polityId, Pageable pageable);
 }

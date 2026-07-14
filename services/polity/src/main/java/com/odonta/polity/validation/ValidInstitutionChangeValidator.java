@@ -1,6 +1,6 @@
 package com.odonta.polity.validation;
 
-import com.odonta.polity.model.CreateInstitutionChangeInput;
+import com.odonta.polity.input.CreateInstitutionChangeInput;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

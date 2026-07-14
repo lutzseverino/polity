@@ -2,9 +2,9 @@ package com.odonta.polity.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.odonta.polity.model.OfficeTermResult;
 import com.odonta.polity.model.OfficeTermStatus;
 import com.odonta.polity.model.VotingThreshold;
+import com.odonta.polity.result.OfficeTermResult;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -110,7 +110,7 @@ class TransportTextResolverTest {
       StaticMessageSource messages = new StaticMessageSource();
       messages.addMessage("office.magistrate.name", Locale.ENGLISH, "Magistrate");
       TransportTextResolver resolver = resolver(messages);
-      OfficeTransportConversions conversions = new OfficeTransportConversions(resolver);
+      OfficeTermTransportText text = new OfficeTermTransportText(resolver);
       OfficeTermResult result =
           new OfficeTermResult(
               UUID.randomUUID(),
@@ -123,7 +123,7 @@ class TransportTextResolverTest {
               null,
               null);
 
-      assertThat(conversions.officeTermOfficeName(result)).isEqualTo("Magistrate");
+      assertThat(text.officeName(result)).isEqualTo("Magistrate");
     } finally {
       LocaleContextHolder.resetLocaleContext();
     }

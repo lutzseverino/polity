@@ -1,7 +1,7 @@
 package com.odonta.polity.mapper;
 
 import com.odonta.polity.api.model.MemberResponse;
-import com.odonta.polity.model.MembershipResult;
+import com.odonta.polity.result.MembershipResult;
 import java.util.List;
 import org.mapstruct.Mapper;
 

@@ -109,8 +109,10 @@ public class MotionController implements MotionsApi {
   }
 
   @Override
-  public ResponseEntity<List<MotionResponse>> listPolityMotions(UUID polityId) {
-    return ResponseEntity.ok(mapper.toResponses(motions.list(polityId, users.currentUser().id())));
+  public ResponseEntity<List<MotionResponse>> listPolityMotions(
+      UUID polityId, Integer page, Integer size) {
+    return PageResponses.ok(
+        motions.list(polityId, users.currentUser().id(), page, size), mapper::toResponses);
   }
 
   @Override

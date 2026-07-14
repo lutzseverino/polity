@@ -2,9 +2,12 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
@@ -18,10 +21,12 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
   List<Membership> findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
       UUID polityId, MembershipStatus status);
 
-  List<MembershipProjection> findProjectionsByPolityIdAndStatusOrderByAdmittedAtAsc(
-      UUID polityId, MembershipStatus status);
+  Page<MembershipProjection> findProjectionsByPolityIdAndStatusOrderByAdmittedAtAscIdAsc(
+      UUID polityId, MembershipStatus status, Pageable pageable);
 
   Optional<MembershipProjection> findProjectedById(UUID id);
+
+  List<MembershipProjection> findProjectionsByPolityIdAndIdIn(UUID polityId, Collection<UUID> ids);
 
   long countByPolityIdAndStatus(UUID polityId, MembershipStatus status);
 }

@@ -7,7 +7,6 @@ import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.ConstitutionalHealthDiagnostic;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.JurisdictionKind;
 import com.odonta.polity.model.Membership;
@@ -71,7 +70,9 @@ public class MembershipResignationService {
                         "polity_membership_required", "Active membership is required."));
     ConstitutionVersion constitution = constitution(polityId);
     long activeMembers = memberships.countByPolityIdAndStatus(polityId, MembershipStatus.ACTIVE);
-    boolean closePolity = activeMembers <= 1 && isDisbandmentUnavailable(polity, constitution);
+    boolean closePolity =
+        activeMembers <= 1
+            && governmentAssessments.lastMemberResignationClosesPolity(polity, constitution);
     if (activeMembers <= 1 && !closePolity) {
       throw ApiException.conflict(
           "last_member_resignation_unavailable",
@@ -125,14 +126,6 @@ public class MembershipResignationService {
               TemplateParameters.of("polityName", polity.getName())),
           now);
     }
-  }
-
-  private boolean isDisbandmentUnavailable(Polity polity, ConstitutionVersion constitution) {
-    return governmentAssessments
-        .assess(polity, constitution)
-        .constitutionalHealth()
-        .diagnostics()
-        .contains(ConstitutionalHealthDiagnostic.DISBANDMENT_PATH_UNAVAILABLE);
   }
 
   private ConstitutionVersion constitution(UUID polityId) {

@@ -19,10 +19,10 @@ import com.odonta.identity.client.IdentityUsersClient;
 import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
+import com.odonta.polity.input.CreateMemberInvitationInput;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
 import com.odonta.polity.mapper.MembershipInvitationApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.CreateMemberInvitationInput;
 import com.odonta.polity.model.InvitationStatus;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.JurisdictionKind;
@@ -35,6 +35,7 @@ import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipProjection;
 import com.odonta.polity.repository.MembershipRepository;
+import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -59,6 +60,8 @@ class InvitationServiceTest {
   private final MembershipRepository memberships = mock(MembershipRepository.class);
   private final PolityGrantPlanner grantPlanner = new PolityGrantPlanner();
   private final PolityService polities = mock(PolityService.class);
+  private final PolityActionAvailabilityResolver actionAvailability =
+      mock(PolityActionAvailabilityResolver.class);
   private final OfficialRecordService officialRecords = mock(OfficialRecordService.class);
   private InvitationService service;
 
@@ -79,6 +82,7 @@ class InvitationServiceTest {
             Mappers.getMapper(MembershipApplicationMapper.class),
             grantPlanner,
             polities,
+            actionAvailability,
             officialRecords);
   }
 
@@ -156,7 +160,7 @@ class InvitationServiceTest {
                 "constitutional_authority_missing", "The member lacks constitutional authority."))
         .when(authority)
         .require(inviter, constitution, PowerCode.ADMIT_MEMBER);
-    when(polities.hasProvisionalFounderAdmissionAuthority(inviter)).thenReturn(true);
+    when(actionAvailability.hasProvisionalFounderAdmissionAuthority(inviter)).thenReturn(true);
     when(polities.jurisdiction(polityId)).thenReturn(jurisdiction);
     when(identityUsers.createProvisional("friend@example.com")).thenReturn(invitee);
     when(invitations.saveAndFlush(any(MembershipInvitation.class)))
@@ -175,7 +179,7 @@ class InvitationServiceTest {
             new CreateMemberInvitationInput("Friend@Example.com"));
 
     assertThat(result.status()).isEqualTo(InvitationStatus.PENDING);
-    verify(polities).hasProvisionalFounderAdmissionAuthority(inviter);
+    verify(actionAvailability).hasProvisionalFounderAdmissionAuthority(inviter);
     verify(invitations).saveAndFlush(any(MembershipInvitation.class));
   }
 
@@ -275,7 +279,7 @@ class InvitationServiceTest {
         .isInstanceOf(ApiException.class)
         .hasMessage("The governing constitution does not authorize this action.");
 
-    verify(polities, never()).hasProvisionalFounderAdmissionAuthority(inviter);
+    verify(actionAvailability, never()).hasProvisionalFounderAdmissionAuthority(inviter);
     verify(identityUsers, never()).createProvisional(any());
   }
 

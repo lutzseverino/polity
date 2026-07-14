@@ -7,45 +7,43 @@ import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.effect.MotionEffectApplier;
 import com.odonta.polity.effect.OfficialActVoidRemedy;
+import com.odonta.polity.evaluator.ConstitutionAmendmentEvaluationException;
+import com.odonta.polity.evaluator.ConstitutionAmendmentEvaluator;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.evaluator.VotingEvaluator;
-import com.odonta.polity.mapper.MotionApplicationMapper;
-import com.odonta.polity.model.ActionAvailabilityResult;
+import com.odonta.polity.input.CastOfficeElectionBallotInput;
+import com.odonta.polity.input.CastVoteInput;
+import com.odonta.polity.input.CreateAppealMotionInput;
+import com.odonta.polity.input.CreateConstitutionAmendmentMotionInput;
+import com.odonta.polity.input.CreateConstitutionalReviewMotionInput;
+import com.odonta.polity.input.CreateDisbandmentMotionInput;
+import com.odonta.polity.input.CreateInstitutionChangeInput;
+import com.odonta.polity.input.CreateMotionInput;
+import com.odonta.polity.input.CreateOfficeChangeInput;
+import com.odonta.polity.input.CreateOfficeElectionMotionInput;
+import com.odonta.polity.input.CreateOfficeTermReviewMotionInput;
+import com.odonta.polity.input.CreatePowerChangeInput;
+import com.odonta.polity.input.CreateProcedureChangeInput;
+import com.odonta.polity.input.CreateSanctionMotionInput;
+import com.odonta.polity.input.RespondOfficeElectionCandidacyInput;
+import com.odonta.polity.input.ValidatedConstitutionAmendmentInput;
 import com.odonta.polity.model.AppealProposal;
-import com.odonta.polity.model.CastOfficeElectionBallotInput;
-import com.odonta.polity.model.CastVoteInput;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.ConstitutionAmendmentProposal;
 import com.odonta.polity.model.ConstitutionInstitutionChangeProposal;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
 import com.odonta.polity.model.ConstitutionOfficeChangeProposal;
 import com.odonta.polity.model.ConstitutionPowerChangeProposal;
 import com.odonta.polity.model.ConstitutionProcedureChangeProposal;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
-import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.ConstitutionalReviewProposal;
-import com.odonta.polity.model.CreateAppealMotionInput;
-import com.odonta.polity.model.CreateConstitutionAmendmentMotionInput;
-import com.odonta.polity.model.CreateConstitutionalReviewMotionInput;
-import com.odonta.polity.model.CreateDisbandmentMotionInput;
-import com.odonta.polity.model.CreateInstitutionChangeInput;
-import com.odonta.polity.model.CreateMotionInput;
-import com.odonta.polity.model.CreateOfficeChangeInput;
-import com.odonta.polity.model.CreateOfficeElectionMotionInput;
-import com.odonta.polity.model.CreateOfficeTermReviewMotionInput;
-import com.odonta.polity.model.CreatePowerChangeInput;
-import com.odonta.polity.model.CreateProcedureChangeInput;
-import com.odonta.polity.model.CreateSanctionMotionInput;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
-import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.Jurisdiction;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.Motion;
 import com.odonta.polity.model.MotionElector;
-import com.odonta.polity.model.MotionResult;
 import com.odonta.polity.model.MotionStatus;
 import com.odonta.polity.model.MotionTemplate;
 import com.odonta.polity.model.MotionTemplateKey;
@@ -53,14 +51,11 @@ import com.odonta.polity.model.Office;
 import com.odonta.polity.model.OfficeElectionBallot;
 import com.odonta.polity.model.OfficeElectionBallotPreference;
 import com.odonta.polity.model.OfficeElectionBallotRanking;
-import com.odonta.polity.model.OfficeElectionBallotResult;
 import com.odonta.polity.model.OfficeElectionCandidate;
 import com.odonta.polity.model.OfficeElectionCandidateOption;
-import com.odonta.polity.model.OfficeElectionCandidateResult;
 import com.odonta.polity.model.OfficeElectionCandidateStatus;
 import com.odonta.polity.model.OfficeElectionMethod;
 import com.odonta.polity.model.OfficeElectionProposal;
-import com.odonta.polity.model.OfficeElectionResult;
 import com.odonta.polity.model.OfficeElectionTallyResult;
 import com.odonta.polity.model.OfficeTerm;
 import com.odonta.polity.model.OfficeTermReviewProposal;
@@ -72,17 +67,13 @@ import com.odonta.polity.model.OfficialRecordTemplate;
 import com.odonta.polity.model.OfficialRecordTemplateKey;
 import com.odonta.polity.model.OfficialRecordType;
 import com.odonta.polity.model.PowerCode;
-import com.odonta.polity.model.PowerHolderScope;
 import com.odonta.polity.model.Procedure;
-import com.odonta.polity.model.ProcedureElectorate;
-import com.odonta.polity.model.RespondOfficeElectionCandidacyInput;
 import com.odonta.polity.model.Sanction;
 import com.odonta.polity.model.SanctionProposal;
 import com.odonta.polity.model.TemplateParameters;
 import com.odonta.polity.model.Vote;
 import com.odonta.polity.model.VoteChoice;
 import com.odonta.polity.model.VotingResult;
-import com.odonta.polity.model.VotingThreshold;
 import com.odonta.polity.repository.AppealProposalRepository;
 import com.odonta.polity.repository.AppealRepository;
 import com.odonta.polity.repository.CertificationRepository;
@@ -92,11 +83,8 @@ import com.odonta.polity.repository.ConstitutionOfficeChangeProposalRepository;
 import com.odonta.polity.repository.ConstitutionPowerChangeProposalRepository;
 import com.odonta.polity.repository.ConstitutionProcedureChangeProposalRepository;
 import com.odonta.polity.repository.ConstitutionVersionRepository;
-import com.odonta.polity.repository.ConstitutionalPowerRepository;
 import com.odonta.polity.repository.ConstitutionalReviewProposalRepository;
 import com.odonta.polity.repository.ConstitutionalReviewRepository;
-import com.odonta.polity.repository.InstitutionRepository;
-import com.odonta.polity.repository.JurisdictionRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.MotionElectorRepository;
 import com.odonta.polity.repository.MotionProjection;
@@ -114,22 +102,27 @@ import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.SanctionProposalRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.repository.VoteRepository;
+import com.odonta.polity.resolver.ConstitutionAmendmentStateResolver;
+import com.odonta.polity.resolver.MotionResultResolver;
+import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import com.odonta.polity.resolver.ProcedureElectorateResolver;
+import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.MotionResult;
+import com.odonta.polity.result.PageResult;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,23 +138,22 @@ public class MotionService {
   private final AppealProposalRepository appealProposals;
   private final CertificationRepository certifications;
   private final ConstitutionalAuthority authority;
+  private final ConstitutionAmendmentEvaluator amendmentEvaluator;
   private final ConstitutionAmendmentProposalRepository amendmentProposals;
+  private final ConstitutionAmendmentStateResolver amendmentStates;
   private final ConstitutionInstitutionChangeProposalRepository institutionChangeProposals;
   private final ConstitutionOfficeChangeProposalRepository officeChangeProposals;
   private final ConstitutionPowerChangeProposalRepository powerChangeProposals;
   private final ConstitutionProcedureChangeProposalRepository procedureChangeProposals;
   private final ConstitutionVersionRepository constitutions;
-  private final ConstitutionalPowerRepository powers;
   private final ConstitutionalReviewProposalRepository constitutionalReviewProposals;
   private final ConstitutionalReviewRepository constitutionalReviews;
   private final MotionEffectApplier effects;
-  private final InstitutionRepository institutions;
-  private final JurisdictionRepository jurisdictions;
   private final OfficeTermReviewProposalRepository officeTermReviewProposals;
   private final MotionElectorRepository electors;
   private final MembershipService membershipService;
   private final MembershipRepository memberships;
-  private final MotionApplicationMapper mapper;
+  private final MotionResultResolver results;
   private final MotionRepository motions;
   private final OfficeElectionBallotRepository officeElectionBallots;
   private final OfficeElectionBallotPreferenceRepository officeElectionBallotPreferences;
@@ -174,12 +166,15 @@ public class MotionService {
   private final OfficialRecordRepository officialRecordEntries;
   private final OfficialRecordService officialRecords;
   private final PolityService polities;
+  private final PolityActionAvailabilityResolver actionAvailability;
   private final ProcedureElectorateResolver procedureElectorates;
   private final ProcedureRepository procedures;
   private final SanctionProposalRepository sanctionProposals;
   private final SanctionRepository sanctions;
   private final VoteRepository votes;
   private final VotingEvaluator voting;
+
+  // region Operations: Introduction
 
   @Transactional
   @PreAuthorize(PolityPermissions.HAS_POLITY_PARTICIPATE)
@@ -488,14 +483,16 @@ public class MotionService {
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
     Procedure procedure = procedure(constitution.getId(), Procedure.CONSTITUTION_AMENDMENT);
     Institution institution = polities.institution(polityId, procedure);
-    List<CreateInstitutionChangeInput> institutionChanges =
-        requireProposableInstitutionChanges(input, constitution);
-    List<CreateOfficeChangeInput> officeChanges =
-        requireProposableOfficeChanges(input, constitution, now);
-    List<CreateProcedureChangeInput> procedureChanges =
-        requireProposableProcedureChanges(input, constitution, institutionChanges, officeChanges);
-    List<CreatePowerChangeInput> powerChanges =
-        requireProposablePowerChanges(input, constitution, officeChanges);
+    ValidatedConstitutionAmendmentInput plan;
+    try {
+      plan = amendmentEvaluator.evaluate(amendmentStates.resolve(constitution, now), input);
+    } catch (ConstitutionAmendmentEvaluationException exception) {
+      throw switch (exception.kind()) {
+        case INVALID -> ApiException.badRequest(exception.code(), exception.getMessage());
+        case MISSING_REFERENCE -> ApiException.notFound(exception.code(), exception.getMessage());
+        case CONFLICTING_STATE -> ApiException.conflict(exception.code(), exception.getMessage());
+      };
+    }
     MotionTemplate template =
         MotionTemplate.of(
             MotionTemplateKey.CONSTITUTION_AMENDMENT,
@@ -518,19 +515,19 @@ public class MotionService {
             new ConstitutionAmendmentProposal(
                 polityId, motion.getId(), input.title(), input.body()));
     institutionChangeProposals.saveAllAndFlush(
-        institutionChanges.stream()
+        plan.institutionChanges().stream()
             .map(change -> toProposal(polityId, proposal.getId(), change))
             .toList());
     procedureChangeProposals.saveAllAndFlush(
-        procedureChanges.stream()
+        plan.procedureChanges().stream()
             .map(change -> toProposal(polityId, proposal.getId(), change))
             .toList());
     officeChangeProposals.saveAllAndFlush(
-        officeChanges.stream()
+        plan.officeChanges().stream()
             .map(change -> toProposal(polityId, proposal.getId(), change))
             .toList());
     powerChangeProposals.saveAllAndFlush(
-        powerChanges.stream()
+        plan.powerChanges().stream()
             .map(change -> toProposal(polityId, proposal.getId(), change))
             .toList());
     return result(motion);
@@ -569,20 +566,35 @@ public class MotionService {
     return result(motion);
   }
 
+  // endregion
+
+  // region Operations: Queries
+
+  @Transactional(readOnly = true)
   @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
-  public List<MotionResult> list(UUID polityId, UUID userId) {
+  public PageResult<MotionResult> list(UUID polityId, UUID userId, int page, int size) {
     access.requireReadable(polityId, userId);
     UUID currentMembershipId = currentMembershipId(polityId, userId);
-    return motions.findProjectionsByPolityIdOrderByOpenedAtDesc(polityId).stream()
-        .map(motion -> result(motion, currentMembershipId))
-        .toList();
+    Page<MotionProjection> projections =
+        motions.findProjectionsByPolityIdOrderByOpenedAtDescIdAsc(
+            polityId, PageRequest.of(page, size));
+    return new PageResult<>(
+        results.resolveAll(polityId, projections.getContent(), currentMembershipId),
+        projections.getNumber(),
+        projections.getSize(),
+        projections.getTotalElements());
   }
 
+  @Transactional(readOnly = true)
   @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
   public MotionResult get(UUID polityId, UUID motionId, UUID userId) {
     access.requireReadable(polityId, userId);
-    return result(projection(polityId, motionId), currentMembershipId(polityId, userId));
+    return results.resolve(polityId, motionId, currentMembershipId(polityId, userId));
   }
+
+  // endregion
+
+  // region Operations: Participation
 
   @Transactional
   @PreAuthorize(PolityPermissions.HAS_POLITY_PARTICIPATE)
@@ -750,6 +762,10 @@ public class MotionService {
     return result(motion, candidate.getId());
   }
 
+  // endregion
+
+  // region Operations: Certification
+
   @Transactional
   @PreAuthorize(PolityPermissions.HAS_POLITY_PARTICIPATE)
   public MotionResult certify(UUID polityId, UUID motionId, AuthenticatedUser actor) {
@@ -864,103 +880,16 @@ public class MotionService {
     return result(motion, requester.getId());
   }
 
+  // endregion
+
+  // region Mechanics: Results and elections
+
   private MotionResult result(Motion motion) {
-    return result(projection(motion.getPolityId(), motion.getId()), null);
+    return results.resolve(motion, motion.getIntroducedBy());
   }
 
   private MotionResult result(Motion motion, UUID currentMembershipId) {
-    return result(projection(motion.getPolityId(), motion.getId()), currentMembershipId);
-  }
-
-  private MotionResult result(MotionProjection motion, UUID currentMembershipId) {
-    OffsetDateTime now = OffsetDateTime.now(clock);
-    Procedure procedure = procedure(motion.getProcedureId());
-    Certification certification = certifications.findEntityByMotionId(motion.getId()).orElse(null);
-    VotingResult tally =
-        motion.getEffectType() == EffectType.ELECT_OFFICE
-            ? null
-            : voting.evaluate(
-                procedure,
-                Math.toIntExact(electors.countByMotionId(motion.getId())),
-                votes.findEntitiesByMotionId(motion.getId()));
-    OfficeElectionTallyResult electionTally =
-        motion.getEffectType() == EffectType.ELECT_OFFICE
-            ? officeElectionTally(motion, procedure, certification, now)
-            : null;
-    ConstitutionVersion constitution =
-        constitutions
-            .findEntityById(motion.getConstitutionVersionId())
-            .orElseThrow(
-                () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
-    return mapper.toResult(
-        motion,
-        constitution.getVersion(),
-        procedure.getName(),
-        procedure.getNameKey(),
-        membershipService.displayName(motion.getIntroducedBy()),
-        tally,
-        officeElection(motion, currentMembershipId),
-        electionTally,
-        certification == null ? null : mapper.toResult(certification));
-  }
-
-  private OfficeElectionTallyResult officeElectionTally(
-      MotionProjection motion,
-      Procedure procedure,
-      Certification certification,
-      OffsetDateTime now) {
-    if (certification != null && certification.getElectionTallySnapshot() != null) {
-      return certification.getElectionTallySnapshot();
-    }
-    return officeElections.evaluate(
-        procedure,
-        Math.toIntExact(electors.countByMotionId(motion.getId())),
-        officeElectionSeatsAvailable(motion.getId()),
-        officeElectionMethod(motion.getId()),
-        electionCandidates(motion.getId(), motion.getStatus() == MotionStatus.VOTING, now),
-        officeElectionBallotRankings(motion.getId()));
-  }
-
-  private OfficeElectionResult officeElection(MotionProjection motion, UUID currentMembershipId) {
-    if (motion.getEffectType() != EffectType.ELECT_OFFICE) {
-      return null;
-    }
-    return officeElectionProposals
-        .findProjectedByMotionId(motion.getId())
-        .map(
-            proposal -> {
-              Office office =
-                  offices
-                      .findEntityByIdAndPolityId(proposal.getOfficeId(), proposal.getPolityId())
-                      .orElseThrow(
-                          () -> ApiException.notFound("office_not_found", "Office not found."));
-              List<OfficeElectionCandidateResult> candidates =
-                  officeElectionCandidates.findEntitiesByMotionId(motion.getId()).stream()
-                      .map(
-                          candidate -> {
-                            Membership membership =
-                                membershipService.get(candidate.getMembershipId());
-                            return mapper.toCandidateResult(
-                                membership.getId(),
-                                membership.getDisplayName(),
-                                candidate.getStatus(),
-                                candidate.getRespondedAt());
-                          })
-                      .sorted(
-                          java.util.Comparator.comparing(OfficeElectionCandidateResult::name)
-                              .thenComparing(candidate -> candidate.membershipId().toString()))
-                      .toList();
-              return mapper.toOfficeElectionResult(
-                  office.getId(),
-                  office.getCode(),
-                  office.getName(),
-                  office.getNameKey(),
-                  proposal.getSeatsAvailable(),
-                  proposal.getMethod(),
-                  currentOfficeElectionBallot(motion.getId(), currentMembershipId),
-                  candidates);
-            })
-        .orElse(null);
+    return results.resolve(motion, currentMembershipId);
   }
 
   private UUID currentMembershipId(UUID polityId, UUID userId) {
@@ -968,29 +897,6 @@ public class MotionService {
         .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
         .map(Membership::getId)
         .orElse(null);
-  }
-
-  private OfficeElectionBallotResult currentOfficeElectionBallot(
-      UUID motionId, UUID currentMembershipId) {
-    if (currentMembershipId == null) {
-      return null;
-    }
-    return officeElectionBallots
-        .findEntityByMotionIdAndMembershipId(motionId, currentMembershipId)
-        .map(
-            ballot ->
-                new OfficeElectionBallotResult(
-                    ballot.getCastAt(),
-                    currentOfficeElectionRanking(motionId, currentMembershipId)))
-        .orElse(null);
-  }
-
-  private List<UUID> currentOfficeElectionRanking(UUID motionId, UUID currentMembershipId) {
-    return officeElectionBallotPreferences
-        .findEntitiesByMotionIdAndMembershipIdOrderByRankAsc(motionId, currentMembershipId)
-        .stream()
-        .map(OfficeElectionBallotPreference::getCandidateMembershipId)
-        .toList();
   }
 
   private List<UUID> rankedCandidateMembershipIds(CastOfficeElectionBallotInput input) {
@@ -1082,11 +988,9 @@ public class MotionService {
     return Math.max(0, office.getSeatCount() - Math.toIntExact(activeTerms));
   }
 
-  private MotionProjection projection(UUID polityId, UUID motionId) {
-    return motions
-        .findProjectedByIdAndPolityId(motionId, polityId)
-        .orElseThrow(() -> ApiException.notFound("motion_not_found", "Motion not found."));
-  }
+  // endregion
+
+  // region Mechanics: Lifecycle
 
   private Motion motion(UUID polityId, UUID motionId) {
     return motions
@@ -1097,12 +1001,6 @@ public class MotionService {
   private Procedure procedure(UUID constitutionId, String code) {
     return procedures
         .findEntityByConstitutionVersionIdAndCode(constitutionId, code)
-        .orElseThrow(() -> ApiException.notFound("procedure_not_found", "Procedure not found."));
-  }
-
-  private Procedure procedure(UUID procedureId) {
-    return procedures
-        .findEntityById(procedureId)
         .orElseThrow(() -> ApiException.notFound("procedure_not_found", "Procedure not found."));
   }
 
@@ -1286,6 +1184,10 @@ public class MotionService {
         eligibleElectorCount);
   }
 
+  // endregion
+
+  // region Mechanics: Eligibility
+
   private Membership activeMembership(UUID membershipId, UUID polityId) {
     return memberships
         .findEntityById(membershipId)
@@ -1406,6 +1308,10 @@ public class MotionService {
         .orElse(false);
   }
 
+  // endregion
+
+  // region Mechanics: Constitutional safeguards
+
   private void requireAppealable(UUID polityId, Sanction sanction, OffsetDateTime now) {
     if (sanction.isInactiveAt(now)) {
       throw ApiException.conflict("sanction_not_active", "Only active sanctions can be appealed.");
@@ -1481,7 +1387,8 @@ public class MotionService {
       Membership target,
       int durationDays,
       OffsetDateTime now) {
-    ActionAvailabilityResult availability = polities.sanctionAvailability(introducer, constitution);
+    ActionAvailabilityResult availability =
+        actionAvailability.sanctionAvailability(introducer, constitution);
     if (!availability.available()) {
       throw ApiException.conflict(
           availability.reason(), "Sanctions require an available appeal procedure.");
@@ -1555,158 +1462,9 @@ public class MotionService {
     return recusals;
   }
 
-  private List<CreateProcedureChangeInput> requireProposableProcedureChanges(
-      CreateConstitutionAmendmentMotionInput input,
-      ConstitutionVersion constitution,
-      List<CreateInstitutionChangeInput> institutionChanges,
-      List<CreateOfficeChangeInput> officeChanges) {
-    List<CreateProcedureChangeInput> changes = proposedChanges(input.procedureChanges());
-    Map<UUID, InstitutionKind> institutionKinds =
-        resultingInstitutionKinds(constitution, institutionChanges);
-    if (changes.isEmpty()) {
-      validateProcedureInstitutionReferences(constitution, institutionKinds, Map.of());
-      validateProcedureOfficeReferences(
-          constitution, resultingOfficeCodes(constitution, officeChanges), Map.of());
-      return List.of();
-    }
-    Set<String> officeCodes = resultingOfficeCodes(constitution, officeChanges);
-    changes =
-        changes.stream()
-            .map(
-                change -> {
-                  Procedure procedure = procedure(constitution.getId(), change.procedureCode());
-                  requireCompatibleProcedureThreshold(
-                      procedure.getEffectType(),
-                      proposedOrCurrent(change.threshold(), procedure.getThreshold()));
-                  requireCompatibleOfficeElectionMethod(
-                      procedure.getEffectType(),
-                      proposedOrCurrent(
-                          change.officeElectionMethod(), procedure.getOfficeElectionMethod()));
-                  UUID institutionId =
-                      proposedOrCurrent(change.institutionId(), procedure.getInstitutionId());
-                  requireKnownProcedureInstitution(institutionId, institutionKinds.keySet());
-                  requireCompatibleProcedureInstitution(
-                      procedure.getEffectType(), institutionId, institutionKinds);
-                  ProcedureElectorate electorate =
-                      proposedOrCurrent(change.electorate(), procedure.getElectorate());
-                  String electorateOfficeCode =
-                      resultingElectorateOfficeCode(
-                          electorate, change.electorateOfficeCode(), procedure);
-                  requireKnownElectorateOffice(electorate, electorateOfficeCode, officeCodes);
-                  return change;
-                })
-            .toList();
-    validateProcedureInstitutionReferences(
-        constitution, institutionKinds, changedProcedureInstitutions(changes));
-    validateProcedureOfficeReferences(
-        constitution, officeCodes, changedProcedureElectorates(changes));
-    return changes;
-  }
+  // endregion
 
-  private List<CreateInstitutionChangeInput> requireProposableInstitutionChanges(
-      CreateConstitutionAmendmentMotionInput input, ConstitutionVersion constitution) {
-    List<CreateInstitutionChangeInput> changes = proposedChanges(input.institutionChanges());
-    if (changes.isEmpty()) {
-      return List.of();
-    }
-    Map<UUID, Institution> currentInstitutions = currentInstitutions(constitution);
-    Set<UUID> jurisdictionIds = currentJurisdictionIds(constitution.getPolityId());
-    changes.forEach(
-        change -> {
-          Institution institution =
-              change.institutionId() == null
-                  ? null
-                  : currentInstitutions.get(change.institutionId());
-          switch (change.action()) {
-            case CREATE -> requireKnownJurisdiction(change.jurisdictionId(), jurisdictionIds);
-            case REVISE -> {
-              if (institution == null) {
-                throw ApiException.notFound("institution_not_found", "Institution not found.");
-              }
-              if (change.jurisdictionId() != null) {
-                requireKnownJurisdiction(change.jurisdictionId(), jurisdictionIds);
-              }
-            }
-            case RETIRE -> {
-              if (institution == null) {
-                throw ApiException.notFound("institution_not_found", "Institution not found.");
-              }
-            }
-          }
-        });
-    return changes;
-  }
-
-  private List<CreateOfficeChangeInput> requireProposableOfficeChanges(
-      CreateConstitutionAmendmentMotionInput input,
-      ConstitutionVersion constitution,
-      OffsetDateTime now) {
-    List<CreateOfficeChangeInput> changes = proposedChanges(input.officeChanges());
-    if (changes.isEmpty()) {
-      return List.of();
-    }
-    Map<String, Office> currentOffices = currentOffices(constitution);
-    Set<UUID> jurisdictionIds = currentJurisdictionIds(constitution.getPolityId());
-    changes.forEach(
-        change -> {
-          String code = normalizedOfficeCode(change.code());
-          Office office = currentOffices.get(code);
-          switch (change.action()) {
-            case CREATE -> {
-              if (office != null) {
-                throw ApiException.conflict(
-                    "office_already_exists", "This office already exists in the constitution.");
-              }
-              if (change.jurisdictionId() != null) {
-                requireKnownJurisdiction(change.jurisdictionId(), jurisdictionIds);
-              }
-            }
-            case REVISE -> {
-              if (office == null) {
-                throw ApiException.notFound("office_not_found", "Office not found.");
-              }
-              if (change.jurisdictionId() != null) {
-                requireKnownJurisdiction(change.jurisdictionId(), jurisdictionIds);
-              }
-              if (change.seatCount() != null) {
-                requireOfficeSeatCapacity(
-                    constitution.getPolityId(), code, change.seatCount(), now);
-              }
-            }
-            case RETIRE -> {
-              if (office == null) {
-                throw ApiException.notFound("office_not_found", "Office not found.");
-              }
-            }
-          }
-        });
-    return changes;
-  }
-
-  private List<CreatePowerChangeInput> requireProposablePowerChanges(
-      CreateConstitutionAmendmentMotionInput input,
-      ConstitutionVersion constitution,
-      List<CreateOfficeChangeInput> officeChanges) {
-    List<CreatePowerChangeInput> changes = proposedChanges(input.powerChanges());
-    if (changes.isEmpty()) {
-      validatePowerOfficeReferences(
-          constitution, resultingOfficeCodes(constitution, officeChanges), Map.of());
-      return List.of();
-    }
-    Set<String> officeCodes = resultingOfficeCodes(constitution, officeChanges);
-    Map<PowerCode, ConstitutionalPower> currentPowers = currentPowers(constitution);
-    changes.forEach(
-        change -> {
-          if (!currentPowers.containsKey(change.powerCode())) {
-            throw ApiException.notFound("power_not_found", "Constitutional power not found.");
-          }
-          requireAllowedPowerHolder(change.powerCode(), change.holderScope());
-          requireKnownPowerOffice(
-              change.holderScope(), normalizedOfficeCode(change.holderOfficeCode()), officeCodes);
-        });
-    validatePowerOfficeReferences(constitution, officeCodes, changedPowerHolders(changes));
-    return changes;
-  }
+  // region Materialization: Amendments
 
   private ConstitutionProcedureChangeProposal toProposal(
       UUID polityId, UUID amendmentProposalId, CreateProcedureChangeInput change) {
@@ -1720,7 +1478,7 @@ public class MotionService {
         change.threshold(),
         change.officeElectionMethod(),
         change.electorate(),
-        trimmedProposalValue(change.electorateOfficeCode()),
+        change.electorateOfficeCode(),
         change.minimumElectorCount(),
         change.minimumNoticeHours(),
         change.votingPeriodHours());
@@ -1732,10 +1490,10 @@ public class MotionService {
         polityId,
         amendmentProposalId,
         change.action(),
-        normalizedOfficeCode(change.code()),
+        change.code(),
         change.jurisdictionId(),
-        trimmedProposalValue(change.name()),
-        trimmedProposalValue(change.description()),
+        change.name(),
+        change.description(),
         change.termLengthDays(),
         change.seatCount());
   }
@@ -1747,7 +1505,7 @@ public class MotionService {
         amendmentProposalId,
         change.powerCode(),
         change.holderScope(),
-        trimmedProposalValue(change.holderOfficeCode()));
+        change.holderOfficeCode());
   }
 
   private ConstitutionInstitutionChangeProposal toProposal(
@@ -1758,272 +1516,9 @@ public class MotionService {
         change.action(),
         change.institutionId(),
         change.jurisdictionId(),
-        trimmedProposalValue(change.name()),
+        change.name(),
         change.kind());
   }
 
-  private Map<String, Office> currentOffices(ConstitutionVersion constitution) {
-    return offices.findEntitiesByConstitutionVersionIdOrderByName(constitution.getId()).stream()
-        .collect(java.util.stream.Collectors.toMap(Office::getCode, office -> office));
-  }
-
-  private Map<PowerCode, ConstitutionalPower> currentPowers(ConstitutionVersion constitution) {
-    return powers.findEntitiesByConstitutionVersionId(constitution.getId()).stream()
-        .collect(java.util.stream.Collectors.toMap(ConstitutionalPower::getCode, power -> power));
-  }
-
-  private Map<UUID, Institution> currentInstitutions(ConstitutionVersion constitution) {
-    return institutions.findEntitiesByConstitutionVersionId(constitution.getId()).stream()
-        .collect(java.util.stream.Collectors.toMap(Institution::getId, institution -> institution));
-  }
-
-  private Set<UUID> currentJurisdictionIds(UUID polityId) {
-    return jurisdictions.findEntitiesByPolityId(polityId).stream()
-        .map(Jurisdiction::getId)
-        .collect(java.util.stream.Collectors.toSet());
-  }
-
-  private Map<UUID, InstitutionKind> resultingInstitutionKinds(
-      ConstitutionVersion constitution, List<CreateInstitutionChangeInput> institutionChanges) {
-    Map<UUID, InstitutionKind> kinds = new HashMap<>();
-    currentInstitutions(constitution)
-        .forEach((id, institution) -> kinds.put(id, institution.getKind()));
-    institutionChanges.forEach(
-        change -> {
-          switch (change.action()) {
-            case CREATE -> {
-              // New institutions cannot be procedure targets in the same amendment.
-            }
-            case REVISE ->
-                kinds.put(
-                    change.institutionId(),
-                    proposedOrCurrent(change.kind(), kinds.get(change.institutionId())));
-            case RETIRE -> kinds.remove(change.institutionId());
-          }
-        });
-    return kinds;
-  }
-
-  private Set<String> resultingOfficeCodes(
-      ConstitutionVersion constitution, List<CreateOfficeChangeInput> officeChanges) {
-    Set<String> codes = new HashSet<>(currentOffices(constitution).keySet());
-    officeChanges.forEach(
-        change -> {
-          String code = normalizedOfficeCode(change.code());
-          if (change.action() == ConstitutionOfficeChangeAction.RETIRE) {
-            codes.remove(code);
-          } else {
-            codes.add(code);
-          }
-        });
-    return codes;
-  }
-
-  private void validatePowerOfficeReferences(
-      ConstitutionVersion constitution,
-      Set<String> officeCodes,
-      Map<PowerCode, CreatePowerChangeInput> powerChanges) {
-    currentPowers(constitution)
-        .values()
-        .forEach(
-            power -> {
-              CreatePowerChangeInput change = powerChanges.get(power.getCode());
-              PowerHolderScope holderScope =
-                  change == null ? power.getHolderScope() : change.holderScope();
-              String holderOfficeCode =
-                  change == null ? power.getHolderOfficeCode() : change.holderOfficeCode();
-              requireAllowedPowerHolder(power.getCode(), holderScope);
-              requireKnownPowerOffice(
-                  holderScope, normalizedOfficeCode(holderOfficeCode), officeCodes);
-            });
-  }
-
-  private void requireAllowedPowerHolder(PowerCode powerCode, PowerHolderScope holderScope) {
-    if (powerCode.requiresActiveMemberHolder() && holderScope != PowerHolderScope.ACTIVE_MEMBER) {
-      throw ApiException.badRequest(
-          "citizen_power_required", "Disbandment must remain an active citizen power.");
-    }
-  }
-
-  private void requireKnownPowerOffice(
-      PowerHolderScope holderScope, String holderOfficeCode, Set<String> officeCodes) {
-    if (holderScope == PowerHolderScope.OFFICE && !officeCodes.contains(holderOfficeCode)) {
-      throw ApiException.badRequest(
-          "power_holder_office_missing",
-          "Office-held powers must refer to an office in the amended constitution.");
-    }
-  }
-
-  private void validateProcedureOfficeReferences(
-      ConstitutionVersion constitution,
-      Set<String> officeCodes,
-      Map<String, CreateProcedureChangeInput> procedureChanges) {
-    procedures
-        .findEntitiesByConstitutionVersionId(constitution.getId())
-        .forEach(
-            procedure -> {
-              CreateProcedureChangeInput change = procedureChanges.get(procedure.getCode());
-              ProcedureElectorate electorate =
-                  change == null
-                      ? procedure.getElectorate()
-                      : proposedOrCurrent(change.electorate(), procedure.getElectorate());
-              String electorateOfficeCode =
-                  change == null
-                      ? procedure.getElectorateOfficeCode()
-                      : resultingElectorateOfficeCode(
-                          electorate, change.electorateOfficeCode(), procedure);
-              requireKnownElectorateOffice(electorate, electorateOfficeCode, officeCodes);
-            });
-  }
-
-  private void validateProcedureInstitutionReferences(
-      ConstitutionVersion constitution,
-      Map<UUID, InstitutionKind> institutionKinds,
-      Map<String, CreateProcedureChangeInput> procedureChanges) {
-    procedures
-        .findEntitiesByConstitutionVersionId(constitution.getId())
-        .forEach(
-            procedure -> {
-              CreateProcedureChangeInput change = procedureChanges.get(procedure.getCode());
-              UUID institutionId =
-                  change == null
-                      ? procedure.getInstitutionId()
-                      : proposedOrCurrent(change.institutionId(), procedure.getInstitutionId());
-              requireKnownProcedureInstitution(institutionId, institutionKinds.keySet());
-              requireCompatibleProcedureInstitution(
-                  procedure.getEffectType(), institutionId, institutionKinds);
-            });
-  }
-
-  private void requireKnownProcedureInstitution(UUID institutionId, Set<UUID> institutionIds) {
-    if (!institutionIds.contains(institutionId)) {
-      throw ApiException.badRequest(
-          "procedure_institution_missing",
-          "Procedures must refer to an institution in the amended constitution.");
-    }
-  }
-
-  private void requireCompatibleProcedureInstitution(
-      EffectType effectType, UUID institutionId, Map<UUID, InstitutionKind> institutionKinds) {
-    InstitutionKind institutionKind = institutionKinds.get(institutionId);
-    if (!effectType.supportsInstitutionKind(institutionKind)) {
-      throw ApiException.badRequest(
-          "procedure_institution_kind_mismatch",
-          "Procedures must belong to an institution kind compatible with their effect.");
-    }
-  }
-
-  private void requireCompatibleProcedureThreshold(
-      EffectType effectType, VotingThreshold threshold) {
-    if (effectType == EffectType.ELECT_OFFICE
-        && threshold != VotingThreshold.OFFICE_ELECTION_RESULT) {
-      throw ApiException.badRequest(
-          "office_election_result_threshold_required",
-          "Office election procedures must use office-election result thresholds.");
-    }
-    if (effectType != EffectType.ELECT_OFFICE
-        && threshold == VotingThreshold.OFFICE_ELECTION_RESULT) {
-      throw ApiException.badRequest(
-          "office_election_result_threshold_requires_election",
-          "Office-election result thresholds can only be used by office election procedures.");
-    }
-  }
-
-  private void requireCompatibleOfficeElectionMethod(
-      EffectType effectType, OfficeElectionMethod officeElectionMethod) {
-    if (effectType == EffectType.ELECT_OFFICE && officeElectionMethod == null) {
-      throw ApiException.badRequest(
-          "office_election_method_required",
-          "Office election procedures must define an office election method.");
-    }
-    if (effectType != EffectType.ELECT_OFFICE && officeElectionMethod != null) {
-      throw ApiException.badRequest(
-          "office_election_method_requires_election",
-          "Office election methods can only be used by office election procedures.");
-    }
-  }
-
-  private void requireKnownJurisdiction(UUID jurisdictionId, Set<UUID> jurisdictionIds) {
-    if (!jurisdictionIds.contains(jurisdictionId)) {
-      throw ApiException.badRequest(
-          "constitution_change_jurisdiction_not_found",
-          "Constitution changes must refer to an existing jurisdiction.");
-    }
-  }
-
-  private void requireKnownElectorateOffice(
-      ProcedureElectorate electorate, String electorateOfficeCode, Set<String> officeCodes) {
-    if (electorate == ProcedureElectorate.OFFICE_HOLDERS
-        && !officeCodes.contains(electorateOfficeCode)) {
-      throw ApiException.badRequest(
-          "procedure_electorate_office_missing",
-          "Office-held procedure electorates must refer to an office in the amended constitution.");
-    }
-  }
-
-  private String resultingElectorateOfficeCode(
-      ProcedureElectorate electorate, String proposedOfficeCode, Procedure currentProcedure) {
-    if (electorate != ProcedureElectorate.OFFICE_HOLDERS) {
-      return null;
-    }
-    return proposedOrCurrent(
-        normalizedProposalOfficeCode(proposedOfficeCode),
-        currentProcedure.getElectorateOfficeCode());
-  }
-
-  private void requireOfficeSeatCapacity(
-      UUID polityId, String officeCode, int seatCount, OffsetDateTime now) {
-    if (officeTerms.countByPolityIdAndOfficeCodeAndStatusAndEndsAtAfter(
-            polityId, officeCode, OfficeTermStatus.ACTIVE, now)
-        > seatCount) {
-      throw ApiException.badRequest(
-          "office_seat_capacity_insufficient",
-          "Office seat count cannot be reduced below the current active terms.");
-    }
-  }
-
-  private Map<PowerCode, CreatePowerChangeInput> changedPowerHolders(
-      List<CreatePowerChangeInput> powerChanges) {
-    Map<PowerCode, CreatePowerChangeInput> changes = new EnumMap<>(PowerCode.class);
-    powerChanges.forEach(change -> changes.put(change.powerCode(), change));
-    return changes;
-  }
-
-  private Map<String, CreateProcedureChangeInput> changedProcedureElectorates(
-      List<CreateProcedureChangeInput> procedureChanges) {
-    Map<String, CreateProcedureChangeInput> changes = new java.util.HashMap<>();
-    procedureChanges.forEach(change -> changes.put(change.procedureCode(), change));
-    return changes;
-  }
-
-  private Map<String, CreateProcedureChangeInput> changedProcedureInstitutions(
-      List<CreateProcedureChangeInput> procedureChanges) {
-    Map<String, CreateProcedureChangeInput> changes = new java.util.HashMap<>();
-    procedureChanges.forEach(change -> changes.put(change.procedureCode(), change));
-    return changes;
-  }
-
-  private <T> T proposedOrCurrent(T value, T fallback) {
-    return value == null ? fallback : value;
-  }
-
-  private <T> List<T> proposedChanges(List<T> values) {
-    return values == null ? List.of() : values;
-  }
-
-  private String normalizedOfficeCode(String value) {
-    return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
-  }
-
-  private String normalizedProposalOfficeCode(String value) {
-    return isBlankProposalValue(value) ? null : normalizedOfficeCode(value);
-  }
-
-  private String trimmedProposalValue(String value) {
-    return isBlankProposalValue(value) ? null : value.trim();
-  }
-
-  private boolean isBlankProposalValue(String value) {
-    return value == null || value.isBlank();
-  }
+  // endregion
 }

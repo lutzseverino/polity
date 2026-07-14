@@ -5,5 +5,9 @@ import java.util.UUID;
 public interface ConstitutionAmendmentProposalProjection {
   UUID getId();
 
+  UUID getMotionId();
+
+  String getTitle();
+
   String getBody();
 }

@@ -21,7 +21,9 @@ public class OfficialRecordController implements OfficialRecordApi {
   private final AuthenticatedUserReader users;
 
   @Override
-  public ResponseEntity<List<OfficialRecordEntryResponse>> listPolityOfficialRecord(UUID polityId) {
-    return ResponseEntity.ok(mapper.toResponses(records.list(polityId, users.currentUser().id())));
+  public ResponseEntity<List<OfficialRecordEntryResponse>> listPolityOfficialRecord(
+      UUID polityId, Integer page, Integer size) {
+    return PageResponses.ok(
+        records.list(polityId, users.currentUser().id(), page, size), mapper::toResponses);
   }
 }

@@ -2,9 +2,10 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.Motion;
 import com.odonta.polity.model.MotionStatus;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MotionRepository extends JpaRepository<Motion, UUID> {
@@ -12,7 +13,8 @@ public interface MotionRepository extends JpaRepository<Motion, UUID> {
 
   boolean existsByIdAndStatus(UUID id, MotionStatus status);
 
-  List<MotionProjection> findProjectionsByPolityIdOrderByOpenedAtDesc(UUID polityId);
+  Page<MotionProjection> findProjectionsByPolityIdOrderByOpenedAtDescIdAsc(
+      UUID polityId, Pageable pageable);
 
   Optional<MotionProjection> findProjectedByIdAndPolityId(UUID id, UUID polityId);
 }

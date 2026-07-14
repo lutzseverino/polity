@@ -37,16 +37,19 @@ public class InvitationController implements InvitationsApi {
   }
 
   @Override
-  public ResponseEntity<List<MemberInvitationResponse>> listPolityInvitations(UUID polityId) {
-    return ResponseEntity.ok(
-        invitationMapper.toResponses(
-            invitations.listPolityInvitations(polityId, users.currentUser().id())));
+  public ResponseEntity<List<MemberInvitationResponse>> listPolityInvitations(
+      UUID polityId, Integer page, Integer size) {
+    return PageResponses.ok(
+        invitations.listPolityInvitations(polityId, users.currentUser().id(), page, size),
+        invitationMapper::toResponses);
   }
 
   @Override
-  public ResponseEntity<List<MemberInvitationResponse>> listCurrentUserInvitations() {
-    return ResponseEntity.ok(
-        invitationMapper.toResponses(invitations.listCurrentUserInvitations(users.currentUser())));
+  public ResponseEntity<List<MemberInvitationResponse>> listCurrentUserInvitations(
+      Integer page, Integer size) {
+    return PageResponses.ok(
+        invitations.listCurrentUserInvitations(users.currentUser(), page, size),
+        invitationMapper::toResponses);
   }
 
   @Override

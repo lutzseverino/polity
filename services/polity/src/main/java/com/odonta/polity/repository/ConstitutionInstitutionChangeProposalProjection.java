@@ -5,6 +5,8 @@ import com.odonta.polity.model.InstitutionKind;
 import java.util.UUID;
 
 public interface ConstitutionInstitutionChangeProposalProjection {
+  UUID getAmendmentProposalId();
+
   ConstitutionInstitutionChangeAction getAction();
 
   UUID getInstitutionId();
