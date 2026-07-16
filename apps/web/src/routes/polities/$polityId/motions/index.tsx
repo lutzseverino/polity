@@ -4,6 +4,10 @@ import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import { AppCard, AppCardContent } from "@/components/app/AppCard";
+import {
+  AppLinkSurface,
+  AppLinkSurfaceIndicator,
+} from "@/components/app/AppLinkSurface";
 import { AppText } from "@/components/app/AppText";
 import { type Motion, MotionSummaryCard } from "@/domains/motion";
 import { usePolity } from "@/domains/polity";
@@ -38,11 +42,17 @@ function MotionSection({
       {motions.length > 0 ? (
         <div className="grid gap-3 lg:grid-cols-2">
           {motions.map((motion) => (
-            <MotionSummaryCard
+            <AppLinkSurface
+              className="h-full"
               key={motion.id}
-              motion={motion}
-              polityId={polityId}
-            />
+              params={{ motionId: motion.id, polityId }}
+              to="/polities/$polityId/motions/$motionId"
+            >
+              <MotionSummaryCard
+                action={<AppLinkSurfaceIndicator />}
+                motion={motion}
+              />
+            </AppLinkSurface>
           ))}
         </div>
       ) : (

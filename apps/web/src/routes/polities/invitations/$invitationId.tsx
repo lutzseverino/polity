@@ -4,6 +4,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { AppLinkButton } from "@/components/app/AppButton";
 import { AppCard } from "@/components/app/AppCard";
+import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { invitationQueryOptions } from "@/domains/membership";
 import {
   InvitationResponse,
@@ -50,7 +51,7 @@ function InvitationRoute() {
   const navigate = Route.useNavigate();
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <AppPageLayout measure="narrow">
       <AppCard className="gap-0 py-0">
         <InvitationResponse
           descriptionId={invitationResponseDescriptionId}
@@ -72,6 +73,6 @@ function InvitationRoute() {
           titleId={invitationResponseTitleId}
         />
       </AppCard>
-    </div>
+    </AppPageLayout>
   );
 }

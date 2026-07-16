@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/shell/ShellNavigation.tsx:186
+#: src/app/shell/ShellNavigation.tsx:185
 msgid "{label}, {openInboxTaskCount} items need action"
 msgstr "{label}, {openInboxTaskCount} items need action"
 
@@ -21,11 +21,11 @@ msgstr "{label}, {openInboxTaskCount} items need action"
 #~ msgid "{label}, {unresolvedInboxCount} unread items"
 #~ msgstr "{label}, {unresolvedInboxCount} unread items"
 
-#: src/app/shell/ShellNavigation.tsx:236
+#: src/app/shell/ShellNavigation.tsx:235
 msgid "Account"
 msgstr "Account"
 
-#: src/app/shell/shell-route-context.test.ts:65
+#: src/app/shell/shell-route-context.test.ts:66
 msgid "All motions"
 msgstr "All motions"
 
@@ -37,15 +37,15 @@ msgstr "All polities"
 msgid "Current location"
 msgstr "Current location"
 
-#: src/app/shell/shell-route-context.ts:96
+#: src/app/shell/shell-route-context.ts:100
 msgid "Explore"
 msgstr "Explore"
 
-#: src/app/shell/shell-route-context.ts:97
+#: src/app/shell/shell-route-context.ts:101
 msgid "Home"
 msgstr "Home"
 
-#: src/app/shell/shell-route-context.ts:98
+#: src/app/shell/shell-route-context.ts:102
 msgid "Inbox"
 msgstr "Inbox"
 
@@ -54,11 +54,11 @@ msgstr "Inbox"
 msgid "Loading page"
 msgstr "Loading page"
 
-#: src/app/shell/shell-route-context.ts:99
+#: src/app/shell/shell-route-context.ts:103
 msgid "Me"
 msgstr "Me"
 
-#: src/app/shell/shell-route-context.test.ts:71
+#: src/app/shell/shell-route-context.test.ts:72
 msgid "Motion"
 msgstr "Motion"
 
@@ -66,7 +66,7 @@ msgstr "Motion"
 msgid "Motions"
 msgstr "Motions"
 
-#: src/app/shell/ShellNavigation.tsx:235
+#: src/app/shell/ShellNavigation.tsx:234
 msgid "Open account"
 msgstr "Open account"
 
@@ -78,16 +78,16 @@ msgstr "Open account"
 msgid "Page not found"
 msgstr "Page not found"
 
-#: src/app/shell/shell-route-context.ts:100
+#: src/app/shell/shell-route-context.ts:104
 msgid "Polities"
 msgstr "Polities"
 
-#: src/app/shell/ShellNavigation.tsx:198
-#: src/app/shell/ShellNavigation.tsx:217
+#: src/app/shell/ShellNavigation.tsx:197
+#: src/app/shell/ShellNavigation.tsx:216
 msgid "Primary Navigation"
 msgstr "Primary Navigation"
 
-#: src/app/shell/AppShell.tsx:47
+#: src/app/shell/AppShell.tsx:49
 msgid "Skip to main content"
 msgstr "Skip to main content"
 

@@ -14,9 +14,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: src/domains/polity/components/ReadinessBadge/ReadinessBadge.tsx:9
-msgid "Forming"
-msgstr "Forming"
+#~ msgid "Forming"
+#~ msgstr "Forming"
 
 #: src/domains/polity/components/ReadinessBadge/ReadinessBadge.tsx:9
-msgid "Ready"
-msgstr "Ready"
+#~ msgid "Ready"
+#~ msgstr "Ready"

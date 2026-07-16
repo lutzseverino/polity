@@ -14,28 +14,28 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: motion.closesAtLabel.toLowerCase()
-#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:50
+#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:52
 msgid "Closes {0}"
 msgstr ""
 
-#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:31
+#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:30
 msgid "Enacted"
 msgstr ""
 
 #. placeholder {0}: motion.title
 #: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:57
-msgid "Open {0}"
-msgstr ""
+#~ msgid "Open {0}"
+#~ msgstr ""
 
-#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:32
+#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:31
 msgid "Rejected"
 msgstr ""
 
 #. placeholder {0}: motion.closesAtLabel.toLowerCase()
-#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:52
+#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:54
 msgid "Voting {0}"
 msgstr ""
 
-#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:29
+#: src/domains/motion/components/MotionSummaryCard/MotionSummaryCard.tsx:28
 msgid "Voting open"
 msgstr ""

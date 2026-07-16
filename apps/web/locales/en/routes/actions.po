@@ -13,11 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/actions/new.tsx:17
+#: src/routes/actions/new.tsx:18
 msgid "Back to Home"
 msgstr "Back to Home"
 
-#: src/routes/actions/new.tsx:18
-#: src/routes/actions/new.tsx:20
+#: src/routes/actions/new.tsx:19
+#: src/routes/actions/new.tsx:21
 msgid "New Action"
 msgstr "New Action"

@@ -7,7 +7,7 @@ import { RouteLoadingPage } from "@/app/shell/RouteLoadingPage";
 import { RouteNotFoundPage } from "@/app/shell/RouteNotFoundPage";
 import { inboxItemsQueryOptions } from "@/domains/inbox";
 import { invitationQueryOptions } from "@/domains/membership";
-import { politiesQueryOptions } from "@/domains/polity";
+import { polityOptionsQueryOptions } from "@/domains/polity";
 import {
   type InvitationTask,
   readInvitationTask,
@@ -29,7 +29,9 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
 
     return Promise.all([
       context.queryClient.ensureQueryData(inboxItemsQueryOptions({ locale })),
-      context.queryClient.ensureQueryData(politiesQueryOptions({ locale })),
+      context.queryClient.ensureQueryData(
+        polityOptionsQueryOptions({ locale }),
+      ),
       deps.task
         ? context.queryClient.ensureQueryData(
             invitationQueryOptions({

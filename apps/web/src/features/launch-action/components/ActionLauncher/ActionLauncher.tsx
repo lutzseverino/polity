@@ -1,20 +1,8 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
-import {
-  ArrowUpRight,
-  BookOpenCheck,
-  CirclePlus,
-  FilePenLine,
-  type LucideIcon,
-  Plus,
-  Scale,
-  Search,
-  UserPlus,
-  Vote,
-} from "lucide-react";
-import { useId, useState } from "react";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Plus, Search } from "lucide-react";
+import { useEffect, useId, useState } from "react";
 
-import { AppButton } from "@/components/app/AppButton";
+import { AppButton, AppLinkButton } from "@/components/app/AppButton";
 import {
   AppCard,
   AppCardContent,
@@ -22,21 +10,23 @@ import {
   AppCardHeader,
   AppCardTitle,
 } from "@/components/app/AppCard";
+import {
+  AppDialog,
+  AppDialogContent,
+  AppDialogDescription,
+  AppDialogTitle,
+  AppDialogTrigger,
+} from "@/components/app/AppDialog";
 import { AppInput } from "@/components/app/AppInput";
 import {
   AppNativeSelect,
   AppNativeSelectOption,
 } from "@/components/app/AppNativeSelect";
-import {
-  AppPopover,
-  AppPopoverContent,
-  AppPopoverTrigger,
-} from "@/components/app/AppPopover";
 import { AppText } from "@/components/app/AppText";
-import {
-  type ActionDefinition,
-  filterActionDefinitions,
-} from "@/features/launch-action/lib/action-definitions";
+import type { PolityActionAvailability } from "@/domains/polity";
+import { usePolityActions } from "@/domains/polity";
+import { ActionResults } from "@/features/launch-action/components/ActionLauncher/ActionResults";
+import { filterActionDefinitions } from "@/features/launch-action/lib/action-definitions";
 import type {
   ActionLauncherVariant,
   PolityOption,
@@ -46,133 +36,136 @@ import { cn } from "@/lib/utils";
 type ActionLauncherProps = Readonly<{
   defaultPolityId?: string;
   polities: readonly PolityOption[];
-  triggerPresentation?: "icon" | "labelled";
+  triggerPresentation?: "icon" | "labelled" | "prompt";
   variant?: ActionLauncherVariant;
 }>;
 
-const actionIconById: Readonly<Record<string, LucideIcon>> = {
-  "amend-constitution": BookOpenCheck,
-  "invite-member": UserPlus,
-  "propose-resolution": FilePenLine,
-  "request-review": Scale,
-  "start-election": Vote,
-};
+function getInitialPolityId(
+  defaultPolityId: string | undefined,
+  polities: readonly PolityOption[],
+) {
+  return polities.some((polity) => polity.id === defaultPolityId)
+    ? (defaultPolityId ?? "")
+    : (polities[0]?.id ?? "");
+}
 
-const actionCardClassName =
-  "grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-xl border p-3.5 text-left transition-colors sm:min-h-36 sm:grid-cols-[1fr_auto] sm:grid-rows-[auto_1fr] sm:items-start";
-
-function ActionOption({
-  action,
-  polityId,
-}: Readonly<{ action: ActionDefinition; polityId: string }>) {
-  const { i18n } = useLingui();
-  const Icon = actionIconById[action.id] ?? CirclePlus;
-  const unavailable = action.unavailableIn?.includes(polityId) ?? false;
-  const content = (
-    <>
-      <span className="col-start-1 row-start-1 flex size-9 items-center justify-center rounded-lg border bg-background text-foreground shadow-xs">
-        <Icon aria-hidden="true" className="size-4" />
-      </span>
-      {unavailable ? (
-        <AppText
-          as="span"
-          className="col-start-3 row-start-1 sm:col-start-2"
-          variant="captionStrong"
-        >
-          <Trans>Unavailable</Trans>
-        </AppText>
-      ) : (
-        <ArrowUpRight
-          aria-hidden="true"
-          className="col-start-3 row-start-1 size-4 text-muted-foreground transition-colors group-hover:text-foreground sm:col-start-2"
-        />
-      )}
-      <div className="col-start-2 row-start-1 min-w-0 sm:col-span-2 sm:col-start-1 sm:row-start-2 sm:self-end sm:pt-4">
-        <AppText variant="strong">{i18n._(action.label)}</AppText>
-        <AppText className="mt-1 line-clamp-2" variant="caption">
-          {i18n._(
-            unavailable && action.unavailableReason
-              ? action.unavailableReason
-              : action.description,
-          )}
-        </AppText>
-      </div>
-    </>
-  );
-
-  if (unavailable) {
-    return (
-      <div
-        aria-disabled="true"
-        className={cn(actionCardClassName, "bg-muted/30 opacity-65")}
-      >
-        {content}
-      </div>
-    );
-  }
+function ReadinessSummary({
+  actions,
+  availableCount,
+  polityName,
+}: Readonly<{
+  actions: PolityActionAvailability;
+  availableCount: number;
+  polityName: string;
+}>) {
+  const healthy = actions.readiness.status === "ready";
 
   return (
-    <Link
-      className={cn(
-        actionCardClassName,
-        "group hover:border-foreground/25 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-      )}
-      search={{ action: action.id, polity: polityId }}
-      to="/actions/new"
-    >
-      {content}
-    </Link>
+    <div className="flex items-start gap-3 rounded-xl bg-muted/55 px-3.5 py-3">
+      <span
+        aria-hidden="true"
+        className={cn(
+          "mt-1.5 size-2.5 shrink-0 rounded-full ring-4",
+          healthy
+            ? "bg-emerald-500 ring-emerald-500/10"
+            : "bg-amber-500 ring-amber-500/10",
+        )}
+      />
+      <div className="min-w-0 flex-1">
+        <AppText variant="strong">
+          <Plural value={availableCount} one="# action" other="# actions" />{" "}
+          <Trans>currently allowed in {polityName}</Trans>
+        </AppText>
+        <AppText className="mt-0.5" variant="caption">
+          {actions.readiness.statusMessage}
+        </AppText>
+      </div>
+    </div>
   );
 }
 
 function ActionLauncherContent({
   defaultPolityId,
+  onSelect,
   polities,
-}: Omit<ActionLauncherProps, "variant">) {
+  presentation,
+}: Readonly<{
+  defaultPolityId?: string;
+  onSelect?: () => void;
+  polities: readonly PolityOption[];
+  presentation: "dialog" | "surface";
+}>) {
   const { i18n, t } = useLingui();
   const inputId = useId();
   const politySelectId = useId();
-  const [polityId, setPolityId] = useState(
-    defaultPolityId ?? polities[0]?.id ?? "",
+  const [polityId, setPolityId] = useState(() =>
+    getInitialPolityId(defaultPolityId, polities),
   );
   const [query, setQuery] = useState("");
+  const {
+    data: availability,
+    error,
+    isPending,
+    refetch,
+  } = usePolityActions({
+    locale: i18n.locale,
+    polityId,
+  });
+  useEffect(() => {
+    const nextPolityId = getInitialPolityId(defaultPolityId, polities);
+
+    if (nextPolityId) {
+      setPolityId(nextPolityId);
+    }
+  }, [defaultPolityId, polities]);
+
   const actions = filterActionDefinitions(query, (message) => i18n._(message));
+  const allActions = filterActionDefinitions("", (message) => i18n._(message));
+  const polityName =
+    polities.find((polity) => polity.id === polityId)?.name ?? "";
+  const availableCount = availability
+    ? allActions.filter(
+        (action) => availability[action.availabilityKey].available,
+      ).length
+    : 0;
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1.5fr)_minmax(12rem,0.75fr)]">
-        <div className="space-y-1.5">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1.45fr)_minmax(12rem,0.8fr)]">
+        <div className="min-w-0 space-y-1.5">
           <label
             className="text-xs font-medium text-muted-foreground"
             htmlFor={inputId}
           >
-            <Trans>Find an Action</Trans>
+            <Trans>What do you want to do?</Trans>
           </label>
-          <div className="relative">
+          <div className="relative min-w-0">
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
             />
             <AppInput
               autoComplete="off"
-              className="pl-9"
+              autoFocus={presentation === "dialog"}
+              className="min-w-0 text-ellipsis pl-9"
               id={inputId}
               name="action-query"
               onChange={(event) => setQuery(event.currentTarget.value)}
-              placeholder={t`Search by goal or action…`}
+              placeholder={t`Try “change our rules” or “invite someone”…`}
               value={query}
             />
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="min-w-0 space-y-1.5">
           <label
             className="text-xs font-medium text-muted-foreground"
             htmlFor={politySelectId}
           >
-            <Trans>Polity</Trans>
+            <Trans>In this polity</Trans>
           </label>
           <AppNativeSelect
             autoComplete="off"
+            className="w-full min-w-0 [&_select]:overflow-hidden [&_select]:text-ellipsis [&_select]:whitespace-nowrap"
             id={politySelectId}
             name="polity"
             onChange={(event) => setPolityId(event.currentTarget.value)}
@@ -187,31 +180,216 @@ function ActionLauncherContent({
         </div>
       </div>
 
-      <div aria-live="polite">
-        {actions.length > 0 ? (
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {actions.map((action) => (
-              <ActionOption
-                action={action}
-                key={action.id}
-                polityId={polityId}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-lg border border-dashed px-4 py-6 text-center">
-            <AppText variant="strong">
-              <Trans>No Matching Actions</Trans>
-            </AppText>
-            <AppText className="mt-1" variant="caption">
-              <Trans>
-                Try a broader phrase such as “vote,” “invite,” or “rules.”
-              </Trans>
-            </AppText>
-          </div>
-        )}
+      {isPending ? (
+        <div
+          className="flex min-h-36 items-center justify-center rounded-xl border border-dashed"
+          role="status"
+        >
+          <AppText variant="supporting">
+            <Trans>Checking what you can do…</Trans>
+          </AppText>
+        </div>
+      ) : error || !availability ? (
+        <div
+          className="flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed px-5 text-center"
+          role="alert"
+        >
+          <AppText variant="strong">
+            <Trans>We couldn’t check your actions</Trans>
+          </AppText>
+          <AppText className="mt-1" variant="caption">
+            <Trans>
+              Your polity is unchanged. Try checking its permissions again.
+            </Trans>
+          </AppText>
+          <AppButton
+            className="mt-3"
+            onClick={() => void refetch()}
+            size="sm"
+            variant="outline"
+          >
+            <Trans>Try again</Trans>
+          </AppButton>
+        </div>
+      ) : (
+        <>
+          <ReadinessSummary
+            actions={availability}
+            availableCount={availableCount}
+            polityName={polityName}
+          />
+
+          <ActionResults
+            actions={actions}
+            availability={availability}
+            onSelect={onSelect}
+            polityId={polityId}
+            presentation={presentation}
+            query={query.trim()}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+function EmptyLauncher() {
+  return (
+    <div className="rounded-xl border border-dashed px-4 py-8 text-center">
+      <AppText variant="strong">
+        <Trans>Join or found a polity first</Trans>
+      </AppText>
+      <AppText className="mt-1" variant="caption">
+        <Trans>Actions become available inside a polity.</Trans>
+      </AppText>
+      <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
+        <AppLinkButton to="/explore" variant="outline">
+          <Trans>Explore polities</Trans>
+        </AppLinkButton>
+        <AppLinkButton to="/polities/new">
+          <Trans>Found a polity</Trans>
+        </AppLinkButton>
       </div>
     </div>
+  );
+}
+
+function CompactActionLauncher({
+  defaultPolityId,
+  polities,
+  triggerPresentation,
+}: Omit<ActionLauncherProps, "variant">) {
+  const { t } = useLingui();
+  const titleId = useId();
+  const descriptionId = useId();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat) {
+        return;
+      }
+
+      if (
+        event.key.toLocaleLowerCase() === "k" &&
+        (event.metaKey || event.ctrlKey)
+      ) {
+        if (
+          !open &&
+          document.querySelector('[role="dialog"], [role="alertdialog"]')
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+        setOpen(!open);
+      }
+    };
+
+    document.addEventListener("keydown", handleShortcut);
+    return () => document.removeEventListener("keydown", handleShortcut);
+  }, [open]);
+
+  return (
+    <AppDialog onOpenChange={setOpen} open={open}>
+      <AppDialogTrigger
+        render={
+          <AppButton
+            aria-keyshortcuts="Control+K Meta+K"
+            aria-label={
+              triggerPresentation === "icon" ? t`Start an action` : undefined
+            }
+            className={cn(
+              triggerPresentation === "prompt" &&
+                "h-auto w-full justify-start gap-3 whitespace-normal rounded-xl p-4 text-left shadow-xs hover:border-foreground/25 hover:bg-muted/40 sm:p-5",
+            )}
+            size={triggerPresentation === "icon" ? "icon-lg" : "lg"}
+            variant={triggerPresentation === "prompt" ? "outline" : "default"}
+          />
+        }
+      >
+        {triggerPresentation === "prompt" ? (
+          <>
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <Plus aria-hidden="true" className="size-4.5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <AppText as="span" className="block" variant="strong">
+                <Trans>Start an action</Trans>
+              </AppText>
+              <AppText as="span" className="mt-0.5 block" variant="caption">
+                <Trans>
+                  Describe the outcome you want. The constitution will guide the
+                  rest.
+                </Trans>
+              </AppText>
+            </span>
+            <kbd className="hidden rounded border bg-background px-1.5 py-1 text-[0.625rem] leading-none font-medium text-muted-foreground sm:block">
+              ⌘K
+            </kbd>
+          </>
+        ) : (
+          <>
+            <Plus
+              aria-hidden="true"
+              data-icon={
+                triggerPresentation === "icon" ? undefined : "inline-start"
+              }
+            />
+            {triggerPresentation === "labelled" ? (
+              <>
+                <Trans>Actions</Trans>
+                <kbd className="ml-1 hidden rounded border border-primary-foreground/25 px-1.5 py-0.5 text-[0.625rem] leading-none font-medium opacity-75 xl:inline">
+                  ⌘K
+                </kbd>
+              </>
+            ) : null}
+          </>
+        )}
+      </AppDialogTrigger>
+
+      <AppDialogContent
+        aria-describedby={descriptionId}
+        aria-labelledby={titleId}
+        className="max-h-[calc(100dvh-1rem)] max-w-none overflow-hidden p-0 sm:max-h-[calc(100dvh-2rem)] sm:max-w-xl"
+      >
+        <div className="flex max-h-[calc(100dvh-1rem)] min-h-0 flex-col sm:max-h-[calc(100dvh-2rem)]">
+          <header className="border-b px-5 py-4 pr-16 sm:px-6 sm:py-5 sm:pr-16">
+            <AppDialogTitle
+              render={<AppText as="h2" id={titleId} variant="sectionTitle" />}
+            >
+              <Trans>Make something happen</Trans>
+            </AppDialogTitle>
+            <AppDialogDescription
+              render={
+                <AppText
+                  className="mt-1"
+                  id={descriptionId}
+                  variant="supporting"
+                />
+              }
+            >
+              <Trans>
+                Start with your goal. The constitution determines the formal
+                action and whether you are authorized to begin.
+              </Trans>
+            </AppDialogDescription>
+          </header>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
+            {polities.length > 0 ? (
+              <ActionLauncherContent
+                defaultPolityId={defaultPolityId}
+                onSelect={() => setOpen(false)}
+                polities={polities}
+                presentation="dialog"
+              />
+            ) : (
+              <EmptyLauncher />
+            )}
+          </div>
+        </div>
+      </AppDialogContent>
+    </AppDialog>
   );
 }
 
@@ -226,61 +404,35 @@ export function ActionLauncher({
       <AppCard>
         <AppCardHeader>
           <AppCardTitle>
-            <Trans>Start an Action</Trans>
+            <Trans>Make something happen</Trans>
           </AppCardTitle>
           <AppCardDescription>
             <Trans>
-              Describe your intent, then review the official action before
-              anything is submitted.
+              Choose the outcome in plain language. The constitution handles the
+              mechanics and shows what is possible now.
             </Trans>
           </AppCardDescription>
         </AppCardHeader>
         <AppCardContent>
-          <ActionLauncherContent
-            defaultPolityId={defaultPolityId}
-            polities={polities}
-          />
+          {polities.length > 0 ? (
+            <ActionLauncherContent
+              defaultPolityId={defaultPolityId}
+              polities={polities}
+              presentation="surface"
+            />
+          ) : (
+            <EmptyLauncher />
+          )}
         </AppCardContent>
       </AppCard>
     );
   }
 
   return (
-    <AppPopover>
-      {triggerPresentation === "icon" ? (
-        <AppPopoverTrigger render={<AppButton size="icon-lg" />}>
-          <Plus aria-hidden="true" />
-          <span className="sr-only">
-            <Trans>New Action</Trans>
-          </span>
-        </AppPopoverTrigger>
-      ) : (
-        <AppPopoverTrigger render={<AppButton size="lg" />}>
-          <Plus aria-hidden="true" data-icon="inline-start" />
-          <Trans>New Action</Trans>
-        </AppPopoverTrigger>
-      )}
-      <AppPopoverContent
-        align="end"
-        className="w-[min(52rem,calc(100vw-2rem))] overscroll-contain p-4"
-        sideOffset={8}
-      >
-        <div className="mb-4">
-          <AppText variant="subsectionTitle">
-            <Trans>Choose an Action</Trans>
-          </AppText>
-          <AppText className="mt-1" variant="caption">
-            <Trans>
-              Start with your goal. You’ll review the formal action before
-              anything is submitted.
-            </Trans>
-          </AppText>
-        </div>
-        <ActionLauncherContent
-          defaultPolityId={defaultPolityId}
-          polities={polities}
-        />
-      </AppPopoverContent>
-    </AppPopover>
+    <CompactActionLauncher
+      defaultPolityId={defaultPolityId}
+      polities={polities}
+      triggerPresentation={triggerPresentation}
+    />
   );
 }

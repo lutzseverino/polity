@@ -30,4 +30,5 @@ Use the [reference template](../_templates/reference.template.md) for new refere
 
 ## Documents
 
+- [App component wrappers](app-component-wrappers.md) — wrapper ownership, minimal shape, composition, and registry-access rules.
 - [Source architecture](source-architecture.md) — authoritative source ownership, naming, and import rules.

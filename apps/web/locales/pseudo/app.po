@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/shell/ShellNavigation.tsx:186
+#: src/app/shell/ShellNavigation.tsx:185
 msgid "{label}, {openInboxTaskCount} items need action"
 msgstr ""
 
@@ -21,11 +21,11 @@ msgstr ""
 #~ msgid "{label}, {unresolvedInboxCount} unread items"
 #~ msgstr ""
 
-#: src/app/shell/ShellNavigation.tsx:236
+#: src/app/shell/ShellNavigation.tsx:235
 msgid "Account"
 msgstr ""
 
-#: src/app/shell/shell-route-context.test.ts:65
+#: src/app/shell/shell-route-context.test.ts:66
 msgid "All motions"
 msgstr ""
 
@@ -37,15 +37,15 @@ msgstr ""
 msgid "Current location"
 msgstr ""
 
-#: src/app/shell/shell-route-context.ts:96
+#: src/app/shell/shell-route-context.ts:100
 msgid "Explore"
 msgstr ""
 
-#: src/app/shell/shell-route-context.ts:97
+#: src/app/shell/shell-route-context.ts:101
 msgid "Home"
 msgstr ""
 
-#: src/app/shell/shell-route-context.ts:98
+#: src/app/shell/shell-route-context.ts:102
 msgid "Inbox"
 msgstr ""
 
@@ -54,11 +54,11 @@ msgstr ""
 msgid "Loading page"
 msgstr ""
 
-#: src/app/shell/shell-route-context.ts:99
+#: src/app/shell/shell-route-context.ts:103
 msgid "Me"
 msgstr ""
 
-#: src/app/shell/shell-route-context.test.ts:71
+#: src/app/shell/shell-route-context.test.ts:72
 msgid "Motion"
 msgstr ""
 
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Motions"
 msgstr ""
 
-#: src/app/shell/ShellNavigation.tsx:235
+#: src/app/shell/ShellNavigation.tsx:234
 msgid "Open account"
 msgstr ""
 
@@ -78,16 +78,16 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
-#: src/app/shell/shell-route-context.ts:100
+#: src/app/shell/shell-route-context.ts:104
 msgid "Polities"
 msgstr ""
 
-#: src/app/shell/ShellNavigation.tsx:198
-#: src/app/shell/ShellNavigation.tsx:217
+#: src/app/shell/ShellNavigation.tsx:197
+#: src/app/shell/ShellNavigation.tsx:216
 msgid "Primary Navigation"
 msgstr ""
 
-#: src/app/shell/AppShell.tsx:47
+#: src/app/shell/AppShell.tsx:49
 msgid "Skip to main content"
 msgstr ""
 

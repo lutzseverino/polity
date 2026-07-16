@@ -1,7 +1,8 @@
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
-
+import { AppPageHeader } from "@/components/app/AppPageHeader";
+import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { AppPlannedDestination } from "@/components/app/AppPlannedDestination";
 
 export const Route = createFileRoute("/explore/")({
@@ -18,16 +19,18 @@ export const Route = createFileRoute("/explore/")({
 
 function ExploreRoute() {
   return (
-    <AppPlannedDestination
-      className="mx-auto max-w-3xl"
-      description={
-        <Trans>
-          Public polity discovery will be designed after the core governing
-          journey is proven.
-        </Trans>
-      }
-      title={<Trans>Explore</Trans>}
-      titleId="planned-page-title"
-    />
+    <AppPageLayout measure="focused">
+      <AppPageHeader title={<Trans>Explore</Trans>} />
+      <AppPlannedDestination
+        description={
+          <Trans>
+            Public polity discovery will be designed after the core governing
+            journey is proven.
+          </Trans>
+        }
+        title={<Trans>Public Polity Discovery</Trans>}
+        titleId="planned-page-title"
+      />
+    </AppPageLayout>
   );
 }

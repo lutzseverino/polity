@@ -12,23 +12,22 @@ import {
 import type { ShellLayout } from "@/app/shell/shell-layout";
 import {
   type ShellSection,
+  type ShellSectionTarget,
   shellSectionDefinitions,
 } from "@/app/shell/shell-route-context";
 import { AppAvatar, AppAvatarFallback } from "@/components/app/AppAvatar";
 import { AppText } from "@/components/app/AppText";
 import { cn } from "@/lib/utils";
 
-type NavigationPath = "/explore" | "/home" | "/inbox" | "/me" | "/polities";
-
 type NavigationDestination = Readonly<{
   group: "account" | "primary";
   icon: LucideIcon;
   matchDescendants?: boolean;
   section: ShellSection;
-  to: NavigationPath;
 }>;
 
 type NavigationItem = NavigationDestination &
+  ShellSectionTarget &
   Readonly<{
     ariaLabel?: string;
     badge?: number;
@@ -43,22 +42,20 @@ type ShellNavigationProps = Readonly<{
 const applicationName = "decreos";
 
 const navigationDestinations: readonly NavigationDestination[] = [
-  { group: "primary", icon: Home, section: "home", to: "/home" },
+  { group: "primary", icon: Home, section: "home" },
   {
     group: "primary",
     icon: Compass,
     section: "explore",
-    to: "/explore",
   },
   {
     group: "primary",
     icon: Landmark,
     matchDescendants: true,
     section: "polities",
-    to: "/polities",
   },
-  { group: "primary", icon: Inbox, section: "inbox", to: "/inbox" },
-  { group: "account", icon: UserRound, section: "me", to: "/me" },
+  { group: "primary", icon: Inbox, section: "inbox" },
+  { group: "account", icon: UserRound, section: "me" },
 ];
 
 const navigationLinkClassName: Readonly<Record<ShellLayout, string>> = {
@@ -82,7 +79,7 @@ function NavigationLink({
       activeProps={{ className: "bg-muted text-foreground" }}
       aria-label={ariaLabel}
       className={cn(
-        "relative flex min-w-0 items-center rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "focus-indicator relative flex min-w-0 items-center rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
         navigationLinkClassName[layout],
       )}
       to={to}
@@ -119,7 +116,7 @@ function AccountLink({
   ariaLabel: string;
   displayLabel: string;
   layout: Exclude<ShellLayout, "compact">;
-  to: NavigationPath;
+  to: ShellSectionTarget["to"];
 }>) {
   return (
     <Link
@@ -127,7 +124,7 @@ function AccountLink({
       activeProps={{ className: "bg-muted text-foreground" }}
       aria-label={ariaLabel}
       className={cn(
-        "flex h-11 min-w-0 items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "focus-indicator flex h-11 min-w-0 items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
         layout === "expanded" ? "gap-3 px-2" : "justify-center",
       )}
       to={to}
@@ -174,7 +171,8 @@ export function ShellNavigation({
 }: ShellNavigationProps) {
   const { i18n, t } = useLingui();
   const items = navigationDestinations.map((destination): NavigationItem => {
-    const label = i18n._(shellSectionDefinitions[destination.section].label);
+    const definition = shellSectionDefinitions[destination.section];
+    const label = i18n._(definition.label);
     const badge =
       destination.section === "inbox" && openInboxTaskCount > 0
         ? openInboxTaskCount
@@ -182,6 +180,7 @@ export function ShellNavigation({
 
     return {
       ...destination,
+      ...definition.target,
       ariaLabel: badge
         ? t`${label}, ${openInboxTaskCount} items need action`
         : undefined,

@@ -13,10 +13,38 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/app/AppTaskSurface/AppTaskSurface.tsx:50
+#: src/components/app/AppDialog/AppDialog.tsx:31
 msgid "Close"
 msgstr "Close"
+
+#: src/components/app/AppPagination/AppPagination.tsx:108
+msgid "Go to next page"
+msgstr "Go to next page"
+
+#: src/components/app/AppPagination/AppPagination.tsx:86
+msgid "Go to page {item}"
+msgstr "Go to page {item}"
+
+#: src/components/app/AppPagination/AppPagination.tsx:64
+msgid "Go to previous page"
+msgstr "Go to previous page"
+
+#: src/components/app/AppPagination/AppPagination.tsx:115
+msgid "Next"
+msgstr "Next"
+
+#: src/components/app/AppPagination/AppPagination.tsx:76
+msgid "Page {currentPage} of {totalPages}"
+msgstr "Page {currentPage} of {totalPages}"
+
+#: src/components/app/AppPagination/AppPagination.tsx:57
+msgid "Pagination"
+msgstr "Pagination"
 
 #: src/components/app/AppPlannedDestination/AppPlannedDestination.tsx:34
 msgid "Planned destination"
 msgstr "Planned destination"
+
+#: src/components/app/AppPagination/AppPagination.tsx:72
+msgid "Previous"
+msgstr "Previous"

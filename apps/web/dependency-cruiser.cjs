@@ -71,6 +71,18 @@ module.exports = {
       to: { path: "^src/(?:app|features|routes)/" },
     },
     {
+      name: "domains-do-not-own-routing",
+      severity: "error",
+      comment:
+        "Domain components stay presentational; routes and features own URL navigation. InboxItemLink remains an explicit migration exception.",
+      from: {
+        path: "^src/domains/",
+        pathNot:
+          "^src/domains/inbox/components/InboxItemLink/InboxItemLink[.]tsx$",
+      },
+      to: { path: "node_modules/@tanstack/react-router/" },
+    },
+    {
       name: "features-do-not-reach-upward",
       severity: "error",
       comment:

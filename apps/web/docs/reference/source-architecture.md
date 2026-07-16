@@ -34,12 +34,14 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   They never depend on routes or app composition. Avoid feature-to-feature dependencies; compose features
   in a route or the app shell instead.
 - Only `src/components/app/` may import `src/components/ui/`. Never manually edit files under
-  `src/components/ui/`.
+  `src/components/ui/`. Follow the [app component wrapper rules](app-component-wrappers.md) when
+  exposing or extending a registry primitive.
 - Package reusable components in `ComponentName/ComponentName.tsx` with a manually curated local `index.ts`.
   Consumers outside that component import its index rather than the implementation file.
 - Prefer a presentational component plus slots or a compound API when consumers need to vary content or
   actions. A reusable component should not acquire route, loader, or fixture knowledge merely for
-  convenience.
+  convenience. Domain components do not import the router; the route or feature composition boundary wraps
+  them in navigable surfaces and supplies any directional action slot.
 - Keep types with their owning domain or feature. Generated OpenAPI types remain in generated API output;
   add a domain type only when it expresses a UI/domain contract rather than copying transport output.
 - Keep plain asynchronous reads in the owning domain's `api/` folder and user-action requests in the owning
@@ -50,10 +52,11 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   ownership instead.
 
 `pnpm check:architecture` enforces the mechanically checkable part of this graph, including acyclic
-dependencies, shadcn isolation, upward-import bans, and public entrypoints.
+dependencies, shadcn isolation, upward-import bans, domain routing ownership, and public entrypoints. The
+legacy `InboxItemLink` route dependency is an explicit migration exception rather than a general precedent.
 
 ## Component Example
 
-`PolityCard` belongs to the `polity` domain and exposes `Header`, `Identity`, `Content`, `Meta`, `Title`, and
-`Description` parts. Consumers compose those parts with route-specific links and actions; the card itself
-does not load data or know which URL owns a polity.
+`PolityCard` belongs to the `polity` domain and exposes `Header`, `Identity`, `Content`, `Footer`, `Meta`,
+`Title`, and `Description` parts. Consumers compose those parts with route-specific links and actions; the
+card itself does not load data or know which URL owns a polity.

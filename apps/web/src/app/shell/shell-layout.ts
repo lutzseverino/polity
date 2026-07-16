@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from "react";
 
+import type { ShellRouteLevel } from "@/app/shell/shell-route-context";
+
 export type ShellLayout = "compact" | "expanded" | "medium";
 
 const mediumShellMediaQuery = "(min-width: 48rem)";
@@ -11,6 +13,13 @@ export const shellContentInsetClassName: Readonly<Record<ShellLayout, string>> =
     expanded: "ml-60",
     medium: "ml-20",
   };
+
+export function shouldHideShellPageHeader(
+  layout: ShellLayout,
+  level: ShellRouteLevel,
+) {
+  return layout === "compact" && level === "root";
+}
 
 function readShellLayout(): ShellLayout {
   if (

@@ -123,7 +123,7 @@ function ShellBreadcrumbs({
             </AppText>
           ) : breadcrumb.target ? (
             <ShellInternalLink
-              className="block max-w-56 truncate rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="focus-indicator block max-w-56 truncate rounded text-muted-foreground transition-colors hover:text-foreground"
               params={breadcrumb.params}
               target={breadcrumb.target}
             >
@@ -194,7 +194,7 @@ export function ShellTopBar({
             {context.back ? (
               <ShellInternalLink
                 ariaLabel={context.back.label}
-                className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="focus-indicator inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 params={context.back.params}
                 target={context.back.target}
               >
@@ -212,6 +212,7 @@ export function ShellTopBar({
         <div className="flex shrink-0 items-center gap-1">
           {context.showPrimaryAction ? (
             <ActionLauncher
+              defaultPolityId={context.polityId}
               polities={polities}
               triggerPresentation={layout === "expanded" ? "labelled" : "icon"}
             />
