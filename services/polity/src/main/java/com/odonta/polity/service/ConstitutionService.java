@@ -1,8 +1,8 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.ConstitutionApplicationMapper;
 import com.odonta.polity.mapper.ConstitutionalPowerApplicationMapper;
 import com.odonta.polity.mapper.InstitutionApplicationMapper;
@@ -46,8 +46,7 @@ public class ConstitutionService {
     ConstitutionVersion constitution =
         constitutions
             .findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
-            .orElseThrow(
-                () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+            .orElseThrow(PolityResource.CONSTITUTION::notFound);
     return mapper.toResult(
         constitution,
         institutions.findProjectionsByConstitutionVersionId(constitution.getId()).stream()

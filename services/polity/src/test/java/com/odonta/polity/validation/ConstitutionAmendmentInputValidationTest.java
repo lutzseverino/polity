@@ -7,8 +7,7 @@ import com.odonta.polity.input.CreateInstitutionChangeInput;
 import com.odonta.polity.input.CreateOfficeChangeInput;
 import com.odonta.polity.input.CreatePowerChangeInput;
 import com.odonta.polity.input.CreateProcedureChangeInput;
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.model.PowerHolderScope;
@@ -49,7 +48,7 @@ class ConstitutionAmendmentInputValidationTest {
   void acceptsInstitutionCreationWithRequiredFields() {
     CreateInstitutionChangeInput input =
         new CreateInstitutionChangeInput(
-            ConstitutionInstitutionChangeAction.CREATE,
+            ConstitutionChangeOperation.CREATE,
             null,
             UUID.randomUUID(),
             "People's Court",
@@ -62,7 +61,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsInstitutionCreationWithExistingInstitutionId() {
     CreateInstitutionChangeInput input =
         new CreateInstitutionChangeInput(
-            ConstitutionInstitutionChangeAction.CREATE,
+            ConstitutionChangeOperation.CREATE,
             UUID.randomUUID(),
             UUID.randomUUID(),
             "People's Court",
@@ -79,7 +78,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsEmptyInstitutionRevision() {
     CreateInstitutionChangeInput input =
         new CreateInstitutionChangeInput(
-            ConstitutionInstitutionChangeAction.REVISE, UUID.randomUUID(), null, " ", null);
+            ConstitutionChangeOperation.REVISE, UUID.randomUUID(), null, " ", null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -92,7 +91,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsInstitutionRetirementWithRevisionFields() {
     CreateInstitutionChangeInput input =
         new CreateInstitutionChangeInput(
-            ConstitutionInstitutionChangeAction.RETIRE, UUID.randomUUID(), null, "New name", null);
+            ConstitutionChangeOperation.RETIRE, UUID.randomUUID(), null, "New name", null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -206,7 +205,7 @@ class ConstitutionAmendmentInputValidationTest {
   void acceptsOfficeCreationWithRequiredFields() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.CREATE, "clerk", "Clerk", "Keeps records.", 30, 1);
+            ConstitutionChangeOperation.CREATE, "clerk", "Clerk", "Keeps records.", 30, 1);
 
     assertThat(validator.validate(input)).isEmpty();
   }
@@ -215,7 +214,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsOfficeCreationWithoutRequiredFields() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.CREATE, "clerk", "", null, null, null);
+            ConstitutionChangeOperation.CREATE, "clerk", "", null, null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -227,7 +226,7 @@ class ConstitutionAmendmentInputValidationTest {
   void interpolatesCustomValidationMessagesFromMessagesBundle() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.CREATE, "clerk", "", null, null, null);
+            ConstitutionChangeOperation.CREATE, "clerk", "", null, null, null);
 
     assertThat(messageValidator.validate(input))
         .anySatisfy(
@@ -240,7 +239,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsEmptyOfficeRevision() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.REVISE, "clerk", null, " ", null, null);
+            ConstitutionChangeOperation.REVISE, "clerk", null, " ", null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(
@@ -252,7 +251,7 @@ class ConstitutionAmendmentInputValidationTest {
   void rejectsOfficeRetirementWithRevisionFields() {
     CreateOfficeChangeInput input =
         new CreateOfficeChangeInput(
-            ConstitutionOfficeChangeAction.RETIRE, "clerk", "Clerk", null, null, null);
+            ConstitutionChangeOperation.RETIRE, "clerk", "Clerk", null, null, null);
 
     assertThat(validator.validate(input))
         .anyMatch(

@@ -9,9 +9,9 @@ import com.odonta.polity.mapper.MembershipInvitationTransportMapper;
 import com.odonta.polity.mapper.MembershipTransportMapper;
 import com.odonta.polity.service.InvitationService;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +37,7 @@ public class InvitationController implements InvitationsApi {
   }
 
   @Override
-  public ResponseEntity<List<MemberInvitationResponse>> listPolityInvitations(
+  public ResponseEntity<PagedModel> listPolityInvitations(
       UUID polityId, Integer page, Integer size) {
     return PageResponses.ok(
         invitations.listPolityInvitations(polityId, users.currentUser().id(), page, size),
@@ -45,8 +45,7 @@ public class InvitationController implements InvitationsApi {
   }
 
   @Override
-  public ResponseEntity<List<MemberInvitationResponse>> listCurrentUserInvitations(
-      Integer page, Integer size) {
+  public ResponseEntity<PagedModel> listCurrentUserInvitations(Integer page, Integer size) {
     return PageResponses.ok(
         invitations.listCurrentUserInvitations(users.currentUser(), page, size),
         invitationMapper::toResponses);

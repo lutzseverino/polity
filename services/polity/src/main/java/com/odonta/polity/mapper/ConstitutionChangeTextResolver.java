@@ -1,6 +1,5 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.model.ConstitutionalPowerTemplateKey;
 import com.odonta.polity.model.PowerCode;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -84,9 +83,7 @@ class ConstitutionChangeTextResolver {
       return keyedValue(keyedValue, "value");
     }
     if (value instanceof PowerCode powerCode) {
-      return message(
-          ConstitutionalPowerTemplateKey.valueOf(powerCode.name()).nameKey(),
-          powerCode.name().toLowerCase(Locale.ROOT));
+      return message(powerCode.defaultNameKey(), powerCode.name().toLowerCase(Locale.ROOT));
     }
     if (value instanceof Enum<?> enumValue) {
       String raw = enumValue.name().toLowerCase(Locale.ROOT);

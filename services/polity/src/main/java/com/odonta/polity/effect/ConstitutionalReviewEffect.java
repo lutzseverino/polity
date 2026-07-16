@@ -1,6 +1,7 @@
 package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalReview;
 import com.odonta.polity.model.EffectType;
@@ -50,10 +51,7 @@ final class ConstitutionalReviewEffect implements MotionEffect {
     OfficialRecordEntry target =
         officialRecordEntries
             .findEntityByIdAndPolityId(proposal.getTargetRecordId(), motion.getPolityId())
-            .orElseThrow(
-                () ->
-                    ApiException.notFound(
-                        "official_record_entry_not_found", "Official record entry not found."));
+            .orElseThrow(PolityResource.OFFICIAL_RECORD_ENTRY::notFound);
     if (!target.getType().isVoidableByConstitutionalReview()) {
       throw ApiException.conflict(
           "official_act_not_voidable",

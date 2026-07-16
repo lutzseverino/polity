@@ -42,8 +42,7 @@ import com.odonta.polity.model.AppealProposal;
 import com.odonta.polity.model.Certification;
 import com.odonta.polity.model.CertificationModality;
 import com.odonta.polity.model.ConstitutionAmendmentProposal;
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.ConstitutionOfficeChangeProposal;
 import com.odonta.polity.model.ConstitutionPowerChangeProposal;
 import com.odonta.polity.model.ConstitutionProcedureChangeProposal;
@@ -126,6 +125,7 @@ import com.odonta.polity.resolver.OfficeElectionResultResolver;
 import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import com.odonta.polity.resolver.ProcedureElectorateResolver;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.ConstitutionOfficeChangeResult;
 import com.odonta.polity.result.ConstitutionPowerChangeResult;
 import java.lang.reflect.Proxy;
@@ -537,7 +537,8 @@ class MotionServiceTest {
     when(memberships.findEntityById(targetMembershipId)).thenReturn(Optional.of(target));
     when(polities.constitution(polityId)).thenReturn(constitution);
     when(polityActionAvailability.sanctionAvailability(actor, constitution))
-        .thenReturn(ActionAvailabilityResult.blocked("appeal_procedure_unavailable"));
+        .thenReturn(
+            ActionAvailabilityResult.blocked(ActionUnavailableReason.APPEAL_PROCEDURE_UNAVAILABLE));
 
     assertThatThrownBy(
             () ->
@@ -741,11 +742,11 @@ class MotionServiceTest {
     assertThat(result.actions().castVote().available()).isTrue();
     assertThat(result.actions().castElectionBallot().available()).isFalse();
     assertThat(result.actions().castElectionBallot().reason())
-        .isEqualTo("motion_not_office_election");
+        .isEqualTo(ActionUnavailableReason.MOTION_NOT_OFFICE_ELECTION);
     assertThat(result.actions().respondCandidacy().available()).isFalse();
     assertThat(result.actions().requestCertification().available()).isFalse();
     assertThat(result.actions().requestCertification().reason())
-        .isEqualTo("certification_not_open");
+        .isEqualTo(ActionUnavailableReason.CERTIFICATION_NOT_OPEN);
   }
 
   @Test
@@ -1638,7 +1639,7 @@ class MotionServiceTest {
                 null,
                 List.of(
                     new CreateOfficeChangeInput(
-                        ConstitutionOfficeChangeAction.CREATE,
+                        ConstitutionChangeOperation.CREATE,
                         "clerk",
                         "Clerk",
                         "Keeps the citizen roll.",
@@ -1847,7 +1848,7 @@ class MotionServiceTest {
                         "Retire an institution without moving its procedures.",
                         List.of(
                             new CreateInstitutionChangeInput(
-                                ConstitutionInstitutionChangeAction.RETIRE,
+                                ConstitutionChangeOperation.RETIRE,
                                 assembly.getId(),
                                 null,
                                 null,
@@ -2132,7 +2133,7 @@ class MotionServiceTest {
                         null,
                         List.of(
                             new CreateOfficeChangeInput(
-                                ConstitutionOfficeChangeAction.RETIRE,
+                                ConstitutionChangeOperation.RETIRE,
                                 Office.STEWARD,
                                 null,
                                 null,
@@ -2221,7 +2222,7 @@ class MotionServiceTest {
                         null,
                         List.of(
                             new CreateOfficeChangeInput(
-                                ConstitutionOfficeChangeAction.RETIRE,
+                                ConstitutionChangeOperation.RETIRE,
                                 Office.MAGISTRATE,
                                 null,
                                 null,
@@ -2326,7 +2327,7 @@ class MotionServiceTest {
             null,
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.REVISE, Office.MAGISTRATE, null, null, null, 1)),
+                    ConstitutionChangeOperation.REVISE, Office.MAGISTRATE, null, null, null, 1)),
             null));
 
     verify(motions).saveAndFlush(any());

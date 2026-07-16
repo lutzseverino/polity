@@ -18,6 +18,7 @@ import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficeTermProjection;
 import com.odonta.polity.repository.OfficialRecordProjection;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.CertificationResult;
 import com.odonta.polity.result.GovernmentReadinessResult;
 import java.time.OffsetDateTime;
@@ -214,7 +215,7 @@ class MapperTest {
       LocaleContextHolder.setLocale(Locale.ENGLISH);
       StaticMessageSource messages = new StaticMessageSource();
       messages.addMessage(
-          "api_error.polity_provisional", Locale.ENGLISH, "This polity needs more citizens.");
+          "api_error.polity_disbanded", Locale.ENGLISH, "This polity has been disbanded.");
       TransportTextResolver text =
           new TransportTextResolver(new ConstitutionChangeTextResolver(messages), messages);
       ActionAvailabilityTransportMapper mapper =
@@ -223,14 +224,27 @@ class MapperTest {
           mapper, "actionAvailabilityTransportText", new ActionAvailabilityTransportText(text));
 
       ActionAvailabilityResponse response =
-          mapper.toResponse(ActionAvailabilityResult.blocked("polity_provisional"));
+          mapper.toResponse(
+              ActionAvailabilityResult.blocked(ActionUnavailableReason.POLITY_DISBANDED));
 
       assertThat(response.getAvailable()).isFalse();
-      assertThat(response.getReason()).isEqualTo("polity_provisional");
-      assertThat(response.getReasonMessage()).isEqualTo("This polity needs more citizens.");
+      assertThat(response.getReason())
+          .isEqualTo(com.odonta.polity.api.model.ActionUnavailableReason.POLITY_DISBANDED);
+      assertThat(response.getReasonMessage()).isEqualTo("This polity has been disbanded.");
     } finally {
       LocaleContextHolder.resetLocaleContext();
     }
+  }
+
+  @Test
+  void mapsEveryActionUnavailableReasonToTheGeneratedContractVocabulary() {
+    ActionAvailabilityTransportMapper mapper =
+        Mappers.getMapper(ActionAvailabilityTransportMapper.class);
+
+    assertThat(ActionUnavailableReason.values())
+        .allSatisfy(
+            reason ->
+                assertThat(mapper.toTransport(reason).getValue()).isEqualTo(reason.wireValue()));
   }
 
   @Test

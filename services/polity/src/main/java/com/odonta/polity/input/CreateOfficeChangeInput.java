@@ -1,6 +1,6 @@
 package com.odonta.polity.input;
 
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.validation.ValidOfficeChange;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @ValidOfficeChange
 public record CreateOfficeChangeInput(
-    @NotNull ConstitutionOfficeChangeAction action,
+    @NotNull ConstitutionChangeOperation action,
     @NotBlank @Size(max = 64) @Pattern(regexp = "^[a-z][a-z0-9-]*$") String code,
     UUID jurisdictionId,
     @Size(max = 120) String name,
@@ -19,7 +19,7 @@ public record CreateOfficeChangeInput(
     @Min(1) Integer termLengthDays,
     @Min(1) Integer seatCount) {
   public CreateOfficeChangeInput(
-      ConstitutionOfficeChangeAction action,
+      ConstitutionChangeOperation action,
       String code,
       String name,
       String description,

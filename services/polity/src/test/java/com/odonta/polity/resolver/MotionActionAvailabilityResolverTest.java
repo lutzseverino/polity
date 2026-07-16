@@ -12,6 +12,7 @@ import com.odonta.polity.repository.ConstitutionalPowerRepository;
 import com.odonta.polity.repository.MotionProjection;
 import com.odonta.polity.repository.OfficeElectionCandidateRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.MotionActionAvailabilityResult;
 import com.odonta.polity.service.MembershipService;
 import java.time.Clock;
@@ -59,7 +60,7 @@ class MotionActionAvailabilityResolverTest {
         .allSatisfy(
             action -> {
               assertThat(action.available()).isFalse();
-              assertThat(action.reason()).isEqualTo("polity_disbanded");
+              assertThat(action.reason()).isEqualTo(ActionUnavailableReason.POLITY_DISBANDED);
             });
     verifyNoInteractions(appeals, authority, powers, memberships, candidates, terms);
   }

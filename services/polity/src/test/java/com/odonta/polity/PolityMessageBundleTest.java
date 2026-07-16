@@ -2,6 +2,8 @@ package com.odonta.polity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.odonta.polity.exception.PolityResource;
+import com.odonta.polity.result.ActionUnavailableReason;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,8 +19,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class PolityMessageBundleTest {
-  private static final Pattern ACTION_AVAILABILITY_REASON =
-      Pattern.compile("ActionAvailabilityResult\\.blocked\\(\\s*\"([a-z0-9_]+)\"");
   private static final Pattern API_EXCEPTION_CODE =
       Pattern.compile(
           "ApiException\\.(?:badRequest|conflict|forbidden|notFound|of)\\(\\s*(?:\\d+\\s*,\\s*)?\"([a-z0-9_]+)\"");
@@ -60,24 +60,31 @@ class PolityMessageBundleTest {
   }
 
   private Set<String> errorCodes() throws IOException {
+    Set<String> errorCodes;
     try (var files =
         Files.find(
             Path.of("src/main/java"), Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile())) {
-      return files
-          .filter(path -> path.toString().endsWith(".java"))
-          .flatMap(
-              path -> {
-                try {
-                  String content = Files.readString(path);
-                  return java.util.stream.Stream.concat(
-                      matches(API_EXCEPTION_CODE, content),
-                      matches(ACTION_AVAILABILITY_REASON, content));
-                } catch (IOException exception) {
-                  throw new java.io.UncheckedIOException(exception);
-                }
-              })
-          .collect(Collectors.toCollection(TreeSet::new));
+      errorCodes =
+          files
+              .filter(path -> path.toString().endsWith(".java"))
+              .flatMap(
+                  path -> {
+                    try {
+                      String content = Files.readString(path);
+                      return matches(API_EXCEPTION_CODE, content);
+                    } catch (IOException exception) {
+                      throw new java.io.UncheckedIOException(exception);
+                    }
+                  })
+              .collect(Collectors.toCollection(TreeSet::new));
     }
+    java.util.Arrays.stream(ActionUnavailableReason.values())
+        .map(ActionUnavailableReason::wireValue)
+        .forEach(errorCodes::add);
+    java.util.Arrays.stream(PolityResource.values())
+        .map(PolityResource::notFoundCode)
+        .forEach(errorCodes::add);
+    return errorCodes;
   }
 
   private java.util.stream.Stream<String> matches(Pattern pattern, String content) {

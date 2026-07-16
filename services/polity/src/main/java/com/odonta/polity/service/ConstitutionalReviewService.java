@@ -1,8 +1,8 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.ConstitutionalReviewApplicationMapper;
 import com.odonta.polity.repository.ConstitutionalReviewProjection;
 import com.odonta.polity.repository.ConstitutionalReviewRepository;
@@ -84,8 +84,7 @@ public class ConstitutionalReviewService {
       Map<UUID, OfficialRecordProjection> recordsById, UUID targetRecordId) {
     OfficialRecordProjection target = recordsById.get(targetRecordId);
     if (target == null) {
-      throw ApiException.notFound(
-          "official_record_entry_not_found", "Official record entry not found.");
+      throw PolityResource.OFFICIAL_RECORD_ENTRY.notFound();
     }
     return target;
   }
@@ -94,7 +93,7 @@ public class ConstitutionalReviewService {
       Map<UUID, String> memberNames, UUID petitionerMembershipId) {
     String petitionerName = memberNames.get(petitionerMembershipId);
     if (petitionerName == null) {
-      throw ApiException.notFound("member_not_found", "Member not found.");
+      throw PolityResource.MEMBER.notFound();
     }
     return petitionerName;
   }

@@ -11,8 +11,7 @@ import com.odonta.polity.input.CreateProcedureChangeInput;
 import com.odonta.polity.model.ConstitutionAmendmentPowerState;
 import com.odonta.polity.model.ConstitutionAmendmentProcedureState;
 import com.odonta.polity.model.ConstitutionAmendmentState;
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.PowerCode;
@@ -40,15 +39,11 @@ class ConstitutionAmendmentEvaluatorTest {
             "Adjust the steward office.",
             List.of(
                 new CreateInstitutionChangeInput(
-                    ConstitutionInstitutionChangeAction.REVISE,
-                    institutionId,
-                    null,
-                    "  Council  ",
-                    null)),
+                    ConstitutionChangeOperation.REVISE, institutionId, null, "  Council  ", null)),
             List.of(),
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.REVISE,
+                    ConstitutionChangeOperation.REVISE,
                     "steward",
                     null,
                     "  Steward  ",
@@ -84,13 +79,7 @@ class ConstitutionAmendmentEvaluatorTest {
             List.of(),
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.RETIRE,
-                    "steward",
-                    null,
-                    null,
-                    null,
-                    null,
-                    null)),
+                    ConstitutionChangeOperation.RETIRE, "steward", null, null, null, null, null)),
             List.of());
 
     assertThatThrownBy(() -> evaluator.evaluate(state, input))
@@ -121,7 +110,7 @@ class ConstitutionAmendmentEvaluatorTest {
             List.of(),
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.REVISE, "steward", null, null, null, null, 1)),
+                    ConstitutionChangeOperation.REVISE, "steward", null, null, null, null, 1)),
             List.of());
 
     assertThatThrownBy(() -> evaluator.evaluate(state, input))
@@ -174,7 +163,7 @@ class ConstitutionAmendmentEvaluatorTest {
             List.of(),
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.CREATE,
+                    ConstitutionChangeOperation.CREATE,
                     "steward",
                     jurisdictionId,
                     "Steward",
@@ -220,13 +209,7 @@ class ConstitutionAmendmentEvaluatorTest {
                     null)),
             List.of(
                 new CreateOfficeChangeInput(
-                    ConstitutionOfficeChangeAction.RETIRE,
-                    "steward",
-                    null,
-                    null,
-                    null,
-                    null,
-                    null)),
+                    ConstitutionChangeOperation.RETIRE, "steward", null, null, null, null, null)),
             List.of(
                 new CreatePowerChangeInput(
                     PowerCode.REQUEST_CERTIFICATION, PowerHolderScope.ACTIVE_MEMBER, null)));

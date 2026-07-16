@@ -34,6 +34,7 @@ import com.odonta.polity.input.CreatePowerChangeInput;
 import com.odonta.polity.input.CreateProcedureChangeInput;
 import com.odonta.polity.input.CreateSanctionMotionInput;
 import com.odonta.polity.input.RespondOfficeElectionCandidacyInput;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.OfficeElectionCandidateRoundTallyResult;
 import com.odonta.polity.model.OfficeElectionRoundResult;
 import com.odonta.polity.model.VotingResult;
@@ -68,11 +69,59 @@ public interface MotionTransportMapper {
 
   CreateInstitutionChangeInput toInput(CreateInstitutionChangeRequest request);
 
+  default ConstitutionChangeOperation toOperation(
+      com.odonta.polity.api.model.ConstitutionInstitutionChangeAction action) {
+    if (action == null) {
+      return null;
+    }
+    return switch (action) {
+      case CREATE -> ConstitutionChangeOperation.CREATE;
+      case RETIRE -> ConstitutionChangeOperation.RETIRE;
+      case REVISE -> ConstitutionChangeOperation.REVISE;
+    };
+  }
+
   CreateDisbandmentMotionInput toInput(CreateDisbandmentMotionRequest request);
 
   CreateProcedureChangeInput toInput(CreateProcedureChangeRequest request);
 
   CreateOfficeChangeInput toInput(CreateOfficeChangeRequest request);
+
+  default ConstitutionChangeOperation toOperation(
+      com.odonta.polity.api.model.ConstitutionOfficeChangeAction action) {
+    if (action == null) {
+      return null;
+    }
+    return switch (action) {
+      case CREATE -> ConstitutionChangeOperation.CREATE;
+      case RETIRE -> ConstitutionChangeOperation.RETIRE;
+      case REVISE -> ConstitutionChangeOperation.REVISE;
+    };
+  }
+
+  default com.odonta.polity.api.model.ConstitutionInstitutionChangeAction toInstitutionChangeAction(
+      ConstitutionChangeOperation operation) {
+    if (operation == null) {
+      return null;
+    }
+    return switch (operation) {
+      case CREATE -> com.odonta.polity.api.model.ConstitutionInstitutionChangeAction.CREATE;
+      case RETIRE -> com.odonta.polity.api.model.ConstitutionInstitutionChangeAction.RETIRE;
+      case REVISE -> com.odonta.polity.api.model.ConstitutionInstitutionChangeAction.REVISE;
+    };
+  }
+
+  default com.odonta.polity.api.model.ConstitutionOfficeChangeAction toOfficeChangeAction(
+      ConstitutionChangeOperation operation) {
+    if (operation == null) {
+      return null;
+    }
+    return switch (operation) {
+      case CREATE -> com.odonta.polity.api.model.ConstitutionOfficeChangeAction.CREATE;
+      case RETIRE -> com.odonta.polity.api.model.ConstitutionOfficeChangeAction.RETIRE;
+      case REVISE -> com.odonta.polity.api.model.ConstitutionOfficeChangeAction.REVISE;
+    };
+  }
 
   CreatePowerChangeInput toInput(CreatePowerChangeRequest request);
 

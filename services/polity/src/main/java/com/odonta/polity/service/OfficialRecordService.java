@@ -1,8 +1,10 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
+import static com.odonta.polity.exception.RequiredResource.required;
+
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.OfficialRecordApplicationMapper;
 import com.odonta.polity.model.OfficialRecordContext;
 import com.odonta.polity.model.OfficialRecordEntry;
@@ -104,23 +106,11 @@ public class OfficialRecordService {
       Map<UUID, String> actorNames) {
     ConstitutionVersionProjection constitution =
         required(
-            constitutionsById,
-            projection.getConstitutionVersionId(),
-            "constitution_not_found",
-            "Constitution not found.");
+            constitutionsById, projection.getConstitutionVersionId(), PolityResource.CONSTITUTION);
     return mapper.toResult(
         projection,
-        required(
-            actorNames, projection.getActorMembershipId(), "member_not_found", "Member not found."),
+        required(actorNames, projection.getActorMembershipId(), PolityResource.MEMBER),
         constitution.getVersion());
-  }
-
-  private <T> T required(Map<UUID, T> values, UUID id, String code, String message) {
-    T value = values.get(id);
-    if (value == null) {
-      throw ApiException.notFound(code, message);
-    }
-    return value;
   }
 
   private int nextEntryNumber(UUID polityId) {

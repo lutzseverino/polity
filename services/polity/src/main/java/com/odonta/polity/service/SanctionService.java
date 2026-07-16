@@ -1,8 +1,8 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.SanctionApplicationMapper;
 import com.odonta.polity.model.SanctionStatus;
 import com.odonta.polity.repository.SanctionProjection;
@@ -64,7 +64,7 @@ public class SanctionService {
   private String requiredTargetName(Map<UUID, String> memberNames, UUID targetMembershipId) {
     String targetName = memberNames.get(targetMembershipId);
     if (targetName == null) {
-      throw ApiException.notFound("member_not_found", "Member not found.");
+      throw PolityResource.MEMBER.notFound();
     }
     return targetName;
   }

@@ -27,10 +27,15 @@ paths:
     get:
       tags: [Polities]
       operationId: listPolities
-      parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
+      summary: List polities accessible to the current user.
+      description: When query is supplied, only polity names containing that text are returned.
+      parameters:
+        - { $ref: "#/components/parameters/SearchQuery" }
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PageSize" }
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Polities, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PolityResponse" } } } } }
+        "200": { description: Polities, content: { application/json: { schema: { $ref: "#/components/schemas/PolityPageResponse" } } } }
     post:
       tags: [Polities]
       operationId: createPolity
@@ -86,7 +91,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Members, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } } } } }
+        "200": { description: Members, content: { application/json: { schema: { $ref: "#/components/schemas/MemberPageResponse" } } } }
   /polities/{polityId}/members/me/resignation:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
@@ -107,7 +112,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Membership invitations, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } } } } }
+        "200": { description: Membership invitations, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationPageResponse" } } } }
     post:
       tags: [Invitations]
       operationId: createPolityInvitation
@@ -124,7 +129,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Pending invitations for the current user, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } } } } }
+        "200": { description: Pending invitations for the current user, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationPageResponse" } } } }
   /invitations/{invitationId}/accept:
     parameters: [{ $ref: "#/components/parameters/InvitationId" }]
     post:
@@ -143,7 +148,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Motions, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/MotionResponse" } } } } }
+        "200": { description: Motions, content: { application/json: { schema: { $ref: "#/components/schemas/MotionPageResponse" } } } }
     post:
       tags: [Motions]
       operationId: createPolityMotion
@@ -290,7 +295,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Offices, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeResponse" } } } } }
+        "200": { description: Offices, content: { application/json: { schema: { $ref: "#/components/schemas/OfficePageResponse" } } } }
   /polities/{polityId}/office-terms:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -299,7 +304,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Office terms, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeTermResponse" } } } } }
+        "200": { description: Office terms, content: { application/json: { schema: { $ref: "#/components/schemas/OfficeTermPageResponse" } } } }
   /polities/{polityId}/sanctions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -308,7 +313,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Sanctions, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/SanctionResponse" } } } } }
+        "200": { description: Sanctions, content: { application/json: { schema: { $ref: "#/components/schemas/SanctionPageResponse" } } } }
   /polities/{polityId}/appeals:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -317,7 +322,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Appeals, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/AppealResponse" } } } } }
+        "200": { description: Appeals, content: { application/json: { schema: { $ref: "#/components/schemas/AppealPageResponse" } } } }
   /polities/{polityId}/office-term-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -326,7 +331,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Office term reviews, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficeTermReviewResponse" } } } } }
+        "200": { description: Office term reviews, content: { application/json: { schema: { $ref: "#/components/schemas/OfficeTermReviewPageResponse" } } } }
   /polities/{polityId}/constitutional-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -335,7 +340,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Constitutional reviews, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ConstitutionalReviewResponse" } } } } }
+        "200": { description: Constitutional reviews, content: { application/json: { schema: { $ref: "#/components/schemas/ConstitutionalReviewPageResponse" } } } }
   /polities/{polityId}/record:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -344,7 +349,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Official record, headers: { X-Page: { $ref: "#/components/headers/XPage" }, X-Page-Size: { $ref: "#/components/headers/XPageSize" }, X-Total-Count: { $ref: "#/components/headers/XTotalCount" } }, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/OfficialRecordEntryResponse" } } } } }
+        "200": { description: Official record, content: { application/json: { schema: { $ref: "#/components/schemas/OfficialRecordEntryPageResponse" } } } }
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
@@ -352,6 +357,12 @@ components:
     PolityId: { name: polityId, in: path, required: true, schema: { type: string, format: uuid } }
     MotionId: { name: motionId, in: path, required: true, schema: { type: string, format: uuid } }
     InvitationId: { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
+    SearchQuery:
+      name: query
+      in: query
+      required: false
+      description: Case-insensitive literal text used to search a collection. Blank values are ignored.
+      schema: { type: string, maxLength: 120 }
     Page:
       name: page
       in: query
@@ -364,16 +375,6 @@ components:
       required: false
       description: Number of items per page.
       schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
-  headers:
-    XPage:
-      description: Zero-based page index returned.
-      schema: { type: integer, minimum: 0 }
-    XPageSize:
-      description: Requested page size.
-      schema: { type: integer, minimum: 1, maximum: 100 }
-    XTotalCount:
-      description: Total number of matching items across all pages.
-      schema: { type: integer, format: int64, minimum: 0 }
   responses:
     BadRequest:
       description: Invalid request.
@@ -400,6 +401,80 @@ components:
         code: { type: string }
         message: { type: string }
         details: { type: object, additionalProperties: true }
+    PageMetadata:
+      type: object
+      required: [size, number, totalElements, totalPages]
+      properties:
+        size: { type: integer, format: int64, minimum: 1 }
+        number: { type: integer, format: int64, minimum: 0 }
+        totalElements: { type: integer, format: int64, minimum: 0 }
+        totalPages: { type: integer, format: int64, minimum: 0 }
+    PolityPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/PolityResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    MemberPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    MemberInvitationPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    MotionPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/MotionResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    OfficePageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/OfficeResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    OfficeTermPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/OfficeTermResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    SanctionPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/SanctionResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    AppealPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/AppealResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    OfficeTermReviewPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/OfficeTermReviewResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    ConstitutionalReviewPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/ConstitutionalReviewResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
+    OfficialRecordEntryPageResponse:
+      type: object
+      required: [content, page]
+      properties:
+        content: { type: array, items: { $ref: "#/components/schemas/OfficialRecordEntryResponse" } }
+        page: { $ref: "#/components/schemas/PageMetadata" }
     CreatePolityRequest:
       type: object
       required: [name, visibility]
@@ -636,12 +711,38 @@ components:
         institutionName: { type: string }
         institutionNameKey: { type: string }
         createdAt: { type: string, format: date-time }
+    ActionUnavailableReason:
+      type: string
+      enum:
+        - appeal_procedure_unavailable
+        - candidacy_not_found
+        - candidacy_response_closed
+        - certification_not_open
+        - constitution_superseded
+        - constitutional_authority_missing
+        - constitutional_office_vacant
+        - constitutional_power_missing
+        - last_member_resignation_unavailable
+        - motion_not_office_election
+        - motion_not_voting
+        - office_election_ballot_required
+        - political_standing_required
+        - polity_disbanded
+        - polity_membership_required
+        - procedure_electorate_below_minimum
+        - procedure_electorate_empty
+        - procedure_electorate_office_vacant
+        - procedure_missing
+        - provisional_founder_resignation_unavailable
+        - vote_ineligible
+        - voting_closed
+        - voting_not_open
     ActionAvailabilityResponse:
       type: object
       required: [available]
       properties:
         available: { type: boolean }
-        reason: { type: string }
+        reason: { $ref: "#/components/schemas/ActionUnavailableReason" }
         reasonMessage: { type: string }
     GovernmentReadinessStatus:
       type: string

@@ -1,6 +1,6 @@
 package com.odonta.polity.resolver;
 
-import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.GovernmentFormationApplicationMapper;
 import com.odonta.polity.mapper.GovernmentStructureApplicationMapper;
 import com.odonta.polity.mapper.JurisdictionApplicationMapper;
@@ -28,10 +28,7 @@ public class GovernmentStructureResolver {
   @Transactional(readOnly = true)
   public GovernmentStructureResult resolve(UUID polityId, UUID userId) {
     var constitution = constitutions.get(polityId, userId);
-    var polity =
-        polities
-            .findEntityById(polityId)
-            .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+    var polity = polities.findEntityById(polityId).orElseThrow(PolityResource.POLITY::notFound);
     var jurisdictionResults =
         jurisdictions.findProjectionsByPolityId(polityId).stream()
             .map(jurisdictionMapper::toResult)

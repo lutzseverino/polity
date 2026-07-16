@@ -97,6 +97,19 @@
               <generatorName>spring</generatorName>
               <apiPackage>com.odonta.polity.api</apiPackage>
               <modelPackage>com.odonta.polity.api.model</modelPackage>
+              <schemaMappings>
+                <schemaMapping>PolityPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>MemberPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>MemberInvitationPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>MotionPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>OfficePageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>OfficeTermPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>SanctionPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>AppealPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>OfficeTermReviewPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>ConstitutionalReviewPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+                <schemaMapping>OfficialRecordEntryPageResponse=org.springframework.data.web.PagedModel</schemaMapping>
+              </schemaMappings>
               <generateApiDocumentation>false</generateApiDocumentation>
               <generateModelDocumentation>false</generateModelDocumentation>
               <generateSupportingFiles>false</generateSupportingFiles>

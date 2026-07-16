@@ -1,7 +1,9 @@
 package com.odonta.polity.resolver;
 
-import com.odonta.common.api.ApiException;
+import static com.odonta.polity.exception.RequiredResource.required;
+
 import com.odonta.polity.evaluator.VotingEvaluator;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.CertificationApplicationMapper;
 import com.odonta.polity.mapper.MotionApplicationMapper;
 import com.odonta.polity.model.CertificationModality;
@@ -65,7 +67,7 @@ public class MotionResultResolver {
     MotionProjection motion =
         motions
             .findProjectedByIdAndPolityId(motionId, polityId)
-            .orElseThrow(() -> ApiException.notFound("motion_not_found", "Motion not found."));
+            .orElseThrow(PolityResource.MOTION::notFound);
     return resolveAll(polityId, List.of(motion), currentMembershipId).getFirst();
   }
 
@@ -79,9 +81,7 @@ public class MotionResultResolver {
       return List.of();
     }
     PolityProjection polity =
-        polities
-            .findProjectedById(polityId)
-            .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+        polities.findProjectedById(polityId).orElseThrow(PolityResource.POLITY::notFound);
     List<UUID> motionIds = motionList.stream().map(MotionProjection::getId).distinct().toList();
     Set<UUID> constitutionIds =
         motionList.stream()
@@ -147,7 +147,7 @@ public class MotionResultResolver {
     MembershipProjection currentMember =
         currentMembershipId == null
             ? null
-            : required(memberById, currentMembershipId, "member_not_found", "Member not found.");
+            : required(memberById, currentMembershipId, PolityResource.MEMBER);
     Set<UUID> eligibleMotionIds =
         currentMembershipId == null
             ? Set.of()
@@ -167,23 +167,14 @@ public class MotionResultResolver {
         .map(
             motion -> {
               ProcedureProjection procedure =
-                  required(
-                      procedureById,
-                      motion.getProcedureId(),
-                      "procedure_not_found",
-                      "Procedure not found.");
+                  required(procedureById, motion.getProcedureId(), PolityResource.PROCEDURE);
               ConstitutionVersionProjection constitution =
                   required(
                       constitutionById,
                       motion.getConstitutionVersionId(),
-                      "constitution_not_found",
-                      "Constitution not found.");
+                      PolityResource.CONSTITUTION);
               MembershipProjection introducer =
-                  required(
-                      memberById,
-                      motion.getIntroducedBy(),
-                      "member_not_found",
-                      "Member not found.");
+                  required(memberById, motion.getIntroducedBy(), PolityResource.MEMBER);
               List<VoteProjection> motionVotes =
                   votesByMotion.getOrDefault(motion.getId(), List.of());
               CertificationProjection certification = certificationByMotion.get(motion.getId());
@@ -254,13 +245,5 @@ public class MotionResultResolver {
         .map(VoteProjection::getChoice)
         .findFirst()
         .orElse(null);
-  }
-
-  private <T> T required(Map<UUID, T> values, UUID id, String code, String message) {
-    T value = values.get(id);
-    if (value == null) {
-      throw ApiException.notFound(code, message);
-    }
-    return value;
   }
 }

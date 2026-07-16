@@ -28,6 +28,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List polities accessible to the current user.
+         * @description When query is supplied, only polity names containing that text are returned.
+         */
         get: operations["listPolities"];
         put?: never;
         post: operations["createPolity"];
@@ -578,6 +582,60 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        PageMetadata: {
+            /** Format: int64 */
+            size: number;
+            /** Format: int64 */
+            number: number;
+            /** Format: int64 */
+            totalElements: number;
+            /** Format: int64 */
+            totalPages: number;
+        };
+        PolityPageResponse: {
+            content: components["schemas"]["PolityResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        MemberPageResponse: {
+            content: components["schemas"]["MemberResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        MemberInvitationPageResponse: {
+            content: components["schemas"]["MemberInvitationResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        MotionPageResponse: {
+            content: components["schemas"]["MotionResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        OfficePageResponse: {
+            content: components["schemas"]["OfficeResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        OfficeTermPageResponse: {
+            content: components["schemas"]["OfficeTermResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        SanctionPageResponse: {
+            content: components["schemas"]["SanctionResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        AppealPageResponse: {
+            content: components["schemas"]["AppealResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        OfficeTermReviewPageResponse: {
+            content: components["schemas"]["OfficeTermReviewResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        ConstitutionalReviewPageResponse: {
+            content: components["schemas"]["ConstitutionalReviewResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
+        OfficialRecordEntryPageResponse: {
+            content: components["schemas"]["OfficialRecordEntryResponse"][];
+            page: components["schemas"]["PageMetadata"];
+        };
         CreatePolityRequest: {
             name: string;
             visibility: components["schemas"]["PolityVisibility"];
@@ -746,9 +804,11 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        /** @enum {string} */
+        ActionUnavailableReason: "appeal_procedure_unavailable" | "candidacy_not_found" | "candidacy_response_closed" | "certification_not_open" | "constitution_superseded" | "constitutional_authority_missing" | "constitutional_office_vacant" | "constitutional_power_missing" | "last_member_resignation_unavailable" | "motion_not_office_election" | "motion_not_voting" | "office_election_ballot_required" | "political_standing_required" | "polity_disbanded" | "polity_membership_required" | "procedure_electorate_below_minimum" | "procedure_electorate_empty" | "procedure_electorate_office_vacant" | "procedure_missing" | "provisional_founder_resignation_unavailable" | "vote_ineligible" | "voting_closed" | "voting_not_open";
         ActionAvailabilityResponse: {
             available: boolean;
-            reason?: string;
+            reason?: components["schemas"]["ActionUnavailableReason"];
             reasonMessage?: string;
         };
         /** @enum {string} */
@@ -1247,20 +1307,15 @@ export interface components {
         PolityId: string;
         MotionId: string;
         InvitationId: string;
+        /** @description Case-insensitive literal text used to search a collection. Blank values are ignored. */
+        SearchQuery: string;
         /** @description Zero-based page index. */
         Page: number;
         /** @description Number of items per page. */
         PageSize: number;
     };
     requestBodies: never;
-    headers: {
-        /** @description Zero-based page index returned. */
-        XPage: number;
-        /** @description Requested page size. */
-        XPageSize: number;
-        /** @description Total number of matching items across all pages. */
-        XTotalCount: number;
-    };
+    headers: never;
     pathItems: never;
 }
 export type $defs = Record<string, never>;
@@ -1287,6 +1342,8 @@ export interface operations {
     listPolities: {
         parameters: {
             query?: {
+                /** @description Case-insensitive literal text used to search a collection. Blank values are ignored. */
+                query?: components["parameters"]["SearchQuery"];
                 /** @description Zero-based page index. */
                 page?: components["parameters"]["Page"];
                 /** @description Number of items per page. */
@@ -1301,13 +1358,10 @@ export interface operations {
             /** @description Polities */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PolityResponse"][];
+                    "application/json": components["schemas"]["PolityPageResponse"];
                 };
             };
         };
@@ -1450,13 +1504,10 @@ export interface operations {
             /** @description Members */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberResponse"][];
+                    "application/json": components["schemas"]["MemberPageResponse"];
                 };
             };
         };
@@ -1503,13 +1554,10 @@ export interface operations {
             /** @description Membership invitations */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberInvitationResponse"][];
+                    "application/json": components["schemas"]["MemberInvitationPageResponse"];
                 };
             };
         };
@@ -1559,13 +1607,10 @@ export interface operations {
             /** @description Pending invitations for the current user */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberInvitationResponse"][];
+                    "application/json": components["schemas"]["MemberInvitationPageResponse"];
                 };
             };
         };
@@ -1613,13 +1658,10 @@ export interface operations {
             /** @description Motions */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MotionResponse"][];
+                    "application/json": components["schemas"]["MotionPageResponse"];
                 };
             };
         };
@@ -2003,13 +2045,10 @@ export interface operations {
             /** @description Offices */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfficeResponse"][];
+                    "application/json": components["schemas"]["OfficePageResponse"];
                 };
             };
         };
@@ -2033,13 +2072,10 @@ export interface operations {
             /** @description Office terms */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfficeTermResponse"][];
+                    "application/json": components["schemas"]["OfficeTermPageResponse"];
                 };
             };
         };
@@ -2063,13 +2099,10 @@ export interface operations {
             /** @description Sanctions */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SanctionResponse"][];
+                    "application/json": components["schemas"]["SanctionPageResponse"];
                 };
             };
         };
@@ -2093,13 +2126,10 @@ export interface operations {
             /** @description Appeals */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AppealResponse"][];
+                    "application/json": components["schemas"]["AppealPageResponse"];
                 };
             };
         };
@@ -2123,13 +2153,10 @@ export interface operations {
             /** @description Office term reviews */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfficeTermReviewResponse"][];
+                    "application/json": components["schemas"]["OfficeTermReviewPageResponse"];
                 };
             };
         };
@@ -2153,13 +2180,10 @@ export interface operations {
             /** @description Constitutional reviews */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConstitutionalReviewResponse"][];
+                    "application/json": components["schemas"]["ConstitutionalReviewPageResponse"];
                 };
             };
         };
@@ -2183,13 +2207,10 @@ export interface operations {
             /** @description Official record */
             200: {
                 headers: {
-                    "X-Page": components["headers"]["XPage"];
-                    "X-Page-Size": components["headers"]["XPageSize"];
-                    "X-Total-Count": components["headers"]["XTotalCount"];
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfficialRecordEntryResponse"][];
+                    "application/json": components["schemas"]["OfficialRecordEntryPageResponse"];
                 };
             };
         };

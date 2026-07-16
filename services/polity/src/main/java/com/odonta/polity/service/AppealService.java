@@ -1,8 +1,8 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.AppealApplicationMapper;
 import com.odonta.polity.repository.AppealProjection;
 import com.odonta.polity.repository.AppealRepository;
@@ -56,7 +56,7 @@ public class AppealService {
   private String requiredAppellantName(Map<UUID, String> memberNames, UUID appellantMembershipId) {
     String appellantName = memberNames.get(appellantMembershipId);
     if (appellantName == null) {
-      throw ApiException.notFound("member_not_found", "Member not found.");
+      throw PolityResource.MEMBER.notFound();
     }
     return appellantName;
   }

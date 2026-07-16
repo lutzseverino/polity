@@ -1,6 +1,7 @@
 package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Membership;
@@ -81,8 +82,6 @@ final class SanctionEffect implements MotionEffect {
   }
 
   private Membership membership(UUID membershipId) {
-    return memberships
-        .findEntityById(membershipId)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 }

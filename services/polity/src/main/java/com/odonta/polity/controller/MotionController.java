@@ -17,9 +17,9 @@ import com.odonta.polity.api.model.RespondOfficeElectionCandidacyRequest;
 import com.odonta.polity.mapper.MotionTransportMapper;
 import com.odonta.polity.service.MotionService;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -109,8 +109,7 @@ public class MotionController implements MotionsApi {
   }
 
   @Override
-  public ResponseEntity<List<MotionResponse>> listPolityMotions(
-      UUID polityId, Integer page, Integer size) {
+  public ResponseEntity<PagedModel> listPolityMotions(UUID polityId, Integer page, Integer size) {
     return PageResponses.ok(
         motions.list(polityId, users.currentUser().id(), page, size), mapper::toResponses);
   }

@@ -1,6 +1,7 @@
 package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Membership;
@@ -56,8 +57,7 @@ final class OfficeTermReviewEffect implements MotionEffect {
     OfficeTerm term =
         officeTerms
             .findEntityByIdAndPolityId(proposal.getOfficeTermId(), motion.getPolityId())
-            .orElseThrow(
-                () -> ApiException.notFound("office_term_not_found", "Office term not found."));
+            .orElseThrow(PolityResource.OFFICE_TERM::notFound);
     if (term.getStatus() != OfficeTermStatus.ACTIVE || !term.getEndsAt().isAfter(now)) {
       throw ApiException.conflict(
           "office_term_not_vacatable", "Only active office terms can be vacated.");
@@ -80,7 +80,7 @@ final class OfficeTermReviewEffect implements MotionEffect {
     Office office =
         offices
             .findEntityByIdAndPolityId(term.getOfficeId(), motion.getPolityId())
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+            .orElseThrow(PolityResource.OFFICE::notFound);
     Membership holder = membership(term.getMembershipId());
     officialRecords.append(
         motion.getPolityId(),
@@ -107,8 +107,6 @@ final class OfficeTermReviewEffect implements MotionEffect {
   }
 
   private Membership membership(UUID membershipId) {
-    return memberships
-        .findEntityById(membershipId)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 }
