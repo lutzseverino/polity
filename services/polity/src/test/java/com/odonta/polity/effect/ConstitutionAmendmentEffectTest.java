@@ -7,9 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odonta.polity.model.ConstitutionAmendmentProposal;
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.ConstitutionInstitutionChangeProposal;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
 import com.odonta.polity.model.ConstitutionOfficeChangeProposal;
 import com.odonta.polity.model.ConstitutionPowerChangeProposal;
 import com.odonta.polity.model.ConstitutionProcedureChangeProposal;
@@ -273,7 +272,7 @@ class ConstitutionAmendmentEffectTest {
         new ConstitutionOfficeChangeProposal(
             polityId,
             proposal.getId(),
-            ConstitutionOfficeChangeAction.CREATE,
+            ConstitutionChangeOperation.CREATE,
             "clerk",
             null,
             "Clerk",
@@ -384,7 +383,7 @@ class ConstitutionAmendmentEffectTest {
         new ConstitutionInstitutionChangeProposal(
             polityId,
             proposal.getId(),
-            ConstitutionInstitutionChangeAction.RETIRE,
+            ConstitutionChangeOperation.RETIRE,
             assemblyId,
             null,
             null,
@@ -393,7 +392,7 @@ class ConstitutionAmendmentEffectTest {
         new ConstitutionInstitutionChangeProposal(
             polityId,
             proposal.getId(),
-            ConstitutionInstitutionChangeAction.REVISE,
+            ConstitutionChangeOperation.REVISE,
             courtId,
             null,
             "High Court",
@@ -402,7 +401,7 @@ class ConstitutionAmendmentEffectTest {
         new ConstitutionInstitutionChangeProposal(
             polityId,
             proposal.getId(),
-            ConstitutionInstitutionChangeAction.CREATE,
+            ConstitutionChangeOperation.CREATE,
             null,
             jurisdictionId,
             "Audit Chamber",

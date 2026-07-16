@@ -49,22 +49,7 @@ public class ConstitutionalPower extends AuditedEntity {
       PowerCode code,
       String name,
       PowerHolderScope holderScope) {
-    this(polityId, constitutionVersionId, code, name, null, holderScope);
-  }
-
-  public ConstitutionalPower(
-      UUID polityId,
-      UUID constitutionVersionId,
-      PowerCode code,
-      String name,
-      ConstitutionalPowerTemplateKey templateKey,
-      PowerHolderScope holderScope) {
-    this.polityId = polityId;
-    this.constitutionVersionId = constitutionVersionId;
-    this.code = code;
-    this.name = name;
-    this.nameKey = templateKey == null ? null : templateKey.nameKey();
-    this.holderScope = holderScope;
+    this(polityId, constitutionVersionId, code, name, null, holderScope, null);
   }
 
   public ConstitutionalPower(
@@ -73,23 +58,38 @@ public class ConstitutionalPower extends AuditedEntity {
       PowerCode code,
       String name,
       String holderOfficeCode) {
-    this(polityId, constitutionVersionId, code, name, null, holderOfficeCode);
+    this(
+        polityId,
+        constitutionVersionId,
+        code,
+        name,
+        null,
+        PowerHolderScope.OFFICE,
+        holderOfficeCode);
   }
 
-  public ConstitutionalPower(
-      UUID polityId,
-      UUID constitutionVersionId,
-      PowerCode code,
-      String name,
-      ConstitutionalPowerTemplateKey templateKey,
-      String holderOfficeCode) {
-    this.polityId = polityId;
-    this.constitutionVersionId = constitutionVersionId;
-    this.code = code;
-    this.name = name;
-    this.nameKey = templateKey == null ? null : templateKey.nameKey();
-    this.holderScope = PowerHolderScope.OFFICE;
-    this.holderOfficeCode = holderOfficeCode;
+  public static ConstitutionalPower defaultNamed(
+      UUID polityId, UUID constitutionVersionId, PowerCode code, PowerHolderScope holderScope) {
+    return new ConstitutionalPower(
+        polityId,
+        constitutionVersionId,
+        code,
+        code.defaultStoredName(),
+        code.defaultNameKey(),
+        holderScope,
+        null);
+  }
+
+  public static ConstitutionalPower defaultNamedForOffice(
+      UUID polityId, UUID constitutionVersionId, PowerCode code, String holderOfficeCode) {
+    return new ConstitutionalPower(
+        polityId,
+        constitutionVersionId,
+        code,
+        code.defaultStoredName(),
+        code.defaultNameKey(),
+        PowerHolderScope.OFFICE,
+        holderOfficeCode);
   }
 
   public ConstitutionalPower copyTo(UUID constitutionVersionId) {

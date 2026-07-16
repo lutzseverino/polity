@@ -1,7 +1,10 @@
 package com.odonta.polity.resolver;
 
+import static com.odonta.polity.exception.RequiredResource.required;
+
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.MotionStatus;
@@ -19,6 +22,7 @@ import com.odonta.polity.repository.OfficeElectionCandidateRepository;
 import com.odonta.polity.repository.OfficeTermProjection;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.MotionActionAvailabilityResult;
 import com.odonta.polity.service.MembershipService;
 import java.time.Clock;
@@ -54,10 +58,10 @@ public class MotionActionAvailabilityResolver {
       return Map.of();
     }
     if (polityStatus == PolityStatus.DISBANDED) {
-      return unavailable(motions, "polity_disbanded");
+      return unavailable(motions, ActionUnavailableReason.POLITY_DISBANDED);
     }
     if (currentMember == null) {
-      return unavailable(motions, "polity_membership_required");
+      return unavailable(motions, ActionUnavailableReason.POLITY_MEMBERSHIP_REQUIRED);
     }
     UUID currentMembershipId = currentMember.getId();
     List<UUID> motionIds = motions.stream().map(MotionProjection::getId).distinct().toList();
@@ -102,7 +106,10 @@ public class MotionActionAvailabilityResolver {
                 motion ->
                     resolve(
                         motion,
-                        required(constitutions, motion.getConstitutionVersionId()),
+                        required(
+                            constitutions,
+                            motion.getConstitutionVersionId(),
+                            PolityResource.CONSTITUTION),
                         currentMember,
                         eligibleMotionIds,
                         candidacyMotionIds,
@@ -114,7 +121,7 @@ public class MotionActionAvailabilityResolver {
   }
 
   private Map<UUID, MotionActionAvailabilityResult> unavailable(
-      List<MotionProjection> motions, String reason) {
+      List<MotionProjection> motions, ActionUnavailableReason reason) {
     ActionAvailabilityResult unavailable = ActionAvailabilityResult.blocked(reason);
     MotionActionAvailabilityResult result =
         new MotionActionAvailabilityResult(unavailable, unavailable, unavailable, unavailable);
@@ -150,7 +157,8 @@ public class MotionActionAvailabilityResolver {
   private ActionAvailabilityResult voteAvailability(
       MotionProjection motion, Set<UUID> eligibleMotionIds, OffsetDateTime now) {
     if (motion.getEffectType() == EffectType.ELECT_OFFICE) {
-      return ActionAvailabilityResult.blocked("office_election_ballot_required");
+      return ActionAvailabilityResult.blocked(
+          ActionUnavailableReason.OFFICE_ELECTION_BALLOT_REQUIRED);
     }
     ActionAvailabilityResult window = votingWindowAvailability(motion, now);
     return window.available() ? electorAvailability(motion, eligibleMotionIds) : window;
@@ -159,7 +167,7 @@ public class MotionActionAvailabilityResolver {
   private ActionAvailabilityResult electionBallotAvailability(
       MotionProjection motion, Set<UUID> eligibleMotionIds, OffsetDateTime now) {
     if (motion.getEffectType() != EffectType.ELECT_OFFICE) {
-      return ActionAvailabilityResult.blocked("motion_not_office_election");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.MOTION_NOT_OFFICE_ELECTION);
     }
     ActionAvailabilityResult window = votingWindowAvailability(motion, now);
     return window.available() ? electorAvailability(motion, eligibleMotionIds) : window;
@@ -169,36 +177,36 @@ public class MotionActionAvailabilityResolver {
       MotionProjection motion, Set<UUID> eligibleMotionIds) {
     return eligibleMotionIds.contains(motion.getId())
         ? ActionAvailabilityResult.allowed()
-        : ActionAvailabilityResult.blocked("vote_ineligible");
+        : ActionAvailabilityResult.blocked(ActionUnavailableReason.VOTE_INELIGIBLE);
   }
 
   private ActionAvailabilityResult votingWindowAvailability(
       MotionProjection motion, OffsetDateTime now) {
     if (motion.getStatus() != MotionStatus.VOTING) {
-      return ActionAvailabilityResult.blocked("motion_not_voting");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.MOTION_NOT_VOTING);
     }
     if (now.isBefore(motion.getVotingOpensAt())) {
-      return ActionAvailabilityResult.blocked("voting_not_open");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.VOTING_NOT_OPEN);
     }
     return now.isBefore(motion.getVotingClosesAt())
         ? ActionAvailabilityResult.allowed()
-        : ActionAvailabilityResult.blocked("voting_closed");
+        : ActionAvailabilityResult.blocked(ActionUnavailableReason.VOTING_CLOSED);
   }
 
   private ActionAvailabilityResult candidacyResponseAvailability(
       MotionProjection motion, Set<UUID> candidacyMotionIds, OffsetDateTime now) {
     if (motion.getEffectType() != EffectType.ELECT_OFFICE) {
-      return ActionAvailabilityResult.blocked("motion_not_office_election");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.MOTION_NOT_OFFICE_ELECTION);
     }
     if (motion.getStatus() != MotionStatus.VOTING) {
-      return ActionAvailabilityResult.blocked("motion_not_voting");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.MOTION_NOT_VOTING);
     }
     if (!now.isBefore(motion.getVotingOpensAt())) {
-      return ActionAvailabilityResult.blocked("candidacy_response_closed");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.CANDIDACY_RESPONSE_CLOSED);
     }
     return candidacyMotionIds.contains(motion.getId())
         ? ActionAvailabilityResult.allowed()
-        : ActionAvailabilityResult.blocked("candidacy_not_found");
+        : ActionAvailabilityResult.blocked(ActionUnavailableReason.CANDIDACY_NOT_FOUND);
   }
 
   private ActionAvailabilityResult certificationAvailability(
@@ -211,13 +219,13 @@ public class MotionActionAvailabilityResolver {
       boolean standing,
       OffsetDateTime now) {
     if (motion.getStatus() != MotionStatus.VOTING) {
-      return ActionAvailabilityResult.blocked("motion_not_voting");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.MOTION_NOT_VOTING);
     }
     if (now.isBefore(motion.getCertificationOpensAt())) {
-      return ActionAvailabilityResult.blocked("certification_not_open");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.CERTIFICATION_NOT_OPEN);
     }
     if (constitution.getStatus() != ConstitutionStatus.RATIFIED) {
-      return ActionAvailabilityResult.blocked("constitution_superseded");
+      return ActionAvailabilityResult.blocked(ActionUnavailableReason.CONSTITUTION_SUPERSEDED);
     }
     boolean ownAppeal =
         motion.getEffectType() == EffectType.GRANT_APPEAL
@@ -228,18 +236,11 @@ public class MotionActionAvailabilityResolver {
     try {
       return authority.allows(member, power, heldTerms, standing, !ownAppeal, now)
           ? ActionAvailabilityResult.allowed()
-          : ActionAvailabilityResult.blocked("constitutional_authority_missing");
+          : ActionAvailabilityResult.blocked(
+              ActionUnavailableReason.CONSTITUTIONAL_AUTHORITY_MISSING);
     } catch (ApiException exception) {
-      return ActionAvailabilityResult.blocked(exception.code());
+      return ActionAvailabilityResult.blocked(
+          ActionUnavailableReason.fromWireValue(exception.code()));
     }
-  }
-
-  private ConstitutionVersionProjection required(
-      Map<UUID, ConstitutionVersionProjection> constitutions, UUID id) {
-    ConstitutionVersionProjection constitution = constitutions.get(id);
-    if (constitution == null) {
-      throw ApiException.notFound("constitution_not_found", "Constitution not found.");
-    }
-    return constitution;
   }
 }

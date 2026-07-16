@@ -1,10 +1,10 @@
 package com.odonta.polity.result;
 
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import java.util.UUID;
 
 public record ConstitutionOfficeChangeResult(
-    ConstitutionOfficeChangeAction action,
+    ConstitutionChangeOperation action,
     String code,
     UUID jurisdictionId,
     String name,

@@ -1,6 +1,8 @@
 package com.odonta.polity.resolver;
 
-import com.odonta.common.api.ApiException;
+import static com.odonta.polity.exception.RequiredResource.required;
+
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.PolityApplicationMapper;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.InstitutionKind;
@@ -72,23 +74,12 @@ public class PolitySummaryResolver {
         .map(
             polity -> {
               ConstitutionVersionProjection constitution =
-                  required(
-                      constitutionByPolity,
-                      polity.getId(),
-                      "constitution_not_found",
-                      "Constitution not found.");
+                  required(constitutionByPolity, polity.getId(), PolityResource.CONSTITUTION);
               JurisdictionProjection jurisdiction =
-                  required(
-                      jurisdictionByPolity,
-                      polity.getId(),
-                      "jurisdiction_not_found",
-                      "Jurisdiction not found.");
+                  required(jurisdictionByPolity, polity.getId(), PolityResource.JURISDICTION);
               InstitutionProjection institution =
                   required(
-                      institutionByConstitution,
-                      constitution.getId(),
-                      "institution_not_found",
-                      "Institution not found.");
+                      institutionByConstitution, constitution.getId(), PolityResource.INSTITUTION);
               return mapper.toSummary(
                   polity,
                   constitution.getVersion(),
@@ -120,13 +111,5 @@ public class PolitySummaryResolver {
       case ASSEMBLY -> 1;
       default -> 2;
     };
-  }
-
-  private <K, V> V required(Map<K, V> values, K key, String code, String message) {
-    V value = values.get(key);
-    if (value == null) {
-      throw ApiException.notFound(code, message);
-    }
-    return value;
   }
 }

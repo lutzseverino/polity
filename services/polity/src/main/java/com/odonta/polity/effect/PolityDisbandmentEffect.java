@@ -3,6 +3,7 @@ package com.odonta.polity.effect;
 import com.odonta.authorization.grant.Revocations;
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Membership;
@@ -43,9 +44,7 @@ final class PolityDisbandmentEffect implements MotionEffect {
   public void apply(
       Motion motion, Membership actor, ConstitutionVersion constitution, OffsetDateTime now) {
     Polity polity =
-        polities
-            .findEntityById(motion.getPolityId())
-            .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+        polities.findEntityById(motion.getPolityId()).orElseThrow(PolityResource.POLITY::notFound);
     if (polity.isDisbanded()) {
       throw ApiException.conflict(
           "polity_already_disbanded", "This polity has already been disbanded.");

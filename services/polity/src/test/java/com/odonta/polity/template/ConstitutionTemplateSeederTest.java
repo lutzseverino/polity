@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
-import com.odonta.polity.model.ConstitutionalPowerTemplateKey;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.InstitutionTemplateKey;
@@ -288,34 +287,24 @@ class ConstitutionTemplateSeederTest {
     assertThat(powerCaptor.getValue())
         .extracting(ConstitutionalPower::getCode, ConstitutionalPower::getNameKey)
         .containsExactly(
-            tuple(
-                PowerCode.INTRODUCE_MOTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_MOTION.nameKey()),
+            tuple(PowerCode.INTRODUCE_MOTION, PowerCode.INTRODUCE_MOTION.defaultNameKey()),
             tuple(
                 PowerCode.INTRODUCE_OFFICE_ELECTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_ELECTION.nameKey()),
-            tuple(
-                PowerCode.INTRODUCE_SANCTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_SANCTION.nameKey()),
-            tuple(
-                PowerCode.INTRODUCE_APPEAL,
-                ConstitutionalPowerTemplateKey.INTRODUCE_APPEAL.nameKey()),
+                PowerCode.INTRODUCE_OFFICE_ELECTION.defaultNameKey()),
+            tuple(PowerCode.INTRODUCE_SANCTION, PowerCode.INTRODUCE_SANCTION.defaultNameKey()),
+            tuple(PowerCode.INTRODUCE_APPEAL, PowerCode.INTRODUCE_APPEAL.defaultNameKey()),
             tuple(
                 PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
-                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_TERM_REVIEW.nameKey()),
+                PowerCode.INTRODUCE_OFFICE_TERM_REVIEW.defaultNameKey()),
             tuple(
                 PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
-                ConstitutionalPowerTemplateKey.INTRODUCE_CONSTITUTIONAL_REVIEW.nameKey()),
+                PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW.defaultNameKey()),
+            tuple(PowerCode.INTRODUCE_AMENDMENT, PowerCode.INTRODUCE_AMENDMENT.defaultNameKey()),
             tuple(
-                PowerCode.INTRODUCE_AMENDMENT,
-                ConstitutionalPowerTemplateKey.INTRODUCE_AMENDMENT.nameKey()),
+                PowerCode.INTRODUCE_DISBANDMENT, PowerCode.INTRODUCE_DISBANDMENT.defaultNameKey()),
+            tuple(PowerCode.ADMIT_MEMBER, PowerCode.ADMIT_MEMBER.defaultNameKey()),
             tuple(
-                PowerCode.INTRODUCE_DISBANDMENT,
-                ConstitutionalPowerTemplateKey.INTRODUCE_DISBANDMENT.nameKey()),
-            tuple(PowerCode.ADMIT_MEMBER, ConstitutionalPowerTemplateKey.ADMIT_MEMBER.nameKey()),
-            tuple(
-                PowerCode.REQUEST_CERTIFICATION,
-                ConstitutionalPowerTemplateKey.REQUEST_CERTIFICATION.nameKey()));
+                PowerCode.REQUEST_CERTIFICATION, PowerCode.REQUEST_CERTIFICATION.defaultNameKey()));
   }
 
   private <T> T withId(T entity) {

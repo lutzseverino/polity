@@ -12,9 +12,10 @@ public class ActionAvailabilityTransportText {
 
   @Named("availabilityReasonMessage")
   public String reasonMessage(ActionAvailabilityResult result) {
-    if (result == null || result.reason() == null || result.reason().isBlank()) {
+    if (result == null || result.reason() == null) {
       return null;
     }
-    return text.resolveName("api_error." + result.reason(), result.reason());
+    String reason = result.reason().wireValue();
+    return text.resolveName("api_error." + reason, reason);
   }
 }

@@ -2,6 +2,7 @@ package com.odonta.polity.service;
 
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
@@ -87,9 +88,7 @@ public class MembershipService {
   }
 
   Membership get(UUID membershipId) {
-    return memberships
-        .findEntityById(membershipId)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 
   public String displayName(UUID membershipId) {

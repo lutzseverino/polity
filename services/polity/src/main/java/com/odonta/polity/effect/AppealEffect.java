@@ -1,6 +1,7 @@
 package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.Appeal;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
@@ -51,7 +52,7 @@ final class AppealEffect implements MotionEffect {
     Sanction sanction =
         sanctions
             .findEntityByIdAndPolityId(proposal.getSanctionId(), motion.getPolityId())
-            .orElseThrow(() -> ApiException.notFound("sanction_not_found", "Sanction not found."));
+            .orElseThrow(PolityResource.SANCTION::notFound);
     if (sanction.isInactiveAt(now)) {
       throw ApiException.conflict("sanction_not_active", "Only active sanctions can be appealed.");
     }
@@ -87,8 +88,6 @@ final class AppealEffect implements MotionEffect {
   }
 
   private Membership membership(UUID membershipId) {
-    return memberships
-        .findEntityById(membershipId)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 }

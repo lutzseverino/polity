@@ -39,7 +39,8 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
         p.createdAt as createdAt
       from Polity p
       left join Membership m on m.polityId = p.id and m.userId = :userId and m.status = :membershipStatus
-      where p.visibility = :publicVisibility or m.id is not null
+      where (p.visibility = :publicVisibility or m.id is not null)
+        and (:query is null or locate(lower(:query), lower(p.name)) > 0)
       order by p.createdAt desc, p.id asc
       """,
       countQuery =
@@ -47,12 +48,14 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
       select count(distinct p.id)
       from Polity p
       left join Membership m on m.polityId = p.id and m.userId = :userId and m.status = :membershipStatus
-      where p.visibility = :publicVisibility or m.id is not null
+      where (p.visibility = :publicVisibility or m.id is not null)
+        and (:query is null or locate(lower(:query), lower(p.name)) > 0)
       """)
   Page<PolityProjection> findAccessibleProjections(
       UUID userId,
       MembershipStatus membershipStatus,
       PolityVisibility publicVisibility,
+      String query,
       Pageable pageable);
 
   Optional<PolityProjection> findProjectedById(UUID id);

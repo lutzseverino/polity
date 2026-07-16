@@ -9,7 +9,7 @@ import com.odonta.polity.input.ValidatedConstitutionAmendmentInput;
 import com.odonta.polity.model.ConstitutionAmendmentPowerState;
 import com.odonta.polity.model.ConstitutionAmendmentProcedureState;
 import com.odonta.polity.model.ConstitutionAmendmentState;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.OfficeElectionMethod;
@@ -207,7 +207,7 @@ public class ConstitutionAmendmentEvaluator {
       ConstitutionAmendmentState state, List<CreateOfficeChangeInput> officeChanges) {
     Set<String> codes = new HashSet<>(state.officeCodes());
     for (CreateOfficeChangeInput change : officeChanges) {
-      if (change.action() == ConstitutionOfficeChangeAction.RETIRE) {
+      if (change.action() == ConstitutionChangeOperation.RETIRE) {
         codes.remove(change.code());
       } else {
         codes.add(change.code());

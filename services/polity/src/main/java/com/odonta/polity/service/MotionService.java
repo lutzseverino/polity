@@ -11,6 +11,7 @@ import com.odonta.polity.evaluator.ConstitutionAmendmentEvaluationException;
 import com.odonta.polity.evaluator.ConstitutionAmendmentEvaluator;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.evaluator.VotingEvaluator;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.input.CastOfficeElectionBallotInput;
 import com.odonta.polity.input.CastVoteInput;
 import com.odonta.polity.input.CreateAppealMotionInput;
@@ -36,6 +37,7 @@ import com.odonta.polity.model.ConstitutionPowerChangeProposal;
 import com.odonta.polity.model.ConstitutionProcedureChangeProposal;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
+import com.odonta.polity.model.ConstitutionalMotionPath;
 import com.odonta.polity.model.ConstitutionalReviewProposal;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
@@ -184,9 +186,10 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_MOTION);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.ORDINARY_GOVERNANCE;
+    authority.require(introducer, constitution, path.introducingPower());
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.ORDINARY_RESOLUTION);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     Motion motion =
         introduceMotion(
@@ -199,7 +202,7 @@ public class MotionService {
             input.title(),
             input.body(),
             null,
-            PowerCode.INTRODUCE_MOTION,
+            path,
             now);
     return result(motion);
   }
@@ -212,9 +215,10 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_OFFICE_ELECTION);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.OFFICE_ELECTION;
+    authority.require(introducer, constitution, path.introducingPower());
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.OFFICE_ELECTION);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     Office office = currentOffice(input.officeId(), polityId, constitution);
     int seatsAvailable = requireOfficeVacancy(office, now);
@@ -240,7 +244,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_OFFICE_ELECTION,
+            path,
             now);
     officeElectionProposals.saveAndFlush(
         new OfficeElectionProposal(
@@ -273,11 +277,12 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_SANCTION);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.SANCTION;
+    authority.require(introducer, constitution, path.introducingPower());
     Membership target = activeMembership(input.targetMembershipId(), polityId);
     requireSanctionSafeguards(introducer, constitution, target, input.durationDays(), now);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.SANCTION);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     MotionTemplate template =
         MotionTemplate.of(
@@ -304,7 +309,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_SANCTION,
+            path,
             now);
     sanctionProposals.saveAndFlush(
         new SanctionProposal(
@@ -325,19 +330,20 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.APPEAL;
     Sanction sanction =
         sanctions
             .findEntityByIdAndPolityId(input.sanctionId(), polityId)
-            .orElseThrow(() -> ApiException.notFound("sanction_not_found", "Sanction not found."));
+            .orElseThrow(PolityResource.SANCTION::notFound);
     requireAppealable(polityId, sanction, now);
     if (sanction.getTargetMembershipId().equals(introducer.getId())) {
       authority.requireOwnAppealIntroduction(introducer, constitution);
     } else {
-      authority.require(introducer, constitution, PowerCode.INTRODUCE_APPEAL);
+      authority.require(introducer, constitution, path.introducingPower());
     }
     UUID sanctionIntroducerId = motion(polityId, sanction.getMotionId()).getIntroducedBy();
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.APPEAL);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     MotionTemplate template =
         MotionTemplate.of(
@@ -355,7 +361,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_APPEAL,
+            path,
             recusals(sanction.getTargetMembershipId(), introducer.getId(), sanctionIntroducerId),
             now);
     appealProposals.saveAndFlush(
@@ -376,16 +382,17 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_OFFICE_TERM_REVIEW);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.OFFICE_TERM_REVIEW;
+    authority.require(introducer, constitution, path.introducingPower());
     OfficeTerm term = reviewableOfficeTerm(input.officeTermId(), polityId, now);
     requireReviewable(polityId, term);
     Office office =
         offices
             .findEntityByIdAndPolityId(term.getOfficeId(), polityId)
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+            .orElseThrow(PolityResource.OFFICE::notFound);
     Membership officeHolder = membershipService.get(term.getMembershipId());
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.OFFICE_TERM_REVIEW);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     MotionTemplate template =
         MotionTemplate.of(
@@ -414,7 +421,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
+            path,
             recusals(introducer.getId(), term.getMembershipId()),
             now);
     officeTermReviewProposals.saveAndFlush(
@@ -431,11 +438,12 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.CONSTITUTIONAL_REVIEW;
+    authority.require(introducer, constitution, path.introducingPower());
     OfficialRecordEntry target = voidableOfficialAct(polityId, input.targetRecordId());
     requireConstitutionalReviewVoidRemedy(polityId, target, now);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.CONSTITUTIONAL_REVIEW);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     MotionTemplate template =
         MotionTemplate.of(
@@ -462,7 +470,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
+            path,
             recusalsForOfficialAct(introducer.getId(), target),
             now);
     constitutionalReviewProposals.saveAndFlush(
@@ -479,9 +487,10 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_AMENDMENT);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.CONSTITUTION_AMENDMENT;
+    authority.require(introducer, constitution, path.introducingPower());
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.CONSTITUTION_AMENDMENT);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     ValidatedConstitutionAmendmentInput plan;
     try {
@@ -508,7 +517,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_AMENDMENT,
+            path,
             now);
     ConstitutionAmendmentProposal proposal =
         amendmentProposals.saveAndFlush(
@@ -541,10 +550,11 @@ public class MotionService {
     polities.requireActive(polityId);
     Membership introducer = membershipService.active(polityId, actor.id());
     ConstitutionVersion constitution = polities.constitution(polityId);
-    authority.require(introducer, constitution, PowerCode.INTRODUCE_DISBANDMENT);
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.DISBANDMENT;
+    authority.require(introducer, constitution, path.introducingPower());
     polities.requireDisbandmentGovernment(polityId);
     Jurisdiction jurisdiction = polities.jurisdiction(polityId);
-    Procedure procedure = procedure(constitution.getId(), Procedure.DISBANDMENT);
+    Procedure procedure = procedure(constitution.getId(), path);
     Institution institution = polities.institution(polityId, procedure);
     MotionTemplate template =
         MotionTemplate.of(
@@ -561,7 +571,7 @@ public class MotionService {
             template.storedTitle(),
             template.storedBody(),
             template,
-            PowerCode.INTRODUCE_DISBANDMENT,
+            path,
             now);
     return result(motion);
   }
@@ -778,8 +788,7 @@ public class MotionService {
     ConstitutionVersion constitution =
         constitutions
             .findEntityById(motion.getConstitutionVersionId())
-            .orElseThrow(
-                () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+            .orElseThrow(PolityResource.CONSTITUTION::notFound);
     if (constitution.getStatus() != ConstitutionStatus.RATIFIED) {
       throw ApiException.conflict(
           "constitution_superseded",
@@ -793,8 +802,7 @@ public class MotionService {
     Procedure procedure =
         procedures
             .findEntityById(motion.getProcedureId())
-            .orElseThrow(
-                () -> ApiException.notFound("procedure_not_found", "Procedure not found."));
+            .orElseThrow(PolityResource.PROCEDURE::notFound);
     int eligible = Math.toIntExact(electors.countByMotionId(motionId));
     boolean passed;
     Certification certification;
@@ -995,13 +1003,17 @@ public class MotionService {
   private Motion motion(UUID polityId, UUID motionId) {
     return motions
         .findEntityByIdAndPolityId(motionId, polityId)
-        .orElseThrow(() -> ApiException.notFound("motion_not_found", "Motion not found."));
+        .orElseThrow(PolityResource.MOTION::notFound);
   }
 
   private Procedure procedure(UUID constitutionId, String code) {
     return procedures
         .findEntityByConstitutionVersionIdAndCode(constitutionId, code)
-        .orElseThrow(() -> ApiException.notFound("procedure_not_found", "Procedure not found."));
+        .orElseThrow(PolityResource.PROCEDURE::notFound);
+  }
+
+  private Procedure procedure(UUID constitutionId, ConstitutionalMotionPath path) {
+    return procedure(constitutionId, path.procedureCode());
   }
 
   private void requireVotingStatus(Motion motion) {
@@ -1045,7 +1057,7 @@ public class MotionService {
       String title,
       String body,
       MotionTemplate template,
-      PowerCode introducingPower,
+      ConstitutionalMotionPath path,
       OffsetDateTime now) {
     return introduceMotion(
         polityId,
@@ -1057,7 +1069,7 @@ public class MotionService {
         title,
         body,
         template,
-        introducingPower,
+        path,
         Set.of(),
         now);
   }
@@ -1072,7 +1084,7 @@ public class MotionService {
       String title,
       String body,
       MotionTemplate template,
-      PowerCode introducingPower,
+      ConstitutionalMotionPath path,
       Set<UUID> recusedMembershipIds,
       OffsetDateTime now) {
     OffsetDateTime votingOpensAt = now.plusHours(procedure.getMinimumNoticeHours());
@@ -1111,7 +1123,8 @@ public class MotionService {
         introducer.getId(),
         OfficialRecordType.MOTION_INTRODUCED,
         motion.getId(),
-        OfficialRecordContext.motion(motion, introducingPower, OfficialRecordOutcome.INTRODUCED),
+        OfficialRecordContext.motion(
+            motion, path.introducingPower(), OfficialRecordOutcome.INTRODUCED),
         OfficialRecordTemplate.of(
             OfficialRecordTemplateKey.MOTION_INTRODUCED,
             introducedMotionParams(
@@ -1193,15 +1206,14 @@ public class MotionService {
         .findEntityById(membershipId)
         .filter(member -> member.getPolityId().equals(polityId))
         .filter(member -> member.getStatus() == MembershipStatus.ACTIVE)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+        .orElseThrow(PolityResource.MEMBER::notFound);
   }
 
   private OfficeTerm reviewableOfficeTerm(UUID officeTermId, UUID polityId, OffsetDateTime now) {
     OfficeTerm term =
         officeTerms
             .findEntityByIdAndPolityId(officeTermId, polityId)
-            .orElseThrow(
-                () -> ApiException.notFound("office_term_not_found", "Office term not found."));
+            .orElseThrow(PolityResource.OFFICE_TERM::notFound);
     if (term.getStatus() != OfficeTermStatus.ACTIVE || !term.getEndsAt().isAfter(now)) {
       throw ApiException.conflict(
           "office_term_not_reviewable", "Only active office terms can be reviewed.");
@@ -1213,7 +1225,7 @@ public class MotionService {
     Office office =
         offices
             .findEntityByIdAndPolityId(officeId, polityId)
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+            .orElseThrow(PolityResource.OFFICE::notFound);
     if (!office.getConstitutionVersionId().equals(constitution.getId())) {
       throw ApiException.conflict(
           "office_not_current", "This office belongs to a previous constitution version.");
@@ -1295,8 +1307,7 @@ public class MotionService {
               Office office =
                   offices
                       .findEntityByIdAndPolityId(proposal.getOfficeId(), proposal.getPolityId())
-                      .orElseThrow(
-                          () -> ApiException.notFound("office_not_found", "Office not found."));
+                      .orElseThrow(PolityResource.OFFICE::notFound);
               return officeTerms
                   .existsByPolityIdAndOfficeCodeAndMembershipIdAndStatusAndEndsAtAfter(
                       proposal.getPolityId(),
@@ -1350,10 +1361,7 @@ public class MotionService {
     OfficialRecordEntry record =
         officialRecordEntries
             .findEntityByIdAndPolityId(recordId, polityId)
-            .orElseThrow(
-                () ->
-                    ApiException.notFound(
-                        "official_record_entry_not_found", "Official record entry not found."));
+            .orElseThrow(PolityResource.OFFICIAL_RECORD_ENTRY::notFound);
     if (!record.getType().isVoidableByConstitutionalReview()) {
       throw ApiException.conflict(
           "official_act_not_reviewable",
@@ -1391,7 +1399,7 @@ public class MotionService {
         actionAvailability.sanctionAvailability(introducer, constitution);
     if (!availability.available()) {
       throw ApiException.conflict(
-          availability.reason(), "Sanctions require an available appeal procedure.");
+          availability.reason().wireValue(), "Sanctions require an available appeal procedure.");
     }
     Procedure appealProcedure = procedure(constitution.getId(), Procedure.APPEAL);
     int minimumDurationDays = minimumAppealableSanctionDurationDays(appealProcedure);

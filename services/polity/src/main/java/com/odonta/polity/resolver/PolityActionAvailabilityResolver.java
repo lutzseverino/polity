@@ -4,8 +4,10 @@ import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
+import com.odonta.polity.model.ConstitutionalMotionPath;
 import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
@@ -31,6 +33,7 @@ import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.GovernmentAssessmentResult;
 import com.odonta.polity.result.PolityActionAvailabilityResult;
 import java.time.Clock;
@@ -66,37 +69,31 @@ public class PolityActionAvailabilityResolver {
     ConstitutionVersion constitution = constitution(polityId);
     GovernmentAssessmentResult assessment = governmentAssessments.assess(polity, constitution);
     if (polity.isDisbanded()) {
-      return unavailable(assessment, "polity_disbanded");
+      return unavailable(assessment, ActionUnavailableReason.POLITY_DISBANDED);
     }
     Membership member =
         memberships
             .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
             .orElse(null);
     if (member == null) {
-      return unavailable(assessment, "polity_membership_required");
+      return unavailable(assessment, ActionUnavailableReason.POLITY_MEMBERSHIP_REQUIRED);
     }
     return new PolityActionAvailabilityResult(
         assessment.readiness(),
         assessment.constitutionalHealth(),
         invitationAvailability(member, constitution),
         fullGovernmentProcedureAvailability(
-            member, constitution, PowerCode.INTRODUCE_MOTION, Procedure.ORDINARY_RESOLUTION),
+            member, constitution, ConstitutionalMotionPath.ORDINARY_GOVERNANCE),
         fullGovernmentProcedureAvailability(
-            member, constitution, PowerCode.INTRODUCE_OFFICE_ELECTION, Procedure.OFFICE_ELECTION),
+            member, constitution, ConstitutionalMotionPath.OFFICE_ELECTION),
         sanctionAvailability(member, constitution),
         appealAvailability(member, constitution),
         fullGovernmentProcedureAvailability(
-            member,
-            constitution,
-            PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
-            Procedure.OFFICE_TERM_REVIEW),
+            member, constitution, ConstitutionalMotionPath.OFFICE_TERM_REVIEW),
         fullGovernmentProcedureAvailability(
-            member,
-            constitution,
-            PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
-            Procedure.CONSTITUTIONAL_REVIEW),
+            member, constitution, ConstitutionalMotionPath.CONSTITUTIONAL_REVIEW),
         fullGovernmentProcedureAvailability(
-            member, constitution, PowerCode.INTRODUCE_AMENDMENT, Procedure.CONSTITUTION_AMENDMENT),
+            member, constitution, ConstitutionalMotionPath.CONSTITUTION_AMENDMENT),
         disbandmentAvailability(member, constitution),
         certificationAvailability(member, constitution),
         resignationAvailability(polity, member, constitution));
@@ -119,20 +116,21 @@ public class PolityActionAvailabilityResolver {
   public ActionAvailabilityResult sanctionAvailability(
       Membership member, ConstitutionVersion constitution) {
     ActionAvailabilityResult authorityResult =
-        authorityAvailability(member, constitution, PowerCode.INTRODUCE_SANCTION);
+        authorityAvailability(
+            member, constitution, ConstitutionalMotionPath.SANCTION.introducingPower());
     if (!authorityResult.available()) {
       return authorityResult;
     }
     ActionAvailabilityResult appealAvailability =
         governmentAssessments.procedureAvailability(
-            member.getPolityId(), constitution, Procedure.APPEAL);
+            member.getPolityId(), constitution, ConstitutionalMotionPath.APPEAL.procedureCode());
     return appealAvailability.available()
         ? ActionAvailabilityResult.allowed()
-        : ActionAvailabilityResult.blocked("appeal_procedure_unavailable");
+        : ActionAvailabilityResult.blocked(ActionUnavailableReason.APPEAL_PROCEDURE_UNAVAILABLE);
   }
 
   private PolityActionAvailabilityResult unavailable(
-      GovernmentAssessmentResult assessment, String reason) {
+      GovernmentAssessmentResult assessment, ActionUnavailableReason reason) {
     ActionAvailabilityResult unavailable = ActionAvailabilityResult.blocked(reason);
     return new PolityActionAvailabilityResult(
         assessment.readiness(),
@@ -155,7 +153,7 @@ public class PolityActionAvailabilityResolver {
     ActionAvailabilityResult authorityResult =
         authorityAvailability(member, constitution, PowerCode.ADMIT_MEMBER);
     if (authorityResult.available()
-        || !authorityResult.reason().equals("constitutional_authority_missing")) {
+        || authorityResult.reason() != ActionUnavailableReason.CONSTITUTIONAL_AUTHORITY_MISSING) {
       return authorityResult;
     }
     return hasProvisionalFounderAdmissionAuthority(member)
@@ -166,8 +164,7 @@ public class PolityActionAvailabilityResolver {
   private ActionAvailabilityResult appealAvailability(
       Membership member, ConstitutionVersion constitution) {
     ActionAvailabilityResult authorityResult =
-        fullGovernmentProcedureAvailability(
-            member, constitution, PowerCode.INTRODUCE_APPEAL, Procedure.APPEAL);
+        fullGovernmentProcedureAvailability(member, constitution, ConstitutionalMotionPath.APPEAL);
     if (authorityResult.available() || !hasOwnAppealAvailable(member, constitution)) {
       return authorityResult;
     }
@@ -184,7 +181,8 @@ public class PolityActionAvailabilityResolver {
     }
     Procedure appealProcedure =
         procedures
-            .findEntityByConstitutionVersionIdAndCode(constitution.getId(), Procedure.APPEAL)
+            .findEntityByConstitutionVersionIdAndCode(
+                constitution.getId(), ConstitutionalMotionPath.APPEAL.procedureCode())
             .orElse(null);
     if (appealProcedure == null) {
       return false;
@@ -280,28 +278,26 @@ public class PolityActionAvailabilityResolver {
   }
 
   private ActionAvailabilityResult fullGovernmentProcedureAvailability(
-      Membership member,
-      ConstitutionVersion constitution,
-      PowerCode powerCode,
-      String procedureCode) {
+      Membership member, ConstitutionVersion constitution, ConstitutionalMotionPath path) {
     ActionAvailabilityResult authorityResult =
-        authorityAvailability(member, constitution, powerCode);
+        authorityAvailability(member, constitution, path.introducingPower());
     if (!authorityResult.available()) {
       return authorityResult;
     }
     return governmentAssessments.procedureAvailability(
-        member.getPolityId(), constitution, procedureCode);
+        member.getPolityId(), constitution, path.procedureCode());
   }
 
   private ActionAvailabilityResult disbandmentAvailability(
       Membership member, ConstitutionVersion constitution) {
     ActionAvailabilityResult authorityResult =
-        authorityAvailability(member, constitution, PowerCode.INTRODUCE_DISBANDMENT);
+        authorityAvailability(
+            member, constitution, ConstitutionalMotionPath.DISBANDMENT.introducingPower());
     if (!authorityResult.available()) {
       return authorityResult;
     }
     return governmentAssessments.procedureAvailability(
-        member.getPolityId(), constitution, Procedure.DISBANDMENT);
+        member.getPolityId(), constitution, ConstitutionalMotionPath.DISBANDMENT.procedureCode());
   }
 
   private ActionAvailabilityResult resignationAvailability(
@@ -311,10 +307,12 @@ public class PolityActionAvailabilityResolver {
       return ActionAvailabilityResult.allowed();
     }
     if (!polity.isBootstrapComplete() && polity.getFounderId().equals(member.getUserId())) {
-      return ActionAvailabilityResult.blocked("provisional_founder_resignation_unavailable");
+      return ActionAvailabilityResult.blocked(
+          ActionUnavailableReason.PROVISIONAL_FOUNDER_RESIGNATION_UNAVAILABLE);
     }
     return governmentAssessments.activeMemberCount(member.getPolityId()) <= 1
-        ? ActionAvailabilityResult.blocked("last_member_resignation_unavailable")
+        ? ActionAvailabilityResult.blocked(
+            ActionUnavailableReason.LAST_MEMBER_RESIGNATION_UNAVAILABLE)
         : ActionAvailabilityResult.allowed();
   }
 
@@ -335,26 +333,26 @@ public class PolityActionAvailabilityResolver {
               power.getHolderOfficeCode(),
               OfficeTermStatus.ACTIVE,
               OffsetDateTime.now(clock))) {
-        return ActionAvailabilityResult.blocked("constitutional_office_vacant");
+        return ActionAvailabilityResult.blocked(
+            ActionUnavailableReason.CONSTITUTIONAL_OFFICE_VACANT);
       }
       return authority.allows(member, constitution, powerCode)
           ? ActionAvailabilityResult.allowed()
-          : ActionAvailabilityResult.blocked("constitutional_authority_missing");
+          : ActionAvailabilityResult.blocked(
+              ActionUnavailableReason.CONSTITUTIONAL_AUTHORITY_MISSING);
     } catch (ApiException exception) {
-      return ActionAvailabilityResult.blocked(exception.code());
+      return ActionAvailabilityResult.blocked(
+          ActionUnavailableReason.fromWireValue(exception.code()));
     }
   }
 
   private ConstitutionVersion constitution(UUID polityId) {
     return constitutions
         .findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
-        .orElseThrow(
-            () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+        .orElseThrow(PolityResource.CONSTITUTION::notFound);
   }
 
   private Polity polity(UUID polityId) {
-    return polities
-        .findEntityById(polityId)
-        .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+    return polities.findEntityById(polityId).orElseThrow(PolityResource.POLITY::notFound);
   }
 }

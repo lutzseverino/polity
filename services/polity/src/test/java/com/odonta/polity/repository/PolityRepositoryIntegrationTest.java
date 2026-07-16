@@ -202,12 +202,35 @@ class PolityRepositoryIntegrationTest {
                 requestingUserId,
                 MembershipStatus.ACTIVE,
                 PolityVisibility.PUBLIC,
+                null,
                 PageRequest.of(0, 50))
             .getContent();
 
     assertThat(accessible)
         .extracting(PolityProjection::getId)
         .containsExactly(memberPolityId, publicPolityId);
+
+    assertThat(
+            polities
+                .findAccessibleProjections(
+                    requestingUserId,
+                    MembershipStatus.ACTIVE,
+                    PolityVisibility.PUBLIC,
+                    "PUBLIC",
+                    PageRequest.of(0, 50))
+                .getContent())
+        .extracting(PolityProjection::getId)
+        .containsExactly(publicPolityId);
+    assertThat(
+            polities
+                .findAccessibleProjections(
+                    requestingUserId,
+                    MembershipStatus.ACTIVE,
+                    PolityVisibility.PUBLIC,
+                    "%",
+                    PageRequest.of(0, 50))
+                .getContent())
+        .isEmpty();
   }
 
   @Test

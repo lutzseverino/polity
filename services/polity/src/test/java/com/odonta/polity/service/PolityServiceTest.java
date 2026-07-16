@@ -60,6 +60,7 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
+import com.odonta.polity.repository.PolityProjection;
 import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.repository.ProcedureProjection;
 import com.odonta.polity.repository.ProcedureRepository;
@@ -67,6 +68,7 @@ import com.odonta.polity.resolver.GovernmentAssessmentResolver;
 import com.odonta.polity.resolver.PolitySummaryResolver;
 import com.odonta.polity.resolver.ProcedureElectorateResolver;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.template.ConstitutionTemplateSeeder;
 import java.lang.reflect.Proxy;
 import java.time.Clock;
@@ -79,6 +81,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class PolityServiceTest {
@@ -158,6 +162,38 @@ class PolityServiceTest {
               assertThat(grant.subject()).isEqualTo("subject-1");
               assertThat(grant.authorities()).containsExactly(PolityPermissions.POLITY_CREATE);
             });
+  }
+
+  @Test
+  void listTrimsThePolityQueryBeforeApplyingPagination() {
+    UUID userId = UUID.randomUUID();
+    PageRequest pageRequest = PageRequest.of(1, 25);
+    when(polities.findAccessibleProjections(
+            userId, MembershipStatus.ACTIVE, PolityVisibility.PUBLIC, "assembly", pageRequest))
+        .thenReturn(Page.<PolityProjection>empty(pageRequest));
+    when(summaries.resolveAll(List.of())).thenReturn(List.of());
+
+    service.list(userId, "  assembly  ", 1, 25);
+
+    verify(polities)
+        .findAccessibleProjections(
+            userId, MembershipStatus.ACTIVE, PolityVisibility.PUBLIC, "assembly", pageRequest);
+  }
+
+  @Test
+  void listTreatsABlankPolityQueryAsAbsent() {
+    UUID userId = UUID.randomUUID();
+    PageRequest pageRequest = PageRequest.of(0, 50);
+    when(polities.findAccessibleProjections(
+            userId, MembershipStatus.ACTIVE, PolityVisibility.PUBLIC, null, pageRequest))
+        .thenReturn(Page.<PolityProjection>empty(pageRequest));
+    when(summaries.resolveAll(List.of())).thenReturn(List.of());
+
+    service.list(userId, " \t ", 0, 50);
+
+    verify(polities)
+        .findAccessibleProjections(
+            userId, MembershipStatus.ACTIVE, PolityVisibility.PUBLIC, null, pageRequest);
   }
 
   @Test
@@ -378,7 +414,8 @@ class PolityServiceTest {
             polityId, constitution, Procedure.CONSTITUTIONAL_REVIEW);
 
     assertThat(result.available()).isFalse();
-    assertThat(result.reason()).isEqualTo("procedure_electorate_below_minimum");
+    assertThat(result.reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_BELOW_MINIMUM);
   }
 
   @Test

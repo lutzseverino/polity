@@ -28,7 +28,7 @@ public class ConstitutionOfficeChangeProposal extends AuditedEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private ConstitutionOfficeChangeAction action;
+  private ConstitutionChangeOperation action;
 
   @Column(name = "office_code", nullable = false)
   private String officeCode;
@@ -49,7 +49,7 @@ public class ConstitutionOfficeChangeProposal extends AuditedEntity {
   public ConstitutionOfficeChangeProposal(
       UUID polityId,
       UUID amendmentProposalId,
-      ConstitutionOfficeChangeAction action,
+      ConstitutionChangeOperation action,
       String officeCode,
       UUID jurisdictionId,
       String name,

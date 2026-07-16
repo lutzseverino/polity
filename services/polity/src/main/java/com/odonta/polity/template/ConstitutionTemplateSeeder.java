@@ -2,7 +2,6 @@ package com.odonta.polity.template;
 
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
-import com.odonta.polity.model.ConstitutionalPowerTemplateKey;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Institution;
 import com.odonta.polity.model.InstitutionKind;
@@ -336,74 +335,26 @@ public class ConstitutionTemplateSeeder {
   private void seedPowers(ConstitutionVersion constitution) {
     powers.saveAllAndFlush(
         List.of(
-            power(
-                constitution,
-                PowerCode.INTRODUCE_MOTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_MOTION),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_OFFICE_ELECTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_ELECTION),
-            officePower(
-                constitution,
-                PowerCode.INTRODUCE_SANCTION,
-                ConstitutionalPowerTemplateKey.INTRODUCE_SANCTION,
-                Office.TRIBUNE),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_APPEAL,
-                ConstitutionalPowerTemplateKey.INTRODUCE_APPEAL),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_OFFICE_TERM_REVIEW,
-                ConstitutionalPowerTemplateKey.INTRODUCE_OFFICE_TERM_REVIEW),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
-                ConstitutionalPowerTemplateKey.INTRODUCE_CONSTITUTIONAL_REVIEW),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_AMENDMENT,
-                ConstitutionalPowerTemplateKey.INTRODUCE_AMENDMENT),
-            power(
-                constitution,
-                PowerCode.INTRODUCE_DISBANDMENT,
-                ConstitutionalPowerTemplateKey.INTRODUCE_DISBANDMENT),
-            officePower(
-                constitution,
-                PowerCode.ADMIT_MEMBER,
-                ConstitutionalPowerTemplateKey.ADMIT_MEMBER,
-                Office.STEWARD),
-            power(
-                constitution,
-                PowerCode.REQUEST_CERTIFICATION,
-                ConstitutionalPowerTemplateKey.REQUEST_CERTIFICATION)));
+            power(constitution, PowerCode.INTRODUCE_MOTION),
+            power(constitution, PowerCode.INTRODUCE_OFFICE_ELECTION),
+            officePower(constitution, PowerCode.INTRODUCE_SANCTION, Office.TRIBUNE),
+            power(constitution, PowerCode.INTRODUCE_APPEAL),
+            power(constitution, PowerCode.INTRODUCE_OFFICE_TERM_REVIEW),
+            power(constitution, PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW),
+            power(constitution, PowerCode.INTRODUCE_AMENDMENT),
+            power(constitution, PowerCode.INTRODUCE_DISBANDMENT),
+            officePower(constitution, PowerCode.ADMIT_MEMBER, Office.STEWARD),
+            power(constitution, PowerCode.REQUEST_CERTIFICATION)));
   }
 
-  private ConstitutionalPower power(
-      ConstitutionVersion constitution,
-      PowerCode code,
-      ConstitutionalPowerTemplateKey templateKey) {
-    return new ConstitutionalPower(
-        constitution.getPolityId(),
-        constitution.getId(),
-        code,
-        templateKey.storedName(),
-        templateKey,
-        PowerHolderScope.ACTIVE_MEMBER);
+  private ConstitutionalPower power(ConstitutionVersion constitution, PowerCode code) {
+    return ConstitutionalPower.defaultNamed(
+        constitution.getPolityId(), constitution.getId(), code, PowerHolderScope.ACTIVE_MEMBER);
   }
 
   private ConstitutionalPower officePower(
-      ConstitutionVersion constitution,
-      PowerCode code,
-      ConstitutionalPowerTemplateKey templateKey,
-      String officeCode) {
-    return new ConstitutionalPower(
-        constitution.getPolityId(),
-        constitution.getId(),
-        code,
-        templateKey.storedName(),
-        templateKey,
-        officeCode);
+      ConstitutionVersion constitution, PowerCode code, String officeCode) {
+    return ConstitutionalPower.defaultNamedForOffice(
+        constitution.getPolityId(), constitution.getId(), code, officeCode);
   }
 }

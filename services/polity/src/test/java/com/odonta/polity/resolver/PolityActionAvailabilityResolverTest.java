@@ -44,6 +44,7 @@ import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.service.MembershipService;
 import java.lang.reflect.Proxy;
 import java.time.Clock;
@@ -178,13 +179,15 @@ class PolityActionAvailabilityResolverTest {
         .containsExactly(GovernmentReadinessDiagnostic.NEEDS_MORE_STANDING_MEMBERS);
     assertThat(result.inviteMembers().available()).isTrue();
     assertThat(result.introduceMotion().available()).isFalse();
-    assertThat(result.introduceMotion().reason()).isEqualTo("procedure_electorate_office_vacant");
+    assertThat(result.introduceMotion().reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceSanction().available()).isFalse();
-    assertThat(result.introduceSanction().reason()).isEqualTo("constitutional_office_vacant");
+    assertThat(result.introduceSanction().reason())
+        .isEqualTo(ActionUnavailableReason.CONSTITUTIONAL_OFFICE_VACANT);
     assertThat(result.introduceDisbandment().available()).isTrue();
     assertThat(result.resignMembership().available()).isFalse();
     assertThat(result.resignMembership().reason())
-        .isEqualTo("provisional_founder_resignation_unavailable");
+        .isEqualTo(ActionUnavailableReason.PROVISIONAL_FOUNDER_RESIGNATION_UNAVAILABLE);
   }
 
   @Test
@@ -254,13 +257,14 @@ class PolityActionAvailabilityResolverTest {
     var result = actionAvailability.resolve(polityId, userId);
 
     assertThat(result.introduceMotion().available()).isFalse();
-    assertThat(result.introduceMotion().reason()).isEqualTo("procedure_electorate_office_vacant");
+    assertThat(result.introduceMotion().reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceOfficeElection().available()).isFalse();
     assertThat(result.introduceOfficeElection().reason())
-        .isEqualTo("procedure_electorate_office_vacant");
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceAmendment().available()).isFalse();
     assertThat(result.introduceAmendment().reason())
-        .isEqualTo("procedure_electorate_office_vacant");
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
   }
 
   @Test
@@ -304,7 +308,7 @@ class PolityActionAvailabilityResolverTest {
 
     assertThat(result.introduceDisbandment().available()).isFalse();
     assertThat(result.introduceDisbandment().reason())
-        .isEqualTo("procedure_electorate_below_minimum");
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_BELOW_MINIMUM);
     assertThat(result.resignMembership().available()).isTrue();
   }
 
@@ -371,15 +375,17 @@ class PolityActionAvailabilityResolverTest {
     var result = actionAvailability.resolve(polityId, userId);
 
     assertThat(result.introduceSanction().available()).isFalse();
-    assertThat(result.introduceSanction().reason()).isEqualTo("appeal_procedure_unavailable");
+    assertThat(result.introduceSanction().reason())
+        .isEqualTo(ActionUnavailableReason.APPEAL_PROCEDURE_UNAVAILABLE);
     assertThat(result.introduceAppeal().available()).isFalse();
-    assertThat(result.introduceAppeal().reason()).isEqualTo("procedure_electorate_office_vacant");
+    assertThat(result.introduceAppeal().reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceOfficeTermReview().available()).isFalse();
     assertThat(result.introduceOfficeTermReview().reason())
-        .isEqualTo("procedure_electorate_office_vacant");
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceConstitutionalReview().available()).isFalse();
     assertThat(result.introduceConstitutionalReview().reason())
-        .isEqualTo("procedure_electorate_office_vacant");
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceDisbandment().available()).isTrue();
     assertThat(result.resignMembership().available()).isTrue();
   }
@@ -568,7 +574,8 @@ class PolityActionAvailabilityResolverTest {
     var result = actionAvailability.resolve(polityId, userId);
 
     assertThat(result.introduceMotion().available()).isFalse();
-    assertThat(result.introduceMotion().reason()).isEqualTo("procedure_electorate_office_vacant");
+    assertThat(result.introduceMotion().reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT);
     assertThat(result.introduceDisbandment().available()).isTrue();
   }
 

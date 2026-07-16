@@ -1,11 +1,10 @@
 package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionChangeItem;
 import com.odonta.polity.model.ConstitutionChangeKind;
 import com.odonta.polity.model.ConstitutionChangeOperation;
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
-import com.odonta.polity.model.ConstitutionOfficeChangeAction;
 import com.odonta.polity.model.ConstitutionTemplateKey;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalPower;
@@ -87,8 +86,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
     ConstitutionVersion current =
         constitutions
             .findEntityById(constitution.getId())
-            .orElseThrow(
-                () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+            .orElseThrow(PolityResource.CONSTITUTION::notFound);
     Map<String, ConstitutionProcedureChangeProposalProjection> procedureChanges =
         procedureChangeProposals.findProjectionsByAmendmentProposalId(proposal.getId()).stream()
             .collect(
@@ -207,7 +205,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
     Institution institution = currentInstitutions.get(change.getInstitutionId());
     return new ConstitutionChangeItem(
         ConstitutionChangeKind.INSTITUTION,
-        changeOperation(change.getAction()),
+        change.getAction(),
         proposedOrCurrent(
             change.getName(), institution == null ? "institution" : institution.getName()),
         change.getName() == null && institution != null ? institution.getNameKey() : null,
@@ -261,7 +259,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
     Office office = currentOffices.get(change.getOfficeCode());
     return new ConstitutionChangeItem(
         ConstitutionChangeKind.OFFICE,
-        changeOperation(change.getAction()),
+        change.getAction(),
         proposedOrCurrent(
             change.getName(), office == null ? change.getOfficeCode() : office.getName()),
         change.getName() == null && office != null ? office.getNameKey() : null,
@@ -319,14 +317,6 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
     return TemplateParameters.ofPresent("value", value, "valueKey", key);
   }
 
-  private ConstitutionChangeOperation changeOperation(ConstitutionInstitutionChangeAction action) {
-    return ConstitutionChangeOperation.valueOf(action.name());
-  }
-
-  private ConstitutionChangeOperation changeOperation(ConstitutionOfficeChangeAction action) {
-    return ConstitutionChangeOperation.valueOf(action.name());
-  }
-
   private Map<UUID, UUID> copyInstitutions(
       ConstitutionVersion current,
       ConstitutionVersion amended,
@@ -340,7 +330,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
                     change -> change));
     List<ConstitutionInstitutionChangeProposalProjection> createChanges =
         institutionChanges.stream()
-            .filter(change -> change.getAction() == ConstitutionInstitutionChangeAction.CREATE)
+            .filter(change -> change.getAction() == ConstitutionChangeOperation.CREATE)
             .toList();
     List<UUID> jurisdictionIds =
         jurisdictions.findEntitiesByPolityId(current.getPolityId()).stream()
@@ -384,7 +374,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
               }
             });
     if (!changesByInstitutionId.isEmpty()) {
-      throw ApiException.notFound("institution_not_found", "Institution not found.");
+      throw PolityResource.INSTITUTION.notFound();
     }
     createChanges.forEach(
         change -> {
@@ -513,8 +503,8 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
         .values()
         .forEach(
             change -> {
-              if (change.getAction() != ConstitutionOfficeChangeAction.CREATE) {
-                throw ApiException.notFound("office_not_found", "Office not found.");
+              if (change.getAction() != ConstitutionChangeOperation.CREATE) {
+                throw PolityResource.OFFICE.notFound();
               }
               offices.save(
                   new Office(
@@ -553,7 +543,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
               powers.save(copied);
             });
     if (!powerChanges.isEmpty()) {
-      throw ApiException.notFound("power_not_found", "Constitutional power not found.");
+      throw PolityResource.CONSTITUTIONAL_POWER.notFound();
     }
   }
 
@@ -561,8 +551,7 @@ final class ConstitutionAmendmentEffect implements MotionEffect {
     return jurisdictions
         .findEntityByPolityIdAndKind(current.getPolityId(), JurisdictionKind.ROOT)
         .map(jurisdiction -> jurisdiction.getId())
-        .orElseThrow(
-            () -> ApiException.notFound("jurisdiction_not_found", "Jurisdiction not found."));
+        .orElseThrow(PolityResource.JURISDICTION::notFound);
   }
 
   private Map<UUID, InstitutionKind> resultingInstitutionKinds(

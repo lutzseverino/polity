@@ -1,8 +1,8 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityAccessPolicy;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.OfficeTermReviewApplicationMapper;
 import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficeRepository;
@@ -101,7 +101,7 @@ public class OfficeTermReviewService {
       Map<UUID, OfficeTermProjection> termsById, UUID officeTermId) {
     OfficeTermProjection term = termsById.get(officeTermId);
     if (term == null) {
-      throw ApiException.notFound("office_term_not_found", "Office term not found.");
+      throw PolityResource.OFFICE_TERM.notFound();
     }
     return term;
   }
@@ -109,7 +109,7 @@ public class OfficeTermReviewService {
   private OfficeProjection requiredOffice(Map<UUID, OfficeProjection> officesById, UUID officeId) {
     OfficeProjection office = officesById.get(officeId);
     if (office == null) {
-      throw ApiException.notFound("office_not_found", "Office not found.");
+      throw PolityResource.OFFICE.notFound();
     }
     return office;
   }
@@ -117,7 +117,7 @@ public class OfficeTermReviewService {
   private String requiredMemberName(Map<UUID, String> memberNames, UUID membershipId) {
     String memberName = memberNames.get(membershipId);
     if (memberName == null) {
-      throw ApiException.notFound("member_not_found", "Member not found.");
+      throw PolityResource.MEMBER.notFound();
     }
     return memberName;
   }

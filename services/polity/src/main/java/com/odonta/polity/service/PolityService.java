@@ -11,6 +11,7 @@ import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
 import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.authorization.PolityGrantPlanner;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.input.CreatePolityInput;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionTemplateKey;
@@ -127,7 +128,7 @@ public class PolityService {
     Office steward =
         offices
             .findEntityByConstitutionVersionIdAndCode(constitution.getId(), Office.STEWARD)
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+            .orElseThrow(PolityResource.OFFICE::notFound);
     OfficeTerm stewardTerm =
         officeTerms.saveAndFlush(
             new OfficeTerm(
@@ -224,15 +225,23 @@ public class PolityService {
     }
   }
 
-  public PageResult<PolitySummaryResult> list(UUID userId, int page, int size) {
+  public PageResult<PolitySummaryResult> list(UUID userId, String query, int page, int size) {
     Page<PolityProjection> projections =
         polities.findAccessibleProjections(
-            userId, MembershipStatus.ACTIVE, PolityVisibility.PUBLIC, PageRequest.of(page, size));
+            userId,
+            MembershipStatus.ACTIVE,
+            PolityVisibility.PUBLIC,
+            normalizeQuery(query),
+            PageRequest.of(page, size));
     return new PageResult<>(
         summaries.resolveAll(projections.getContent()),
         projections.getNumber(),
         projections.getSize(),
         projections.getTotalElements());
+  }
+
+  private String normalizeQuery(String query) {
+    return query == null || query.isBlank() ? null : query.trim();
   }
 
   @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
@@ -247,29 +256,23 @@ public class PolityService {
 
   private PolitySummaryResult getSummary(UUID polityId) {
     return summaries.resolve(
-        polities
-            .findProjectedById(polityId)
-            .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found.")));
+        polities.findProjectedById(polityId).orElseThrow(PolityResource.POLITY::notFound));
   }
 
   ConstitutionVersion constitution(UUID polityId) {
     return constitutions
         .findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
-        .orElseThrow(
-            () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+        .orElseThrow(PolityResource.CONSTITUTION::notFound);
   }
 
   private Polity polity(UUID polityId) {
-    return polities
-        .findEntityById(polityId)
-        .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+    return polities.findEntityById(polityId).orElseThrow(PolityResource.POLITY::notFound);
   }
 
   Jurisdiction jurisdiction(UUID polityId) {
     return jurisdictions
         .findEntityByPolityIdAndKind(polityId, JurisdictionKind.ROOT)
-        .orElseThrow(
-            () -> ApiException.notFound("jurisdiction_not_found", "Jurisdiction not found."));
+        .orElseThrow(PolityResource.JURISDICTION::notFound);
   }
 
   Institution institution(UUID polityId) {
@@ -288,15 +291,13 @@ public class PolityService {
                     .filter(institution -> institution.getKind() == InstitutionKind.ASSEMBLY)
                     .findFirst())
         .or(() -> current.stream().findFirst())
-        .orElseThrow(
-            () -> ApiException.notFound("institution_not_found", "Institution not found."));
+        .orElseThrow(PolityResource.INSTITUTION::notFound);
   }
 
   Institution institution(UUID polityId, Procedure procedure) {
     return institutions
         .findEntityByIdAndPolityId(procedure.getInstitutionId(), polityId)
-        .orElseThrow(
-            () -> ApiException.notFound("institution_not_found", "Institution not found."));
+        .orElseThrow(PolityResource.INSTITUTION::notFound);
   }
 
   void requireActive(UUID polityId) {
@@ -311,7 +312,7 @@ public class PolityService {
     return polities
         .findProjectedById(polityId)
         .map(com.odonta.polity.repository.PolityProjection::getName)
-        .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+        .orElseThrow(PolityResource.POLITY::notFound);
   }
 
   void requireDisbandmentGovernment(UUID polityId) {

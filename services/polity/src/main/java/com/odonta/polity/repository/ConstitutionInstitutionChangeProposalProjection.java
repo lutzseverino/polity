@@ -1,13 +1,13 @@
 package com.odonta.polity.repository;
 
-import com.odonta.polity.model.ConstitutionInstitutionChangeAction;
+import com.odonta.polity.model.ConstitutionChangeOperation;
 import com.odonta.polity.model.InstitutionKind;
 import java.util.UUID;
 
 public interface ConstitutionInstitutionChangeProposalProjection {
   UUID getAmendmentProposalId();
 
-  ConstitutionInstitutionChangeAction getAction();
+  ConstitutionChangeOperation getAction();
 
   UUID getInstitutionId();
 

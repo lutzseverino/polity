@@ -9,6 +9,7 @@ import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.input.CreateMemberInvitationInput;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
 import com.odonta.polity.mapper.MembershipInvitationApplicationMapper;
@@ -154,8 +155,7 @@ public class InvitationService {
     MembershipInvitation invitation =
         invitations
             .findEntityByIdAndStatus(invitationId, InvitationStatus.PENDING)
-            .orElseThrow(
-                () -> ApiException.notFound("invitation_not_found", "Invitation not found."));
+            .orElseThrow(PolityResource.INVITATION::notFound);
     polities.requireActive(invitation.getPolityId());
     requireInvitee(invitation, identity);
     Membership admitted =
@@ -207,15 +207,14 @@ public class InvitationService {
     return memberMapper.toResult(
         memberships
             .findProjectedById(admitted.getId())
-            .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found.")));
+            .orElseThrow(PolityResource.MEMBER::notFound));
   }
 
   private MembershipInvitationResult result(UUID invitationId) {
     return result(
         invitations
             .findProjectedById(invitationId)
-            .orElseThrow(
-                () -> ApiException.notFound("invitation_not_found", "Invitation not found.")));
+            .orElseThrow(PolityResource.INVITATION::notFound));
   }
 
   private MembershipInvitationResult result(MembershipInvitationProjection projection) {

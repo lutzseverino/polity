@@ -5,6 +5,7 @@ import com.odonta.authorization.spring.AuthenticatedUser;
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionStatus;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.Jurisdiction;
@@ -54,9 +55,7 @@ public class MembershipResignationService {
   public void resign(UUID polityId, AuthenticatedUser actor) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     Polity polity =
-        polities
-            .findEntityByIdForUpdate(polityId)
-            .orElseThrow(() -> ApiException.notFound("polity_not_found", "Polity not found."));
+        polities.findEntityByIdForUpdate(polityId).orElseThrow(PolityResource.POLITY::notFound);
     if (polity.getStatus() != PolityStatus.ACTIVE) {
       throw ApiException.conflict(
           "polity_disbanded", "This polity has been disbanded and no longer accepts actions.");
@@ -131,14 +130,12 @@ public class MembershipResignationService {
   private ConstitutionVersion constitution(UUID polityId) {
     return constitutions
         .findEntityByPolityIdAndStatus(polityId, ConstitutionStatus.RATIFIED)
-        .orElseThrow(
-            () -> ApiException.notFound("constitution_not_found", "Constitution not found."));
+        .orElseThrow(PolityResource.CONSTITUTION::notFound);
   }
 
   private Jurisdiction jurisdiction(UUID polityId) {
     return jurisdictions
         .findEntityByPolityIdAndKind(polityId, JurisdictionKind.ROOT)
-        .orElseThrow(
-            () -> ApiException.notFound("jurisdiction_not_found", "Jurisdiction not found."));
+        .orElseThrow(PolityResource.JURISDICTION::notFound);
   }
 }

@@ -16,9 +16,9 @@ import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import com.odonta.polity.service.ConstitutionService;
 import com.odonta.polity.service.PolityService;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,9 +51,9 @@ public class PolityController implements PolitiesApi {
   }
 
   @Override
-  public ResponseEntity<List<PolityResponse>> listPolities(Integer page, Integer size) {
+  public ResponseEntity<PagedModel> listPolities(String query, Integer page, Integer size) {
     return PageResponses.ok(
-        polities.list(users.currentUser().id(), page, size), mapper::toResponses);
+        polities.list(users.currentUser().id(), query, page, size), mapper::toResponses);
   }
 
   @Override

@@ -1,9 +1,10 @@
 package com.odonta.polity.resolver;
 
-import com.odonta.common.api.ApiException;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalHealthDiagnostic;
 import com.odonta.polity.model.ConstitutionalHealthStatus;
+import com.odonta.polity.model.ConstitutionalMotionPath;
 import com.odonta.polity.model.ConstitutionalPower;
 import com.odonta.polity.model.GovernmentReadinessDiagnostic;
 import com.odonta.polity.model.GovernmentReadinessStatus;
@@ -21,6 +22,7 @@ import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.result.ActionAvailabilityResult;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.ConstitutionalHealthResult;
 import com.odonta.polity.result.GovernmentAssessmentResult;
 import com.odonta.polity.result.GovernmentReadinessResult;
@@ -92,8 +94,7 @@ public class GovernmentAssessmentResolver {
         diagnostics,
         polityId,
         constitution,
-        PowerCode.INTRODUCE_OFFICE_ELECTION,
-        Procedure.OFFICE_ELECTION,
+        ConstitutionalMotionPath.OFFICE_ELECTION,
         GovernmentReadinessDiagnostic.OFFICE_ELECTION_AUTHORITY_UNAVAILABLE,
         GovernmentReadinessDiagnostic.OFFICE_ELECTION_ELECTORATE_UNAVAILABLE);
     if (!holderAvailable(polityId, constitution, PowerCode.REQUEST_CERTIFICATION)) {
@@ -103,24 +104,21 @@ public class GovernmentAssessmentResolver {
         diagnostics,
         polityId,
         constitution,
-        PowerCode.INTRODUCE_MOTION,
-        Procedure.ORDINARY_RESOLUTION,
+        ConstitutionalMotionPath.ORDINARY_GOVERNANCE,
         GovernmentReadinessDiagnostic.ORDINARY_GOVERNANCE_AUTHORITY_UNAVAILABLE,
         GovernmentReadinessDiagnostic.ORDINARY_GOVERNANCE_ELECTORATE_UNAVAILABLE);
     addReadinessDiagnostics(
         diagnostics,
         polityId,
         constitution,
-        PowerCode.INTRODUCE_APPEAL,
-        Procedure.APPEAL,
+        ConstitutionalMotionPath.APPEAL,
         GovernmentReadinessDiagnostic.APPEAL_AUTHORITY_UNAVAILABLE,
         GovernmentReadinessDiagnostic.APPEAL_ELECTORATE_UNAVAILABLE);
     addReadinessDiagnostics(
         diagnostics,
         polityId,
         constitution,
-        PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
-        Procedure.CONSTITUTIONAL_REVIEW,
+        ConstitutionalMotionPath.CONSTITUTIONAL_REVIEW,
         GovernmentReadinessDiagnostic.CONSTITUTIONAL_REVIEW_AUTHORITY_UNAVAILABLE,
         GovernmentReadinessDiagnostic.CONSTITUTIONAL_REVIEW_ELECTORATE_UNAVAILABLE);
     if (diagnostics.contains(GovernmentReadinessDiagnostic.OFFICE_ELECTION_AUTHORITY_UNAVAILABLE)
@@ -141,51 +139,43 @@ public class GovernmentAssessmentResolver {
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.ADMISSION_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(constitution, PowerCode.ADMIT_MEMBER, null));
+        powerStructurallyAvailable(constitution, PowerCode.ADMIT_MEMBER));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.ORDINARY_GOVERNANCE_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_MOTION, Procedure.ORDINARY_RESOLUTION));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.ORDINARY_GOVERNANCE));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.SANCTION_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(constitution, PowerCode.INTRODUCE_SANCTION, Procedure.SANCTION));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.SANCTION));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.APPEAL_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(constitution, PowerCode.INTRODUCE_APPEAL, Procedure.APPEAL));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.APPEAL));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.OFFICE_TERM_REVIEW_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_OFFICE_TERM_REVIEW, Procedure.OFFICE_TERM_REVIEW));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.OFFICE_TERM_REVIEW));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.CONSTITUTIONAL_REVIEW_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution,
-            PowerCode.INTRODUCE_CONSTITUTIONAL_REVIEW,
-            Procedure.CONSTITUTIONAL_REVIEW));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.CONSTITUTIONAL_REVIEW));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.OFFICE_ELECTION_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_OFFICE_ELECTION, Procedure.OFFICE_ELECTION));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.OFFICE_ELECTION));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.AMENDMENT_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_AMENDMENT, Procedure.CONSTITUTION_AMENDMENT));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.CONSTITUTION_AMENDMENT));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.DISBANDMENT_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_DISBANDMENT, Procedure.DISBANDMENT));
+        pathStructurallyAvailable(constitution, ConstitutionalMotionPath.DISBANDMENT));
     addIfUnavailable(
         diagnostics,
         ConstitutionalHealthDiagnostic.CERTIFICATION_PATH_UNAVAILABLE,
-        pathStructurallyAvailable(constitution, PowerCode.REQUEST_CERTIFICATION, null));
+        powerStructurallyAvailable(constitution, PowerCode.REQUEST_CERTIFICATION));
     if (diagnostics.isEmpty()) {
       return new ConstitutionalHealthResult(ConstitutionalHealthStatus.HEALTHY, diagnostics);
     }
@@ -226,15 +216,14 @@ public class GovernmentAssessmentResolver {
       List<GovernmentReadinessDiagnostic> diagnostics,
       UUID polityId,
       ConstitutionVersion constitution,
-      PowerCode powerCode,
-      String procedureCode,
+      ConstitutionalMotionPath path,
       GovernmentReadinessDiagnostic authorityDiagnostic,
       GovernmentReadinessDiagnostic electorateDiagnostic) {
-    if (!holderAvailable(polityId, constitution, powerCode)) {
+    if (!holderAvailable(polityId, constitution, path.introducingPower())) {
       diagnostics.add(authorityDiagnostic);
       return;
     }
-    if (!procedureAvailability(polityId, constitution, procedureCode).available()) {
+    if (!procedureAvailability(polityId, constitution, path.procedureCode()).available()) {
       diagnostics.add(electorateDiagnostic);
     }
   }
@@ -244,15 +233,15 @@ public class GovernmentAssessmentResolver {
     return procedures
         .findEntityByConstitutionVersionIdAndCode(constitution.getId(), procedureCode)
         .map(this::procedureElectorateAvailability)
-        .orElse(ActionAvailabilityResult.blocked("procedure_missing"));
+        .orElse(ActionAvailabilityResult.blocked(ActionUnavailableReason.PROCEDURE_MISSING));
   }
 
   public boolean lastMemberResignationClosesPolity(
       Polity polity, ConstitutionVersion constitution) {
-    return !pathStructurallyAvailable(
-            constitution, PowerCode.INTRODUCE_DISBANDMENT, Procedure.DISBANDMENT)
-        || !holderAvailable(polity.getId(), constitution, PowerCode.INTRODUCE_DISBANDMENT)
-        || !procedureAvailability(polity.getId(), constitution, Procedure.DISBANDMENT).available();
+    ConstitutionalMotionPath path = ConstitutionalMotionPath.DISBANDMENT;
+    return !pathStructurallyAvailable(constitution, path)
+        || !holderAvailable(polity.getId(), constitution, path.introducingPower())
+        || !procedureAvailability(polity.getId(), constitution, path.procedureCode()).available();
   }
 
   private boolean holderAvailable(UUID polityId, ConstitutionVersion constitution, PowerCode code) {
@@ -263,9 +252,9 @@ public class GovernmentAssessmentResolver {
   }
 
   private boolean pathStructurallyAvailable(
-      ConstitutionVersion constitution, PowerCode powerCode, String procedureCode) {
-    return powerStructurallyAvailable(constitution, powerCode)
-        && (procedureCode == null || procedureStructurallyAvailable(constitution, procedureCode));
+      ConstitutionVersion constitution, ConstitutionalMotionPath path) {
+    return powerStructurallyAvailable(constitution, path.introducingPower())
+        && procedureStructurallyAvailable(constitution, path.procedureCode());
   }
 
   private boolean powerStructurallyAvailable(ConstitutionVersion constitution, PowerCode code) {
@@ -318,11 +307,13 @@ public class GovernmentAssessmentResolver {
     List<Membership> electors = procedureElectorates.electors(procedure, votingOpensAt);
     if (electors.isEmpty()) {
       return procedure.getElectorate() == ProcedureElectorate.OFFICE_HOLDERS
-          ? ActionAvailabilityResult.blocked("procedure_electorate_office_vacant")
-          : ActionAvailabilityResult.blocked("procedure_electorate_empty");
+          ? ActionAvailabilityResult.blocked(
+              ActionUnavailableReason.PROCEDURE_ELECTORATE_OFFICE_VACANT)
+          : ActionAvailabilityResult.blocked(ActionUnavailableReason.PROCEDURE_ELECTORATE_EMPTY);
     }
     if (electors.size() < procedure.getMinimumElectorCount()) {
-      return ActionAvailabilityResult.blocked("procedure_electorate_below_minimum");
+      return ActionAvailabilityResult.blocked(
+          ActionUnavailableReason.PROCEDURE_ELECTORATE_BELOW_MINIMUM);
     }
     return ActionAvailabilityResult.allowed();
   }
@@ -339,8 +330,6 @@ public class GovernmentAssessmentResolver {
   }
 
   private Membership membership(UUID membershipId) {
-    return memberships
-        .findEntityById(membershipId)
-        .orElseThrow(() -> ApiException.notFound("member_not_found", "Member not found."));
+    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 }

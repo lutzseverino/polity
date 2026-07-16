@@ -2,6 +2,7 @@ package com.odonta.polity.effect;
 
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Membership;
@@ -76,12 +77,11 @@ final class OfficeElectionEffect implements MotionEffect {
     Office office =
         offices
             .findEntityByIdAndPolityId(proposal.getOfficeId(), motion.getPolityId())
-            .orElseThrow(() -> ApiException.notFound("office_not_found", "Office not found."));
+            .orElseThrow(PolityResource.OFFICE::notFound);
     Procedure procedure =
         procedures
             .findEntityById(motion.getProcedureId())
-            .orElseThrow(
-                () -> ApiException.notFound("procedure_not_found", "Procedure not found."));
+            .orElseThrow(PolityResource.PROCEDURE::notFound);
     Set<UUID> currentHolderIds = currentHolderIds(motion.getPolityId(), office, now);
     List<OfficeElectionCandidateOption> candidateOptions =
         electionCandidates(motion, currentHolderIds, now);
@@ -174,7 +174,7 @@ final class OfficeElectionEffect implements MotionEffect {
             candidate -> {
               MembershipProjection membership = membersById.get(candidate.getMembershipId());
               if (membership == null) {
-                throw ApiException.notFound("member_not_found", "Member not found.");
+                throw PolityResource.MEMBER.notFound();
               }
               if (!standingMembershipIds.contains(membership.getId())) {
                 return null;

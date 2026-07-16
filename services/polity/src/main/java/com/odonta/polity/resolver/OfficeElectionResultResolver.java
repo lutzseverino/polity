@@ -1,7 +1,10 @@
 package com.odonta.polity.resolver;
 
+import static com.odonta.polity.exception.RequiredResource.required;
+
 import com.odonta.common.api.ApiException;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
+import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.OfficeElectionApplicationMapper;
 import com.odonta.polity.model.MotionStatus;
 import com.odonta.polity.model.OfficeElectionBallotRanking;
@@ -133,21 +136,13 @@ public class OfficeElectionResultResolver {
                 motion ->
                     resolve(
                         motion,
-                        required(
-                            proposalByMotion,
-                            motion.getId(),
-                            "office_election_not_found",
-                            "Office election not found."),
+                        requiredOfficeElection(proposalByMotion, motion.getId()),
                         officeById,
                         candidatesByMotion.getOrDefault(motion.getId(), List.of()),
                         memberById,
                         currentBallotByMotion.get(motion.getId()),
                         preferencesByMotion.getOrDefault(motion.getId(), List.of()),
-                        required(
-                            procedures,
-                            motion.getProcedureId(),
-                            "procedure_not_found",
-                            "Procedure not found."),
+                        required(procedures, motion.getProcedureId(), PolityResource.PROCEDURE),
                         electorCounts.getOrDefault(motion.getId(), 0),
                         certifications.get(motion.getId()),
                         activeTerms,
@@ -169,18 +164,13 @@ public class OfficeElectionResultResolver {
       List<OfficeTermProjection> activeTerms,
       Set<UUID> standingMembershipIds,
       OffsetDateTime now) {
-    OfficeProjection office =
-        required(officeById, proposal.getOfficeId(), "office_not_found", "Office not found.");
+    OfficeProjection office = required(officeById, proposal.getOfficeId(), PolityResource.OFFICE);
     List<OfficeElectionCandidateResult> candidateResults =
         candidateList.stream()
             .map(
                 candidate -> {
                   MembershipProjection member =
-                      required(
-                          memberById,
-                          candidate.getMembershipId(),
-                          "member_not_found",
-                          "Member not found.");
+                      required(memberById, candidate.getMembershipId(), PolityResource.MEMBER);
                   return mapper.toCandidateResult(
                       member.getId(),
                       member.getDisplayName(),
@@ -221,11 +211,7 @@ public class OfficeElectionResultResolver {
             .map(
                 candidate -> {
                   MembershipProjection member =
-                      required(
-                          memberById,
-                          candidate.getMembershipId(),
-                          "member_not_found",
-                          "Member not found.");
+                      required(memberById, candidate.getMembershipId(), PolityResource.MEMBER);
                   return new OfficeElectionCandidateOption(member.getId(), member.getDisplayName());
                 })
             .toList();
@@ -283,11 +269,12 @@ public class OfficeElectionResultResolver {
                     && term.getEndsAt().isAfter(now));
   }
 
-  private <T> T required(Map<UUID, T> values, UUID id, String code, String message) {
-    T value = values.get(id);
-    if (value == null) {
-      throw ApiException.notFound(code, message);
+  private OfficeElectionProposalProjection requiredOfficeElection(
+      Map<UUID, OfficeElectionProposalProjection> values, UUID id) {
+    OfficeElectionProposalProjection proposal = values.get(id);
+    if (proposal == null) {
+      throw ApiException.notFound("office_election_not_found", "Office election not found.");
     }
-    return value;
+    return proposal;
   }
 }
