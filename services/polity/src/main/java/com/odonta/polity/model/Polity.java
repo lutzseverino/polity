@@ -1,9 +1,9 @@
 package com.odonta.polity.model;
 
-import com.odonta.authorization.resource.AuthorizationResourceType;
-import com.odonta.authorization.resource.TargetableAuthorizationResource;
-import com.odonta.common.data.AuditedEntity;
 import com.odonta.polity.PolityResources;
+import io.github.lutzseverino.cardo.authorization.resource.AuthorizationResourceType;
+import io.github.lutzseverino.cardo.authorization.resource.TargetableAuthorizationResource;
+import io.github.lutzseverino.cardo.common.data.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

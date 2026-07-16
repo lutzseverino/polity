@@ -10,8 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.odonta.authorization.grant.RevocationPlan;
-import com.odonta.authorization.grant.Revocations;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
@@ -26,6 +24,8 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.authorization.grant.RevocationPlan;
+import io.github.lutzseverino.cardo.authorization.grant.Revocations;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: odonta-polity
+    name: polity
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/odonta}
     username: ${SPRING_DATASOURCE_USERNAME:odonta}
@@ -23,16 +23,17 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:${odonta.polity.keycloak.base-url}/realms/${odonta.polity.keycloak.realm}}
-odonta:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:${polity.keycloak.base-url}/realms/${polity.keycloak.realm}}
+polity:
   api:
     base-path: /api/v1
-  polity:
-    keycloak:
-      base-url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
-      realm: ${KEYCLOAK_REALM:odonta}
-      client-id: ${KEYCLOAK_POLITY_CLIENT_ID:polity}
-      client-secret: ${KEYCLOAK_POLITY_CLIENT_SECRET:polity-secret}
+  keycloak:
+    base-url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
+    realm: ${KEYCLOAK_REALM:odonta}
+    client-id: ${KEYCLOAK_POLITY_CLIENT_ID:polity}
+    client-secret: ${KEYCLOAK_POLITY_CLIENT_SECRET:polity-secret}
+
+cardo:
   billing:
     client:
       base-url: ${BILLING_BASE_URL:http://localhost:8085/api/v1}

@@ -1,7 +1,7 @@
 package com.odonta.polity.model;
 
-import com.odonta.common.data.AuditedEntity;
-import com.odonta.common.data.PersonalDataEntity;
+import io.github.lutzseverino.cardo.common.data.AuditedEntity;
+import io.github.lutzseverino.cardo.common.data.PersonalDataEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

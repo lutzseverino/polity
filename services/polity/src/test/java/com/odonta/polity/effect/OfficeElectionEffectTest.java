@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Office;
@@ -41,6 +40,7 @@ import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.service.MembershipService;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

@@ -1,6 +1,5 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.PolitiesApi;
 import com.odonta.polity.api.model.ConstitutionResponse;
 import com.odonta.polity.api.model.CreatePolityRequest;
@@ -15,6 +14,7 @@ import com.odonta.polity.resolver.GovernmentStructureResolver;
 import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import com.odonta.polity.service.ConstitutionService;
 import com.odonta.polity.service.PolityService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class PolityController implements PolitiesApi {
   private final PolityService polities;

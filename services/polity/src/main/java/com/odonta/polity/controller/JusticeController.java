@@ -1,6 +1,5 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.JusticeApi;
 import com.odonta.polity.mapper.AppealTransportMapper;
 import com.odonta.polity.mapper.ConstitutionalReviewTransportMapper;
@@ -10,6 +9,7 @@ import com.odonta.polity.service.AppealService;
 import com.odonta.polity.service.ConstitutionalReviewService;
 import com.odonta.polity.service.OfficeTermReviewService;
 import com.odonta.polity.service.SanctionService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class JusticeController implements JusticeApi {
   private final SanctionService sanctionService;

@@ -1,12 +1,5 @@
 package com.odonta.polity.service;
 
-import com.odonta.authorization.grant.Grants;
-import com.odonta.authorization.spring.AuthenticatedUser;
-import com.odonta.billing.client.BillingEntitlement;
-import com.odonta.billing.client.BillingEntitlementsClient;
-import com.odonta.common.api.ApiException;
-import com.odonta.identity.client.IdentityUser;
-import com.odonta.identity.client.IdentityUsersClient;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
 import com.odonta.polity.authorization.PolityAccessPolicy;
@@ -49,6 +42,13 @@ import com.odonta.polity.resolver.PolitySummaryResolver;
 import com.odonta.polity.result.PageResult;
 import com.odonta.polity.result.PolitySummaryResult;
 import com.odonta.polity.template.ConstitutionTemplateSeeder;
+import io.github.lutzseverino.cardo.authorization.grant.Grants;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
+import io.github.lutzseverino.cardo.billing.client.BillingEntitlement;
+import io.github.lutzseverino.cardo.billing.client.BillingEntitlementsClient;
+import io.github.lutzseverino.cardo.common.api.ApiException;
+import io.github.lutzseverino.cardo.identity.client.IdentityUser;
+import io.github.lutzseverino.cardo.identity.client.IdentityUsersClient;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;

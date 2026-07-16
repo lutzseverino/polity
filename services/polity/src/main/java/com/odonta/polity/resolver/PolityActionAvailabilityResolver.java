@@ -1,6 +1,5 @@
 package com.odonta.polity.resolver;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
@@ -36,6 +35,7 @@ import com.odonta.polity.result.ActionAvailabilityResult;
 import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.GovernmentAssessmentResult;
 import com.odonta.polity.result.PolityActionAvailabilityResult;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;

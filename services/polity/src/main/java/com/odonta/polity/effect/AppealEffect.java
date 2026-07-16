@@ -1,6 +1,5 @@
 package com.odonta.polity.effect;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.Appeal;
 import com.odonta.polity.model.ConstitutionVersion;
@@ -20,6 +19,7 @@ import com.odonta.polity.repository.AppealRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

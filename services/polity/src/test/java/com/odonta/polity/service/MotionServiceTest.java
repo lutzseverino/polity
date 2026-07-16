@@ -10,8 +10,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.odonta.authorization.spring.AuthenticatedUser;
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.effect.MotionEffectApplier;
@@ -128,6 +126,8 @@ import com.odonta.polity.result.ActionAvailabilityResult;
 import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.ConstitutionOfficeChangeResult;
 import com.odonta.polity.result.ConstitutionPowerChangeResult;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.lang.reflect.Proxy;
 import java.time.Clock;
 import java.time.Instant;

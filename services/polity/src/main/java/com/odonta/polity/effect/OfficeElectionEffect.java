@@ -1,6 +1,5 @@
 package com.odonta.polity.effect;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionVersion;
@@ -32,6 +31,7 @@ import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.ProcedureRepository;
 import com.odonta.polity.service.MembershipService;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;

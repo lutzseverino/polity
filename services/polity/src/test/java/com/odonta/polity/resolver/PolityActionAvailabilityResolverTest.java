@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
 import com.odonta.polity.model.AppealProposal;
@@ -46,6 +45,7 @@ import com.odonta.polity.repository.SanctionProjection;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.service.MembershipService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.lang.reflect.Proxy;
 import java.time.Clock;
 import java.time.OffsetDateTime;

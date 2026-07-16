@@ -1,8 +1,8 @@
 package com.odonta.polity.authorization;
 
-import com.odonta.authorization.grant.GrantPlan;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
+import io.github.lutzseverino.cardo.authorization.grant.GrantPlan;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;

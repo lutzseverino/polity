@@ -1,6 +1,5 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.InvitationsApi;
 import com.odonta.polity.api.model.CreateMemberInvitationRequest;
 import com.odonta.polity.api.model.MemberInvitationResponse;
@@ -8,6 +7,7 @@ import com.odonta.polity.api.model.MemberResponse;
 import com.odonta.polity.mapper.MembershipInvitationTransportMapper;
 import com.odonta.polity.mapper.MembershipTransportMapper;
 import com.odonta.polity.service.InvitationService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class InvitationController implements InvitationsApi {
   private final InvitationService invitations;

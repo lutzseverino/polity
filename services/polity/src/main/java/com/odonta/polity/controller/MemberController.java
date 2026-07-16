@@ -1,10 +1,10 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MembersApi;
 import com.odonta.polity.mapper.MembershipTransportMapper;
 import com.odonta.polity.service.MembershipResignationService;
 import com.odonta.polity.service.MembershipService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class MemberController implements MembersApi {
   private final MembershipService memberships;

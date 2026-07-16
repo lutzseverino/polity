@@ -2,7 +2,6 @@ package com.odonta.polity.resolver;
 
 import static com.odonta.polity.exception.RequiredResource.required;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.model.ConstitutionStatus;
@@ -25,6 +24,7 @@ import com.odonta.polity.result.ActionAvailabilityResult;
 import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.MotionActionAvailabilityResult;
 import com.odonta.polity.service.MembershipService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;

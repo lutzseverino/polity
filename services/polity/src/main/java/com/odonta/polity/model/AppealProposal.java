@@ -1,6 +1,6 @@
 package com.odonta.polity.model;
 
-import com.odonta.common.data.AuditedEntity;
+import io.github.lutzseverino.cardo.common.data.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,7 +1,5 @@
 package com.odonta.polity.service;
 
-import com.odonta.authorization.spring.AuthenticatedUser;
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityAccessPolicy;
@@ -111,6 +109,8 @@ import com.odonta.polity.resolver.ProcedureElectorateResolver;
 import com.odonta.polity.result.ActionAvailabilityResult;
 import com.odonta.polity.result.MotionResult;
 import com.odonta.polity.result.PageResult;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;

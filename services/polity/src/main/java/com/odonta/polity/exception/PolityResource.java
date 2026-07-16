@@ -1,6 +1,6 @@
 package com.odonta.polity.exception;
 
-import com.odonta.common.api.ApiException;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 
 public enum PolityResource {
   MEMBER("member_not_found", "Member not found."),

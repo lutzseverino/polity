@@ -1,8 +1,5 @@
 package com.odonta.polity.service;
 
-import com.odonta.authorization.grant.Revocations;
-import com.odonta.authorization.spring.AuthenticatedUser;
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.PolityRevocationPlanner;
 import com.odonta.polity.exception.PolityResource;
@@ -27,6 +24,9 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.resolver.GovernmentAssessmentResolver;
+import io.github.lutzseverino.cardo.authorization.grant.Revocations;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;

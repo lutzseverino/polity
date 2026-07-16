@@ -1,8 +1,8 @@
 package com.odonta.polity.config;
 
-import com.odonta.authorization.keycloak.KeycloakAuthoritiesConverter;
-import com.odonta.authorization.spring.AuthenticatedUserReader;
-import com.odonta.authorization.spring.ResourcePermissionEvaluator;
+import io.github.lutzseverino.cardo.authorization.keycloak.KeycloakAuthoritiesConverter;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
+import io.github.lutzseverino.cardo.authorization.spring.ResourcePermissionEvaluator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +44,7 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain security(
       HttpSecurity http,
-      @Value("${odonta.api.base-path}") String basePath,
+      @Value("${polity.api.base-path}") String basePath,
       KeycloakAuthoritiesConverter authorities) {
     JwtAuthenticationConverter jwt = new JwtAuthenticationConverter();
     jwt.setJwtGrantedAuthoritiesConverter(authorities);

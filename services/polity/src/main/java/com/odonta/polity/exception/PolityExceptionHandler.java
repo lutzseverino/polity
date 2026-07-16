@@ -1,6 +1,6 @@
 package com.odonta.polity.exception;
 
-import com.odonta.common.web.ApiExceptionHandler;
+import io.github.lutzseverino.cardo.common.web.ApiExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice

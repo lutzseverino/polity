@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
-import com.odonta.common.api.ApiException;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;

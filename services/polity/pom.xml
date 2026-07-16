@@ -25,7 +25,7 @@
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <lombok.version>1.18.42</lombok.version>
     <mapstruct.version>1.6.3</mapstruct.version>
-    <odonta.platform.version>0.0.0-SNAPSHOT</odonta.platform.version>
+    <cardo.version>0.1.0-SNAPSHOT</cardo.version>
     <openapi-generator.version>7.22.0</openapi-generator.version>
     <archunit.version>1.4.2</archunit.version>
     <spotbugs.version>4.10.2.0</spotbugs.version>
@@ -33,12 +33,12 @@
   </properties>
 
   <dependencies>
-    <dependency><groupId>com.odonta</groupId><artifactId>common</artifactId><version>${odonta.platform.version}</version></dependency>
-    <dependency><groupId>com.odonta</groupId><artifactId>authorization</artifactId><version>${odonta.platform.version}</version></dependency>
-    <dependency><groupId>com.odonta</groupId><artifactId>billing-client</artifactId><version>${odonta.platform.version}</version></dependency>
-    <dependency><groupId>com.odonta</groupId><artifactId>billing-client-http</artifactId><version>${odonta.platform.version}</version><scope>runtime</scope></dependency>
-    <dependency><groupId>com.odonta</groupId><artifactId>identity-client</artifactId><version>${odonta.platform.version}</version></dependency>
-    <dependency><groupId>com.odonta</groupId><artifactId>identity-client-http</artifactId><version>${odonta.platform.version}</version><scope>runtime</scope></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>common</artifactId><version>${cardo.version}</version></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>authorization</artifactId><version>${cardo.version}</version></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>billing-client</artifactId><version>${cardo.version}</version></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>billing-client-http</artifactId><version>${cardo.version}</version><scope>runtime</scope></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>identity-client</artifactId><version>${cardo.version}</version></dependency>
+    <dependency><groupId>io.github.lutzseverino.cardo</groupId><artifactId>identity-client-http</artifactId><version>${cardo.version}</version><scope>runtime</scope></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>

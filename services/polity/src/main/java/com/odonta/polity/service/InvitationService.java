@@ -1,11 +1,5 @@
 package com.odonta.polity.service;
 
-import com.odonta.authorization.grant.Grants;
-import com.odonta.authorization.spring.AuthenticatedUser;
-import com.odonta.common.api.ApiException;
-import com.odonta.identity.client.IdentityUser;
-import com.odonta.identity.client.IdentityUsersClient;
-import com.odonta.identity.client.ProvisionalUser;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.authorization.ConstitutionalAuthority;
 import com.odonta.polity.authorization.PolityGrantPlanner;
@@ -32,6 +26,12 @@ import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
 import com.odonta.polity.result.MembershipInvitationResult;
 import com.odonta.polity.result.MembershipResult;
 import com.odonta.polity.result.PageResult;
+import io.github.lutzseverino.cardo.authorization.grant.Grants;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
+import io.github.lutzseverino.cardo.common.api.ApiException;
+import io.github.lutzseverino.cardo.identity.client.IdentityUser;
+import io.github.lutzseverino.cardo.identity.client.IdentityUsersClient;
+import io.github.lutzseverino.cardo.identity.client.ProvisionalUser;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.OffsetDateTime;

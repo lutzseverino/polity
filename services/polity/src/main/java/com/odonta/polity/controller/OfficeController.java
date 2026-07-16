@@ -1,11 +1,11 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.OfficesApi;
 import com.odonta.polity.mapper.OfficeTermTransportMapper;
 import com.odonta.polity.mapper.OfficeTransportMapper;
 import com.odonta.polity.service.OfficeService;
 import com.odonta.polity.service.OfficeTermService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class OfficeController implements OfficesApi {
   private final OfficeTransportMapper officeMapper;

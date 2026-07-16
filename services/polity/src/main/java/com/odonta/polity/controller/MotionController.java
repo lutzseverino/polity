@@ -1,6 +1,5 @@
 package com.odonta.polity.controller;
 
-import com.odonta.authorization.spring.AuthenticatedUserReader;
 import com.odonta.polity.api.MotionsApi;
 import com.odonta.polity.api.model.CastOfficeElectionBallotRequest;
 import com.odonta.polity.api.model.CastVoteRequest;
@@ -16,6 +15,7 @@ import com.odonta.polity.api.model.MotionResponse;
 import com.odonta.polity.api.model.RespondOfficeElectionCandidacyRequest;
 import com.odonta.polity.mapper.MotionTransportMapper;
 import com.odonta.polity.service.MotionService;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${odonta.api.base-path}")
+@RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class MotionController implements MotionsApi {
   private final MotionService motions;

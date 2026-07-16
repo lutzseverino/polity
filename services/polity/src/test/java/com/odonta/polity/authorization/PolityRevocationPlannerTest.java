@@ -2,9 +2,9 @@ package com.odonta.polity.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.odonta.authorization.grant.RevocationPlan;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
+import io.github.lutzseverino.cardo.authorization.grant.RevocationPlan;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

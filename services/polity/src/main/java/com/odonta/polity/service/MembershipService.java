@@ -1,6 +1,5 @@
 package com.odonta.polity.service;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
@@ -13,6 +12,7 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.result.MembershipResult;
 import com.odonta.polity.result.PageResult;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;

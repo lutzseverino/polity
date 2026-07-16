@@ -1,38 +1,25 @@
-# Polity Service
+<div align="center">
+    <h1 align="center">Polity Service</h1>
+    <p>The product-owned backend for constitutional government.</p>
+</div>
 
-Polity owns constitutional government behavior, including membership, versioned constitutions,
-procedures, motions, voting, certification, typed official effects, and the official record.
-
-Platform authorization controls coarse product access. Constitutional authority remains Polity
-domain state and is evaluated synchronously by Polity application services.
+The service owns Polity's domain behavior, API contract, persistence, permissions, and lifecycle
+decisions. Shared authorization, identity, billing, and API mechanics come from
+[Cardo](https://github.com/lutzseverino/cardo).
 
 ## Development
 
-From the repository root:
+Install Cardo into the local Maven repository, then run service checks from the repository root:
 
 ```bash
+mvn -f ../cardo/pom.xml install
 pnpm test:service
-pnpm compile:service
 pnpm check:service:architecture
 pnpm check:service:static
 ```
 
-Or from this service directory:
-
-```bash
-cd services/polity
-mvn test
-```
-
-The service consumes Odonta platform artifacts through the local or configured Maven repository.
-
-Architecture rules live in the ArchUnit test suite and run with `mvn test`. SpotBugs runs through
-`pnpm check:service:static`; generated OpenAPI code and low-value model DTO mutability findings are
-excluded in `spotbugs-exclude.xml` so the gate focuses on higher-signal bug patterns.
-
 ## Documentation
 
-Durable service docs live in [docs](docs/README.md).
-
-- [Architecture](docs/explanation/architecture.md)
-- [OpenAPI contract](openapi/polity.yaml)
+Start with the [documentation index](docs/README.md). Documentation is organized by reader intent
+so durable guidance has one predictable home. The [OpenAPI contract](openapi/polity.yaml) is owned
+beside the service.

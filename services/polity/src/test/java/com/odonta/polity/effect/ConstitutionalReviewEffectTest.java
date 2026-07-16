@@ -8,7 +8,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.ConstitutionalReview;
 import com.odonta.polity.model.ConstitutionalReviewProposal;
@@ -32,6 +31,7 @@ import com.odonta.polity.repository.OfficialRecordRepository;
 import com.odonta.polity.repository.ResolutionRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.lang.reflect.Proxy;
 import java.time.OffsetDateTime;
 import java.util.Optional;

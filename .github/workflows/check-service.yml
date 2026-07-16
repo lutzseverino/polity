@@ -1,0 +1,34 @@
+name: Check Service
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: check-service-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Polity
+        uses: actions/checkout@v6
+      - name: Check out Cardo
+        uses: actions/checkout@v6
+        with:
+          repository: lutzseverino/cardo
+          path: cardo
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Install Cardo
+        run: mvn -f cardo/pom.xml install -DskipTests
+      - name: Check Polity service
+        run: mvn -f services/polity/pom.xml test
+

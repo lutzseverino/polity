@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.model.AppealProposal;
 import com.odonta.polity.model.EffectType;
 import com.odonta.polity.model.Sanction;
@@ -20,6 +19,7 @@ import com.odonta.polity.repository.AppealRepository;
 import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.SanctionRepository;
 import com.odonta.polity.service.OfficialRecordService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package com.odonta.polity;
 
-import com.odonta.authorization.resource.AuthorizationResourceType;
+import io.github.lutzseverino.cardo.authorization.resource.AuthorizationResourceType;
 import java.util.List;
 
 public final class PolityResources {

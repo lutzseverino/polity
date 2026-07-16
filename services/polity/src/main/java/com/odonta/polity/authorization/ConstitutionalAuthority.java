@@ -1,6 +1,5 @@
 package com.odonta.polity.authorization;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.OfficeTermStatus;
@@ -12,6 +11,7 @@ import com.odonta.polity.repository.MembershipProjection;
 import com.odonta.polity.repository.OfficeTermProjection;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.service.MembershipService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Collection;

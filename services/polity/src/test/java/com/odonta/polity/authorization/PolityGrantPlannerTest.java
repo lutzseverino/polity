@@ -2,10 +2,10 @@ package com.odonta.polity.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.odonta.authorization.grant.GrantPlan;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.PolityResources;
 import com.odonta.polity.model.PowerCode;
+import io.github.lutzseverino.cardo.authorization.grant.GrantPlan;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,6 @@ package com.odonta.polity.resolver;
 
 import static com.odonta.polity.exception.RequiredResource.required;
 
-import com.odonta.common.api.ApiException;
 import com.odonta.polity.evaluator.OfficeElectionEvaluator;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.OfficeElectionApplicationMapper;
@@ -31,6 +30,7 @@ import com.odonta.polity.repository.ProcedureProjection;
 import com.odonta.polity.result.OfficeElectionBallotResult;
 import com.odonta.polity.result.OfficeElectionCandidateResult;
 import com.odonta.polity.service.MembershipService;
+import io.github.lutzseverino.cardo.common.api.ApiException;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Comparator;
