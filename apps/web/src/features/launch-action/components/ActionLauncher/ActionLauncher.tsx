@@ -266,7 +266,7 @@ function CompactActionLauncher({
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      if (event.repeat) {
+      if (event.defaultPrevented || event.repeat) {
         return;
       }
 
@@ -274,14 +274,21 @@ function CompactActionLauncher({
         event.key.toLocaleLowerCase() === "k" &&
         (event.metaKey || event.ctrlKey)
       ) {
+        if (
+          !open &&
+          document.querySelector('[role="dialog"], [role="alertdialog"]')
+        ) {
+          return;
+        }
+
         event.preventDefault();
-        setOpen((current) => !current);
+        setOpen(!open);
       }
     };
 
     document.addEventListener("keydown", handleShortcut);
     return () => document.removeEventListener("keydown", handleShortcut);
-  }, []);
+  }, [open]);
 
   return (
     <AppDialog onOpenChange={setOpen} open={open}>

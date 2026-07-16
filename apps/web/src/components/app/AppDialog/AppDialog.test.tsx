@@ -35,6 +35,46 @@ function setMobileViewport(matches: boolean) {
   });
 }
 
+function createResponsiveViewport(initiallyMobile: boolean) {
+  const listeners = new Set<() => void>();
+  let matches = initiallyMobile;
+  const mediaQueryList = {
+    addEventListener: (_type: string, listener: () => void) => {
+      listeners.add(listener);
+    },
+    get matches() {
+      return matches;
+    },
+    media: "(max-width: 767px)",
+    removeEventListener: (_type: string, listener: () => void) => {
+      listeners.delete(listener);
+    },
+  } as unknown as MediaQueryList;
+
+  const setMobile = (nextMatches: boolean) => {
+    matches = nextMatches;
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: matches ? 500 : 1024,
+      writable: true,
+    });
+    act(() =>
+      listeners.forEach((listener) => {
+        listener();
+      }),
+    );
+  };
+
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: vi.fn(() => mediaQueryList),
+    writable: true,
+  });
+  setMobile(initiallyMobile);
+
+  return { setMobile };
+}
+
 function renderAppDialog() {
   return render(
     <AppDialog>
@@ -144,6 +184,33 @@ describe("AppDialog", () => {
     await user.click(screen.getByRole("button", { name: "Close" }));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("preserves uncontrolled open state across responsive primitive changes", async () => {
+    const user = userEvent.setup();
+    const viewport = createResponsiveViewport(false);
+    renderAppDialog();
+
+    await user.click(screen.getByRole("button", { name: "Review invitation" }));
+
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "data-slot",
+      "dialog-content",
+    );
+
+    viewport.setMobile(true);
+
+    expect(await screen.findByRole("dialog")).toHaveAttribute(
+      "data-slot",
+      "drawer-popup",
+    );
+
+    viewport.setMobile(false);
+
+    expect(screen.getByRole("dialog")).toHaveAttribute(
+      "data-slot",
+      "dialog-content",
+    );
   });
 
   it.each([

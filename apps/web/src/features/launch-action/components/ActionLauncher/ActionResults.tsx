@@ -2,7 +2,6 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   BookOpenCheck,
   CheckCircle2,
-  CirclePlus,
   FilePenLine,
   Gavel,
   Landmark,
@@ -27,10 +26,13 @@ import type {
   ActionAvailability,
   PolityActionAvailability,
 } from "@/domains/polity";
-import type { ActionDefinition } from "@/features/launch-action/lib/action-definitions";
+import type {
+  ActionDefinition,
+  ActionId,
+} from "@/features/launch-action/lib/action-definitions";
 import { cn } from "@/lib/utils";
 
-const actionIconById: Readonly<Record<string, LucideIcon>> = {
+const actionIconById: Readonly<Record<ActionId, LucideIcon>> = {
   "amend-constitution": BookOpenCheck,
   "appeal-sanction": Scale,
   "certify-motion": CheckCircle2,
@@ -56,7 +58,7 @@ function ActionOption({
   polityId: string;
 }>) {
   const { i18n } = useLingui();
-  const Icon = actionIconById[action.id] ?? CirclePlus;
+  const Icon = actionIconById[action.id];
   const content = (
     <>
       <span

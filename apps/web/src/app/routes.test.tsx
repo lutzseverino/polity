@@ -354,6 +354,29 @@ describe("first governing journey", () => {
     ).toBeInTheDocument();
   });
 
+  it("does not stack the action launcher over an open invitation task", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/inbox");
+
+    renderRouter(router);
+
+    await user.click(
+      await screen.findByRole("link", {
+        name: /invitation to join sunday supper club/i,
+      }),
+    );
+    const invitationDialog = await screen.findByRole("dialog", {
+      name: "Join Sunday Supper Club?",
+    });
+
+    fireEvent.keyDown(document, { key: "k", metaKey: true });
+
+    expect(screen.getAllByRole("dialog")).toEqual([invitationDialog]);
+    expect(
+      screen.queryByRole("dialog", { name: "Make something happen" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("dismisses an invitation back to the exact Inbox state", async () => {
     const user = userEvent.setup();
     const router = createTestRouter("/inbox");
@@ -482,6 +505,16 @@ describe("first governing journey", () => {
     renderRouter(router);
 
     await screen.findByRole("link", { name: "Home" });
+    const preventedShortcut = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      key: "k",
+      metaKey: true,
+    });
+    preventedShortcut.preventDefault();
+    document.dispatchEvent(preventedShortcut);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
     fireEvent.keyDown(document, { key: "k", metaKey: true, repeat: true });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 

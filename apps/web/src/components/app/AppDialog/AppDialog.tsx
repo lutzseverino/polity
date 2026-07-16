@@ -22,35 +22,50 @@ type AppDialogProps = Omit<ComponentProps<typeof Dialog>, "onOpenChange"> & {
 type AppDialogContentProps = ComponentProps<typeof DialogContent> &
   ComponentProps<typeof DrawerContent>;
 
-function AppDialog({ onOpenChange, open, ...props }: AppDialogProps) {
+function AppDialog({
+  defaultOpen = false,
+  onOpenChange,
+  open,
+  ...props
+}: AppDialogProps) {
   const isMobile = useIsMobile();
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const resolvedOpen = open ?? uncontrolledOpen;
   const [renderedOpen, setRenderedOpen] = useState(false);
 
   useEffect(() => {
-    if (open === undefined) {
+    if (!resolvedOpen) {
+      setRenderedOpen(false);
       return undefined;
     }
 
     const animationFrame = window.requestAnimationFrame(() => {
-      setRenderedOpen(open);
+      setRenderedOpen(true);
     });
 
     return () => window.cancelAnimationFrame(animationFrame);
-  }, [open]);
+  }, [resolvedOpen]);
+
+  const handleOpenChange: NonNullable<AppDialogProps["onOpenChange"]> = (
+    nextOpen,
+    eventDetails,
+  ) => {
+    if (open === undefined) {
+      setUncontrolledOpen(nextOpen);
+      setRenderedOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen, eventDetails);
+  };
 
   return isMobile ? (
     <Drawer
       {...props}
-      onOpenChange={(open, eventDetails) => onOpenChange?.(open, eventDetails)}
-      open={open === undefined ? undefined : renderedOpen}
+      onOpenChange={handleOpenChange}
+      open={renderedOpen}
       showSwipeHandle
     />
   ) : (
-    <Dialog
-      {...props}
-      onOpenChange={(open, eventDetails) => onOpenChange?.(open, eventDetails)}
-      open={open}
-    />
+    <Dialog {...props} onOpenChange={handleOpenChange} open={resolvedOpen} />
   );
 }
 

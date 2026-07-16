@@ -17,7 +17,7 @@ type LaunchableActionAvailabilityKey = keyof Pick<
   | "resignMembership"
 >;
 
-export type ActionDefinition = Readonly<{
+type ActionDefinitionShape = Readonly<{
   availabilityKey: LaunchableActionAvailabilityKey;
   description: MessageDescriptor;
   goal: MessageDescriptor;
@@ -27,7 +27,7 @@ export type ActionDefinition = Readonly<{
   deemphasized?: boolean;
 }>;
 
-const actionDefinitions: readonly ActionDefinition[] = [
+const definedActions = [
   {
     availabilityKey: "introduceMotion",
     description: msg`Put a decision before the polity for an official vote.`,
@@ -191,7 +191,13 @@ const actionDefinitions: readonly ActionDefinition[] = [
     label: msg`Resign Membership`,
     deemphasized: true,
   },
-];
+] as const satisfies readonly ActionDefinitionShape[];
+
+export type ActionId = (typeof definedActions)[number]["id"];
+export type ActionDefinition = Omit<ActionDefinitionShape, "id"> &
+  Readonly<{ id: ActionId }>;
+
+const actionDefinitions: readonly ActionDefinition[] = definedActions;
 
 export function findActionDefinition(actionId: string | null) {
   return actionDefinitions.find((action) => action.id === actionId);
