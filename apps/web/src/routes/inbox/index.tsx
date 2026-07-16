@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppBadge } from "@/components/app/AppBadge";
 import { AppButton } from "@/components/app/AppButton";
 import { AppPageHeader } from "@/components/app/AppPageHeader";
+import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { AppText } from "@/components/app/AppText";
 import {
   filterInboxItemsByCategory,
@@ -49,7 +50,7 @@ function InboxRoute() {
   const visibleItems = filterInboxItemsByCategory(items, activeCategory);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <AppPageLayout measure="standard">
       <AppPageHeader
         description={
           <Trans>
@@ -136,6 +137,6 @@ function InboxRoute() {
           </div>
         )}
       </section>
-    </div>
+    </AppPageLayout>
   );
 }

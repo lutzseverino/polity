@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { AppPageHeader } from "@/components/app/AppPageHeader";
 
 describe("AppPageHeader", () => {
-  it("keeps a compactly hidden title available to assistive technology", () => {
-    render(<AppPageHeader compactVisibility="hidden" title="Polities" />);
+  it("exposes a semantic page heading to the shell visibility system", () => {
+    render(<AppPageHeader title="Polities" />);
 
     const heading = screen.getByRole("heading", {
       level: 1,
@@ -13,7 +13,7 @@ describe("AppPageHeader", () => {
     });
     const header = heading.closest("header");
 
-    expect(header).toHaveClass("sr-only", "md:not-sr-only");
+    expect(header).toHaveAttribute("data-slot", "page-header");
     expect(header?.querySelectorAll("p")).toHaveLength(0);
   });
 });

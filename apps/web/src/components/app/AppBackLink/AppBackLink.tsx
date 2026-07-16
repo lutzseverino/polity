@@ -11,7 +11,7 @@ const AppBackLinkBase = forwardRef<HTMLAnchorElement, AppBackLinkBaseProps>(
   ({ children, className, ...props }, ref) => (
     <a
       className={cn(
-        "inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground focus-visible:rounded focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "focus-indicator inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground focus-visible:rounded",
         className,
       )}
       ref={ref}

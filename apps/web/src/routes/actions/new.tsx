@@ -2,6 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { usePolityOptions } from "@/domains/polity";
 import { ActionSetup } from "@/features/launch-action";
 
@@ -35,10 +36,12 @@ function ActionSetupRoute() {
   const search = Route.useSearch();
 
   return (
-    <ActionSetup
-      actionId={search.action}
-      polities={polityOptions}
-      polityId={search.polity}
-    />
+    <AppPageLayout measure="focused">
+      <ActionSetup
+        actionId={search.action}
+        polities={polityOptions}
+        polityId={search.polity}
+      />
+    </AppPageLayout>
   );
 }

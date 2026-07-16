@@ -14,7 +14,7 @@ import {
   invitationsQueryOptions,
   type PendingInvitation,
 } from "@/domains/membership";
-import { politiesQueryOptions } from "@/domains/polity";
+import { polityListQueryKey } from "@/domains/polity";
 import {
   type AcceptInvitationInput,
   acceptInvitation,
@@ -44,7 +44,7 @@ function acceptInvitationMutationOptions({
           invitations?.filter((invitation) => invitation.id !== invitationId),
       );
       void queryClient.invalidateQueries({
-        queryKey: politiesQueryOptions({ locale }).queryKey,
+        queryKey: polityListQueryKey,
       });
     },
   });

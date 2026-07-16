@@ -4,8 +4,11 @@ import { useLingui } from "@lingui/react";
 import { useMatches } from "@tanstack/react-router";
 
 export type ShellSection = "explore" | "home" | "inbox" | "me" | "polities";
+export type ShellRouteLevel = "detail" | "root" | "task" | "workspace";
 
 type ShellStaticPath = "/explore" | "/home" | "/inbox" | "/me" | "/polities";
+
+export type ShellSectionTarget = Readonly<{ to: ShellStaticPath }>;
 
 type ShellPolityPath =
   | "/polities/$polityId"
@@ -42,7 +45,7 @@ export type ShellRouteData = Readonly<{
   /** Static route label. Prefer loader `shellLabel` for fetched entities. */
   label?: MessageDescriptor;
   /** Semantic depth used by the shell and available for future presentation rules. */
-  level?: "detail" | "root" | "task" | "workspace";
+  level?: ShellRouteLevel;
   /** Primary application section used for navigation state and the breadcrumb root. */
   section?: ShellSection;
   /** Whether the global action launcher is available from the top bar. */
@@ -79,7 +82,8 @@ export type ResolvedShellContext = Readonly<{
   back?: ResolvedShellBackTarget;
   breadcrumbs: readonly ResolvedShellBreadcrumb[];
   compactNavigation: "hidden" | "visible";
-  level: "detail" | "root" | "task" | "workspace";
+  level: ShellRouteLevel;
+  polityId?: string;
   section: ShellSection;
   showPrimaryAction: boolean;
   title: string;
@@ -87,7 +91,7 @@ export type ResolvedShellContext = Readonly<{
 
 type ShellSectionDefinition = Readonly<{
   label: MessageDescriptor;
-  target: ShellLinkTarget;
+  target: ShellSectionTarget;
 }>;
 
 export const shellSectionDefinitions: Readonly<
@@ -191,12 +195,18 @@ export function resolveShellContext(
     }
   }
 
-  const activeContext = routeContexts.at(-1);
-  const title = activeContext?.shell.compactLabel
-    ? translate(activeContext.shell.compactLabel)
-    : (activeContext?.label ??
-      (activeContext?.shell.label
-        ? translate(activeContext.shell.label)
+  const titleContext = findLastMatching(
+    routeContexts,
+    (context) =>
+      Boolean(context.shell.compactLabel) ||
+      Boolean(context.label) ||
+      Boolean(context.shell.label),
+  );
+  const title = titleContext?.shell.compactLabel
+    ? translate(titleContext.shell.compactLabel)
+    : (titleContext?.label ??
+      (titleContext?.shell.label
+        ? translate(titleContext.shell.label)
         : undefined) ??
       translate(sectionDefinition.label));
   const backContext = findLastMatching(routeContexts, (context) =>
@@ -213,6 +223,9 @@ export function resolveShellContext(
   const levelContext = findLastMatching(routeContexts, (context) =>
     Boolean(context.shell.level),
   );
+  const polityContext = findLastMatching(routeContexts, (context) =>
+    Boolean(context.params.polityId),
+  );
   const back = backContext?.shell.back;
 
   return {
@@ -226,6 +239,7 @@ export function resolveShellContext(
     breadcrumbs,
     compactNavigation: visibilityContext?.shell.compactNavigation ?? "visible",
     level: levelContext?.shell.level ?? "root",
+    polityId: polityContext?.params.polityId,
     section,
     showPrimaryAction: actionContext?.shell.showPrimaryAction ?? true,
     title,

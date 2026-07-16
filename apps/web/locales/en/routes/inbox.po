@@ -17,34 +17,34 @@ msgstr ""
 #~ msgid "Find everything that needs your attention here. Each item opens where that decision belongs."
 #~ msgstr "Find everything that needs your attention here. Each item opens where that decision belongs."
 
-#: src/routes/inbox/index.tsx:25
-#: src/routes/inbox/index.tsx:60
+#: src/routes/inbox/index.tsx:26
+#: src/routes/inbox/index.tsx:61
 msgid "Inbox"
 msgstr "Inbox"
 
-#: src/routes/inbox/index.tsx:65
+#: src/routes/inbox/index.tsx:66
 msgid "Inbox Categories"
 msgstr "Inbox Categories"
 
-#: src/routes/inbox/index.tsx:42
-#: src/routes/inbox/index.tsx:100
+#: src/routes/inbox/index.tsx:43
+#: src/routes/inbox/index.tsx:101
 msgid "Needs Action"
 msgstr "Needs Action"
 
-#: src/routes/inbox/index.tsx:132
+#: src/routes/inbox/index.tsx:133
 msgid "New items will appear here when they need your attention."
 msgstr "New items will appear here when they need your attention."
 
-#: src/routes/inbox/index.tsx:129
+#: src/routes/inbox/index.tsx:130
 msgid "Nothing Here Right Now"
 msgstr "Nothing Here Right Now"
 
-#: src/routes/inbox/index.tsx:55
+#: src/routes/inbox/index.tsx:56
 msgid "Review actions and updates from across your polities. Each item opens where that decision belongs."
 msgstr "Review actions and updates from across your polities. Each item opens where that decision belongs."
 
-#: src/routes/inbox/index.tsx:43
-#: src/routes/inbox/index.tsx:102
+#: src/routes/inbox/index.tsx:44
+#: src/routes/inbox/index.tsx:103
 msgid "Updates"
 msgstr "Updates"
 

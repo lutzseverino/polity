@@ -5,11 +5,12 @@ import { ShellNavigation } from "@/app/shell/ShellNavigation";
 import { ShellTopBar } from "@/app/shell/ShellTopBar";
 import {
   shellContentInsetClassName,
+  shouldHideShellPageHeader,
   useShellLayout,
 } from "@/app/shell/shell-layout";
 import { useShellRouteContext } from "@/app/shell/shell-route-context";
 import { AppLinkButton } from "@/components/app/AppButton";
-import { AppTaskSurface } from "@/components/app/AppTaskSurface";
+import { AppDialog, AppDialogContent } from "@/components/app/AppDialog";
 import { countOpenInboxTasks, useInboxItems } from "@/domains/inbox";
 import { usePolityOptions } from "@/domains/polity";
 import {
@@ -31,6 +32,7 @@ export function AppShell() {
   const openInboxTaskCount = countOpenInboxTasks(inboxItems);
   const showCompactNavigation =
     layout !== "compact" || shellContext.compactNavigation === "visible";
+  const hidePageHeader = shouldHideShellPageHeader(layout, shellContext.level);
 
   useEffect(() => {
     if (task) {
@@ -41,7 +43,7 @@ export function AppShell() {
   return (
     <div className="min-h-svh bg-muted/30">
       <a
-        className="fixed top-[max(0.5rem,env(safe-area-inset-top))] left-[max(0.5rem,env(safe-area-inset-left))] z-50 -translate-y-24 rounded-lg bg-background px-3 py-2 text-sm font-medium shadow-md focus-visible:translate-y-0 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="focus-indicator fixed top-[max(0.5rem,env(safe-area-inset-top))] left-[max(0.5rem,env(safe-area-inset-left))] z-50 -translate-y-24 rounded-lg bg-background px-3 py-2 text-sm font-medium shadow-md focus-visible:translate-y-0"
         href="#main-content"
       >
         <Trans>Skip to main content</Trans>
@@ -64,10 +66,13 @@ export function AppShell() {
         className={cn(
           "pb-8 focus:outline-none",
           shellContentInsetClassName[layout],
+          hidePageHeader && "[&_[data-slot=page-header]]:sr-only",
           layout === "compact" &&
             showCompactNavigation &&
             "pb-[calc(5rem+env(safe-area-inset-bottom))]",
         )}
+        data-shell-layout={layout}
+        data-shell-level={shellContext.level}
         id="main-content"
         tabIndex={-1}
       >
@@ -77,10 +82,12 @@ export function AppShell() {
       </main>
 
       {displayedTask ? (
-        <AppTaskSurface
-          describedBy={invitationResponseDescriptionId}
-          labelledBy={invitationResponseTitleId}
-          onDismiss={() => router.history.back()}
+        <AppDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              router.history.back();
+            }
+          }}
           onOpenChangeComplete={(open) => {
             if (!open && task === undefined) {
               setDisplayedTask(undefined);
@@ -88,26 +95,32 @@ export function AppShell() {
           }}
           open={task !== undefined}
         >
-          <InvitationResponse
-            descriptionId={invitationResponseDescriptionId}
-            headingLevel="h2"
-            invitationId={displayedTask.invitationId}
-            locale={i18n.locale}
-            onDismiss={() => router.history.back()}
-            renderPolitiesLink={(label) => (
-              <AppLinkButton
-                className="min-h-11 w-full sm:min-h-9 sm:w-auto"
-                search={{ task: undefined }}
-                size="lg"
-                to="/polities"
-              >
-                {label}
-              </AppLinkButton>
-            )}
-            showDismissAfterAccept
-            titleId={invitationResponseTitleId}
-          />
-        </AppTaskSurface>
+          <AppDialogContent
+            aria-describedby={invitationResponseDescriptionId}
+            aria-labelledby={invitationResponseTitleId}
+            className="max-h-[calc(100dvh-1rem)] max-w-none overflow-hidden p-0 sm:max-h-[calc(100dvh-2rem)] sm:max-w-xl"
+          >
+            <InvitationResponse
+              descriptionId={invitationResponseDescriptionId}
+              headingLevel="h2"
+              invitationId={displayedTask.invitationId}
+              locale={i18n.locale}
+              onDismiss={() => router.history.back()}
+              renderPolitiesLink={(label) => (
+                <AppLinkButton
+                  className="min-h-11 w-full sm:min-h-9 sm:w-auto"
+                  search={{ task: undefined }}
+                  size="lg"
+                  to="/polities"
+                >
+                  {label}
+                </AppLinkButton>
+              )}
+              showDismissAfterAccept
+              titleId={invitationResponseTitleId}
+            />
+          </AppDialogContent>
+        </AppDialog>
       ) : null}
     </div>
   );

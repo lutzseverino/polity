@@ -13,109 +13,353 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/features/launch-action/lib/action-definitions.ts:38
+#. placeholder {0}: actions.length
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:154
+msgid "{0, plural, one {# matching action.} other {# matching actions.}}"
+msgstr "{0, plural, one {# matching action.} other {# matching actions.}}"
+
+#. placeholder {0}: unavailableActions.length
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:272
+msgid "{0, plural, one {# more action exists, but is unavailable here} other {# more actions exist, but are unavailable here}}"
+msgstr "{0, plural, one {# more action exists, but is unavailable here} other {# more actions exist, but are unavailable here}}"
+
+#. placeholder {0}: sensitiveActions.length
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:283
+#~ msgid "{0, plural, one {# sensitive action} other {# sensitive actions}}"
+#~ msgstr "{0, plural, one {# sensitive action} other {# sensitive actions}}"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:76
+msgid "{availableCount, plural, one {# action} other {# actions}}"
+msgstr "{availableCount, plural, one {# action} other {# actions}}"
+
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:159
+msgid "{availableMatchCount, plural, one {# is allowed.} other {# are allowed.}}"
+msgstr "{availableMatchCount, plural, one {# is allowed.} other {# are allowed.}}"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:338
+msgid "Actions"
+msgstr "Actions"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:243
+msgid "Actions become available inside a polity."
+msgstr "Actions become available inside a polity."
+
+#: src/features/launch-action/lib/action-definitions.ts:57
+msgid "add member"
+msgstr "add member"
+
+#: src/features/launch-action/lib/action-definitions.ts:95
+msgid "Address harmful conduct"
+msgstr "Address harmful conduct"
+
+#: src/features/launch-action/lib/action-definitions.ts:43
+msgid "adopt a policy"
+msgstr "adopt a policy"
+
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:200
+msgid "Allowed actions"
+msgstr "Allowed actions"
+
+#: src/features/launch-action/lib/action-definitions.ts:90
 msgid "Amend the Constitution"
 msgstr "Amend the Constitution"
 
-#: src/features/launch-action/lib/action-definitions.ts:43
+#: src/features/launch-action/lib/action-definitions.ts:113
 msgid "appeal"
 msgstr "appeal"
 
-#: src/features/launch-action/lib/action-definitions.ts:29
+#: src/features/launch-action/lib/action-definitions.ts:160
+msgid "apply the outcome"
+msgstr "apply the outcome"
+
+#: src/features/launch-action/lib/action-definitions.ts:41
+msgid "approve an idea"
+msgstr "approve an idea"
+
+#: src/features/launch-action/lib/action-definitions.ts:49
 msgid "Ask someone to become a member of this polity."
 msgstr "Ask someone to become a member of this polity."
+
+#: src/features/launch-action/lib/action-definitions.ts:94
+msgid "Ask the polity to issue a warning or temporary suspension."
+msgstr "Ask the polity to issue a warning or temporary suspension."
+
+#: src/features/launch-action/lib/action-definitions.ts:109
+msgid "Ask the polity to overturn an active sanction."
+msgstr "Ask the polity to overturn an active sanction."
+
+#: src/features/launch-action/lib/action-definitions.ts:123
+msgid "Ask the polity to review and potentially vacate an active office term."
+msgstr "Ask the polity to review and potentially vacate an active office term."
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:185
+#~ msgid "available in {polityName}"
+#~ msgstr "available in {polityName}"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:258
+#~ msgid "Available now"
+#~ msgstr "Available now"
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:36
 #~ msgid "Back to Home"
 #~ msgstr "Back to Home"
 
-#: src/features/launch-action/lib/action-definitions.ts:23
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:198
+msgid "Best matches"
+msgstr "Best matches"
+
+#: src/features/launch-action/lib/action-definitions.ts:68
 msgid "candidate"
 msgstr "candidate"
 
-#: src/features/launch-action/lib/action-definitions.ts:43
+#: src/features/launch-action/lib/action-definitions.ts:156
+msgid "certify"
+msgstr "certify"
+
+#: src/features/launch-action/lib/action-definitions.ts:153
+msgid "Certify a completed decision"
+msgstr "Certify a completed decision"
+
+#: src/features/launch-action/lib/action-definitions.ts:162
+msgid "Certify a Motion"
+msgstr "Certify a Motion"
+
+#: src/features/launch-action/lib/action-definitions.ts:142
 msgid "challenge"
 msgstr "challenge"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:270
+#: src/features/launch-action/lib/action-definitions.ts:110
+msgid "Challenge a sanction"
+msgstr "Challenge a sanction"
+
+#: src/features/launch-action/lib/action-definitions.ts:117
+msgid "challenge a warning"
+msgstr "challenge a warning"
+
+#: src/features/launch-action/lib/action-definitions.ts:138
+msgid "Challenge an official act"
+msgstr "Challenge an official act"
+
+#: src/features/launch-action/lib/action-definitions.ts:88
+msgid "change an office"
+msgstr "change an office"
+
+#: src/features/launch-action/lib/action-definitions.ts:79
+msgid "Change how this polity works"
+msgstr "Change how this polity works"
+
+#: src/features/launch-action/lib/action-definitions.ts:87
+msgid "change our rules"
+msgstr "change our rules"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:189
+msgid "Checking what you can do…"
+msgstr "Checking what you can do…"
+
+#: src/features/launch-action/lib/action-definitions.ts:71
+msgid "choose a leader"
+msgstr "choose a leader"
+
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:45
 msgid "Choose an Action"
 msgstr "Choose an Action"
 
-#: src/features/launch-action/lib/action-definitions.ts:31
+#: src/features/launch-action/lib/action-definitions.ts:64
+msgid "Choose people for an office"
+msgstr "Choose people for an office"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:409
+msgid "Choose the outcome in plain language. The constitution handles the mechanics and shows what is possible now."
+msgstr "Choose the outcome in plain language. The constitution handles the mechanics and shows what is possible now."
+
+#: src/features/launch-action/lib/action-definitions.ts:54
 msgid "citizen"
 msgstr "citizen"
 
-#: src/features/launch-action/lib/action-definitions.ts:43
+#: src/features/launch-action/lib/action-definitions.ts:171
+msgid "close"
+msgstr "close"
+
+#: src/features/launch-action/lib/action-definitions.ts:158
+msgid "close a motion"
+msgstr "close a motion"
+
+#: src/features/launch-action/lib/action-definitions.ts:167
+msgid "Close this polity"
+msgstr "Close this polity"
+
+#: src/features/launch-action/lib/action-definitions.ts:86
+msgid "constitution"
+msgstr "constitution"
+
+#: src/features/launch-action/lib/action-definitions.ts:143
 msgid "constitutional"
 msgstr "constitutional"
 
-#: src/features/launch-action/lib/action-definitions.ts:17
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:77
+msgid "currently allowed in {polityName}"
+msgstr "currently allowed in {polityName}"
+
+#: src/features/launch-action/lib/action-definitions.ts:38
 msgid "decision"
 msgstr "decision"
 
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:318
+msgid "Describe the outcome you want. The constitution will guide the rest."
+msgstr "Describe the outcome you want. The constitution will guide the rest."
+
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:232
-msgid "Describe your intent, then review the official action before anything is submitted."
-msgstr "Describe your intent, then review the official action before anything is submitted."
+#~ msgid "Describe your intent, then review the official action before anything is submitted."
+#~ msgstr "Describe your intent, then review the official action before anything is submitted."
+
+#: src/features/launch-action/lib/action-definitions.ts:170
+msgid "disband"
+msgstr "disband"
+
+#: src/features/launch-action/lib/action-definitions.ts:102
+msgid "discipline a member"
+msgstr "discipline a member"
+
+#: src/features/launch-action/lib/action-definitions.ts:173
+msgid "dissolve"
+msgstr "dissolve"
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:53
 msgid "Draft"
 msgstr "Draft"
 
-#: src/features/launch-action/lib/action-definitions.ts:23
+#: src/features/launch-action/lib/action-definitions.ts:70
 msgid "elect"
 msgstr "elect"
 
+#: src/features/launch-action/lib/action-definitions.ts:172
+msgid "end the group"
+msgstr "end the group"
+
+#: src/features/launch-action/lib/action-definitions.ts:181
+msgid "End your membership and give up your participation rights in this polity."
+msgstr "End your membership and give up your participation rights in this polity."
+
+#: src/features/launch-action/lib/action-definitions.ts:188
+msgid "exit the group"
+msgstr "exit the group"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:247
+msgid "Explore polities"
+msgstr "Explore polities"
+
+#: src/features/launch-action/lib/action-definitions.ts:72
+msgid "fill a position"
+msgstr "fill a position"
+
+#: src/features/launch-action/lib/action-definitions.ts:152
+msgid "Finalize a motion whose voting or election period has ended."
+msgstr "Finalize a motion whose voting or election period has ended."
+
+#: src/features/launch-action/lib/action-definitions.ts:157
+msgid "finalize a vote"
+msgstr "finalize a vote"
+
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:149
-msgid "Find an Action"
-msgstr "Find an Action"
+#~ msgid "Find an Action"
+#~ msgstr "Find an Action"
 
 #: src/features/launch-action/lib/action-definitions.ts:26
-msgid "Finish forming this polity before starting an election."
-msgstr "Finish forming this polity before starting an election."
+#~ msgid "Finish forming this polity before starting an election."
+#~ msgstr "Finish forming this polity before starting an election."
 
-#: src/features/launch-action/lib/action-definitions.ts:37
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:250
+msgid "Found a polity"
+msgstr "Found a polity"
+
+#: src/features/launch-action/lib/action-definitions.ts:83
 msgid "government"
 msgstr "government"
 
-#: src/features/launch-action/lib/action-definitions.ts:32
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:164
+msgid "In this polity"
+msgstr "In this polity"
+
+#: src/features/launch-action/lib/action-definitions.ts:59
 msgid "Invite a Member"
 msgstr "Invite a Member"
 
-#: src/features/launch-action/lib/action-definitions.ts:31
+#: src/features/launch-action/lib/action-definitions.ts:50
+msgid "Invite someone to join"
+msgstr "Invite someone to join"
+
+#: src/features/launch-action/lib/action-definitions.ts:56
 msgid "join"
 msgstr "join"
 
-#: src/features/launch-action/lib/action-definitions.ts:43
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:240
+msgid "Join or found a polity first"
+msgstr "Join or found a polity first"
+
+#: src/features/launch-action/lib/action-definitions.ts:141
 msgid "justice"
 msgstr "justice"
 
-#: src/features/launch-action/lib/action-definitions.ts:31
+#: src/features/launch-action/lib/action-definitions.ts:186
+msgid "leave"
+msgstr "leave"
+
+#: src/features/launch-action/lib/action-definitions.ts:182
+msgid "Leave this polity"
+msgstr "Leave this polity"
+
+#: src/features/launch-action/lib/action-definitions.ts:34
+msgid "Make a group decision"
+msgstr "Make a group decision"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:360
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:406
+msgid "Make something happen"
+msgstr "Make something happen"
+
+#: src/features/launch-action/lib/action-definitions.ts:55
 msgid "membership"
 msgstr "membership"
 
-#: src/features/launch-action/lib/action-definitions.ts:17
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:225
+msgid "Membership and closure"
+msgstr "Membership and closure"
+
+#: src/features/launch-action/lib/action-definitions.ts:101
+msgid "misconduct"
+msgstr "misconduct"
+
+#: src/features/launch-action/lib/action-definitions.ts:37
 msgid "motion"
 msgstr "motion"
 
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:254
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:260
-msgid "New Action"
-msgstr "New Action"
+#~ msgid "New Action"
+#~ msgstr "New Action"
+
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:177
+msgid "No matching actions"
+msgstr "No matching actions"
 
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:204
-msgid "No Matching Actions"
-msgstr "No Matching Actions"
+#~ msgid "No Matching Actions"
+#~ msgstr "No Matching Actions"
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:51
 msgid "No polity selected"
 msgstr "No polity selected"
 
-#: src/features/launch-action/lib/action-definitions.ts:23
+#: src/features/launch-action/lib/action-definitions.ts:69
 msgid "nomination"
 msgstr "nomination"
 
-#: src/features/launch-action/lib/action-definitions.ts:23
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:255
+msgid "Not available here"
+msgstr "Not available here"
+
+#: src/features/launch-action/lib/action-definitions.ts:67
+#: src/features/launch-action/lib/action-definitions.ts:127
 msgid "office"
 msgstr "office"
 
@@ -123,97 +367,240 @@ msgstr "office"
 msgid "Official Action"
 msgstr "Official Action"
 
-#: src/features/launch-action/lib/action-definitions.ts:21
+#: src/features/launch-action/lib/action-definitions.ts:146
+msgid "official record"
+msgstr "official record"
+
+#: src/features/launch-action/lib/action-definitions.ts:119
+msgid "Open an Appeal"
+msgstr "Open an Appeal"
+
+#: src/features/launch-action/lib/action-definitions.ts:63
 msgid "Open nominations and elect someone to an office."
 msgstr "Open nominations and elect someone to an office."
 
-#: src/features/launch-action/lib/action-definitions.ts:31
+#: src/features/launch-action/lib/action-definitions.ts:116
+msgid "overturn punishment"
+msgstr "overturn punishment"
+
+#: src/features/launch-action/lib/action-definitions.ts:53
 msgid "person"
 msgstr "person"
 
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:172
-msgid "Polity"
-msgstr "Polity"
+#~ msgid "Polity"
+#~ msgstr "Polity"
 
-#: src/features/launch-action/lib/action-definitions.ts:37
+#: src/features/launch-action/lib/action-definitions.ts:85
 msgid "power"
 msgstr "power"
 
-#: src/features/launch-action/lib/action-definitions.ts:37
+#: src/features/launch-action/lib/action-definitions.ts:84
 msgid "procedure"
 msgstr "procedure"
 
-#: src/features/launch-action/lib/action-definitions.ts:17
+#: src/features/launch-action/lib/action-definitions.ts:40
 msgid "proposal"
 msgstr "proposal"
 
-#: src/features/launch-action/lib/action-definitions.ts:35
+#: src/features/launch-action/lib/action-definitions.ts:78
 msgid "Propose a change to the polity’s governing rules."
 msgstr "Propose a change to the polity’s governing rules."
 
-#: src/features/launch-action/lib/action-definitions.ts:18
+#: src/features/launch-action/lib/action-definitions.ts:45
 msgid "Propose a Resolution"
 msgstr "Propose a Resolution"
 
-#: src/features/launch-action/lib/action-definitions.ts:15
+#: src/features/launch-action/lib/action-definitions.ts:105
+msgid "Propose a Sanction"
+msgstr "Propose a Sanction"
+
+#: src/features/launch-action/lib/action-definitions.ts:176
+msgid "Propose Disbandment"
+msgstr "Propose Disbandment"
+
+#: src/features/launch-action/lib/action-definitions.ts:166
+msgid "Propose permanently closing the polity through its constitutional procedure."
+msgstr "Propose permanently closing the polity through its constitutional procedure."
+
+#: src/features/launch-action/lib/action-definitions.ts:33
 msgid "Put a decision before the polity for an official vote."
 msgstr "Put a decision before the polity for an official vote."
 
-#: src/features/launch-action/lib/action-definitions.ts:44
+#: src/features/launch-action/lib/action-definitions.ts:187
+msgid "quit membership"
+msgstr "quit membership"
+
+#: src/features/launch-action/lib/action-definitions.ts:131
+msgid "recall a leader"
+msgstr "recall a leader"
+
+#: src/features/launch-action/lib/action-definitions.ts:159
+msgid "record the result"
+msgstr "record the result"
+
+#: src/features/launch-action/lib/action-definitions.ts:129
+msgid "remove an officer"
+msgstr "remove an officer"
+
+#: src/features/launch-action/lib/action-definitions.ts:148
 msgid "Request Constitutional Review"
 msgstr "Request Constitutional Review"
 
-#: src/features/launch-action/lib/action-definitions.ts:41
+#: src/features/launch-action/lib/action-definitions.ts:137
 msgid "Request review of whether an act follows the constitution."
 msgstr "Request review of whether an act follows the constitution."
+
+#: src/features/launch-action/lib/action-definitions.ts:185
+msgid "resign"
+msgstr "resign"
+
+#: src/features/launch-action/lib/action-definitions.ts:191
+msgid "Resign Membership"
+msgstr "Resign Membership"
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:39
 msgid "Return to the launcher and choose a valid action to continue."
 msgstr "Return to the launcher and choose a valid action to continue."
 
+#: src/features/launch-action/lib/action-definitions.ts:133
+msgid "Review an Office Term"
+msgstr "Review an Office Term"
+
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:57
 msgid "Review Before You Submit"
 msgstr "Review Before You Submit"
 
-#: src/features/launch-action/lib/action-definitions.ts:37
+#: src/features/launch-action/lib/action-definitions.ts:124
+msgid "Review someone in office"
+msgstr "Review someone in office"
+
+#: src/features/launch-action/lib/action-definitions.ts:82
 msgid "rules"
 msgstr "rules"
 
+#: src/features/launch-action/lib/action-definitions.ts:98
+#: src/features/launch-action/lib/action-definitions.ts:114
+msgid "sanction"
+msgstr "sanction"
+
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:162
-msgid "Search by goal or action…"
-msgstr "Search by goal or action…"
+#~ msgid "Search by goal or action…"
+#~ msgstr "Search by goal or action…"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:114
+#~ msgid "Sensitive"
+#~ msgstr "Sensitive"
+
+#: src/features/launch-action/lib/action-definitions.ts:174
+msgid "shut down"
+msgstr "shut down"
+
+#: src/features/launch-action/lib/action-definitions.ts:103
+msgid "someone broke the rules"
+msgstr "someone broke the rules"
+
+#: src/features/launch-action/lib/action-definitions.ts:42
+msgid "spend money"
+msgstr "spend money"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:293
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:311
+msgid "Start an action"
+msgstr "Start an action"
 
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:229
-msgid "Start an Action"
-msgstr "Start an Action"
+#~ msgid "Start an Action"
+#~ msgstr "Start an Action"
 
-#: src/features/launch-action/lib/action-definitions.ts:24
+#: src/features/launch-action/lib/action-definitions.ts:74
 msgid "Start an Election"
 msgstr "Start an Election"
 
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:371
+msgid "Start with your goal. The constitution determines the formal action and whether you are authorized to begin."
+msgstr "Start with your goal. The constitution determines the formal action and whether you are authorized to begin."
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:554
+#~ msgid "Start with your goal. The constitution determines the formal action and whether you can take it now."
+#~ msgstr "Start with your goal. The constitution determines the formal action and whether you can take it now."
+
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:273
-msgid "Start with your goal. You’ll review the formal action before anything is submitted."
-msgstr "Start with your goal. You’ll review the formal action before anything is submitted."
+#~ msgid "Start with your goal. You’ll review the formal action before anything is submitted."
+#~ msgstr "Start with your goal. You’ll review the formal action before anything is submitted."
+
+#: src/features/launch-action/lib/action-definitions.ts:189
+msgid "stop participating"
+msgstr "stop participating"
+
+#: src/features/launch-action/lib/action-definitions.ts:100
+#: src/features/launch-action/lib/action-definitions.ts:115
+msgid "suspension"
+msgstr "suspension"
+
+#: src/features/launch-action/lib/action-definitions.ts:128
+msgid "term"
+msgstr "term"
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:60
 msgid "This handoff reserves space for the structured form required by the selected action."
 msgstr "This handoff reserves space for the structured form required by the selected action."
 
 #: src/features/launch-action/lib/action-definitions.ts:46
-msgid "This polity has no active constitutional review procedure."
-msgstr "This polity has no active constitutional review procedure."
+#~ msgid "This polity has no active constitutional review procedure."
+#~ msgstr "This polity has no active constitutional review procedure."
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:154
+msgid "Try “change our rules” or “invite someone”…"
+msgstr "Try “change our rules” or “invite someone”…"
 
 #: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:207
-msgid "Try a broader phrase such as “vote,” “invite,” or “rules.”"
-msgstr "Try a broader phrase such as “vote,” “invite,” or “rules.”"
+#~ msgid "Try a broader phrase such as “vote,” “invite,” or “rules.”"
+#~ msgstr "Try a broader phrase such as “vote,” “invite,” or “rules.”"
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:82
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:211
+msgid "Try again"
+msgstr "Try again"
+
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:180
+msgid "Try describing the outcome, such as “invite someone,” “change our rules,” or “remove an officer.”"
+msgstr "Try describing the outcome, such as “invite someone,” “change our rules,” or “remove an officer.”"
+
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:77
 msgid "Unavailable"
 msgstr "Unavailable"
 
-#: src/features/launch-action/lib/action-definitions.ts:17
+#: src/features/launch-action/lib/action-definitions.ts:145
+msgid "unconstitutional"
+msgstr "unconstitutional"
+
+#: src/features/launch-action/lib/action-definitions.ts:130
+msgid "vacate a position"
+msgstr "vacate a position"
+
+#: src/features/launch-action/lib/action-definitions.ts:144
+msgid "void a decision"
+msgstr "void a decision"
+
+#: src/features/launch-action/lib/action-definitions.ts:39
 msgid "vote"
 msgstr "vote"
+
+#: src/features/launch-action/lib/action-definitions.ts:99
+msgid "warning"
+msgstr "warning"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:198
+msgid "We couldn’t check your actions"
+msgstr "We couldn’t check your actions"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:140
+msgid "What do you want to do?"
+msgstr "What do you want to do?"
+
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:201
+msgid "Your polity is unchanged. Try checking its permissions again."
+msgstr "Your polity is unchanged. Try checking its permissions again."
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:69
 msgid "Your words will never become a binding government action automatically. You will review the action type, polity, formal content, eligibility, and consequences first."

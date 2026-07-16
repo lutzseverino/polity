@@ -40,6 +40,38 @@ describe("resolveShellContext", () => {
       "Motions",
     ]);
     expect(context.back?.label).toBe("All polities");
+    expect(context.polityId).toBe("thursday-assembly");
+  });
+
+  it("inherits the workspace title through a label-less index route", () => {
+    const context = resolveShellContext(
+      [
+        {
+          loaderData: { shellLabel: "Thursday Assembly" },
+          params: { polityId: "thursday-assembly" },
+          shell: {
+            level: "workspace",
+            section: "polities",
+            target: { params: "polityId", to: "/polities/$polityId" },
+          },
+        },
+        {
+          params: { polityId: "thursday-assembly" },
+          shell: { showPrimaryAction: false },
+        },
+      ],
+      translate,
+    );
+
+    expect(context).toMatchObject({
+      level: "workspace",
+      showPrimaryAction: false,
+      title: "Thursday Assembly",
+    });
+    expect(context.breadcrumbs.map((breadcrumb) => breadcrumb.label)).toEqual([
+      "Polities",
+      "Thursday Assembly",
+    ]);
   });
 
   it("lets a focused detail route override inherited compact behavior", () => {

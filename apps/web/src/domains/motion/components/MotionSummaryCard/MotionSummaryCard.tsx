@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { AppBadge } from "@/components/app/AppBadge";
 import {
@@ -15,14 +14,11 @@ import { AppText } from "@/components/app/AppText";
 import type { Motion } from "@/domains/motion/lib/motion";
 
 type MotionSummaryCardProps = Readonly<{
+  action?: ReactNode;
   motion: Motion;
-  polityId: string;
 }>;
 
-export function MotionSummaryCard({
-  motion,
-  polityId,
-}: MotionSummaryCardProps) {
+export function MotionSummaryCard({ action, motion }: MotionSummaryCardProps) {
   const { t } = useLingui();
   const statusLabel =
     motion.status === "voting"
@@ -32,7 +28,10 @@ export function MotionSummaryCard({
         : t`Rejected`;
 
   return (
-    <AppCard size="sm">
+    <AppCard
+      className="h-full transition-[background-color,box-shadow] group-hover/link-surface:bg-muted/40 group-hover/link-surface:ring-foreground/20"
+      size="sm"
+    >
       <AppCardHeader>
         <div className="mb-1 flex flex-wrap items-center gap-2">
           <AppBadge
@@ -52,16 +51,7 @@ export function MotionSummaryCard({
             <Trans>Voting {motion.closesAtLabel.toLowerCase()}</Trans>
           )}
         </AppCardDescription>
-        <AppCardAction>
-          <Link
-            aria-label={t`Open ${motion.title}`}
-            className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            params={{ motionId: motion.id, polityId }}
-            to="/polities/$polityId/motions/$motionId"
-          >
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
-        </AppCardAction>
+        {action ? <AppCardAction>{action}</AppCardAction> : null}
       </AppCardHeader>
       <AppCardContent>
         <AppText className="line-clamp-2" variant="supporting">

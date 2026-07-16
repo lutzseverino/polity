@@ -5,6 +5,7 @@ import {
   AppCard,
   AppCardContent,
   AppCardDescription,
+  AppCardFooter,
   AppCardHeader,
   AppCardTitle,
 } from "@/components/app/AppCard";
@@ -94,9 +95,17 @@ function PolityCardMeta({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
+function PolityCardFooter({
+  className,
+  ...props
+}: ComponentProps<typeof AppCardFooter>) {
+  return <AppCardFooter className={cn("gap-3", className)} {...props} />;
+}
+
 export const PolityCard = Object.assign(PolityCardRoot, {
   Content: PolityCardContent,
   Description: PolityCardDescription,
+  Footer: PolityCardFooter,
   Header: PolityCardHeader,
   Identity: PolityCardIdentity,
   Meta: PolityCardMeta,

@@ -10,6 +10,20 @@ Object.defineProperty(window, "scrollTo", {
   writable: true,
 });
 
+Object.defineProperty(window, "matchMedia", {
+  value: vi.fn().mockImplementation((query: string) => ({
+    addEventListener: vi.fn(),
+    addListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    matches: query.includes("min-width"),
+    media: query,
+    onchange: null,
+    removeEventListener: vi.fn(),
+    removeListener: vi.fn(),
+  })),
+  writable: true,
+});
+
 beforeAll(() => {
   apiMockServer.listen({ onUnhandledRequest: "error" });
 });

@@ -1,10 +1,17 @@
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { AppProviders } from "@/app/providers/AppProviders";
 import { createAppRouter } from "@/app/router";
+import { shellSectionDefinitions } from "@/app/shell/shell-route-context";
 
 function createTestRouter(initialEntry: string) {
   return createAppRouter(
@@ -20,7 +27,47 @@ function renderRouter(router: ReturnType<typeof createTestRouter>) {
   );
 }
 
+const rootDestinationPaths = Object.values(shellSectionDefinitions).map(
+  ({ target }) => target.to,
+);
+
 describe("first governing journey", () => {
+  it.each([
+    ["wide", "/polities"],
+    ["standard", "/home"],
+    ["focused", "/polities/new"],
+    ["narrow", "/polities/invitations/invitation-supper-club"],
+  ] as const)("uses the %s page measure at %s", async (measure, pathname) => {
+    const router = createTestRouter(pathname);
+
+    renderRouter(router);
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="page-layout"]'),
+      ).toHaveAttribute("data-measure", measure);
+    });
+  });
+
+  it.each(
+    rootDestinationPaths,
+  )("uses the compact shell title and wide content heading at %s", async (pathname) => {
+    const router = createTestRouter(pathname);
+
+    renderRouter(router);
+
+    const heading = await screen.findByRole("heading", { level: 1 });
+
+    expect(heading.closest("header")).toHaveAttribute(
+      "data-slot",
+      "page-header",
+    );
+    expect(heading.closest("main")).toHaveAttribute("data-shell-level", "root");
+    expect(
+      screen.queryByRole("navigation", { name: "Current location" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("lets an eligible member understand and record an official vote", async () => {
     const user = userEvent.setup();
     const router = createTestRouter(
@@ -63,14 +110,24 @@ describe("first governing journey", () => {
     expect(
       screen.getByRole("link", { name: /the thursday assembly/i }),
     ).toHaveAttribute("href", "/polities/thursday-assembly");
-    expect(
-      screen.getByRole("navigation", { name: "Primary Navigation" }),
-    ).toBeInTheDocument();
+    const primaryNavigation = screen.getByRole("navigation", {
+      name: "Primary Navigation",
+    });
+    for (const { target } of Object.values(shellSectionDefinitions).filter(
+      ({ target }) => target.to !== shellSectionDefinitions.me.target.to,
+    )) {
+      expect(
+        primaryNavigation.querySelector(`a[href="${target.to}"]`),
+      ).not.toBeNull();
+    }
     expect(
       screen.queryByRole("navigation", { name: "Current location" }),
     ).not.toBeInTheDocument();
     const accountLink = screen.getByRole("link", { name: "Open account" });
-    expect(accountLink).toHaveAttribute("href", "/me");
+    expect(accountLink).toHaveAttribute(
+      "href",
+      shellSectionDefinitions.me.target.to,
+    );
     expect(accountLink.querySelector('[data-slot="avatar"]')).not.toBeNull();
     expect(within(accountLink).getByText("Account")).toBeInTheDocument();
   });
@@ -86,23 +143,152 @@ describe("first governing journey", () => {
         level: 1,
       }),
     ).toBeInTheDocument();
-    const politySection = screen.getByRole("region", { name: "Polities" });
+    const politySection = screen.getByRole("region", { name: "3 polities" });
     expect(politySection).toBeInTheDocument();
-    const foundPolityLink = within(politySection).getByRole("link", {
+    const foundPolityLink = screen.getByRole("link", {
       name: /found a polity/i,
     });
     expect(foundPolityLink).toHaveAttribute("href", "/polities/new");
-    const separators = politySection.querySelectorAll(
+    expect(
+      within(politySection).getByRole("link", {
+        name: /found a polity/i,
+      }),
+    ).toBe(foundPolityLink);
+    expect(politySection.querySelector("a")).toBe(foundPolityLink);
+    const pageLayout = document.querySelector<HTMLElement>(
+      '[data-slot="page-layout"]',
+    );
+    const separators = pageLayout?.querySelectorAll<HTMLElement>(
       '[data-slot="separator"]',
     );
     expect(separators).toHaveLength(2);
-    expect(separators[0]).toHaveClass("hidden", "md:block");
-    expect(separators[1]).toHaveClass("md:hidden");
-    expect(foundPolityLink.nextElementSibling).toBe(separators[1]);
-    expect(politySection.querySelector('[data-slot="empty"]')).toBeVisible();
+    const pageSeparator = separators?.[0];
+    const featureSeparator = separators?.[1];
+    expect(pageSeparator).not.toHaveClass("data-horizontal:bg-linear-to-r");
+    expect(pageSeparator?.parentElement).toHaveClass(
+      "-mx-4",
+      "hidden",
+      "sm:-mx-6",
+      "md:-mx-8",
+      "md:block",
+    );
+    expect(pageSeparator?.parentElement?.nextElementSibling).toBe(
+      politySection,
+    );
+    expect(featureSeparator).toHaveClass(
+      "data-horizontal:bg-linear-to-r",
+      "md:hidden",
+    );
+    expect(politySection).not.toContainElement(pageSeparator ?? null);
+    expect(politySection).toContainElement(featureSeparator ?? null);
+    expect(politySection.querySelectorAll('[data-slot="empty"]')).toHaveLength(
+      1,
+    );
+    const searchLabel = document.querySelector('label[for="polity-search"]');
+    expect(searchLabel).toHaveClass("sr-only");
+    const search = screen.getByRole("searchbox", { name: "Search polities" });
+    const searchControls = search.closest("search")?.parentElement;
+    expect(politySection.firstElementChild).toBe(foundPolityLink);
+    expect(foundPolityLink.nextElementSibling).toBe(featureSeparator);
+    expect(featureSeparator?.nextElementSibling).toBe(searchControls);
+    expect(foundPolityLink).not.toHaveClass("order-1");
+    expect(foundPolityLink).not.toHaveClass("md:order-3");
+    expect(featureSeparator).toHaveClass("md:hidden");
+    expect(searchControls).toHaveClass("md:order-first");
+    expect(foundPolityLink.compareDocumentPosition(search)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
     expect(screen.queryByRole("region", { name: "Invitations" })).toBeNull();
     expect(screen.queryByText("Sunday Supper Club")).toBeNull();
-    expect(screen.getByText("The Thursday Assembly")).toBeInTheDocument();
+    const thursdayAssemblyLink = screen.getByRole("link", {
+      name: /the thursday assembly/i,
+    });
+    expect(
+      within(thursdayAssemblyLink).getByText("Public"),
+    ).toBeInTheDocument();
+    expect(
+      within(thursdayAssemblyLink).getByText("8 members"),
+    ).toBeInTheDocument();
+    expect(
+      within(thursdayAssemblyLink).getByText("2 actions need you"),
+    ).toBeInTheDocument();
+    expect(within(thursdayAssemblyLink).queryByText("Ready")).toBeNull();
+
+    const neighbourhoodTableLink = screen.getByRole("link", {
+      name: /neighbourhood table/i,
+    });
+    expect(
+      within(neighbourhoodTableLink).getByText("Finish forming this polity"),
+    ).toBeInTheDocument();
+    expect(within(neighbourhoodTableLink).queryByText("Forming")).toBeNull();
+
+    const weekendCouncilLink = screen.getByRole("link", {
+      name: /weekend council/i,
+    });
+    expect(
+      within(weekendCouncilLink).getByText("You’re all caught up"),
+    ).toBeInTheDocument();
+    expect(within(weekendCouncilLink).queryByText("Ready")).toBeNull();
+  });
+
+  it("searches polities from a URL-backed query", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/polities?query=weekend");
+
+    renderRouter(router);
+
+    const search = await screen.findByRole("searchbox", {
+      name: "Search polities",
+    });
+    expect(search).toHaveValue("weekend");
+    expect(screen.getByText("Weekend Council")).toBeInTheDocument();
+    expect(screen.queryByText("The Thursday Assembly")).not.toBeInTheDocument();
+
+    await user.clear(search);
+
+    expect(
+      await screen.findByText("The Thursday Assembly"),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(router.state.location.search).toEqual({});
+    });
+  });
+
+  it("offers a useful empty state for an unmatched polity search", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/polities?query=unknown");
+
+    renderRouter(router);
+
+    const emptyStateHeading = await screen.findByRole("heading", {
+      name: "No matching polities",
+    });
+    expect(emptyStateHeading).toBeInTheDocument();
+    expect(
+      screen.getByText("No polities match “unknown”."),
+    ).toBeInTheDocument();
+    const emptyState = emptyStateHeading.closest('[data-slot="empty"]');
+    expect(emptyState).not.toBeNull();
+    expect(
+      within(emptyState as HTMLElement).queryByRole("link", {
+        name: /found a polity/i,
+      }),
+    ).not.toBeInTheDocument();
+    const foundPolityLinks = screen.getAllByRole("link", {
+      name: /found a polity/i,
+    });
+    expect(foundPolityLinks).toHaveLength(1);
+    expect(foundPolityLinks[0]).toHaveAttribute("href", "/polities/new");
+    expect(foundPolityLinks[0]?.parentElement?.firstElementChild).toBe(
+      foundPolityLinks[0],
+    );
+
+    await user.click(screen.getByRole("button", { name: "Clear search" }));
+
+    expect(
+      await screen.findByText("The Thursday Assembly"),
+    ).toBeInTheDocument();
+    expect(router.state.location.search).toEqual({});
   });
 
   it("resolves an invitation from Inbox as an open task", async () => {
@@ -263,23 +449,182 @@ describe("first governing journey", () => {
     renderRouter(router);
 
     const actionInput = await screen.findByRole("textbox", {
-      name: "Find an Action",
+      name: "What do you want to do?",
     });
     await user.type(actionInput, "invite");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "1 matching action. 1 is allowed.",
+    );
     await user.click(screen.getByRole("link", { name: /invite a member/i }));
 
     expect(router.state.location.pathname).toBe("/actions/new");
     expect(router.state.location.searchStr).toBe(
       "?action=invite-member&polity=thursday-assembly",
     );
-    expect(
-      await screen.findByRole("heading", { name: "Invite a Member" }),
-    ).toBeInTheDocument();
+    const actionHeading = await screen.findByRole("heading", {
+      name: "Invite a Member",
+    });
+    expect(actionHeading).toBeInTheDocument();
+    expect(actionHeading.closest("main")).toHaveAttribute(
+      "data-shell-level",
+      "task",
+    );
     expect(
       screen.getByText(
         /never become a binding government action automatically/i,
       ),
     ).toBeInTheDocument();
+  });
+
+  it("ignores repeated action-launcher shortcut events", async () => {
+    const router = createTestRouter("/home");
+
+    renderRouter(router);
+
+    await screen.findByRole("link", { name: "Home" });
+    fireEvent.keyDown(document, { key: "k", metaKey: true, repeat: true });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "k", metaKey: true });
+    expect(
+      await screen.findByRole("dialog", { name: "Make something happen" }),
+    ).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "k", metaKey: true, repeat: true });
+    expect(
+      screen.getByRole("dialog", { name: "Make something happen" }),
+    ).toBeInTheDocument();
+  });
+
+  it("scopes the polity-home action finder to the current polity", async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter("/polities/neighbourhood-table");
+
+    renderRouter(router);
+
+    const actionTrigger = await screen.findByRole("button", {
+      name: /^start an action/i,
+    });
+    expect(
+      screen.getByRole("link", { name: /finish forming the polity/i }),
+    ).toHaveAttribute(
+      "href",
+      "/actions/new?action=invite-member&polity=neighbourhood-table",
+    );
+    expect(
+      screen.getAllByRole("button", { name: /^start an action/i }),
+    ).toHaveLength(1);
+
+    await user.click(actionTrigger);
+
+    const dialog = await screen.findByRole("dialog", {
+      name: "Make something happen",
+    });
+    const polityPicker = within(dialog).getByRole("combobox", {
+      name: "In this polity",
+    });
+    const actionInput = within(dialog).getByRole("textbox", {
+      name: "What do you want to do?",
+    });
+
+    expect(polityPicker).toHaveValue("neighbourhood-table");
+    expect(
+      polityPicker.closest('[data-slot="native-select-wrapper"]'),
+    ).toHaveClass(
+      "w-full",
+      "min-w-0",
+      "[&_select]:overflow-hidden",
+      "[&_select]:text-ellipsis",
+      "[&_select]:whitespace-nowrap",
+    );
+    expect(actionInput).toHaveClass("min-w-0", "text-ellipsis");
+    expect(
+      within(dialog).getByText(
+        "3 actions currently allowed in Neighbourhood Table",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("link", { name: /invite someone to join/i }),
+    ).toHaveAttribute(
+      "href",
+      "/actions/new?action=invite-member&polity=neighbourhood-table",
+    );
+  });
+
+  it("presents the polity home as one actionable feed", async () => {
+    const router = createTestRouter("/polities/thursday-assembly");
+
+    renderRouter(router);
+
+    const dinnerLink = await screen.findByRole("link", {
+      name: /vote on shared thursday dinner/i,
+    });
+    const candidacyLink = screen.getByRole("link", {
+      name: /respond to your nomination/i,
+    });
+    const workspaceNavigation = screen.getByRole("navigation", {
+      name: "The Thursday Assembly navigation",
+    });
+    const workspaceTabs = within(workspaceNavigation).getAllByRole("tab");
+
+    expect(workspaceTabs).toHaveLength(4);
+    const homeTab = within(workspaceNavigation).getByRole("tab", {
+      name: "Home",
+    });
+    expect(homeTab.tagName).toBe("A");
+    expect(homeTab).toHaveAttribute("aria-selected", "true");
+    expect(homeTab).toHaveAttribute("href", "/polities/thursday-assembly");
+    expect(workspaceNavigation.nextElementSibling).toHaveAttribute(
+      "data-slot",
+      "separator",
+    );
+    expect(dinnerLink).toHaveAttribute(
+      "href",
+      "/polities/thursday-assembly/motions/shared-dinner",
+    );
+    expect(candidacyLink).toHaveAttribute(
+      "href",
+      "/polities/thursday-assembly/motions/tribune-election",
+    );
+    expect(dinnerLink).toHaveAttribute("data-slot", "link-surface");
+    expect(
+      dinnerLink.querySelector('[data-slot="link-surface-indicator"]'),
+    ).toHaveAttribute("aria-hidden", "true");
+    expect(
+      dinnerLink.querySelector('[data-slot="link-surface-indicator"]'),
+    ).toHaveClass(
+      "group-hover/link-surface:text-foreground",
+      "group-focus-visible/link-surface:text-foreground",
+      "motion-safe:group-hover/link-surface:translate-x-0.5",
+    );
+    expect(dinnerLink.querySelector("a")).toBeNull();
+    expect(
+      screen
+        .getAllByRole("link")
+        .filter(
+          (link) =>
+            link.getAttribute("href") ===
+            "/polities/thursday-assembly/motions/shared-dinner",
+        ),
+    ).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "For you" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Latest" })).toBeVisible();
+    expect(screen.queryByText("Active motions")).not.toBeInTheDocument();
+    expect(screen.queryByText("Government status")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ready")).not.toBeInTheDocument();
+  });
+
+  it("uses calm polity-home empty states", async () => {
+    const router = createTestRouter("/polities/weekend-council");
+
+    renderRouter(router);
+
+    expect(await screen.findByText("You’re all caught up")).toBeVisible();
+    expect(screen.getByText("It’s quiet here for now")).toBeVisible();
+    expect(screen.queryByText(/no actions need you/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/there are no active motions/i),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps candidacy consent distinct from voting", async () => {

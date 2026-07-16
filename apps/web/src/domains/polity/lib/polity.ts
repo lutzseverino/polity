@@ -1,13 +1,48 @@
 import type { Motion } from "@/domains/motion";
 
+export type ActionAvailability = Readonly<{
+  available: boolean;
+  reason?: string;
+  reasonMessage?: string;
+}>;
+
+export type PolityActionAvailability = Readonly<{
+  constitutionalHealth: Readonly<{
+    diagnostics: readonly Readonly<{ code: string; message: string }>[];
+    status: "critical" | "degraded" | "healthy";
+    statusMessage: string;
+  }>;
+  introduceAmendment: ActionAvailability;
+  introduceAppeal: ActionAvailability;
+  introduceConstitutionalReview: ActionAvailability;
+  introduceDisbandment: ActionAvailability;
+  introduceMotion: ActionAvailability;
+  introduceOfficeElection: ActionAvailability;
+  introduceOfficeTermReview: ActionAvailability;
+  introduceSanction: ActionAvailability;
+  inviteMembers: ActionAvailability;
+  readiness: Readonly<{
+    diagnostics: readonly Readonly<{ code: string; message: string }>[];
+    status:
+      | "blocked"
+      | "disbanded"
+      | "forming_offices"
+      | "provisional"
+      | "ready";
+    statusMessage: string;
+  }>;
+  requestCertification: ActionAvailability;
+  resignMembership: ActionAvailability;
+}>;
+
 type AttentionItem = Readonly<{
   description: string;
   dueLabel: string;
   id: string;
   kind: "candidacy" | "formation" | "vote";
   target:
-    | Readonly<{ kind: "motion"; motionId: string }>
-    | Readonly<{ kind: "polity" }>;
+    | Readonly<{ actionId: string; kind: "action" }>
+    | Readonly<{ kind: "motion"; motionId: string }>;
   title: string;
 }>;
 

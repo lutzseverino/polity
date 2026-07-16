@@ -1,4 +1,17 @@
-import type { Polity } from "@/domains/polity/lib/polity";
+import type {
+  ActionAvailability,
+  Polity,
+  PolityActionAvailability,
+} from "@/domains/polity/lib/polity";
+
+const available: ActionAvailability = { available: true };
+
+function unavailable(
+  reason: string,
+  reasonMessage: string,
+): ActionAvailability {
+  return { available: false, reason, reasonMessage };
+}
 
 const thursdayAssembly: Polity = {
   attention: [
@@ -132,7 +145,7 @@ const neighbourhoodTable: Polity = {
       dueLabel: "No deadline",
       id: "complete-formation",
       kind: "formation",
-      target: { kind: "polity" },
+      target: { actionId: "invite-member", kind: "action" },
       title: "Finish forming the polity",
     },
   ],
@@ -175,6 +188,112 @@ const polities: readonly Polity[] = [
   weekendCouncil,
 ];
 
+const readyActions: PolityActionAvailability = {
+  constitutionalHealth: {
+    diagnostics: [],
+    status: "healthy",
+    statusMessage: "Every core constitutional path is operating.",
+  },
+  introduceAmendment: available,
+  introduceAppeal: available,
+  introduceConstitutionalReview: available,
+  introduceDisbandment: available,
+  introduceMotion: available,
+  introduceOfficeElection: available,
+  introduceOfficeTermReview: available,
+  introduceSanction: available,
+  inviteMembers: available,
+  readiness: {
+    diagnostics: [],
+    status: "ready",
+    statusMessage: "Government is operating normally.",
+  },
+  requestCertification: available,
+  resignMembership: available,
+};
+
+const actionAvailabilityByPolityId: Readonly<
+  Record<string, PolityActionAvailability>
+> = {
+  "neighbourhood-table": {
+    ...readyActions,
+    constitutionalHealth: {
+      diagnostics: [
+        {
+          code: "ordinary_governance_unavailable",
+          message: "Ordinary decisions need one more standing member.",
+        },
+        {
+          code: "office_election_path_unavailable",
+          message: "Office elections need one more standing member.",
+        },
+      ],
+      status: "degraded",
+      statusMessage: "Formation is still in progress.",
+    },
+    introduceAppeal: unavailable(
+      "procedure_electorate_below_minimum",
+      "An appeal needs one more eligible member.",
+    ),
+    introduceConstitutionalReview: unavailable(
+      "procedure_electorate_below_minimum",
+      "A constitutional review needs one more eligible member.",
+    ),
+    introduceMotion: unavailable(
+      "procedure_electorate_below_minimum",
+      "Invite one more standing member before opening an ordinary decision.",
+    ),
+    introduceOfficeElection: unavailable(
+      "procedure_electorate_below_minimum",
+      "Finish forming this polity before starting an election.",
+    ),
+    introduceOfficeTermReview: unavailable(
+      "procedure_electorate_below_minimum",
+      "An office-term review needs one more eligible member.",
+    ),
+    introduceSanction: unavailable(
+      "procedure_electorate_below_minimum",
+      "A sanction proceeding needs one more eligible member and a working appeal path.",
+    ),
+    readiness: {
+      diagnostics: [
+        {
+          code: "needs_more_standing_members",
+          message: "One more standing member is needed for full government.",
+        },
+      ],
+      status: "provisional",
+      statusMessage: "Invite one more person to finish forming the government.",
+    },
+    requestCertification: unavailable(
+      "certification_not_open",
+      "There is no motion ready to certify.",
+    ),
+    resignMembership: unavailable(
+      "provisional_founder_resignation_unavailable",
+      "The provisional founder cannot leave until the government finishes forming.",
+    ),
+  },
+  "thursday-assembly": readyActions,
+  "weekend-council": {
+    ...readyActions,
+    constitutionalHealth: {
+      diagnostics: [
+        {
+          code: "constitutional_review_path_unavailable",
+          message: "The constitution has no active review procedure.",
+        },
+      ],
+      status: "degraded",
+      statusMessage: "Most constitutional paths are operating.",
+    },
+    introduceConstitutionalReview: unavailable(
+      "procedure_missing",
+      "This polity has no active constitutional review procedure.",
+    ),
+  },
+};
+
 export function findPolityMotionFixture(polityId: string, motionId: string) {
   return findPolityFixture(polityId)?.motions.find(
     (motion) => motion.id === motionId,
@@ -185,6 +304,18 @@ export function findPolityFixture(polityId: string) {
   return polities.find((polity) => polity.id === polityId);
 }
 
-export function listPolityFixtures() {
-  return polities;
+export function findPolityActionAvailabilityFixture(polityId: string) {
+  return actionAvailabilityByPolityId[polityId];
+}
+
+export function listPolityFixtures(query?: string) {
+  if (!query) {
+    return polities;
+  }
+
+  const normalizedQuery = query.toLocaleLowerCase();
+
+  return polities.filter((polity) =>
+    polity.name.toLocaleLowerCase().includes(normalizedQuery),
+  );
 }

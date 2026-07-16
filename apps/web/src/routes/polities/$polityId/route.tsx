@@ -6,6 +6,7 @@ import {
   notFound,
   Outlet,
   useMatches,
+  useRouterState,
 } from "@tanstack/react-router";
 
 import { AppBadge } from "@/components/app/AppBadge";
@@ -13,13 +14,20 @@ import {
   AppNativeSelect,
   AppNativeSelectOption,
 } from "@/components/app/AppNativeSelect";
+import { AppPageLayout } from "@/components/app/AppPageLayout";
+import { AppSeparator } from "@/components/app/AppSeparator";
+import {
+  AppTabs,
+  AppTabsContent,
+  AppTabsList,
+  AppTabsTrigger,
+} from "@/components/app/AppTabs";
 import { AppText } from "@/components/app/AppText";
 import {
-  politiesQueryOptions,
+  polityOptionsQueryOptions,
   polityQueryOptions,
-  ReadinessBadge,
-  usePolities,
   usePolity,
+  usePolityOptions,
 } from "@/domains/polity";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 import { cn } from "@/lib/utils";
@@ -31,7 +39,9 @@ export const Route = createFileRoute("/polities/$polityId")({
 
     try {
       const [, polity] = await Promise.all([
-        context.queryClient.ensureQueryData(politiesQueryOptions(input)),
+        context.queryClient.ensureQueryData(
+          polityOptionsQueryOptions({ locale: input.locale }),
+        ),
         context.queryClient.ensureQueryData(polityQueryOptions(input)),
       ]);
 
@@ -57,7 +67,7 @@ export const Route = createFileRoute("/polities/$polityId")({
 function PolityWorkspaceRoute() {
   const { i18n, t } = useLingui();
   const { polityId } = Route.useParams();
-  const { data: polities } = usePolities({ locale: i18n.locale });
+  const { data: polities } = usePolityOptions({ locale: i18n.locale });
   const { data: polity } = usePolity({
     locale: i18n.locale,
     polityId,
@@ -68,19 +78,41 @@ function PolityWorkspaceRoute() {
       matches.at(-1)?.staticData.shell?.compactWorkspaceChrome ?? "visible",
   });
   const hideCompactWorkspaceChrome = compactWorkspaceChrome === "hidden";
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const activeWorkspaceTab = pathname.includes("/motions")
+    ? "motions"
+    : pathname.endsWith("/government")
+      ? "government"
+      : pathname.endsWith("/record")
+        ? "record"
+        : "home";
   const workspaceNavigation = [
-    { exact: true, label: t`Overview`, to: "/polities/$polityId" },
-    { exact: false, label: t`Motions`, to: "/polities/$polityId/motions" },
     {
-      exact: false,
+      label: t`Home`,
+      to: "/polities/$polityId",
+      value: "home",
+    },
+    {
+      label: t`Motions`,
+      to: "/polities/$polityId/motions",
+      value: "motions",
+    },
+    {
       label: t`Government`,
       to: "/polities/$polityId/government",
+      value: "government",
     },
-    { exact: false, label: t`Record`, to: "/polities/$polityId/record" },
+    {
+      label: t`Record`,
+      to: "/polities/$polityId/record",
+      value: "record",
+    },
   ] as const;
 
   return (
-    <div className="space-y-6">
+    <AppPageLayout measure="wide">
       <header
         className={cn(
           "space-y-4",
@@ -90,7 +122,11 @@ function PolityWorkspaceRoute() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <ReadinessBadge readiness={polity.readiness} />
+              {polity.readiness === "forming" ? (
+                <AppBadge variant="outline">
+                  <Trans>Forming</Trans>
+                </AppBadge>
+              ) : null}
               <AppBadge variant="outline">
                 {polity.visibility === "public" ? (
                   <Trans>Public</Trans>
@@ -104,7 +140,7 @@ function PolityWorkspaceRoute() {
             </div>
             <AppText
               as={hideCompactWorkspaceChrome ? "div" : "h1"}
-              className="sr-only md:not-sr-only md:truncate"
+              className="truncate"
               variant="pageTitle"
             >
               {polity.name}
@@ -146,30 +182,44 @@ function PolityWorkspaceRoute() {
         </div>
       </header>
 
-      <nav
-        aria-label={t`${polity.name} navigation`}
-        className={cn(
-          "no-scrollbar -mx-4 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0",
-          hideCompactWorkspaceChrome && "hidden md:block",
-        )}
-      >
-        <div className="flex min-w-max gap-1">
-          {workspaceNavigation.map((item) => (
-            <Link
-              activeOptions={{ exact: item.exact }}
-              activeProps={{ className: "border-foreground text-foreground" }}
-              className="border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:rounded-t focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              key={item.label}
-              params={{ polityId: polity.id }}
-              to={item.to}
-            >
-              {item.label}
-            </Link>
-          ))}
+      <AppTabs className="min-w-0 flex-col gap-0" value={activeWorkspaceTab}>
+        <div
+          className={cn(
+            "-mx-4 sm:-mx-6 md:-mx-8",
+            hideCompactWorkspaceChrome && "hidden md:block",
+          )}
+        >
+          <nav
+            aria-label={t`${polity.name} navigation`}
+            className="no-scrollbar overflow-x-auto px-4 pb-4 sm:px-6 md:px-8"
+          >
+            <AppTabsList className="min-w-max justify-start">
+              {workspaceNavigation.map((item) => (
+                <AppTabsTrigger
+                  className="flex-none px-3"
+                  key={item.value}
+                  nativeButton={false}
+                  render={
+                    <Link
+                      params={{ polityId: polity.id }}
+                      preload="intent"
+                      to={item.to}
+                    />
+                  }
+                  value={item.value}
+                >
+                  {item.label}
+                </AppTabsTrigger>
+              ))}
+            </AppTabsList>
+          </nav>
+          <AppSeparator />
         </div>
-      </nav>
 
-      <Outlet />
-    </div>
+        <AppTabsContent className="min-w-0 pt-6" value={activeWorkspaceTab}>
+          <Outlet />
+        </AppTabsContent>
+      </AppTabs>
+    </AppPageLayout>
   );
 }

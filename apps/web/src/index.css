@@ -5,6 +5,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@utility focus-indicator {
+  &:focus-visible {
+    @apply outline-none ring-3 ring-ring/50;
+  }
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: "Geist Variable", sans-serif;
@@ -131,5 +137,6 @@
   }
   html {
     @apply font-sans;
+    scrollbar-gutter: stable;
   }
 }

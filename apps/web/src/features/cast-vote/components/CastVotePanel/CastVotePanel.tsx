@@ -102,7 +102,7 @@ export function CastVotePanel({ motion, polityId }: CastVotePanelProps) {
                   aria-label={`${choice.label}: ${choice.description}`}
                   aria-pressed={isSelected}
                   className={cn(
-                    "flex min-h-14 w-full items-center justify-between gap-4 rounded-lg border px-3 py-2.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "focus-indicator flex min-h-14 w-full items-center justify-between gap-4 rounded-lg border px-3 py-2.5 text-left transition-colors hover:bg-muted",
                     isSelected && "border-foreground bg-muted",
                   )}
                   key={choice.value}

@@ -1,8 +1,8 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
-
 import { AppPageHeader } from "@/components/app/AppPageHeader";
+import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { usePolityOptions } from "@/domains/polity";
 import { ActionLauncher } from "@/features/launch-action";
 
@@ -23,7 +23,7 @@ function HomeRoute() {
   const { data: polityOptions } = usePolityOptions({ locale: i18n.locale });
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <AppPageLayout measure="standard">
       <AppPageHeader
         description={
           <Trans>
@@ -34,6 +34,6 @@ function HomeRoute() {
         title={<Trans>Your Work Across Polities</Trans>}
       />
       <ActionLauncher polities={polityOptions} variant="surface" />
-    </div>
+    </AppPageLayout>
   );
 }

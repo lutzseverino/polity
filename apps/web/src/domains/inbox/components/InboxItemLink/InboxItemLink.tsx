@@ -63,7 +63,7 @@ export function InboxItemLink({
   return (
     <InboxTargetLink
       className={cn(
-        "group flex min-w-0 gap-3 rounded-lg border transition-colors hover:border-foreground/20 hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "focus-indicator group flex min-w-0 gap-3 rounded-lg border transition-colors hover:border-foreground/20 hover:bg-muted",
         compact ? "p-3" : "p-4",
       )}
       item={item}

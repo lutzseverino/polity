@@ -30,7 +30,7 @@ export function ActionSetup({
   const polity = polities.find((option) => option.id === polityId);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <>
       <AppPageHeader
         description={
           action ? (
@@ -74,6 +74,6 @@ export function ActionSetup({
           </AppText>
         </AppCardContent>
       </AppCard>
-    </div>
+    </>
   );
 }
