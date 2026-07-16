@@ -1,11 +1,9 @@
 <div align="center">
-    <h1 align="center">Polity</h1>
-    <p>Constitutional government software for small groups.</p>
-    <p>
-        <a href="https://github.com/lutzseverino/polity/actions/workflows/check-js.yml"><img alt="Check JavaScript" src="https://github.com/lutzseverino/polity/actions/workflows/check-js.yml/badge.svg"></a>
-        <a href="https://github.com/lutzseverino/polity/actions/workflows/check-service.yml"><img alt="Check Service" src="https://github.com/lutzseverino/polity/actions/workflows/check-service.yml/badge.svg"></a>
-        <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-    </p>
+  <h1>Polity</h1>
+  <p>Constitutional government software for small groups.</p>
+
+  [![CI](https://github.com/lutzseverino/polity/actions/workflows/ci.yml/badge.svg)](https://github.com/lutzseverino/polity/actions/workflows/ci.yml)
+  [![License: MIT](https://img.shields.io/badge/license-MIT-2f3437)](LICENSE)
 </div>
 
 Polity is a product workspace for membership, constitutions, institutions, offices, motions,
@@ -28,7 +26,7 @@ authorization, and billing capabilities provided by [Cardo](https://github.com/l
 Install Cardo into your local Maven repository, then install the JavaScript workspace:
 
 ```bash
-mvn -f ../cardo/pom.xml install
+../cardo/mvnw -f ../cardo/pom.xml install
 pnpm install
 ```
 

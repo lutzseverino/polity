@@ -1,0 +1,3 @@
+# Generated legacy Vite configuration
+web/vite.config.js
+web/vite.config.d.ts

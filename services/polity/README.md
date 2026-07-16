@@ -1,7 +1,6 @@
-<div align="center">
-    <h1 align="center">Polity Service</h1>
-    <p>The product-owned backend for constitutional government.</p>
-</div>
+# Polity Service
+
+The product-owned backend for constitutional government.
 
 The service owns Polity's domain behavior, API contract, persistence, permissions, and lifecycle
 decisions. Shared authorization, identity, billing, and API mechanics come from
@@ -12,7 +11,7 @@ decisions. Shared authorization, identity, billing, and API mechanics come from
 Install Cardo into the local Maven repository, then run service checks from the repository root:
 
 ```bash
-mvn -f ../cardo/pom.xml install
+../cardo/mvnw -f ../cardo/pom.xml install
 pnpm test:service
 pnpm check:service:architecture
 pnpm check:service:static

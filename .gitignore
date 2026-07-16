@@ -1,14 +1,41 @@
-node_modules/
-dist/
-target/
-coverage/
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.iml
+*.swp
+*~
+
+# Local environment and logs
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.log
+
+# Node.js and pnpm
+node_modules/
+.pnpm-store/
+.npm/
+*.tgz
+
+# Vite and frontend tests
+dist/
+coverage/
 *.tsbuildinfo
+.vite/
+
+# Maven and JVM
+target/
+*.class
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+dependency-reduced-pom.xml
+
+# Generated legacy Vite configuration
 web/vite.config.js
 web/vite.config.d.ts
-.idea/
-.vscode/
-.DS_Store
