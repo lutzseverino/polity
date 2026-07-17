@@ -14,13 +14,9 @@ import {
   Users,
   Vote,
 } from "lucide-react";
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 
 import { AppBadge } from "@/components/app/AppBadge";
-import {
-  AppLinkSurface,
-  AppLinkSurfaceIndicator,
-} from "@/components/app/AppLinkSurface";
 import { AppText } from "@/components/app/AppText";
 import type {
   ActionAvailability,
@@ -30,6 +26,7 @@ import type {
   ActionDefinition,
   ActionId,
 } from "@/features/launch-action/lib/action-definitions";
+import type { ActionLauncherActionLinkProps } from "@/features/launch-action/lib/launch-action";
 import { cn } from "@/lib/utils";
 
 const actionIconById: Readonly<Record<ActionId, LucideIcon>> = {
@@ -51,11 +48,13 @@ function ActionOption({
   availability,
   onSelect,
   polityId,
+  renderActionLink,
 }: Readonly<{
   action: ActionDefinition;
   availability: ActionAvailability;
   onSelect?: () => void;
   polityId: string;
+  renderActionLink: (props: ActionLauncherActionLinkProps) => ReactNode;
 }>) {
   const { i18n } = useLingui();
   const Icon = actionIconById[action.id];
@@ -90,7 +89,6 @@ function ActionOption({
             : (availability.reasonMessage ?? i18n._(action.description))}
         </AppText>
       </span>
-      {availability.available ? <AppLinkSurfaceIndicator /> : null}
     </>
   );
 
@@ -105,16 +103,14 @@ function ActionOption({
     );
   }
 
-  return (
-    <AppLinkSurface
-      className="flex items-start gap-3 border bg-background p-3.5 transition-colors hover:border-foreground/25 hover:bg-muted/40"
-      onClick={onSelect}
-      search={{ action: action.id, polity: polityId }}
-      to="/actions/new"
-    >
-      {content}
-    </AppLinkSurface>
-  );
+  return renderActionLink({
+    actionId: action.id,
+    children: content,
+    className:
+      "flex items-start gap-3 border bg-background p-3.5 transition-colors hover:border-foreground/25 hover:bg-muted/40",
+    onSelect,
+    polityId,
+  });
 }
 
 export function ActionResults({
@@ -124,6 +120,7 @@ export function ActionResults({
   polityId,
   presentation,
   query,
+  renderActionLink,
 }: Readonly<{
   actions: readonly ActionDefinition[];
   availability: PolityActionAvailability;
@@ -131,6 +128,7 @@ export function ActionResults({
   polityId: string;
   presentation: "dialog" | "surface";
   query: string;
+  renderActionLink: (props: ActionLauncherActionLinkProps) => ReactNode;
 }>) {
   const availableHeadingId = useId();
   const unavailableHeadingId = useId();
@@ -212,6 +210,7 @@ export function ActionResults({
                 key={action.id}
                 onSelect={onSelect}
                 polityId={polityId}
+                renderActionLink={renderActionLink}
               />
             ))}
           </div>
@@ -237,6 +236,7 @@ export function ActionResults({
                 key={action.id}
                 onSelect={onSelect}
                 polityId={polityId}
+                renderActionLink={renderActionLink}
               />
             ))}
           </div>
@@ -261,6 +261,7 @@ export function ActionResults({
                   availability={availability[action.availabilityKey]}
                   key={action.id}
                   polityId={polityId}
+                  renderActionLink={renderActionLink}
                 />
               ))}
             </div>
@@ -287,6 +288,7 @@ export function ActionResults({
                   availability={availability[action.availabilityKey]}
                   key={action.id}
                   polityId={polityId}
+                  renderActionLink={renderActionLink}
                 />
               ))}
             </div>

@@ -20,8 +20,8 @@ import { AppProgress, AppProgressLabel } from "@/components/app/AppProgress";
 import { AppText } from "@/components/app/AppText";
 import type { Motion } from "@/domains/motion";
 import { polityMotionQueryOptions, usePolityMotion } from "@/domains/polity";
-import { CastVotePanel } from "@/features/cast-vote";
-import { NominationResponsePanel } from "@/features/respond-to-nomination";
+import { CastMotionVoteWorkflow } from "@/features/cast-motion-vote";
+import { RespondOfficeElectionCandidacyWorkflow } from "@/features/respond-office-election-candidacy";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 
 export const Route = createFileRoute("/polities/$polityId/motions/$motionId")({
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/polities/$polityId/motions/$motionId")({
   },
 });
 
-function MotionResult({
+function MotionResultDetails({
   motion,
   polityId,
 }: Readonly<{ motion: Motion; polityId: string }>) {
@@ -114,13 +114,16 @@ function MotionDecision({
   polityId,
 }: Readonly<{ motion: Motion; polityId: string }>) {
   if (motion.status !== "voting") {
-    return <MotionResult motion={motion} polityId={polityId} />;
+    return <MotionResultDetails motion={motion} polityId={polityId} />;
   }
 
   return motion.actionKind === "vote" ? (
-    <CastVotePanel motion={motion} polityId={polityId} />
+    <CastMotionVoteWorkflow motion={motion} polityId={polityId} />
   ) : (
-    <NominationResponsePanel motion={motion} polityId={polityId} />
+    <RespondOfficeElectionCandidacyWorkflow
+      motion={motion}
+      polityId={polityId}
+    />
   );
 }
 

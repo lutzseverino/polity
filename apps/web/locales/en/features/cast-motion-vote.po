@@ -1,0 +1,71 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-16 12:32+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:43
+msgid "Abstain"
+msgstr "Abstain"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:85
+msgid "How do you vote?"
+msgstr "How do you vote?"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:40
+msgid "No"
+msgstr "No"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:82
+msgid "Official vote"
+msgstr "Official vote"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:40
+msgid "Oppose the motion"
+msgstr "Oppose the motion"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:42
+msgid "Participate without choosing a side"
+msgstr "Participate without choosing a side"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:147
+msgid "Record vote"
+msgstr "Record vote"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:39
+msgid "Support the motion"
+msgstr "Support the motion"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:145
+msgid "Update vote"
+msgstr "Update vote"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:98
+msgid "Vote choice"
+msgstr "Vote choice"
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:39
+msgid "Yes"
+msgstr "Yes"
+
+#. placeholder {0}: motion.closesAtLabel.toLowerCase()
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:159
+msgid "You voted {recordedVote}. You can change it until voting closes {0}."
+msgstr "You voted {recordedVote}. You can change it until voting closes {0}."
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:88
+msgid "Your vote determines the motion. Reactions and comments never count toward the result."
+msgstr "Your vote determines the motion. Reactions and comments never count toward the result."
+
+#: src/features/cast-motion-vote/components/CastMotionVoteWorkflow/CastMotionVoteWorkflow.tsx:156
+msgid "Your vote was recorded"
+msgstr "Your vote was recorded"

@@ -9,6 +9,7 @@ import {
   AppCardHeader,
   AppCardTitle,
 } from "@/components/app/AppCard";
+import { AppLinkButton } from "@/components/app/AppLinkButton";
 import {
   AppLinkSurface,
   AppLinkSurfaceIndicator,
@@ -16,7 +17,11 @@ import {
 import { AppText } from "@/components/app/AppText";
 import type { Polity } from "@/domains/polity";
 import { usePolity, usePolityOptions } from "@/domains/polity";
-import { ActionLauncher } from "@/features/launch-action";
+import {
+  ActionLauncher,
+  type ActionLauncherActionLinkProps,
+  type ActionLauncherEmptyActionLinkProps,
+} from "@/features/launch-action";
 
 const polityRoute = getRouteApi("/polities/$polityId");
 
@@ -30,6 +35,39 @@ export const Route = createFileRoute("/polities/$polityId/")({
 });
 
 type AttentionItem = Polity["attention"][number];
+
+function renderActionLink({
+  actionId,
+  children,
+  className,
+  onSelect,
+  polityId,
+}: ActionLauncherActionLinkProps) {
+  return (
+    <AppLinkSurface
+      className={className}
+      onClick={onSelect}
+      search={{ action: actionId, polity: polityId }}
+      to="/actions/new"
+    >
+      {children}
+      <AppLinkSurfaceIndicator />
+    </AppLinkSurface>
+  );
+}
+
+function renderEmptyActionLink({
+  children,
+  kind,
+}: ActionLauncherEmptyActionLinkProps) {
+  return kind === "explore-polities" ? (
+    <AppLinkButton to="/explore" variant="outline">
+      {children}
+    </AppLinkButton>
+  ) : (
+    <AppLinkButton to="/polities/new">{children}</AppLinkButton>
+  );
+}
 
 function AttentionCard({
   item,
@@ -97,6 +135,8 @@ function PolityOverviewRoute() {
       <ActionLauncher
         defaultPolityId={polity.id}
         polities={polities}
+        renderActionLink={renderActionLink}
+        renderEmptyActionLink={renderEmptyActionLink}
         triggerPresentation="prompt"
       />
 

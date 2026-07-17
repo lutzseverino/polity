@@ -1,6 +1,6 @@
 package com.odonta.polity.result;
 
-import com.odonta.polity.model.InvitationStatus;
+import com.odonta.polity.model.MembershipInvitationStatus;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -10,6 +10,6 @@ public record MembershipInvitationResult(
     String polityName,
     String email,
     String invitedByName,
-    InvitationStatus status,
+    MembershipInvitationStatus status,
     OffsetDateTime invitedAt,
     OffsetDateTime respondedAt) {}

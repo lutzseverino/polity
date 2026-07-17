@@ -1,4 +1,1 @@
-export {
-  AppButton,
-  AppLinkButton,
-} from "@/components/app/AppButton/AppButton";
+export { AppButton } from "@/components/app/AppButton/AppButton";

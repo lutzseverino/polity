@@ -1,6 +1,5 @@
 export {
   politiesQueryOptions,
-  polityActionsQueryOptions,
   polityListQueryKey,
   polityMotionQueryOptions,
   polityOptionsQueryOptions,

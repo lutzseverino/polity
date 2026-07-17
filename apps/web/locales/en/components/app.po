@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/app/AppDialog/AppDialog.tsx:31
+#: src/components/app/AppDialog/AppDialog.tsx:93
 msgid "Close"
 msgstr "Close"
 

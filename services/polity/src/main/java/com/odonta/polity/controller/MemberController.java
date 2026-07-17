@@ -2,8 +2,8 @@ package com.odonta.polity.controller;
 
 import com.odonta.polity.api.MembersApi;
 import com.odonta.polity.mapper.MembershipTransportMapper;
-import com.odonta.polity.service.MembershipResignationService;
 import com.odonta.polity.service.MembershipService;
+import com.odonta.polity.workflow.ResignMembershipWorkflow;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberController implements MembersApi {
   private final MembershipService memberships;
-  private final MembershipResignationService resignations;
+  private final ResignMembershipWorkflow resignMembership;
   private final MembershipTransportMapper mapper;
   private final AuthenticatedUserReader users;
 
@@ -29,7 +29,7 @@ public class MemberController implements MembersApi {
 
   @Override
   public ResponseEntity<Void> resignPolityMembership(UUID polityId) {
-    resignations.resign(polityId, users.currentUser());
+    resignMembership.resign(polityId, users.currentUser());
     return ResponseEntity.noContent().build();
   }
 }

@@ -20,8 +20,10 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
 
 ## Rules
 
-- Name domains with nouns (`polity`, `motion`, `membership`) and features with verb phrases
-  (`cast-vote`, `accept-invitation`).
+- Name domains with canonical backend nouns (`polity`, `motion`, `membership`) and features with
+  explicit verb phrases (`cast-motion-vote`, `accept-membership-invitation`). Do not introduce a
+  frontend synonym when the backend already owns the concept: for example, code uses
+  `OfficeElectionCandidacy`, even when product copy explains that concept as a nomination.
 - Mirror the public URL hierarchy in `src/routes/`, including dynamic segments such as `$polityId`.
 - Keep route params, search state, loaders, redirects, and page composition in route modules.
 - Export every domain and feature through a manually curated root `index.ts`. Name each value and type
@@ -33,6 +35,9 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
 - Features may depend on domain public contracts, app components, API contracts, and low-level libraries.
   They never depend on routes or app composition. Avoid feature-to-feature dependencies; compose features
   in a route or the app shell instead.
+- Route ownership is transitive: domains and features cannot hide concrete URLs behind router-aware app
+  components such as `AppLinkButton` or `AppLinkSurface`. Reusable owners expose link/action render props or
+  slots; routes and app composition supply the router-aware wrapper and destination.
 - Only `src/components/app/` may import `src/components/ui/`. Never manually edit files under
   `src/components/ui/`. Follow the [app component wrapper rules](app-component-wrappers.md) when
   exposing or extending a registry primitive.
@@ -42,6 +47,18 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   actions. A reusable component should not acquire route, loader, or fixture knowledge merely for
   convenience. Domain components do not import the router; the route or feature composition boundary wraps
   them in navigable surfaces and supplies any directional action slot.
+- Name domain presenters for the representation they expose: `<Noun>Summary` for compact list/feed
+  representations and `<Noun>Details` for fuller read-only representations. Do not suffix a presenter with
+  its current primitive (`Card`, `Panel`) unless the primitive itself is the reusable contract, as it is for
+  the compound `PolityCard` API.
+- Name mutation-owning feature components `<Verb><CanonicalNoun>Workflow`. A workflow may own action state,
+  mutation orchestration, and owner-specific success UI, but it receives the domain object it renders and
+  never loads route data. Put a reusable read-only representation in its domain and compose it from the
+  workflow. Name a side-effect-free input surface `<Verb><CanonicalNoun>Form`; a form receives values and
+  callbacks and does not invoke a mutation hook.
+- Routes and app-shell task boundaries own params, reads, navigation, dialogs/pages, and workflow
+  composition. The dependency direction is `route/app shell -> workflow -> domain presenter`; the domain
+  presenter never imports the feature.
 - Keep types with their owning domain or feature. Generated OpenAPI types remain in generated API output;
   add a domain type only when it expresses a UI/domain contract rather than copying transport output.
 - Keep plain asynchronous reads in the owning domain's `api/` folder and user-action requests in the owning
@@ -52,11 +69,23 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   ownership instead.
 
 `pnpm check:architecture` enforces the mechanically checkable part of this graph, including acyclic
-dependencies, shadcn isolation, upward-import bans, domain routing ownership, and public entrypoints. The
-legacy `InboxItemLink` route dependency is an explicit migration exception rather than a general precedent.
+dependencies, shadcn isolation, upward-import bans, transitive domain and feature routing ownership, and
+public entrypoints.
 
 ## Component Example
 
 `PolityCard` belongs to the `polity` domain and exposes `Header`, `Identity`, `Content`, `Footer`, `Meta`,
 `Title`, and `Description` parts. Consumers compose those parts with route-specific links and actions; the
 card itself does not load data or know which URL owns a polity.
+
+The current canonical examples are:
+
+| Concern | Owner and name | Responsibility |
+| --- | --- | --- |
+| Compact motion representation | `domains/motion/MotionSummary` | renders one `Motion` and an optional action slot |
+| Membership-invitation representation | `domains/membership/MembershipInvitationDetails` | renders one `MembershipInvitation` without action state |
+| Invitation acceptance | `features/accept-membership-invitation/AcceptMembershipInvitationWorkflow` | accepts a supplied invitation and owns the acceptance mutation |
+| Secret-token onboarding | `features/onboard-membership-invitation/OnboardMembershipInvitationWorkflow` | requests and polls Cardo-owned passwordless identity completion without accepting membership |
+| Motion voting | `features/cast-motion-vote/CastMotionVoteWorkflow` | owns vote selection and mutation state for a supplied motion |
+| Election candidacy response | `features/respond-office-election-candidacy/RespondOfficeElectionCandidacyWorkflow` | owns candidacy-response mutation state for a supplied motion |
+| Action discovery | `features/launch-action/ActionLauncher` | owns action filtering and availability state while consumers supply route-owned action and empty-state link renderers |

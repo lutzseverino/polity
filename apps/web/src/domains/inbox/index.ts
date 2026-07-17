@@ -3,9 +3,9 @@ export {
   useInboxItems,
 } from "@/domains/inbox/api/inbox-queries";
 export {
-  InboxItemLink,
-  type RenderInvitationLink,
-} from "@/domains/inbox/components/InboxItemLink";
+  InboxItemSummary,
+  type RenderInboxItemLink,
+} from "@/domains/inbox/components/InboxItemSummary";
 export { InboxPreview } from "@/domains/inbox/components/InboxPreview";
 export type {
   InboxCategory,
@@ -16,7 +16,5 @@ export type {
 export {
   countOpenInboxTasks,
   filterInboxItemsByCategory,
-  isOpenInboxTask,
-  removeInvitationInboxTask,
-  selectInboxPreviewItems,
+  removeMembershipInvitationInboxTask,
 } from "@/domains/inbox/lib/inbox-selectors";

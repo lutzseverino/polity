@@ -6,6 +6,7 @@ import com.odonta.polity.mapper.OfficeApplicationMapper;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.repository.OfficeProjection;
 import com.odonta.polity.repository.OfficeRepository;
+import com.odonta.polity.resolver.PolityContextResolver;
 import com.odonta.polity.result.OfficeResult;
 import com.odonta.polity.result.PageResult;
 import java.util.UUID;
@@ -21,12 +22,12 @@ public class OfficeService {
   private final PolityAccessPolicy access;
   private final OfficeApplicationMapper officeMapper;
   private final OfficeRepository offices;
-  private final PolityService polities;
+  private final PolityContextResolver polityContext;
 
   @PreAuthorize(PolityPermissions.CAN_READ_POLITY)
   public PageResult<OfficeResult> list(UUID polityId, UUID userId, int page, int size) {
     access.requireReadable(polityId, userId);
-    ConstitutionVersion constitution = polities.constitution(polityId);
+    ConstitutionVersion constitution = polityContext.constitution(polityId);
     Page<OfficeProjection> projections =
         offices.findProjectionsByConstitutionVersionIdOrderByNameAscIdAsc(
             constitution.getId(), PageRequest.of(page, size));

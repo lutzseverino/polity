@@ -30,6 +30,7 @@ import com.odonta.polity.repository.MembershipRepository;
 import com.odonta.polity.repository.OfficeRepository;
 import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.ProcedureRepository;
+import com.odonta.polity.result.ActionUnavailableReason;
 import com.odonta.polity.result.GovernmentAssessmentResult;
 import com.odonta.polity.service.MembershipService;
 import java.time.Clock;
@@ -98,6 +99,54 @@ class GovernmentAssessmentResolverTest {
                 .procedureAvailability(polityId, constitution, Procedure.OFFICE_ELECTION)
                 .available())
         .isTrue();
+  }
+
+  @Test
+  void procedureAvailabilityRequiresMinimumOfficeHolderElectorate() {
+    UUID polityId = UUID.randomUUID();
+    ConstitutionVersion constitution = constitution(polityId);
+    Membership magistrate = member(polityId, "Magistrate");
+    Procedure procedure =
+        new Procedure(
+            polityId,
+            constitution.getId(),
+            UUID.randomUUID(),
+            Procedure.CONSTITUTIONAL_REVIEW,
+            "Constitutional review",
+            null,
+            1,
+            2,
+            VotingThreshold.SIMPLE_MAJORITY_CAST,
+            ProcedureElectorate.OFFICE_HOLDERS,
+            Office.MAGISTRATE,
+            2,
+            0,
+            24,
+            EffectType.VOID_OFFICIAL_ACT,
+            null);
+    OfficeTerm term =
+        new OfficeTerm(
+            polityId,
+            UUID.randomUUID(),
+            Office.MAGISTRATE,
+            magistrate.getId(),
+            NOW.minusDays(1),
+            NOW.plusDays(14));
+    when(procedures.findEntityByConstitutionVersionIdAndCode(
+            constitution.getId(), Procedure.CONSTITUTIONAL_REVIEW))
+        .thenReturn(Optional.of(procedure));
+    when(officeTerms.findEntitiesByPolityIdAndOfficeCodeAndStatusAndEndsAtAfterOrderByStartedAtAsc(
+            polityId, Office.MAGISTRATE, OfficeTermStatus.ACTIVE, NOW))
+        .thenReturn(List.of(term));
+    when(memberships.findEntityById(magistrate.getId())).thenReturn(Optional.of(magistrate));
+    when(membershipService.hasPoliticalStanding(magistrate.getId(), NOW)).thenReturn(true);
+
+    var result =
+        resolver.procedureAvailability(polityId, constitution, Procedure.CONSTITUTIONAL_REVIEW);
+
+    assertThat(result.available()).isFalse();
+    assertThat(result.reason())
+        .isEqualTo(ActionUnavailableReason.PROCEDURE_ELECTORATE_BELOW_MINIMUM);
   }
 
   @Test

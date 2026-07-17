@@ -13,41 +13,33 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/inbox/index.tsx:55
-#~ msgid "Find everything that needs your attention here. Each item opens where that decision belongs."
-#~ msgstr "Find everything that needs your attention here. Each item opens where that decision belongs."
-
-#: src/routes/inbox/index.tsx:26
-#: src/routes/inbox/index.tsx:61
+#: src/routes/inbox/index.tsx:60
+#: src/routes/inbox/index.tsx:95
 msgid "Inbox"
 msgstr "Inbox"
 
-#: src/routes/inbox/index.tsx:66
+#: src/routes/inbox/index.tsx:100
 msgid "Inbox Categories"
 msgstr "Inbox Categories"
 
-#: src/routes/inbox/index.tsx:43
-#: src/routes/inbox/index.tsx:101
+#: src/routes/inbox/index.tsx:77
+#: src/routes/inbox/index.tsx:135
 msgid "Needs Action"
 msgstr "Needs Action"
 
-#: src/routes/inbox/index.tsx:133
+#: src/routes/inbox/index.tsx:176
 msgid "New items will appear here when they need your attention."
 msgstr "New items will appear here when they need your attention."
 
-#: src/routes/inbox/index.tsx:130
+#: src/routes/inbox/index.tsx:173
 msgid "Nothing Here Right Now"
 msgstr "Nothing Here Right Now"
 
-#: src/routes/inbox/index.tsx:56
+#: src/routes/inbox/index.tsx:90
 msgid "Review actions and updates from across your polities. Each item opens where that decision belongs."
 msgstr "Review actions and updates from across your polities. Each item opens where that decision belongs."
 
-#: src/routes/inbox/index.tsx:44
-#: src/routes/inbox/index.tsx:103
+#: src/routes/inbox/index.tsx:78
+#: src/routes/inbox/index.tsx:137
 msgid "Updates"
 msgstr "Updates"
-
-#: src/routes/inbox/index.tsx:60
-#~ msgid "Your Attention"
-#~ msgstr "Your Attention"

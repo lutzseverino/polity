@@ -14,33 +14,28 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: actions.length
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:154
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:152
 msgid "{0, plural, one {# matching action.} other {# matching actions.}}"
 msgstr ""
 
 #. placeholder {0}: unavailableActions.length
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:272
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:273
 msgid "{0, plural, one {# more action exists, but is unavailable here} other {# more actions exist, but are unavailable here}}"
 msgstr ""
 
-#. placeholder {0}: sensitiveActions.length
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:283
-#~ msgid "{0, plural, one {# sensitive action} other {# sensitive actions}}"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:76
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:82
 msgid "{availableCount, plural, one {# action} other {# actions}}"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:159
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:157
 msgid "{availableMatchCount, plural, one {# is allowed.} other {# are allowed.}}"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:338
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:358
 msgid "Actions"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:243
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:256
 msgid "Actions become available inside a polity."
 msgstr ""
 
@@ -56,7 +51,7 @@ msgstr ""
 msgid "adopt a policy"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:200
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:198
 msgid "Allowed actions"
 msgstr ""
 
@@ -92,19 +87,7 @@ msgstr ""
 msgid "Ask the polity to review and potentially vacate an active office term."
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:185
-#~ msgid "available in {polityName}"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:258
-#~ msgid "Available now"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:36
-#~ msgid "Back to Home"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:198
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:196
 msgid "Best matches"
 msgstr ""
 
@@ -152,7 +135,7 @@ msgstr ""
 msgid "change our rules"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:189
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:197
 msgid "Checking what you can do…"
 msgstr ""
 
@@ -168,7 +151,7 @@ msgstr ""
 msgid "Choose people for an office"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:409
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:430
 msgid "Choose the outcome in plain language. The constitution handles the mechanics and shows what is possible now."
 msgstr ""
 
@@ -196,7 +179,7 @@ msgstr ""
 msgid "constitutional"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:77
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:83
 msgid "currently allowed in {polityName}"
 msgstr ""
 
@@ -204,13 +187,9 @@ msgstr ""
 msgid "decision"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:318
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:338
 msgid "Describe the outcome you want. The constitution will guide the rest."
 msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:232
-#~ msgid "Describe your intent, then review the official action before anything is submitted."
-#~ msgstr ""
 
 #: src/features/launch-action/lib/action-definitions.ts:170
 msgid "disband"
@@ -244,7 +223,7 @@ msgstr ""
 msgid "exit the group"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:247
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:260
 msgid "Explore polities"
 msgstr ""
 
@@ -260,15 +239,7 @@ msgstr ""
 msgid "finalize a vote"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:149
-#~ msgid "Find an Action"
-#~ msgstr ""
-
-#: src/features/launch-action/lib/action-definitions.ts:26
-#~ msgid "Finish forming this polity before starting an election."
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:250
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:264
 msgid "Found a polity"
 msgstr ""
 
@@ -276,7 +247,7 @@ msgstr ""
 msgid "government"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:164
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:172
 msgid "In this polity"
 msgstr ""
 
@@ -292,7 +263,7 @@ msgstr ""
 msgid "join"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:240
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:253
 msgid "Join or found a polity first"
 msgstr ""
 
@@ -312,8 +283,8 @@ msgstr ""
 msgid "Make a group decision"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:360
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:406
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:378
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:427
 msgid "Make something happen"
 msgstr ""
 
@@ -321,7 +292,7 @@ msgstr ""
 msgid "membership"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:225
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:224
 msgid "Membership and closure"
 msgstr ""
 
@@ -333,18 +304,9 @@ msgstr ""
 msgid "motion"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:254
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:260
-#~ msgid "New Action"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:177
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:175
 msgid "No matching actions"
 msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:204
-#~ msgid "No Matching Actions"
-#~ msgstr ""
 
 #: src/features/launch-action/components/ActionSetup/ActionSetup.tsx:51
 msgid "No polity selected"
@@ -386,10 +348,6 @@ msgstr ""
 #: src/features/launch-action/lib/action-definitions.ts:53
 msgid "person"
 msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:172
-#~ msgid "Polity"
-#~ msgstr ""
 
 #: src/features/launch-action/lib/action-definitions.ts:85
 msgid "power"
@@ -484,14 +442,6 @@ msgstr ""
 msgid "sanction"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:162
-#~ msgid "Search by goal or action…"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:114
-#~ msgid "Sensitive"
-#~ msgstr ""
-
 #: src/features/launch-action/lib/action-definitions.ts:174
 msgid "shut down"
 msgstr ""
@@ -504,30 +454,18 @@ msgstr ""
 msgid "spend money"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:293
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:311
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:317
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:335
 msgid "Start an action"
 msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:229
-#~ msgid "Start an Action"
-#~ msgstr ""
 
 #: src/features/launch-action/lib/action-definitions.ts:74
 msgid "Start an Election"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:371
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:389
 msgid "Start with your goal. The constitution determines the formal action and whether you are authorized to begin."
 msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:554
-#~ msgid "Start with your goal. The constitution determines the formal action and whether you can take it now."
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:273
-#~ msgid "Start with your goal. You’ll review the formal action before anything is submitted."
-#~ msgstr ""
 
 #: src/features/launch-action/lib/action-definitions.ts:189
 msgid "stop participating"
@@ -546,27 +484,19 @@ msgstr ""
 msgid "This handoff reserves space for the structured form required by the selected action."
 msgstr ""
 
-#: src/features/launch-action/lib/action-definitions.ts:46
-#~ msgid "This polity has no active constitutional review procedure."
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:154
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:162
 msgid "Try “change our rules” or “invite someone”…"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:207
-#~ msgid "Try a broader phrase such as “vote,” “invite,” or “rules.”"
-#~ msgstr ""
-
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:211
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:219
 msgid "Try again"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:180
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:178
 msgid "Try describing the outcome, such as “invite someone,” “change our rules,” or “remove an officer.”"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:77
+#: src/features/launch-action/components/ActionLauncher/ActionResults.tsx:78
 msgid "Unavailable"
 msgstr ""
 
@@ -590,15 +520,15 @@ msgstr ""
 msgid "warning"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:198
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:206
 msgid "We couldn’t check your actions"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:140
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:148
 msgid "What do you want to do?"
 msgstr ""
 
-#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:201
+#: src/features/launch-action/components/ActionLauncher/ActionLauncher.tsx:209
 msgid "Your polity is unchanged. Try checking its permissions again."
 msgstr ""
 

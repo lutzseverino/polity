@@ -17,15 +17,11 @@ msgstr ""
 msgid "{label}, {openInboxTaskCount} items need action"
 msgstr "{label}, {openInboxTaskCount} items need action"
 
-#: src/app/shell/ShellNavigation.tsx:149
-#~ msgid "{label}, {unresolvedInboxCount} unread items"
-#~ msgstr "{label}, {unresolvedInboxCount} unread items"
-
 #: src/app/shell/ShellNavigation.tsx:235
 msgid "Account"
 msgstr "Account"
 
-#: src/app/shell/shell-route-context.test.ts:66
+#: src/app/shell/shell-route-context.test.ts:97
 msgid "All motions"
 msgstr "All motions"
 
@@ -33,7 +29,7 @@ msgstr "All motions"
 msgid "All polities"
 msgstr "All polities"
 
-#: src/app/shell/ShellTopBar.tsx:111
+#: src/app/shell/ShellTopBar.tsx:187
 msgid "Current location"
 msgstr "Current location"
 
@@ -58,7 +54,7 @@ msgstr "Loading page"
 msgid "Me"
 msgstr "Me"
 
-#: src/app/shell/shell-route-context.test.ts:72
+#: src/app/shell/shell-route-context.test.ts:103
 msgid "Motion"
 msgstr "Motion"
 
@@ -69,10 +65,6 @@ msgstr "Motions"
 #: src/app/shell/ShellNavigation.tsx:234
 msgid "Open account"
 msgstr "Open account"
-
-#: src/app/shell/ShellNavigation.tsx:133
-#~ msgid "Open profile"
-#~ msgstr "Open profile"
 
 #: src/app/shell/RouteNotFoundPage.tsx:18
 msgid "Page not found"
@@ -87,7 +79,7 @@ msgstr "Polities"
 msgid "Primary Navigation"
 msgstr "Primary Navigation"
 
-#: src/app/shell/AppShell.tsx:49
+#: src/app/shell/AppShell.tsx:86
 msgid "Skip to main content"
 msgstr "Skip to main content"
 

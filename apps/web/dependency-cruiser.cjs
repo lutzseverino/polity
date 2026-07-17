@@ -74,13 +74,12 @@ module.exports = {
       name: "domains-do-not-own-routing",
       severity: "error",
       comment:
-        "Domain components stay presentational; routes and features own URL navigation. InboxItemLink remains an explicit migration exception.",
-      from: {
-        path: "^src/domains/",
-        pathNot:
-          "^src/domains/inbox/components/InboxItemLink/InboxItemLink[.]tsx$",
+        "Domain components stay presentational; routes and application composition own URL navigation, including navigation hidden behind app-component wrappers.",
+      from: { path: "^src/domains/" },
+      to: {
+        path: "node_modules/@tanstack/react-router/",
+        reachable: true,
       },
-      to: { path: "node_modules/@tanstack/react-router/" },
     },
     {
       name: "features-do-not-reach-upward",
@@ -89,6 +88,17 @@ module.exports = {
         "Features own user actions and cannot depend on app composition or routes.",
       from: { path: "^src/features/" },
       to: { path: "^src/(?:app|routes)/" },
+    },
+    {
+      name: "features-do-not-own-routing",
+      severity: "error",
+      comment:
+        "Routes and app composition own URL navigation, including navigation hidden behind app-component wrappers; workflows receive objects, callbacks, and slots.",
+      from: { path: "^src/features/" },
+      to: {
+        path: "node_modules/@tanstack/react-router/",
+        reachable: true,
+      },
     },
     {
       name: "routes-do-not-import-app-composition",

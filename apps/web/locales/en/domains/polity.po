@@ -12,11 +12,3 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
-
-#: src/domains/polity/components/ReadinessBadge/ReadinessBadge.tsx:9
-#~ msgid "Forming"
-#~ msgstr "Forming"
-
-#: src/domains/polity/components/ReadinessBadge/ReadinessBadge.tsx:9
-#~ msgid "Ready"
-#~ msgstr "Ready"

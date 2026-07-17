@@ -7,6 +7,8 @@ import java.util.UUID;
 public interface MembershipProjection {
   UUID getId();
 
+  UUID getPolityId();
+
   UUID getUserId();
 
   String getDisplayName();

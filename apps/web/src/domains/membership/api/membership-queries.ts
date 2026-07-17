@@ -1,45 +1,78 @@
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 import {
-  getInvitation,
-  listInvitations,
+  getMembershipInvitation,
+  getMembershipInvitationByToken,
+  listMembershipInvitations,
 } from "@/domains/membership/api/membership-requests";
 
 type LocalizedQuery = Readonly<{
   locale: string;
 }>;
 
-type InvitationQuery = LocalizedQuery &
+type MembershipInvitationQuery = LocalizedQuery &
   Readonly<{
     invitationId: string;
   }>;
 
+type MembershipInvitationTokenQuery = LocalizedQuery &
+  Readonly<{
+    token: string;
+  }>;
+
 const membershipQueryKeys = {
   all: ["memberships"] as const,
-  invitation: ({ invitationId, locale }: InvitationQuery) =>
+  membershipInvitation: ({ invitationId, locale }: MembershipInvitationQuery) =>
     ["memberships", "invitations", "detail", invitationId, { locale }] as const,
-  invitations: ({ locale }: LocalizedQuery) =>
+  membershipInvitations: ({ locale }: LocalizedQuery) =>
     ["memberships", "invitations", "list", { locale }] as const,
+  membershipInvitationToken: ({
+    locale,
+    token,
+  }: MembershipInvitationTokenQuery) =>
+    ["memberships", "invitation-tokens", token, { locale }] as const,
 };
 
-export function invitationsQueryOptions(input: LocalizedQuery) {
+export function membershipInvitationsQueryOptions(input: LocalizedQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => listInvitations({ signal }),
-    queryKey: membershipQueryKeys.invitations(input),
+    queryFn: ({ signal }) =>
+      listMembershipInvitations({
+        acceptedLanguage: input.locale,
+        signal,
+      }),
+    queryKey: membershipQueryKeys.membershipInvitations(input),
   });
 }
 
-export function invitationQueryOptions(input: InvitationQuery) {
+export function membershipInvitationQueryOptions(
+  input: MembershipInvitationQuery,
+) {
   return queryOptions({
-    queryFn: ({ signal }) => getInvitation(input.invitationId, { signal }),
-    queryKey: membershipQueryKeys.invitation(input),
+    queryFn: ({ signal }) =>
+      getMembershipInvitation(input.invitationId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
+    queryKey: membershipQueryKeys.membershipInvitation(input),
   });
 }
 
-export function useInvitations(input: LocalizedQuery) {
-  return useSuspenseQuery(invitationsQueryOptions(input));
+export function useMembershipInvitation(input: MembershipInvitationQuery) {
+  return useSuspenseQuery(membershipInvitationQueryOptions(input));
 }
 
-export function useInvitation(input: InvitationQuery) {
-  return useSuspenseQuery(invitationQueryOptions(input));
+export function membershipInvitationTokenQueryOptions(
+  input: MembershipInvitationTokenQuery,
+) {
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      getMembershipInvitationByToken(input.token, { signal }),
+    queryKey: membershipQueryKeys.membershipInvitationToken(input),
+  });
+}
+
+export function useMembershipInvitationToken(
+  input: MembershipInvitationTokenQuery,
+) {
+  return useSuspenseQuery(membershipInvitationTokenQueryOptions(input));
 }

@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 class ConstitutionChangeOperationTransportMapperTest {
-  private final MotionTransportMapper mapper = Mappers.getMapper(MotionTransportMapper.class);
+  private final ConstitutionAmendmentTransportMapper mapper =
+      Mappers.getMapper(ConstitutionAmendmentTransportMapper.class);
 
   @Test
   void preservesPersistedOperationNames() {

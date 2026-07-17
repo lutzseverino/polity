@@ -1,18 +1,25 @@
 import { listInboxItemFixtures } from "@/domains/inbox/lib/inbox-fixtures";
-import { projectPendingInvitationToInboxTask } from "@/domains/inbox/lib/inbox-projectors";
-import { listInvitations } from "@/domains/membership";
+import { projectMembershipInvitationToInboxTask } from "@/domains/inbox/lib/inbox-projectors";
+import { listMembershipInvitations } from "@/domains/membership";
 
 type RequestOptions = Readonly<{
+  acceptedLanguage: string;
   signal?: AbortSignal;
 }>;
 
-export async function listInboxItems({ signal }: RequestOptions = {}) {
+export async function listInboxItems({
+  acceptedLanguage,
+  signal,
+}: RequestOptions) {
   signal?.throwIfAborted();
 
-  const invitations = await listInvitations({ signal });
+  const invitations = await listMembershipInvitations({
+    acceptedLanguage,
+    signal,
+  });
 
   return [
     ...listInboxItemFixtures(),
-    ...invitations.map(projectPendingInvitationToInboxTask),
+    ...invitations.map(projectMembershipInvitationToInboxTask),
   ];
 }

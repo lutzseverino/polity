@@ -1,8 +1,8 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Plus, Search } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 
-import { AppButton, AppLinkButton } from "@/components/app/AppButton";
+import { AppButton } from "@/components/app/AppButton";
 import {
   AppCard,
   AppCardContent,
@@ -28,6 +28,8 @@ import { usePolityActions } from "@/domains/polity";
 import { ActionResults } from "@/features/launch-action/components/ActionLauncher/ActionResults";
 import { filterActionDefinitions } from "@/features/launch-action/lib/action-definitions";
 import type {
+  ActionLauncherActionLinkProps,
+  ActionLauncherEmptyActionLinkProps,
   ActionLauncherVariant,
   PolityOption,
 } from "@/features/launch-action/lib/launch-action";
@@ -36,6 +38,10 @@ import { cn } from "@/lib/utils";
 type ActionLauncherProps = Readonly<{
   defaultPolityId?: string;
   polities: readonly PolityOption[];
+  renderActionLink: (props: ActionLauncherActionLinkProps) => ReactNode;
+  renderEmptyActionLink: (
+    props: ActionLauncherEmptyActionLinkProps,
+  ) => ReactNode;
   triggerPresentation?: "icon" | "labelled" | "prompt";
   variant?: ActionLauncherVariant;
 }>;
@@ -89,11 +95,13 @@ function ActionLauncherContent({
   onSelect,
   polities,
   presentation,
+  renderActionLink,
 }: Readonly<{
   defaultPolityId?: string;
   onSelect?: () => void;
   polities: readonly PolityOption[];
   presentation: "dialog" | "surface";
+  renderActionLink: ActionLauncherProps["renderActionLink"];
 }>) {
   const { i18n, t } = useLingui();
   const inputId = useId();
@@ -226,6 +234,7 @@ function ActionLauncherContent({
             polityId={polityId}
             presentation={presentation}
             query={query.trim()}
+            renderActionLink={renderActionLink}
           />
         </>
       )}
@@ -233,7 +242,11 @@ function ActionLauncherContent({
   );
 }
 
-function EmptyLauncher() {
+function EmptyLauncher({
+  renderEmptyActionLink,
+}: Readonly<{
+  renderEmptyActionLink: ActionLauncherProps["renderEmptyActionLink"];
+}>) {
   return (
     <div className="rounded-xl border border-dashed px-4 py-8 text-center">
       <AppText variant="strong">
@@ -243,12 +256,14 @@ function EmptyLauncher() {
         <Trans>Actions become available inside a polity.</Trans>
       </AppText>
       <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
-        <AppLinkButton to="/explore" variant="outline">
-          <Trans>Explore polities</Trans>
-        </AppLinkButton>
-        <AppLinkButton to="/polities/new">
-          <Trans>Found a polity</Trans>
-        </AppLinkButton>
+        {renderEmptyActionLink({
+          children: <Trans>Explore polities</Trans>,
+          kind: "explore-polities",
+        })}
+        {renderEmptyActionLink({
+          children: <Trans>Found a polity</Trans>,
+          kind: "found-polity",
+        })}
       </div>
     </div>
   );
@@ -257,6 +272,8 @@ function EmptyLauncher() {
 function CompactActionLauncher({
   defaultPolityId,
   polities,
+  renderActionLink,
+  renderEmptyActionLink,
   triggerPresentation,
 }: Omit<ActionLauncherProps, "variant">) {
   const { t } = useLingui();
@@ -382,9 +399,10 @@ function CompactActionLauncher({
                 onSelect={() => setOpen(false)}
                 polities={polities}
                 presentation="dialog"
+                renderActionLink={renderActionLink}
               />
             ) : (
-              <EmptyLauncher />
+              <EmptyLauncher renderEmptyActionLink={renderEmptyActionLink} />
             )}
           </div>
         </div>
@@ -396,6 +414,8 @@ function CompactActionLauncher({
 export function ActionLauncher({
   defaultPolityId,
   polities,
+  renderActionLink,
+  renderEmptyActionLink,
   triggerPresentation = "labelled",
   variant = "compact",
 }: ActionLauncherProps) {
@@ -419,9 +439,10 @@ export function ActionLauncher({
               defaultPolityId={defaultPolityId}
               polities={polities}
               presentation="surface"
+              renderActionLink={renderActionLink}
             />
           ) : (
-            <EmptyLauncher />
+            <EmptyLauncher renderEmptyActionLink={renderEmptyActionLink} />
           )}
         </AppCardContent>
       </AppCard>
@@ -432,6 +453,8 @@ export function ActionLauncher({
     <CompactActionLauncher
       defaultPolityId={defaultPolityId}
       polities={polities}
+      renderActionLink={renderActionLink}
+      renderEmptyActionLink={renderEmptyActionLink}
       triggerPresentation={triggerPresentation}
     />
   );

@@ -1,4 +1,4 @@
-export { MotionSummaryCard } from "@/domains/motion/components/MotionSummaryCard";
+export { MotionSummary } from "@/domains/motion/components/MotionSummary";
 export type {
   Motion,
   MotionStatus,

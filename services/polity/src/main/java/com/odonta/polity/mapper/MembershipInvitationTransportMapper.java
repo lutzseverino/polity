@@ -1,18 +1,26 @@
 package com.odonta.polity.mapper;
 
-import com.odonta.polity.api.model.CreateMemberInvitationRequest;
-import com.odonta.polity.api.model.MemberInvitationResponse;
-import com.odonta.polity.input.CreateMemberInvitationInput;
+import com.odonta.polity.api.model.CreateMembershipInvitationRequest;
+import com.odonta.polity.api.model.MembershipInvitationCompletionResponse;
+import com.odonta.polity.api.model.MembershipInvitationResponse;
+import com.odonta.polity.api.model.MembershipInvitationTokenResponse;
+import com.odonta.polity.input.CreateMembershipInvitationInput;
+import com.odonta.polity.result.MembershipInvitationCompletionResult;
 import com.odonta.polity.result.MembershipInvitationResult;
+import com.odonta.polity.result.MembershipInvitationTokenResult;
 import java.util.List;
 import org.mapstruct.Mapper;
 
 @Mapper(config = PolityMapperConfig.class)
 public interface MembershipInvitationTransportMapper {
 
-  CreateMemberInvitationInput toInput(CreateMemberInvitationRequest request);
+  CreateMembershipInvitationInput toInput(CreateMembershipInvitationRequest request);
 
-  MemberInvitationResponse toResponse(MembershipInvitationResult result);
+  MembershipInvitationResponse toResponse(MembershipInvitationResult result);
 
-  List<MemberInvitationResponse> toResponses(List<MembershipInvitationResult> results);
+  MembershipInvitationTokenResponse toResponse(MembershipInvitationTokenResult result);
+
+  MembershipInvitationCompletionResponse toResponse(MembershipInvitationCompletionResult result);
+
+  List<MembershipInvitationResponse> toResponses(List<MembershipInvitationResult> results);
 }

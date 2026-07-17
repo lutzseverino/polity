@@ -13,7 +13,7 @@ public enum PolityResource {
   PROCEDURE("procedure_not_found", "Procedure not found."),
   OFFICE_TERM("office_term_not_found", "Office term not found."),
   SANCTION("sanction_not_found", "Sanction not found."),
-  INVITATION("invitation_not_found", "Invitation not found."),
+  MEMBERSHIP_INVITATION("invitation_not_found", "Invitation not found."),
   CONSTITUTIONAL_POWER("power_not_found", "Constitutional power not found."),
   OFFICIAL_RECORD_ENTRY("official_record_entry_not_found", "Official record entry not found.");
 

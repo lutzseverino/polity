@@ -9,7 +9,7 @@ import {
   AppLinkSurfaceIndicator,
 } from "@/components/app/AppLinkSurface";
 import { AppText } from "@/components/app/AppText";
-import { type Motion, MotionSummaryCard } from "@/domains/motion";
+import { type Motion, MotionSummary } from "@/domains/motion";
 import { usePolity } from "@/domains/polity";
 
 const polityRoute = getRouteApi("/polities/$polityId");
@@ -48,7 +48,7 @@ function MotionSection({
               params={{ motionId: motion.id, polityId }}
               to="/polities/$polityId/motions/$motionId"
             >
-              <MotionSummaryCard
+              <MotionSummary
                 action={<AppLinkSurfaceIndicator />}
                 motion={motion}
               />

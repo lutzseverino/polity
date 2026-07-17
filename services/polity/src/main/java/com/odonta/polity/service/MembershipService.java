@@ -3,7 +3,6 @@ package com.odonta.polity.service;
 import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.mapper.MembershipApplicationMapper;
-import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.SanctionStatus;
 import com.odonta.polity.model.SanctionType;
@@ -47,7 +46,10 @@ public class MembershipService {
   }
 
   public void requireActive(UUID polityId, UUID userId) {
-    active(polityId, userId);
+    if (!memberships.existsByPolityIdAndUserIdAndStatus(
+        polityId, userId, MembershipStatus.ACTIVE)) {
+      throw ApiException.forbidden("polity_membership_required", "Active membership is required.");
+    }
   }
 
   public void requirePoliticalStanding(UUID membershipId, OffsetDateTime at) {
@@ -78,17 +80,8 @@ public class MembershipService {
         .collect(Collectors.toSet());
   }
 
-  Membership active(UUID polityId, UUID userId) {
-    return memberships
-        .findEntityByPolityIdAndUserIdAndStatus(polityId, userId, MembershipStatus.ACTIVE)
-        .orElseThrow(
-            () ->
-                ApiException.forbidden(
-                    "polity_membership_required", "Active membership is required."));
-  }
-
-  Membership get(UUID membershipId) {
-    return memberships.findEntityById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
+  MembershipProjection get(UUID membershipId) {
+    return memberships.findProjectedById(membershipId).orElseThrow(PolityResource.MEMBER::notFound);
   }
 
   public String displayName(UUID membershipId) {
@@ -105,7 +98,7 @@ public class MembershipService {
                 (first, ignored) -> first));
   }
 
-  boolean hasPoliticalStanding(Membership member, OffsetDateTime at) {
+  boolean hasPoliticalStanding(MembershipProjection member, OffsetDateTime at) {
     return member.getStatus() == MembershipStatus.ACTIVE
         && !sanctions.existsByPolityIdAndTargetMembershipIdAndTypeAndStatusAndEndsAtAfter(
             member.getPolityId(),
@@ -115,7 +108,7 @@ public class MembershipService {
             at);
   }
 
-  void requirePoliticalStanding(Membership member, OffsetDateTime at) {
+  void requirePoliticalStanding(MembershipProjection member, OffsetDateTime at) {
     if (!hasPoliticalStanding(member, at)) {
       throw ApiException.forbidden(
           "political_standing_required",

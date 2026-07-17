@@ -7,11 +7,21 @@ servers:
   - url: /api/v1
 tags:
   - name: Polities
+  - name: Constitutions
+  - name: Government Structures
+  - name: Polity Action Availability
   - name: Members
-  - name: Invitations
+  - name: Membership Invitations
   - name: Motions
+  - name: Office Elections
+  - name: Sanctions
+  - name: Appeals
+  - name: Office Term Reviews
+  - name: Constitutional Reviews
+  - name: Constitution Amendments
+  - name: Disbandments
   - name: Offices
-  - name: Justice
+  - name: Office Terms
   - name: Official Record
 paths:
   /polity/account:
@@ -58,7 +68,7 @@ paths:
   /polities/{polityId}/constitution:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Polities]
+      tags: [Constitutions]
       operationId: getPolityConstitution
       security: [{ bearerAuth: [] }]
       responses:
@@ -67,7 +77,7 @@ paths:
   /polities/{polityId}/government:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Polities]
+      tags: [Government Structures]
       operationId: getPolityGovernment
       summary: Return the current government structure, including its constitution, jurisdiction scope, and live formation state.
       security: [{ bearerAuth: [] }]
@@ -77,7 +87,7 @@ paths:
   /polities/{polityId}/actions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Polities]
+      tags: [Polity Action Availability]
       operationId: getPolityActions
       security: [{ bearerAuth: [] }]
       responses:
@@ -104,42 +114,75 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
+        "410": { $ref: "#/components/responses/Gone" }
   /polities/{polityId}/invitations:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Invitations]
-      operationId: listPolityInvitations
+      tags: [Membership Invitations]
+      operationId: listPolityMembershipInvitations
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Membership invitations, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationPageResponse" } } } }
+        "200": { description: Membership invitations, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationPageResponse" } } } }
     post:
-      tags: [Invitations]
-      operationId: createPolityInvitation
+      tags: [Membership Invitations]
+      operationId: createPolityMembershipInvitation
       security: [{ bearerAuth: [] }]
-      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMemberInvitationRequest" } } } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateMembershipInvitationRequest" } } } }
       responses:
-        "201": { description: Membership invitation created, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationResponse" } } } }
+        "201": { description: Membership invitation created, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationResponse" } } } }
         "400": { $ref: "#/components/responses/BadRequest" }
         "409": { $ref: "#/components/responses/Conflict" }
   /invitations:
     get:
-      tags: [Invitations]
-      operationId: listCurrentUserInvitations
+      tags: [Membership Invitations]
+      operationId: listCurrentUserMembershipInvitations
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
       responses:
-        "200": { description: Pending invitations for the current user, content: { application/json: { schema: { $ref: "#/components/schemas/MemberInvitationPageResponse" } } } }
-  /invitations/{invitationId}/accept:
-    parameters: [{ $ref: "#/components/parameters/InvitationId" }]
+        "200": { description: Pending invitations for the current user, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationPageResponse" } } } }
+  /invitation-tokens/{token}:
+    parameters: [{ $ref: "#/components/parameters/MembershipInvitationToken" }]
+    get:
+      tags: [Membership Invitations]
+      operationId: getMembershipInvitationByToken
+      summary: Inspect a pending Polity membership invitation using its secret Cardo token.
+      responses:
+        "200": { description: Pending invitation onboarding context, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationTokenResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "410": { $ref: "#/components/responses/Gone" }
+  /invitation-tokens/{token}/completion:
+    parameters: [{ $ref: "#/components/parameters/MembershipInvitationToken" }]
     post:
-      tags: [Invitations]
-      operationId: acceptInvitation
+      tags: [Membership Invitations]
+      operationId: requestMembershipInvitationCompletion
+      summary: Durably request Cardo-owned identity completion without accepting Polity membership.
+      responses:
+        "202": { description: Identity completion request accepted, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationCompletionResponse" } } } }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "410": { $ref: "#/components/responses/Gone" }
+    get:
+      tags: [Membership Invitations]
+      operationId: getMembershipInvitationCompletion
+      summary: Poll the durable Cardo-owned identity completion state.
+      responses:
+        "200": { description: Identity completion state, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationCompletionResponse" } } } }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "410": { $ref: "#/components/responses/Gone" }
+  /invitations/{invitationId}/accept:
+    parameters: [{ $ref: "#/components/parameters/MembershipInvitationId" }]
+    post:
+      tags: [Membership Invitations]
+      operationId: acceptMembershipInvitation
       security: [{ bearerAuth: [] }]
       responses:
         "201": { description: Invitation accepted and membership created, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
+        "410": { $ref: "#/components/responses/Gone" }
   /polities/{polityId}/motions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -160,7 +203,7 @@ paths:
   /polities/{polityId}/motions/office-elections:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Office Elections]
       operationId: createPolityOfficeElectionMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateOfficeElectionMotionRequest" } } } }
@@ -171,7 +214,7 @@ paths:
   /polities/{polityId}/motions/sanctions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Sanctions]
       operationId: createPolitySanctionMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateSanctionMotionRequest" } } } }
@@ -182,7 +225,7 @@ paths:
   /polities/{polityId}/motions/appeals:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Appeals]
       operationId: createPolityAppealMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateAppealMotionRequest" } } } }
@@ -193,7 +236,7 @@ paths:
   /polities/{polityId}/motions/office-term-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Office Term Reviews]
       operationId: createPolityOfficeTermReviewMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateOfficeTermReviewMotionRequest" } } } }
@@ -205,7 +248,7 @@ paths:
   /polities/{polityId}/motions/constitutional-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Constitutional Reviews]
       operationId: createPolityConstitutionalReviewMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateConstitutionalReviewMotionRequest" } } } }
@@ -217,7 +260,7 @@ paths:
   /polities/{polityId}/motions/constitution-amendments:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Constitution Amendments]
       operationId: createPolityConstitutionAmendmentMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateConstitutionAmendmentMotionRequest" } } } }
@@ -227,7 +270,7 @@ paths:
   /polities/{polityId}/motions/disbandment:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     post:
-      tags: [Motions]
+      tags: [Disbandments]
       operationId: createPolityDisbandmentMotion
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateDisbandmentMotionRequest" } } } }
@@ -256,7 +299,7 @@ paths:
   /polities/{polityId}/motions/{motionId}/election-ballot:
     parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
     put:
-      tags: [Motions]
+      tags: [Office Elections]
       operationId: castPolityOfficeElectionBallot
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CastOfficeElectionBallotRequest" } } } }
@@ -269,7 +312,7 @@ paths:
   /polities/{polityId}/motions/{motionId}/candidacy:
     parameters: [{ $ref: "#/components/parameters/PolityId" }, { $ref: "#/components/parameters/MotionId" }]
     put:
-      tags: [Motions]
+      tags: [Office Elections]
       operationId: respondPolityOfficeElectionCandidacy
       security: [{ bearerAuth: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/RespondOfficeElectionCandidacyRequest" } } } }
@@ -299,7 +342,7 @@ paths:
   /polities/{polityId}/office-terms:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Offices]
+      tags: [Office Terms]
       operationId: listPolityOfficeTerms
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
@@ -308,7 +351,7 @@ paths:
   /polities/{polityId}/sanctions:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Justice]
+      tags: [Sanctions]
       operationId: listPolitySanctions
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
@@ -317,7 +360,7 @@ paths:
   /polities/{polityId}/appeals:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Justice]
+      tags: [Appeals]
       operationId: listPolityAppeals
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
@@ -326,7 +369,7 @@ paths:
   /polities/{polityId}/office-term-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Justice]
+      tags: [Office Term Reviews]
       operationId: listPolityOfficeTermReviews
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
@@ -335,7 +378,7 @@ paths:
   /polities/{polityId}/constitutional-reviews:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
-      tags: [Justice]
+      tags: [Constitutional Reviews]
       operationId: listPolityConstitutionalReviews
       parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }]
       security: [{ bearerAuth: [] }]
@@ -356,7 +399,8 @@ components:
   parameters:
     PolityId: { name: polityId, in: path, required: true, schema: { type: string, format: uuid } }
     MotionId: { name: motionId, in: path, required: true, schema: { type: string, format: uuid } }
-    InvitationId: { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
+    MembershipInvitationId: { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
+    MembershipInvitationToken: { name: token, in: path, required: true, schema: { type: string, minLength: 1 } }
     SearchQuery:
       name: query
       in: query
@@ -387,6 +431,9 @@ components:
       content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
     Conflict:
       description: Resource conflicts with current state.
+      content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
+    Gone:
+      description: Resource is no longer available.
       content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
   schemas:
     ApiError:
@@ -421,11 +468,11 @@ components:
       properties:
         content: { type: array, items: { $ref: "#/components/schemas/MemberResponse" } }
         page: { $ref: "#/components/schemas/PageMetadata" }
-    MemberInvitationPageResponse:
+    MembershipInvitationPageResponse:
       type: object
       required: [content, page]
       properties:
-        content: { type: array, items: { $ref: "#/components/schemas/MemberInvitationResponse" } }
+        content: { type: array, items: { $ref: "#/components/schemas/MembershipInvitationResponse" } }
         page: { $ref: "#/components/schemas/PageMetadata" }
     MotionPageResponse:
       type: object
@@ -483,7 +530,7 @@ components:
         visibility: { $ref: "#/components/schemas/PolityVisibility" }
         setupPreset: { $ref: "#/components/schemas/PolitySetupPreset" }
         pace: { $ref: "#/components/schemas/PolityPace" }
-    CreateMemberInvitationRequest:
+    CreateMembershipInvitationRequest:
       type: object
       required: [email]
       properties:
@@ -636,7 +683,7 @@ components:
     InstitutionKind: { type: string, enum: [assembly, council, judiciary] }
     PolitySetupPreset: { type: string, enum: [standard_constitutional_council_republic] }
     PolityPace: { type: string, enum: [fast, standard, deliberate] }
-    InvitationStatus: { type: string, enum: [pending, accepted] }
+    MembershipInvitationStatus: { type: string, enum: [pending, accepted, cancelled] }
     VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible, office_election_result] }
     OfficeElectionMethod: { type: string, enum: [plurality, ranked_choice] }
     ProcedureElectorate: { type: string, enum: [active_members, office_holders] }
@@ -932,7 +979,7 @@ components:
         email: { type: string, format: email }
         status: { type: string, enum: [active, resigned] }
         admittedAt: { type: string, format: date-time }
-    MemberInvitationResponse:
+    MembershipInvitationResponse:
       type: object
       required: [id, polityId, polityName, email, invitedByName, status, invitedAt]
       properties:
@@ -941,9 +988,31 @@ components:
         polityName: { type: string }
         email: { type: string, format: email }
         invitedByName: { type: string }
-        status: { $ref: "#/components/schemas/InvitationStatus" }
+        status: { $ref: "#/components/schemas/MembershipInvitationStatus" }
         invitedAt: { type: string, format: date-time }
         respondedAt: { type: string, format: date-time }
+    MembershipInvitationTokenResponse:
+      type: object
+      required: [polityId, polityName, invitedEmail, expiresAt]
+      properties:
+        polityId: { type: string, format: uuid }
+        polityName: { type: string }
+        invitedEmail: { type: string, format: email }
+        expiresAt: { type: string, format: date-time }
+    MembershipInvitationCompletionStatus:
+      type: string
+      enum: [requested, awaiting_identity, completed, failed]
+    MembershipInvitationCompletionResponse:
+      type: object
+      required: [status, attemptCount, createdAt, updatedAt]
+      properties:
+        status: { $ref: "#/components/schemas/MembershipInvitationCompletionStatus" }
+        attemptCount: { type: integer, format: int32, minimum: 0 }
+        lastError: { type: string }
+        actionExpiresAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
     VoteTallyResponse:
       type: object
       required: ["yes", "no", abstain, eligible, quorumRequired, quorumMet, outcomeReason]
