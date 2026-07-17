@@ -307,7 +307,7 @@ class PolityRepositoryIntegrationTest {
   }
 
   @Test
-  void flywayAppliesBaselineAndActiveGovernmentIndexes() {
+  void flywayAppliesAllMigrationsAndActiveGovernmentIndexes() {
     List<String> successfulVersions =
         jdbc.queryForList(
             """
@@ -333,7 +333,7 @@ class PolityRepositoryIntegrationTest {
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    assertThat(successfulVersions).containsExactly("1", "2");
+    assertThat(successfulVersions).containsExactly("1", "2", "3");
     assertThat(indexes)
         .containsOnlyKeys(
             "idx_sanctions_active_target",
