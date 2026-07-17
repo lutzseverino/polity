@@ -13,7 +13,7 @@ Decision records capture durable choices with meaningful tradeoffs.
 
 - draft proposals that have not become durable decisions
 - factual contracts; use [Reference](../reference/README.md)
-- broad conceptual background; use [Explanation](../explanation/README.md)
+- broad conceptual background; use an explanation document
 - implementation checklists
 
 ## Required Shape
@@ -26,7 +26,8 @@ Decision records must use this section order:
 - `Consequences`
 - `Alternatives Considered`
 
-Use the [decision template](../_templates/decision.template.md) for new decision records.
+Use the [repository decision template](../../../../docs/_templates/decision.template.md)
+for new decision records.
 
 ## Decisions
 

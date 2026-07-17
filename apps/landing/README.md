@@ -1,4 +1,4 @@
-# Landing
+# Polity Landing
 
 The landing app is the public front door and onboarding surface for Polity.
 
