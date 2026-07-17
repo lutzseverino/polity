@@ -18,7 +18,11 @@ msgstr ""
 msgid "{0} invited you to join this polity."
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:108
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:88
+msgid "Couldn’t join polity"
+msgstr ""
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:125
 msgid "Done"
 msgstr ""
 
@@ -35,19 +39,23 @@ msgstr ""
 msgid "Join {0}?"
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:133
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:150
 msgid "Join polity"
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:121
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:138
 msgid "Not Now"
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:111
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:91
+msgid "This invitation may no longer be available. Check your access and try again."
+msgstr ""
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:128
 msgid "View My Polities"
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:88
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:105
 msgid "You can now participate according to the polity’s constitution."
 msgstr ""
 
@@ -56,7 +64,7 @@ msgstr ""
 msgid "You joined {0}"
 msgstr ""
 
-#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:85
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:102
 msgid "You’re now a member"
 msgstr ""
 

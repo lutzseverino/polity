@@ -78,6 +78,23 @@ export function AcceptMembershipInvitationWorkflow({
       </header>
 
       <div className="min-h-0 overflow-y-auto px-5 pb-5 sm:px-6 sm:pb-6">
+        {acceptMembershipInvitation.isError ? (
+          <AppAlert
+            aria-live="assertive"
+            className="mb-4"
+            variant="destructive"
+          >
+            <AppAlertTitle>
+              <Trans>Couldn’t join polity</Trans>
+            </AppAlertTitle>
+            <AppAlertDescription>
+              <Trans>
+                This invitation may no longer be available. Check your access
+                and try again.
+              </Trans>
+            </AppAlertDescription>
+          </AppAlert>
+        ) : null}
         {accepted ? (
           <AppAlert aria-live="polite">
             <CheckCircle2 aria-hidden="true" />

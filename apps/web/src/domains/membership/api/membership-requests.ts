@@ -24,6 +24,10 @@ type MembershipInvitationResponse = Readonly<{
 
 type MembershipInvitationPageResponse = Readonly<{
   content: readonly MembershipInvitationResponse[];
+  page: Readonly<{
+    number: number;
+    totalPages: number;
+  }>;
 }>;
 
 const httpClient = createHttpClient();
@@ -42,35 +46,64 @@ function toMembershipInvitation(
   };
 }
 
+async function getMembershipInvitationPage(
+  page: number,
+  { acceptedLanguage, signal }: LocalizedRequestOptions,
+): Promise<MembershipInvitationPageResponse> {
+  return httpClient.request<MembershipInvitationPageResponse>({
+    acceptedLanguage,
+    method: "GET",
+    params: { page, size: 100 },
+    signal,
+    url: "/invitations",
+  });
+}
+
 export async function listMembershipInvitations({
   acceptedLanguage,
   signal,
 }: LocalizedRequestOptions): Promise<readonly MembershipInvitation[]> {
-  const response = await httpClient.request<MembershipInvitationPageResponse>({
-    acceptedLanguage,
-    method: "GET",
-    params: { size: 100 },
-    signal,
-    url: "/invitations",
-  });
+  const invitations: MembershipInvitation[] = [];
+  let pageNumber = 0;
+  let totalPages = 1;
 
-  return response.content.map((invitation) =>
-    toMembershipInvitation(invitation, acceptedLanguage),
-  );
+  while (pageNumber < totalPages) {
+    const response = await getMembershipInvitationPage(pageNumber, {
+      acceptedLanguage,
+      signal,
+    });
+    invitations.push(
+      ...response.content.map((invitation) =>
+        toMembershipInvitation(invitation, acceptedLanguage),
+      ),
+    );
+    totalPages = response.page.totalPages;
+    pageNumber += 1;
+  }
+
+  return invitations;
 }
 
 export async function getMembershipInvitation(
   invitationId: string,
   options: LocalizedRequestOptions,
 ) {
-  const invitation = (await listMembershipInvitations(options)).find(
-    (candidate) => candidate.id === invitationId,
-  );
+  let pageNumber = 0;
+  let totalPages = 1;
 
-  if (!invitation) {
-    throw new ResourceNotFoundError("Membership invitation", invitationId);
+  while (pageNumber < totalPages) {
+    const response = await getMembershipInvitationPage(pageNumber, options);
+    const invitation = response.content.find(
+      (candidate) => candidate.id === invitationId,
+    );
+    if (invitation) {
+      return toMembershipInvitation(invitation, options.acceptedLanguage);
+    }
+    totalPages = response.page.totalPages;
+    pageNumber += 1;
   }
-  return invitation;
+
+  throw new ResourceNotFoundError("Membership invitation", invitationId);
 }
 
 async function invitationTokenResponse<T>(
