@@ -1,12 +1,12 @@
 import type { InboxTaskItem } from "@/domains/inbox/lib/inbox";
-import type { PendingInvitation } from "@/domains/membership";
+import type { MembershipInvitation } from "@/domains/membership";
 
-export function projectPendingInvitationToInboxTask(
-  invitation: PendingInvitation,
+export function projectMembershipInvitationToInboxTask(
+  invitation: MembershipInvitation,
 ): InboxTaskItem {
   return {
     category: "needs-action",
-    description: `${invitation.invitedBy} invited you to join this polity.`,
+    description: `${invitation.invitedByName} invited you to join this polity.`,
     id: `membership-invitation:${invitation.id}`,
     isUnread: true,
     polityName: invitation.polityName,
@@ -14,7 +14,7 @@ export function projectPendingInvitationToInboxTask(
       invitationId: invitation.id,
       kind: "membership-invitation",
     },
-    timeLabel: invitation.receivedLabel,
+    timeLabel: invitation.invitedAtLabel,
     title: `Invitation to join ${invitation.polityName}`,
   };
 }

@@ -1,7 +1,7 @@
 package com.odonta.polity.repository;
 
-import com.odonta.polity.model.InvitationStatus;
 import com.odonta.polity.model.MembershipInvitation;
+import com.odonta.polity.model.MembershipInvitationStatus;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,13 +12,13 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MembershipInvitationRepository extends JpaRepository<MembershipInvitation, UUID> {
 
-  boolean existsByPolityIdAndInvitedUserIdAndStatus(
-      UUID polityId, UUID invitedUserId, InvitationStatus status);
+  Optional<MembershipInvitation> findEntityById(UUID id);
 
   boolean existsByPolityIdAndEmailIgnoreCaseAndStatus(
-      UUID polityId, String email, InvitationStatus status);
+      UUID polityId, String email, MembershipInvitationStatus status);
 
-  Optional<MembershipInvitation> findEntityByIdAndStatus(UUID id, InvitationStatus status);
+  Optional<MembershipInvitation> findEntityByIdAndStatus(
+      UUID id, MembershipInvitationStatus status);
 
   Page<MembershipInvitationProjection> findProjectionsByPolityIdOrderByInvitedAtDescIdAsc(
       UUID polityId, Pageable pageable);
@@ -39,7 +39,9 @@ public interface MembershipInvitationRepository extends JpaRepository<Membership
       order by invitation.invitedAt desc, invitation.id asc
       """)
   Page<MembershipInvitationProjection> findPendingProjectionsForInvitee(
-      UUID userId, Collection<String> emails, InvitationStatus status, Pageable pageable);
+      UUID userId, Collection<String> emails, MembershipInvitationStatus status, Pageable pageable);
 
   Optional<MembershipInvitationProjection> findProjectedById(UUID id);
+
+  Optional<MembershipInvitationProjection> findProjectedByCardoInvitationId(UUID cardoInvitationId);
 }

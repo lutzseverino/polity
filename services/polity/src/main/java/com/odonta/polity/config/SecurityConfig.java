@@ -6,6 +6,7 @@ import io.github.lutzseverino.cardo.authorization.spring.ResourcePermissionEvalu
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -59,6 +60,12 @@ public class SecurityConfig {
                         "/docs/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, basePath + "/invitation-tokens/*")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, basePath + "/invitation-tokens/*/completion")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, basePath + "/invitation-tokens/*/completion")
                     .permitAll()
                     .requestMatchers(basePath + "/**")
                     .authenticated()

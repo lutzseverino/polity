@@ -24,6 +24,30 @@ function findTsxFiles(directory: string): string[] {
 }
 
 describe("web style conventions", () => {
+  it("names mutation-owning feature components as workflows", () => {
+    const featureRoot = path.join(sourceRoot, "features");
+    const mutationOwningComponents = findTsxFiles(featureRoot)
+      .filter((file) =>
+        readFileSync(file, "utf8").match(/\/api\/[^"']*mutation/),
+      )
+      .map((file) => path.relative(featureRoot, file));
+
+    expect(mutationOwningComponents).not.toHaveLength(0);
+    for (const componentPath of mutationOwningComponents) {
+      const componentName = path.basename(componentPath, ".tsx");
+
+      expect(componentName).toMatch(/Workflow$/);
+      expect(
+        componentPath.endsWith(
+          `components/${componentName}/${componentName}.tsx`,
+        ),
+      ).toBe(true);
+      expect(
+        readFileSync(path.join(featureRoot, componentPath), "utf8"),
+      ).toContain(`export function ${componentName}`);
+    }
+  });
+
   it("owns the shared keyboard focus indicator in one semantic utility", () => {
     const styles = readFileSync(path.join(sourceRoot, "index.css"), "utf8");
     const legacyCallSites = findTsxFiles(sourceRoot)

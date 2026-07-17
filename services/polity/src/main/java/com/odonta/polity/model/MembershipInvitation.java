@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,11 +26,14 @@ public class MembershipInvitation extends AuditedEntity implements PersonalDataE
   @Column(name = "polity_id", nullable = false)
   private UUID polityId;
 
-  @Column(name = "invited_user_id", nullable = false)
+  @Column(name = "invited_user_id")
   private UUID invitedUserId;
 
-  @Column(name = "authorization_subject", nullable = false)
-  private String authorizationSubject;
+  @Column(name = "cardo_invitation_id", unique = true)
+  private UUID cardoInvitationId;
+
+  @Column(name = "cardo_expires_at")
+  private OffsetDateTime cardoExpiresAt;
 
   @Column(nullable = false)
   private String email;
@@ -39,7 +43,7 @@ public class MembershipInvitation extends AuditedEntity implements PersonalDataE
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private InvitationStatus status;
+  private MembershipInvitationStatus status;
 
   @Column(name = "invited_at", nullable = false)
   private OffsetDateTime invitedAt;
@@ -48,23 +52,35 @@ public class MembershipInvitation extends AuditedEntity implements PersonalDataE
   private OffsetDateTime respondedAt;
 
   public MembershipInvitation(
-      UUID polityId,
-      UUID invitedUserId,
-      String authorizationSubject,
-      String email,
-      UUID invitedBy,
-      OffsetDateTime invitedAt) {
+      UUID polityId, String email, UUID invitedBy, OffsetDateTime invitedAt) {
     this.polityId = polityId;
-    this.invitedUserId = invitedUserId;
-    this.authorizationSubject = authorizationSubject;
     this.email = email;
     this.invitedBy = invitedBy;
-    this.status = InvitationStatus.PENDING;
+    this.status = MembershipInvitationStatus.PENDING;
     this.invitedAt = invitedAt;
   }
 
   public void accept(OffsetDateTime acceptedAt) {
-    this.status = InvitationStatus.ACCEPTED;
+    this.status = MembershipInvitationStatus.ACCEPTED;
     this.respondedAt = acceptedAt;
+  }
+
+  public void registerCardoInvitation(UUID invitationId, UUID userId, OffsetDateTime expiresAt) {
+    Objects.requireNonNull(invitationId, "Cardo invitation ID is required.");
+    Objects.requireNonNull(userId, "Invited user ID is required.");
+    Objects.requireNonNull(expiresAt, "Cardo invitation expiry is required.");
+    if (cardoInvitationId != null && !cardoInvitationId.equals(invitationId)) {
+      throw new IllegalStateException(
+          "Membership invitation is linked to another Cardo invitation.");
+    }
+    if (invitedUserId != null && !invitedUserId.equals(userId)) {
+      throw new IllegalStateException("Membership invitation is linked to another invited user.");
+    }
+    if (cardoExpiresAt != null && !cardoExpiresAt.isEqual(expiresAt)) {
+      throw new IllegalStateException("Membership invitation has another Cardo expiry.");
+    }
+    this.cardoInvitationId = invitationId;
+    this.invitedUserId = userId;
+    this.cardoExpiresAt = expiresAt;
   }
 }

@@ -1,8 +1,9 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Bell } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { AppBadge } from "@/components/app/AppBadge";
-import { AppButton, AppLinkButton } from "@/components/app/AppButton";
+import { AppButton } from "@/components/app/AppButton";
 import {
   AppPopover,
   AppPopoverContent,
@@ -10,9 +11,9 @@ import {
 } from "@/components/app/AppPopover";
 import { AppText } from "@/components/app/AppText";
 import {
-  InboxItemLink,
-  type RenderInvitationLink,
-} from "@/domains/inbox/components/InboxItemLink";
+  InboxItemSummary,
+  type RenderInboxItemLink,
+} from "@/domains/inbox/components/InboxItemSummary";
 import type { InboxItem } from "@/domains/inbox/lib/inbox";
 import {
   countOpenInboxTasks,
@@ -21,12 +22,14 @@ import {
 
 type InboxPreviewProps = Readonly<{
   items: readonly InboxItem[];
-  renderInvitationLink: RenderInvitationLink;
+  renderInboxItemLink: RenderInboxItemLink;
+  renderInboxLink: (label: ReactNode) => ReactNode;
 }>;
 
 export function InboxPreview({
   items,
-  renderInvitationLink,
+  renderInboxItemLink,
+  renderInboxLink,
 }: InboxPreviewProps) {
   const { t } = useLingui();
   const openTaskCount = countOpenInboxTasks(items);
@@ -73,17 +76,15 @@ export function InboxPreview({
         </div>
         <div className="space-y-2">
           {previewItems.map((item) => (
-            <InboxItemLink
+            <InboxItemSummary
               compact
               item={item}
               key={item.id}
-              renderInvitationLink={renderInvitationLink}
+              renderLink={renderInboxItemLink}
             />
           ))}
         </div>
-        <AppLinkButton className="mt-3 w-full" to="/inbox" variant="outline">
-          <Trans>View All Inbox Items</Trans>
-        </AppLinkButton>
+        {renderInboxLink(<Trans>View All Inbox Items</Trans>)}
       </AppPopoverContent>
     </AppPopover>
   );

@@ -1,4 +1,4 @@
-export type PageMetadata = Readonly<{
+type PageMetadata = Readonly<{
   number: number;
   size: number;
   totalElements: number;

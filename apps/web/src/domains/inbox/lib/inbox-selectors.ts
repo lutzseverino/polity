@@ -4,7 +4,7 @@ import type {
   InboxTaskItem,
 } from "@/domains/inbox/lib/inbox";
 
-export function isOpenInboxTask(item: InboxItem): item is InboxTaskItem {
+function isOpenInboxTask(item: InboxItem): item is InboxTaskItem {
   return item.category === "needs-action";
 }
 
@@ -29,7 +29,7 @@ export function selectInboxPreviewItems(
   return [...tasks, ...updates].slice(0, limit);
 }
 
-export function removeInvitationInboxTask(
+export function removeMembershipInvitationInboxTask(
   items: readonly InboxItem[],
   invitationId: string,
 ) {

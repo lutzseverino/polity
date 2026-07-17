@@ -1,19 +1,12 @@
 package com.odonta.polity.controller;
 
 import com.odonta.polity.api.PolitiesApi;
-import com.odonta.polity.api.model.ConstitutionResponse;
 import com.odonta.polity.api.model.CreatePolityRequest;
-import com.odonta.polity.api.model.GovernmentStructureResponse;
-import com.odonta.polity.api.model.PolityActionAvailabilityResponse;
 import com.odonta.polity.api.model.PolityResponse;
-import com.odonta.polity.mapper.ConstitutionTransportMapper;
-import com.odonta.polity.mapper.GovernmentStructureTransportMapper;
-import com.odonta.polity.mapper.PolityActionAvailabilityTransportMapper;
 import com.odonta.polity.mapper.PolityTransportMapper;
-import com.odonta.polity.resolver.GovernmentStructureResolver;
-import com.odonta.polity.resolver.PolityActionAvailabilityResolver;
-import com.odonta.polity.service.ConstitutionService;
 import com.odonta.polity.service.PolityService;
+import com.odonta.polity.workflow.CreatePolityWorkflow;
+import com.odonta.polity.workflow.ProvisionPolityAccountWorkflow;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -28,26 +21,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${polity.api.base-path}")
 @RequiredArgsConstructor
 public class PolityController implements PolitiesApi {
+  private final CreatePolityWorkflow createPolity;
   private final PolityService polities;
   private final PolityTransportMapper mapper;
-  private final ConstitutionService constitutions;
-  private final ConstitutionTransportMapper constitutionMapper;
-  private final GovernmentStructureResolver government;
-  private final GovernmentStructureTransportMapper governmentMapper;
-  private final PolityActionAvailabilityTransportMapper actionMapper;
-  private final PolityActionAvailabilityResolver actionAvailability;
+  private final ProvisionPolityAccountWorkflow provisionAccount;
   private final AuthenticatedUserReader users;
 
   @Override
   public ResponseEntity<Void> provisionPolityAccount() {
-    polities.provisionAccount(users.currentUser());
+    provisionAccount.provision(users.currentUser());
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public ResponseEntity<PolityResponse> createPolity(@Valid CreatePolityRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(mapper.toResponse(polities.create(users.currentUser(), mapper.toInput(request))));
+        .body(mapper.toResponse(createPolity.create(users.currentUser(), mapper.toInput(request))));
   }
 
   @Override
@@ -59,23 +48,5 @@ public class PolityController implements PolitiesApi {
   @Override
   public ResponseEntity<PolityResponse> getPolity(UUID polityId) {
     return ResponseEntity.ok(mapper.toResponse(polities.get(polityId, users.currentUser().id())));
-  }
-
-  @Override
-  public ResponseEntity<ConstitutionResponse> getPolityConstitution(UUID polityId) {
-    return ResponseEntity.ok(
-        constitutionMapper.toResponse(constitutions.get(polityId, users.currentUser().id())));
-  }
-
-  @Override
-  public ResponseEntity<GovernmentStructureResponse> getPolityGovernment(UUID polityId) {
-    return ResponseEntity.ok(
-        governmentMapper.toResponse(government.resolve(polityId, users.currentUser().id())));
-  }
-
-  @Override
-  public ResponseEntity<PolityActionAvailabilityResponse> getPolityActions(UUID polityId) {
-    return ResponseEntity.ok(
-        actionMapper.toResponse(actionAvailability.resolve(polityId, users.currentUser().id())));
   }
 }

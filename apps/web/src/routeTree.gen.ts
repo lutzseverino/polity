@@ -19,7 +19,8 @@ import { Route as PolitiesNewRouteImport } from './routes/polities/new'
 import { Route as ActionsNewRouteImport } from './routes/actions/new'
 import { Route as PolitiesPolityIdRouteRouteImport } from './routes/polities/$polityId/route'
 import { Route as PolitiesPolityIdIndexRouteImport } from './routes/polities/$polityId/index'
-import { Route as PolitiesInvitationsInvitationIdRouteImport } from './routes/polities/invitations/$invitationId'
+import { Route as PolitiesMembershipInvitationsInvitationIdRouteImport } from './routes/polities/membership-invitations/$invitationId'
+import { Route as PolitiesInvitationsTokenRouteImport } from './routes/polities/invitations/$token'
 import { Route as PolitiesPolityIdRecordRouteImport } from './routes/polities/$polityId/record'
 import { Route as PolitiesPolityIdGovernmentRouteImport } from './routes/polities/$polityId/government'
 import { Route as PolitiesPolityIdMotionsIndexRouteImport } from './routes/polities/$polityId/motions/index'
@@ -75,10 +76,16 @@ const PolitiesPolityIdIndexRoute = PolitiesPolityIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PolitiesPolityIdRouteRoute,
 } as any)
-const PolitiesInvitationsInvitationIdRoute =
-  PolitiesInvitationsInvitationIdRouteImport.update({
-    id: '/polities/invitations/$invitationId',
-    path: '/polities/invitations/$invitationId',
+const PolitiesMembershipInvitationsInvitationIdRoute =
+  PolitiesMembershipInvitationsInvitationIdRouteImport.update({
+    id: '/polities/membership-invitations/$invitationId',
+    path: '/polities/membership-invitations/$invitationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PolitiesInvitationsTokenRoute =
+  PolitiesInvitationsTokenRouteImport.update({
+    id: '/polities/invitations/$token',
+    path: '/polities/invitations/$token',
     getParentRoute: () => rootRouteImport,
   } as any)
 const PolitiesPolityIdRecordRoute = PolitiesPolityIdRecordRouteImport.update({
@@ -117,7 +124,8 @@ export interface FileRoutesByFullPath {
   '/polities/': typeof PolitiesIndexRoute
   '/polities/$polityId/government': typeof PolitiesPolityIdGovernmentRoute
   '/polities/$polityId/record': typeof PolitiesPolityIdRecordRoute
-  '/polities/invitations/$invitationId': typeof PolitiesInvitationsInvitationIdRoute
+  '/polities/invitations/$token': typeof PolitiesInvitationsTokenRoute
+  '/polities/membership-invitations/$invitationId': typeof PolitiesMembershipInvitationsInvitationIdRoute
   '/polities/$polityId/': typeof PolitiesPolityIdIndexRoute
   '/polities/$polityId/motions/$motionId': typeof PolitiesPolityIdMotionsMotionIdRoute
   '/polities/$polityId/motions/': typeof PolitiesPolityIdMotionsIndexRoute
@@ -133,7 +141,8 @@ export interface FileRoutesByTo {
   '/polities': typeof PolitiesIndexRoute
   '/polities/$polityId/government': typeof PolitiesPolityIdGovernmentRoute
   '/polities/$polityId/record': typeof PolitiesPolityIdRecordRoute
-  '/polities/invitations/$invitationId': typeof PolitiesInvitationsInvitationIdRoute
+  '/polities/invitations/$token': typeof PolitiesInvitationsTokenRoute
+  '/polities/membership-invitations/$invitationId': typeof PolitiesMembershipInvitationsInvitationIdRoute
   '/polities/$polityId': typeof PolitiesPolityIdIndexRoute
   '/polities/$polityId/motions/$motionId': typeof PolitiesPolityIdMotionsMotionIdRoute
   '/polities/$polityId/motions': typeof PolitiesPolityIdMotionsIndexRoute
@@ -151,7 +160,8 @@ export interface FileRoutesById {
   '/polities/': typeof PolitiesIndexRoute
   '/polities/$polityId/government': typeof PolitiesPolityIdGovernmentRoute
   '/polities/$polityId/record': typeof PolitiesPolityIdRecordRoute
-  '/polities/invitations/$invitationId': typeof PolitiesInvitationsInvitationIdRoute
+  '/polities/invitations/$token': typeof PolitiesInvitationsTokenRoute
+  '/polities/membership-invitations/$invitationId': typeof PolitiesMembershipInvitationsInvitationIdRoute
   '/polities/$polityId/': typeof PolitiesPolityIdIndexRoute
   '/polities/$polityId/motions/$motionId': typeof PolitiesPolityIdMotionsMotionIdRoute
   '/polities/$polityId/motions/': typeof PolitiesPolityIdMotionsIndexRoute
@@ -170,7 +180,8 @@ export interface FileRouteTypes {
     | '/polities/'
     | '/polities/$polityId/government'
     | '/polities/$polityId/record'
-    | '/polities/invitations/$invitationId'
+    | '/polities/invitations/$token'
+    | '/polities/membership-invitations/$invitationId'
     | '/polities/$polityId/'
     | '/polities/$polityId/motions/$motionId'
     | '/polities/$polityId/motions/'
@@ -186,7 +197,8 @@ export interface FileRouteTypes {
     | '/polities'
     | '/polities/$polityId/government'
     | '/polities/$polityId/record'
-    | '/polities/invitations/$invitationId'
+    | '/polities/invitations/$token'
+    | '/polities/membership-invitations/$invitationId'
     | '/polities/$polityId'
     | '/polities/$polityId/motions/$motionId'
     | '/polities/$polityId/motions'
@@ -203,7 +215,8 @@ export interface FileRouteTypes {
     | '/polities/'
     | '/polities/$polityId/government'
     | '/polities/$polityId/record'
-    | '/polities/invitations/$invitationId'
+    | '/polities/invitations/$token'
+    | '/polities/membership-invitations/$invitationId'
     | '/polities/$polityId/'
     | '/polities/$polityId/motions/$motionId'
     | '/polities/$polityId/motions/'
@@ -219,7 +232,8 @@ export interface RootRouteChildren {
   InboxIndexRoute: typeof InboxIndexRoute
   MeIndexRoute: typeof MeIndexRoute
   PolitiesIndexRoute: typeof PolitiesIndexRoute
-  PolitiesInvitationsInvitationIdRoute: typeof PolitiesInvitationsInvitationIdRoute
+  PolitiesInvitationsTokenRoute: typeof PolitiesInvitationsTokenRoute
+  PolitiesMembershipInvitationsInvitationIdRoute: typeof PolitiesMembershipInvitationsInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -294,11 +308,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PolitiesPolityIdIndexRouteImport
       parentRoute: typeof PolitiesPolityIdRouteRoute
     }
-    '/polities/invitations/$invitationId': {
-      id: '/polities/invitations/$invitationId'
-      path: '/polities/invitations/$invitationId'
-      fullPath: '/polities/invitations/$invitationId'
-      preLoaderRoute: typeof PolitiesInvitationsInvitationIdRouteImport
+    '/polities/membership-invitations/$invitationId': {
+      id: '/polities/membership-invitations/$invitationId'
+      path: '/polities/membership-invitations/$invitationId'
+      fullPath: '/polities/membership-invitations/$invitationId'
+      preLoaderRoute: typeof PolitiesMembershipInvitationsInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/polities/invitations/$token': {
+      id: '/polities/invitations/$token'
+      path: '/polities/invitations/$token'
+      fullPath: '/polities/invitations/$token'
+      preLoaderRoute: typeof PolitiesInvitationsTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/polities/$polityId/record': {
@@ -363,7 +384,9 @@ const rootRouteChildren: RootRouteChildren = {
   InboxIndexRoute: InboxIndexRoute,
   MeIndexRoute: MeIndexRoute,
   PolitiesIndexRoute: PolitiesIndexRoute,
-  PolitiesInvitationsInvitationIdRoute: PolitiesInvitationsInvitationIdRoute,
+  PolitiesInvitationsTokenRoute: PolitiesInvitationsTokenRoute,
+  PolitiesMembershipInvitationsInvitationIdRoute:
+    PolitiesMembershipInvitationsInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

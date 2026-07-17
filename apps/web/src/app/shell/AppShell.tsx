@@ -9,16 +9,53 @@ import {
   useShellLayout,
 } from "@/app/shell/shell-layout";
 import { useShellRouteContext } from "@/app/shell/shell-route-context";
-import { AppLinkButton } from "@/components/app/AppButton";
 import { AppDialog, AppDialogContent } from "@/components/app/AppDialog";
+import { AppLinkButton } from "@/components/app/AppLinkButton";
 import { countOpenInboxTasks, useInboxItems } from "@/domains/inbox";
+import { useMembershipInvitation } from "@/domains/membership";
 import { usePolityOptions } from "@/domains/polity";
 import {
-  InvitationResponse,
-  invitationResponseDescriptionId,
-  invitationResponseTitleId,
-} from "@/features/accept-invitation";
+  type AcceptMembershipInvitationTask,
+  AcceptMembershipInvitationWorkflow,
+  acceptMembershipInvitationDescriptionId,
+  acceptMembershipInvitationTitleId,
+} from "@/features/accept-membership-invitation";
 import { cn } from "@/lib/utils";
+
+function AcceptMembershipInvitationTaskContent({
+  locale,
+  onDismiss,
+  task,
+}: Readonly<{
+  locale: string;
+  onDismiss: () => void;
+  task: AcceptMembershipInvitationTask;
+}>) {
+  const { data: invitation } = useMembershipInvitation({
+    invitationId: task.invitationId,
+    locale,
+  });
+
+  return (
+    <AcceptMembershipInvitationWorkflow
+      headingLevel="h2"
+      invitation={invitation}
+      locale={locale}
+      onDismiss={onDismiss}
+      renderPolitiesLink={(label) => (
+        <AppLinkButton
+          className="min-h-11 w-full sm:min-h-9 sm:w-auto"
+          search={{ task: undefined }}
+          size="lg"
+          to="/polities"
+        >
+          {label}
+        </AppLinkButton>
+      )}
+      showDismissAfterAccept
+    />
+  );
+}
 
 export function AppShell() {
   const { i18n } = useLingui();
@@ -96,28 +133,14 @@ export function AppShell() {
           open={task !== undefined}
         >
           <AppDialogContent
-            aria-describedby={invitationResponseDescriptionId}
-            aria-labelledby={invitationResponseTitleId}
+            aria-describedby={acceptMembershipInvitationDescriptionId}
+            aria-labelledby={acceptMembershipInvitationTitleId}
             className="max-h-[calc(100dvh-1rem)] max-w-none overflow-hidden p-0 sm:max-h-[calc(100dvh-2rem)] sm:max-w-xl"
           >
-            <InvitationResponse
-              descriptionId={invitationResponseDescriptionId}
-              headingLevel="h2"
-              invitationId={displayedTask.invitationId}
+            <AcceptMembershipInvitationTaskContent
               locale={i18n.locale}
               onDismiss={() => router.history.back()}
-              renderPolitiesLink={(label) => (
-                <AppLinkButton
-                  className="min-h-11 w-full sm:min-h-9 sm:w-auto"
-                  search={{ task: undefined }}
-                  size="lg"
-                  to="/polities"
-                >
-                  {label}
-                </AppLinkButton>
-              )}
-              showDismissAfterAccept
-              titleId={invitationResponseTitleId}
+              task={displayedTask}
             />
           </AppDialogContent>
         </AppDialog>

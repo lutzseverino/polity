@@ -12,3 +12,19 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#: src/domains/membership/components/MembershipInvitationDetails/MembershipInvitationDetails.tsx:29
+msgid "Invited by"
+msgstr "Invited by"
+
+#: src/domains/membership/components/MembershipInvitationDetails/MembershipInvitationDetails.tsx:43
+msgid "Received"
+msgstr "Received"
+
+#: src/domains/membership/components/MembershipInvitationDetails/MembershipInvitationDetails.tsx:58
+msgid "This polity will be added to your workspace. Its constitution determines which proposals, votes, and other government actions are available to you."
+msgstr "This polity will be added to your workspace. Its constitution determines which proposals, votes, and other government actions are available to you."
+
+#: src/domains/membership/components/MembershipInvitationDetails/MembershipInvitationDetails.tsx:55
+msgid "What joining changes"
+msgstr "What joining changes"

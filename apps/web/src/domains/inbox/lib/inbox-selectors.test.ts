@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { InboxItem } from "@/domains/inbox/lib/inbox";
 import {
   countOpenInboxTasks,
-  removeInvitationInboxTask,
+  removeMembershipInvitationInboxTask,
   selectInboxPreviewItems,
 } from "@/domains/inbox/lib/inbox-selectors";
 
@@ -62,7 +62,9 @@ describe("Inbox attention selectors", () => {
 
   it("removes only the invitation task resolved by its source domain", () => {
     expect(
-      removeInvitationInboxTask(items, "invitation-1").map((item) => item.id),
+      removeMembershipInvitationInboxTask(items, "invitation-1").map(
+        (item) => item.id,
+      ),
     ).toEqual(["motion-result:result-1", "motion-vote:vote-1"]);
   });
 });

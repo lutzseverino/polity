@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
 import { AppBadge } from "@/components/app/AppBadge";
 import { AppButton } from "@/components/app/AppButton";
@@ -10,14 +11,47 @@ import { AppText } from "@/components/app/AppText";
 import {
   filterInboxItemsByCategory,
   type InboxCategory,
-  InboxItemLink,
+  InboxItemSummary,
   useInboxItems,
 } from "@/domains/inbox";
-import { InvitationTaskLink } from "@/features/accept-invitation";
 
 type InboxSearch = Readonly<{
   category?: InboxCategory;
 }>;
+
+type AcceptMembershipInvitationTaskLinkProps = Readonly<{
+  children: ReactNode;
+  className?: string;
+  invitationId: string;
+}>;
+
+function AcceptMembershipInvitationTaskLink({
+  children,
+  className,
+  invitationId,
+}: AcceptMembershipInvitationTaskLinkProps) {
+  return (
+    <Link
+      className={className}
+      mask={{
+        params: { invitationId },
+        to: "/polities/membership-invitations/$invitationId",
+        unmaskOnReload: true,
+      }}
+      resetScroll={false}
+      search={(previous) => ({
+        ...previous,
+        task: {
+          invitationId,
+          kind: "accept-membership-invitation" as const,
+        },
+      })}
+      to="."
+    >
+      {children}
+    </Link>
+  );
+}
 
 export const Route = createFileRoute("/inbox/")({
   component: InboxRoute,
@@ -106,21 +140,30 @@ function InboxRoute() {
         {visibleItems.length > 0 ? (
           <div className="space-y-3">
             {visibleItems.map((item) => (
-              <InboxItemLink
+              <InboxItemSummary
                 item={item}
                 key={item.id}
-                renderInvitationLink={({
-                  children,
-                  className,
-                  invitationId,
-                }) => (
-                  <InvitationTaskLink
-                    className={className}
-                    invitationId={invitationId}
-                  >
-                    {children}
-                  </InvitationTaskLink>
-                )}
+                renderLink={({ children, className, item: linkedItem }) =>
+                  linkedItem.source.kind === "membership-invitation" ? (
+                    <AcceptMembershipInvitationTaskLink
+                      className={className}
+                      invitationId={linkedItem.source.invitationId}
+                    >
+                      {children}
+                    </AcceptMembershipInvitationTaskLink>
+                  ) : (
+                    <Link
+                      className={className}
+                      params={{
+                        motionId: linkedItem.source.motionId,
+                        polityId: linkedItem.source.polityId,
+                      }}
+                      to="/polities/$polityId/motions/$motionId"
+                    >
+                      {children}
+                    </Link>
+                  )
+                }
               />
             ))}
           </div>

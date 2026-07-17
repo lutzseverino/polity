@@ -26,6 +26,14 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
 
   Optional<MembershipProjection> findProjectedById(UUID id);
 
+  Optional<MembershipProjection> findProjectedByPolityIdAndUserIdAndStatus(
+      UUID polityId, UUID userId, MembershipStatus status);
+
+  boolean existsByPolityIdAndUserIdAndStatus(UUID polityId, UUID userId, MembershipStatus status);
+
+  boolean existsByPolityIdAndEmailIgnoreCaseAndStatus(
+      UUID polityId, String email, MembershipStatus status);
+
   List<MembershipProjection> findProjectionsByPolityIdAndIdIn(UUID polityId, Collection<UUID> ids);
 
   long countByPolityIdAndStatus(UUID polityId, MembershipStatus status);

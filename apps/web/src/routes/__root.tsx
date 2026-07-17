@@ -6,22 +6,22 @@ import { RouteErrorPage } from "@/app/shell/RouteErrorPage";
 import { RouteLoadingPage } from "@/app/shell/RouteLoadingPage";
 import { RouteNotFoundPage } from "@/app/shell/RouteNotFoundPage";
 import { inboxItemsQueryOptions } from "@/domains/inbox";
-import { invitationQueryOptions } from "@/domains/membership";
+import { membershipInvitationQueryOptions } from "@/domains/membership";
 import { polityOptionsQueryOptions } from "@/domains/polity";
 import {
-  type InvitationTask,
-  readInvitationTask,
-} from "@/features/accept-invitation";
+  type AcceptMembershipInvitationTask,
+  readAcceptMembershipInvitationTask,
+} from "@/features/accept-membership-invitation";
 
 type AppSearch = Readonly<{
-  task?: InvitationTask;
+  task?: AcceptMembershipInvitationTask;
 }>;
 
 export const Route = createRootRouteWithContext<AppRouterContext>()({
   component: AppShell,
   errorComponent: RouteErrorPage,
   validateSearch: (search): AppSearch => ({
-    task: readInvitationTask(search.task),
+    task: readAcceptMembershipInvitationTask(search.task),
   }),
   loaderDeps: ({ search }) => ({ task: search.task }),
   loader: ({ context, deps }) => {
@@ -34,7 +34,7 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
       ),
       deps.task
         ? context.queryClient.ensureQueryData(
-            invitationQueryOptions({
+            membershipInvitationQueryOptions({
               invitationId: deps.task.invitationId,
               locale,
             }),

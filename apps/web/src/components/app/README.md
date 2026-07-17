@@ -20,6 +20,11 @@ keyboard focus boundary, intent preloading, and the named interaction group. Pai
 `AppLinkSurfaceIndicator` when the surface needs the shared directional hover and focus cue; feature
 and domain owners still control the surface's content and layout.
 
+Use `AppLinkButton` for button-styled navigation and `AppButton` for behavior without navigation.
+They are separate component boundaries so architecture checks can distinguish router-aware wrappers.
+Only routes and app composition pass concrete destinations; domains and features receive these wrappers
+through render props or slots.
+
 ## Tabs convention
 
 Product tab sets use the compound `AppTabs` exports. Routes may render `AppTabsTrigger` through a

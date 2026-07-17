@@ -310,10 +310,10 @@ describe("first governing journey", () => {
 
     expect(router.state.location.pathname).toBe("/inbox");
     expect(router.state.location.maskedLocation?.pathname).toBe(
-      "/polities/invitations/invitation-supper-club",
+      "/polities/membership-invitations/invitation-supper-club",
     );
     expect(router.history.location.pathname).toBe(
-      "/polities/invitations/invitation-supper-club",
+      "/polities/membership-invitations/invitation-supper-club",
     );
     const invitationDialog = await screen.findByRole("dialog");
     expect(
@@ -402,7 +402,7 @@ describe("first governing journey", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a direct invitation URL as the standalone fallback", async () => {
+  it("renders a direct invitation URL as passwordless token onboarding", async () => {
     const router = createTestRouter(
       "/polities/invitations/invitation-supper-club",
     );
@@ -411,10 +411,16 @@ describe("first governing journey", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "Join Sunday Supper Club?",
+        name: "Join Sunday Supper Club",
         level: 1,
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Set up identity" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Join polity" }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
@@ -435,7 +441,7 @@ describe("first governing journey", () => {
     });
     expect(invitationLink).toHaveAttribute(
       "href",
-      "/polities/invitations/invitation-supper-club",
+      "/polities/membership-invitations/invitation-supper-club",
     );
 
     await user.click(invitationLink);

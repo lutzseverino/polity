@@ -7,7 +7,7 @@ import {
   AppAlertDescription,
   AppAlertTitle,
 } from "@/components/app/AppAlert";
-import { AppLinkButton } from "@/components/app/AppButton";
+import { AppLinkButton } from "@/components/app/AppLinkButton";
 
 export function RouteErrorPage({ error }: ErrorComponentProps) {
   const { t } = useLingui();

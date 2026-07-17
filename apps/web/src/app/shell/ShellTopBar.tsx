@@ -12,10 +12,19 @@ import type {
   ResolvedShellContext,
   ShellLinkTarget,
 } from "@/app/shell/shell-route-context";
+import { AppLinkButton } from "@/components/app/AppLinkButton";
+import {
+  AppLinkSurface,
+  AppLinkSurfaceIndicator,
+} from "@/components/app/AppLinkSurface";
 import { AppText } from "@/components/app/AppText";
 import { type InboxItem, InboxPreview } from "@/domains/inbox";
-import { InvitationTaskLink } from "@/features/accept-invitation";
-import { ActionLauncher, type PolityOption } from "@/features/launch-action";
+import {
+  ActionLauncher,
+  type ActionLauncherActionLinkProps,
+  type ActionLauncherEmptyActionLinkProps,
+  type PolityOption,
+} from "@/features/launch-action";
 import { cn } from "@/lib/utils";
 
 type ShellTopBarProps = Readonly<{
@@ -24,6 +33,73 @@ type ShellTopBarProps = Readonly<{
   layout: ShellLayout;
   polities: readonly PolityOption[];
 }>;
+
+function renderActionLink({
+  actionId,
+  children,
+  className,
+  onSelect,
+  polityId,
+}: ActionLauncherActionLinkProps) {
+  return (
+    <AppLinkSurface
+      className={className}
+      onClick={onSelect}
+      search={{ action: actionId, polity: polityId }}
+      to="/actions/new"
+    >
+      {children}
+      <AppLinkSurfaceIndicator />
+    </AppLinkSurface>
+  );
+}
+
+function renderEmptyActionLink({
+  children,
+  kind,
+}: ActionLauncherEmptyActionLinkProps) {
+  return kind === "explore-polities" ? (
+    <AppLinkButton to="/explore" variant="outline">
+      {children}
+    </AppLinkButton>
+  ) : (
+    <AppLinkButton to="/polities/new">{children}</AppLinkButton>
+  );
+}
+
+type AcceptMembershipInvitationTaskLinkProps = Readonly<{
+  children: ReactNode;
+  className?: string;
+  invitationId: string;
+}>;
+
+function AcceptMembershipInvitationTaskLink({
+  children,
+  className,
+  invitationId,
+}: AcceptMembershipInvitationTaskLinkProps) {
+  return (
+    <Link
+      className={className}
+      mask={{
+        params: { invitationId },
+        to: "/polities/membership-invitations/$invitationId",
+        unmaskOnReload: true,
+      }}
+      resetScroll={false}
+      search={(previous) => ({
+        ...previous,
+        task: {
+          invitationId,
+          kind: "accept-membership-invitation" as const,
+        },
+      })}
+      to="."
+    >
+      {children}
+    </Link>
+  );
+}
 
 type ShellInternalLinkProps = Readonly<{
   ariaLabel?: string;
@@ -214,6 +290,8 @@ export function ShellTopBar({
             <ActionLauncher
               defaultPolityId={context.polityId}
               polities={polities}
+              renderActionLink={renderActionLink}
+              renderEmptyActionLink={renderEmptyActionLink}
               triggerPresentation={layout === "expanded" ? "labelled" : "icon"}
             />
           ) : null}
@@ -227,17 +305,35 @@ export function ShellTopBar({
               ) : null}
               <InboxPreview
                 items={inboxItems}
-                renderInvitationLink={({
-                  children,
-                  className,
-                  invitationId,
-                }) => (
-                  <InvitationTaskLink
-                    className={className}
-                    invitationId={invitationId}
+                renderInboxItemLink={({ children, className, item }) =>
+                  item.source.kind === "membership-invitation" ? (
+                    <AcceptMembershipInvitationTaskLink
+                      className={className}
+                      invitationId={item.source.invitationId}
+                    >
+                      {children}
+                    </AcceptMembershipInvitationTaskLink>
+                  ) : (
+                    <Link
+                      className={className}
+                      params={{
+                        motionId: item.source.motionId,
+                        polityId: item.source.polityId,
+                      }}
+                      to="/polities/$polityId/motions/$motionId"
+                    >
+                      {children}
+                    </Link>
+                  )
+                }
+                renderInboxLink={(label) => (
+                  <AppLinkButton
+                    className="mt-3 w-full"
+                    to="/inbox"
+                    variant="outline"
                   >
-                    {children}
-                  </InvitationTaskLink>
+                    {label}
+                  </AppLinkButton>
                 )}
               />
             </>

@@ -20,7 +20,7 @@ export type ShellLinkTarget =
   | Readonly<{ to: ShellStaticPath }>
   | Readonly<{ params: "polityId"; to: ShellPolityPath }>;
 
-export type ShellBackTarget = Readonly<{
+type ShellBackTarget = Readonly<{
   label: MessageDescriptor;
   target: ShellLinkTarget;
 }>;
@@ -33,7 +33,7 @@ export type ShellBackTarget = Readonly<{
  * task/detail routes only need to specify their overrides. A loader may return
  * `{ shellLabel: string }` when the route label comes from fetched data.
  */
-export type ShellRouteData = Readonly<{
+type ShellRouteData = Readonly<{
   /** Back destination shown by the compact top bar. */
   back?: ShellBackTarget;
   /** Short compact title used in place of the route's label. */
@@ -72,7 +72,7 @@ export type ResolvedShellBreadcrumb = Readonly<{
   target?: ShellLinkTarget;
 }>;
 
-export type ResolvedShellBackTarget = Readonly<{
+type ResolvedShellBackTarget = Readonly<{
   label: string;
   params: Readonly<Record<string, string>>;
   target: ShellLinkTarget;

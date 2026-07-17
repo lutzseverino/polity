@@ -27,6 +27,9 @@ spring:
 polity:
   api:
     base-path: /api/v1
+  membership-invitations:
+    accept-url-base: ${POLITY_MEMBERSHIP_INVITATION_ACCEPT_URL_BASE:http://localhost:5173/polities/invitations}
+    retry-delay: ${POLITY_MEMBERSHIP_INVITATION_RETRY_DELAY:PT1M}
   keycloak:
     base-url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
     realm: ${KEYCLOAK_REALM:odonta}
@@ -40,6 +43,9 @@ cardo:
   identity:
     client:
       base-url: ${IDENTITY_BASE_URL:http://localhost:8081/api/v1}
+  invite:
+    client:
+      base-url: ${INVITE_BASE_URL:http://localhost:8083/api/v1}
 server:
   port: ${POLITY_PORT:8084}
 management:

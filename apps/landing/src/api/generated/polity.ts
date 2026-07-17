@@ -160,9 +160,9 @@ export interface paths {
             };
             cookie?: never;
         };
-        get: operations["listPolityInvitations"];
+        get: operations["listPolityMembershipInvitations"];
         put?: never;
-        post: operations["createPolityInvitation"];
+        post: operations["createPolityMembershipInvitation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -176,9 +176,48 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["listCurrentUserInvitations"];
+        get: operations["listCurrentUserMembershipInvitations"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitation-tokens/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["MembershipInvitationToken"];
+            };
+            cookie?: never;
+        };
+        /** Inspect a pending Polity membership invitation using its secret Cardo token. */
+        get: operations["getMembershipInvitationByToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitation-tokens/{token}/completion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["MembershipInvitationToken"];
+            };
+            cookie?: never;
+        };
+        /** Poll the durable Cardo-owned identity completion state. */
+        get: operations["getMembershipInvitationCompletion"];
+        put?: never;
+        /** Durably request Cardo-owned identity completion without accepting Polity membership. */
+        post: operations["requestMembershipInvitationCompletion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -190,13 +229,13 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
-                invitationId: components["parameters"]["InvitationId"];
+                invitationId: components["parameters"]["MembershipInvitationId"];
             };
             cookie?: never;
         };
         get?: never;
         put?: never;
-        post: operations["acceptInvitation"];
+        post: operations["acceptMembershipInvitation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -600,8 +639,8 @@ export interface components {
             content: components["schemas"]["MemberResponse"][];
             page: components["schemas"]["PageMetadata"];
         };
-        MemberInvitationPageResponse: {
-            content: components["schemas"]["MemberInvitationResponse"][];
+        MembershipInvitationPageResponse: {
+            content: components["schemas"]["MembershipInvitationResponse"][];
             page: components["schemas"]["PageMetadata"];
         };
         MotionPageResponse: {
@@ -642,7 +681,7 @@ export interface components {
             setupPreset?: components["schemas"]["PolitySetupPreset"];
             pace?: components["schemas"]["PolityPace"];
         };
-        CreateMemberInvitationRequest: {
+        CreateMembershipInvitationRequest: {
             /** Format: email */
             email: string;
         };
@@ -758,7 +797,7 @@ export interface components {
         /** @enum {string} */
         PolityPace: "fast" | "standard" | "deliberate";
         /** @enum {string} */
-        InvitationStatus: "pending" | "accepted";
+        MembershipInvitationStatus: "pending" | "accepted";
         /** @enum {string} */
         VotingThreshold: "simple_majority_cast" | "majority_of_eligible" | "two_thirds_cast" | "two_thirds_eligible" | "office_election_result";
         /** @enum {string} */
@@ -940,7 +979,7 @@ export interface components {
             /** Format: date-time */
             admittedAt: string;
         };
-        MemberInvitationResponse: {
+        MembershipInvitationResponse: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -949,11 +988,36 @@ export interface components {
             /** Format: email */
             email: string;
             invitedByName: string;
-            status: components["schemas"]["InvitationStatus"];
+            status: components["schemas"]["MembershipInvitationStatus"];
             /** Format: date-time */
             invitedAt: string;
             /** Format: date-time */
             respondedAt?: string;
+        };
+        MembershipInvitationTokenResponse: {
+            /** Format: uuid */
+            polityId: string;
+            polityName: string;
+            /** Format: email */
+            invitedEmail: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        /** @enum {string} */
+        MembershipInvitationCompletionStatus: "requested" | "awaiting_identity" | "completed" | "failed";
+        MembershipInvitationCompletionResponse: {
+            status: components["schemas"]["MembershipInvitationCompletionStatus"];
+            /** Format: int32 */
+            attemptCount: number;
+            lastError?: string;
+            /** Format: date-time */
+            actionExpiresAt?: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         VoteTallyResponse: {
             yes: number;
@@ -1302,11 +1366,21 @@ export interface components {
                 "application/json": components["schemas"]["ApiError"];
             };
         };
+        /** @description Resource is no longer available. */
+        Gone: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ApiError"];
+            };
+        };
     };
     parameters: {
         PolityId: string;
         MotionId: string;
-        InvitationId: string;
+        MembershipInvitationId: string;
+        MembershipInvitationToken: string;
         /** @description Case-insensitive literal text used to search a collection. Blank values are ignored. */
         SearchQuery: string;
         /** @description Zero-based page index. */
@@ -1533,9 +1607,10 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            410: components["responses"]["Gone"];
         };
     };
-    listPolityInvitations: {
+    listPolityMembershipInvitations: {
         parameters: {
             query?: {
                 /** @description Zero-based page index. */
@@ -1557,12 +1632,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberInvitationPageResponse"];
+                    "application/json": components["schemas"]["MembershipInvitationPageResponse"];
                 };
             };
         };
     };
-    createPolityInvitation: {
+    createPolityMembershipInvitation: {
         parameters: {
             query?: never;
             header?: never;
@@ -1573,7 +1648,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateMemberInvitationRequest"];
+                "application/json": components["schemas"]["CreateMembershipInvitationRequest"];
             };
         };
         responses: {
@@ -1583,14 +1658,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberInvitationResponse"];
+                    "application/json": components["schemas"]["MembershipInvitationResponse"];
                 };
             };
             400: components["responses"]["BadRequest"];
             409: components["responses"]["Conflict"];
         };
     };
-    listCurrentUserInvitations: {
+    listCurrentUserMembershipInvitations: {
         parameters: {
             query?: {
                 /** @description Zero-based page index. */
@@ -1610,17 +1685,92 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberInvitationPageResponse"];
+                    "application/json": components["schemas"]["MembershipInvitationPageResponse"];
                 };
             };
         };
     };
-    acceptInvitation: {
+    getMembershipInvitationByToken: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                invitationId: components["parameters"]["InvitationId"];
+                token: components["parameters"]["MembershipInvitationToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending invitation onboarding context */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipInvitationTokenResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            410: components["responses"]["Gone"];
+        };
+    };
+    getMembershipInvitationCompletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["MembershipInvitationToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Identity completion state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipInvitationCompletionResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            410: components["responses"]["Gone"];
+        };
+    };
+    requestMembershipInvitationCompletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: components["parameters"]["MembershipInvitationToken"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Identity completion request accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipInvitationCompletionResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Gone"];
+        };
+    };
+    acceptMembershipInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitationId: components["parameters"]["MembershipInvitationId"];
             };
             cookie?: never;
         };
@@ -1637,6 +1787,7 @@ export interface operations {
             };
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            410: components["responses"]["Gone"];
         };
     };
     listPolityMotions: {

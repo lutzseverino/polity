@@ -1,94 +1,105 @@
 # Backend Conventions
 
-This reference is authoritative for Polity backend package roles, repository projections, and
-service assembly rules.
+This reference is authoritative for Polity-specific backend packages, canonical owners, platform
+constraints, and deliberate exceptions.
 
-## Structure
+Polity adopts Cardo's repo-agnostic
+[Application Boundaries](https://github.com/lutzseverino/cardo/blob/main/docs/reference/application-boundaries.md)
+reference. That document defines service, workflow, resolver, mapper, transport, contract-type,
+projection, and materialization semantics. This document adds the local choices needed to apply
+those rules in Polity; it does not redefine them.
 
-Top-level packages describe mechanical roles:
+## Adopted Profile
+
+Polity uses the Spring Boot, JPA, MapStruct, and generated OpenAPI form of the shared convention:
+
+- application services use `@Service` and the `Service` suffix;
+- public cross-owner application entrypoints use `@Component` and the
+  `{Verb}{Object}Workflow` shape;
+- repositories use projections and scalar predicates for reads and make exceptional entity
+  materialization explicit;
+- generated API interfaces, OpenAPI tags, controllers, and transport mappers align to semantic
+  transport owners;
+- public services and workflows expose application inputs, results, domain values deliberately
+  established as contracts, or ordinary context values—not transport or persistence types.
+
+## Package Map
+
+Polity organizes most mechanical roles as top-level packages:
 
 - `controller` owns HTTP adapters and generated API interfaces.
-- `mapper` owns declarative boundary mappings.
-- `model` owns entities, inputs, results, enums, and domain value objects.
-- `repository` owns persistence ports, entity-owned projections, and explicit entity materialization
-  for command paths.
-- `service` owns application behavior for product entities and workflows.
-- `effect` owns official-effect application components and effect-specific remedies.
-- `resolver` owns repository-backed components that resolve a domain set or context for another
-  owner.
+- `mapper` owns declarative application and transport mappings.
+- `model` owns entities, enums, and domain value objects.
+- `input` owns operation-specific application inputs using the `Input` suffix.
+- `result` owns application results, named read views, and supporting semantic value types.
+- `repository` owns persistence ports, entity projections, scalar predicates, locks, and explicit
+  mutation-side entity materialization.
+- `service` owns application behavior for stable domain and application owners.
+- `workflow` owns transactional use cases that coordinate independent owners.
+- `effect` owns official-effect application and effect-specific remedies.
+- `resolver` owns narrow repository-backed context reconstruction for other application owners.
 - `template` owns preset and template seeding components.
 - `authorization` owns product access and constitutional authority rules.
+- `integration` owns durable adapters to Cardo and other external application owners; it does not
+  acquire the product domain decisions that trigger those adapters.
 - `evaluator` owns pure calculation engines.
 - `validation` owns Bean Validation annotations and validators.
 - `config` and `exception` own Spring configuration and exception handling.
 
-Do not add product-lore top-level packages. If a concept fits an existing mechanical role, use the
-existing role.
+Do not add product-lore top-level packages when a concept fits an established mechanical role. A
+feature-specific local package is warranted only when its contents form a real boundary that the
+existing role packages would obscure.
 
-## Service Rules
+## Canonical Owners
 
-- Use the `Service` suffix and `@Service` stereotype for application services that own a product
-  entity or a real workflow spanning multiple entities.
-- Internal collaborators that resolve, adapt, plan, apply, or calculate one mechanic should use a
-  precise noun such as `Resolver`, `Adapter`, `Planner`, `Applicator`, or `Evaluator` and the
-  narrowest fitting stereotype/package.
-- Public application service methods accept application-owned inputs or ordinary context values and
-  return application-owned results or no value.
-- Public application service methods must not accept or return entities, repository projections, or
-  generated transport types.
-- Prefer one service per entity or clear workflow owner.
-- Put ordinary owner lookups and derived owner rules in that entity service.
-- Avoid materializing entities for application flow. Prefer projections, scalar predicates, and
-  explicit repository commands. Entity materialization is a command-side escape hatch for managed
-  aggregate transitions that cannot be expressed cleanly otherwise.
-- Do not create `Reader` or `Writer` classes for generic entity lookup or persistence commands.
-- A separate non-entity service is acceptable only when it owns a real workflow boundary.
-- Use `authorization` for product authorization rules instead of placing them in `service`.
-- Use `evaluator` for pure tally or calculation code with no repository ownership.
+Use the backend and OpenAPI nouns as the source of truth. Frontend domains, application results,
+mappers, controllers, and generated types keep the same canonical noun unless their boundary role
+requires a suffix.
 
-## Platform Client Rules
+- `MotionService` owns generic motion reads. Voting, certification, candidacy, and introduction
+  paths are named workflows because they coordinate motion state with memberships, procedures,
+  effects, elections, or official records.
+- A specialized motion route belongs to the object it creates or changes. Sanctions, appeals,
+  office elections, office-term reviews, constitutional reviews, amendments, and disbandments each
+  retain their own transport mapper and controller ownership even when the path is nested under a
+  motion.
+- `MembershipInvitation` is the canonical invitation noun across the entity, repository,
+  application result, OpenAPI schema, generated client, frontend domain, and feature workflows.
+  `MembershipInvitationService` owns reads; creation and acceptance are workflows.
+- `GovernmentStructureService` and `PolityActionAvailabilityService` are stable application-view
+  owners. They are not resolver implementations hidden behind service facades.
 
-- Platform clients may gate product access, delivery, billing, identity, or grants.
-- Keep commercial rules outside constitutional state. Billing may decide whether a caller can create
-  or use a paid product surface, but it must not grant membership, political standing, office
-  authority, procedure eligibility, or official effects.
-- Product services should consume published platform client contracts directly and keep product
-  limits in product-owned terms.
+Route nesting does not transfer ownership. Do not group unrelated owners under umbrellas such as
+`Justice`, or assign every polity-nested operation to `PolityController` and every motion-nested
+operation to `MotionController`.
 
-## Projection Rules
+## Platform Boundaries
 
-- `EntityProjection` exposes fields owned by `Entity`.
-- Generic entity projections must not borrow display names, versions, or labels from neighboring
-  entities through joins.
-- Repository read methods return projections or scalar values. A custom repository method that
-  returns an entity must include `Entity` in the method name, such as `findEntityBy...` or
-  `findEntitiesBy...`, and should only serve command-side state transitions that truly require a
-  managed aggregate.
-- When a result needs data from multiple owners, the application service assembles the result by
-  asking the owning repository or service for each piece.
-- Repository joins are allowed for filtering, existence predicates, locking, and persistence
-  constraints when the selected projection remains owned by the repository entity. Do not use joins
-  to smuggle neighboring-owner state into generic repository reads.
-- Cross-owned read projections are exceptions. Use them only when the read model is a concrete
-  product view that cannot be expressed cleanly by owner assembly. Name the projection after that
-  concrete view, not as a generic `Slice` or `Summary`.
+Cardo clients may gate product access, delivery, billing, identity, and authorization mechanics.
+Polity keeps the resulting product decisions in Polity-owned terms.
 
-## Mapper Rules
+- Billing may decide whether a caller can create or use a paid product surface, but it must not
+  grant membership, political standing, office authority, procedure eligibility, or official
+  effects.
+- Identity owns platform users and authentication; Polity owns memberships and political identity
+  inside a polity.
+- Authorization provides shared mechanics; Polity owns constitutional powers, product resource
+  types, actions, and grant planning.
+- Product services consume stable Cardo client contracts rather than Cardo persistence or transport
+  implementation types.
 
-- Mappers are named by owner and boundary: `{Owner}ApplicationMapper` or
-  `{Owner}TransportMapper`.
-- Do not group mappings under product-area umbrellas when the mapped types belong to separate
-  owners.
-- Do not create one mapper per request or response class unless that type is itself the stable
-  owner.
-- Application mappers stay declarative.
-- They may map an entity-owned projection to an application result when no cross-owner assembly is
-  needed.
-- They must not hide repository joins or product orchestration.
-- If mapping requires owner lookups, build the result in the owning service instead.
+Membership invitations use Cardo Invite for token, delivery, provisional identity, expiry, and
+captured authorization-grant mechanics. Polity retains the membership-invitation record,
+constitutional admission authority, official records, membership admission, and its public read
+model. The detailed ordering and retry contract is documented in
+[Membership Invitation Integration](membership-invitation-integration.md).
 
-## Exception Rule
+## Local Exceptions
 
-Before adding a new package, reader, writer, cross-owned projection, or non-entity service, first
-try to fit the behavior into an existing convention. Add a new convention only when the simpler
-shape would misrepresent ownership or obscure behavior.
+Before adding a package role, reader, writer, cross-owned projection, non-owner service, or public
+application type, first try to fit the behavior into the shared convention and this package map.
+
+An exception must identify the owner that cannot be represented cleanly, explain why owner assembly
+or an existing boundary is insufficient, and remain narrower than a new project-wide convention.
+Update architecture tests when an exception represents a durable rule; do not leave the exception
+as an unverified naming precedent.

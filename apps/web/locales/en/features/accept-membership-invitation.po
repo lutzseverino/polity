@@ -1,0 +1,65 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-16 12:32+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. placeholder {0}: invitation.invitedByName
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:73
+msgid "{0} invited you to join this polity."
+msgstr "{0} invited you to join this polity."
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:108
+msgid "Done"
+msgstr "Done"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:48
+msgid "Invitation accepted"
+msgstr "Invitation accepted"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:50
+msgid "Invitation to join"
+msgstr "Invitation to join"
+
+#. placeholder {0}: invitation.polityName
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:62
+msgid "Join {0}?"
+msgstr "Join {0}?"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:133
+msgid "Join polity"
+msgstr "Join polity"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:121
+msgid "Not Now"
+msgstr "Not Now"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:111
+msgid "View My Polities"
+msgstr "View My Polities"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:88
+msgid "You can now participate according to the polity’s constitution."
+msgstr "You can now participate according to the polity’s constitution."
+
+#. placeholder {0}: invitation.polityName
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:60
+msgid "You joined {0}"
+msgstr "You joined {0}"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:85
+msgid "You’re now a member"
+msgstr "You’re now a member"
+
+#: src/features/accept-membership-invitation/components/AcceptMembershipInvitationWorkflow/AcceptMembershipInvitationWorkflow.tsx:71
+msgid "Your membership is now active."
+msgstr "Your membership is now active."

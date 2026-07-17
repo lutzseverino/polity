@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @AnalyzeClasses(
@@ -50,6 +51,7 @@ class PolityArchitectureTest {
               "..resolver..",
               "..config..",
               "..service..",
+              "..workflow..",
               "com.odonta.polity.authorization..",
               "com.odonta.polity.api..");
 
@@ -76,6 +78,7 @@ class PolityArchitectureTest {
               "..repository..",
               "..resolver..",
               "..service..",
+              "..workflow..",
               "com.odonta.polity.authorization..",
               "com.odonta.polity.api..");
 
@@ -89,6 +92,24 @@ class PolityArchitectureTest {
           .resideInAnyPackage("..controller..", "com.odonta.polity.api..");
 
   @ArchTest
+  static final ArchRule workflows_do_not_depend_on_transport =
+      noClasses()
+          .that()
+          .resideInAPackage("..workflow..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage("..controller..", "com.odonta.polity.api..");
+
+  @ArchTest
+  static final ArchRule services_do_not_depend_on_workflows =
+      noClasses()
+          .that()
+          .resideInAPackage("..service..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..workflow..");
+
+  @ArchTest
   static final ArchRule controllers_do_not_access_repositories =
       noClasses()
           .that()
@@ -96,6 +117,15 @@ class PolityArchitectureTest {
           .should()
           .dependOnClassesThat()
           .resideInAPackage("..repository..");
+
+  @ArchTest
+  static final ArchRule controllers_do_not_access_resolvers =
+      noClasses()
+          .that()
+          .resideInAPackage("..controller..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..resolver..");
 
   @ArchTest
   static final ArchRule resolvers_do_not_apply_effects =
@@ -126,6 +156,20 @@ class PolityArchitectureTest {
           .beAnnotatedWith(Service.class);
 
   @ArchTest
+  static final ArchRule public_workflow_entrypoints_use_the_workflow_convention =
+      classes()
+          .that()
+          .resideInAPackage("..workflow..")
+          .and()
+          .areTopLevelClasses()
+          .and()
+          .arePublic()
+          .should()
+          .haveSimpleNameEndingWith("Workflow")
+          .andShould()
+          .beAnnotatedWith(Component.class);
+
+  @ArchTest
   static final ArchRule application_mappers_stay_inside_the_application_boundary =
       noClasses()
           .that()
@@ -150,7 +194,7 @@ class PolityArchitectureTest {
           .resideInAPackage("..mapper..")
           .should()
           .dependOnClassesThat()
-          .resideInAnyPackage("..controller..", "..service..", "..config..");
+          .resideInAnyPackage("..controller..", "..service..", "..workflow..", "..config..");
 
   @ArchTest
   static final ArchRule repositories_do_not_depend_on_application_layers =
@@ -162,6 +206,7 @@ class PolityArchitectureTest {
           .resideInAnyPackage(
               "..controller..",
               "..service..",
+              "..workflow..",
               "..mapper..",
               "com.odonta.polity.authorization..",
               "com.odonta.polity.api..");

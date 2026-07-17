@@ -1,38 +1,38 @@
-import type { PendingInvitation } from "@/domains/membership/lib/membership";
+import type { MembershipInvitation } from "@/domains/membership/lib/membership";
 
-const pendingInvitations: readonly PendingInvitation[] = [
+const membershipInvitations: readonly MembershipInvitation[] = [
   {
     id: "invitation-supper-club",
-    invitedBy: "Sam Ortega",
+    invitedAtLabel: "Today",
+    invitedByName: "Sam Ortega",
     polityName: "Sunday Supper Club",
-    receivedLabel: "Today",
   },
   {
     id: "invitation-garden-cooperative",
-    invitedBy: "Mira Chen",
+    invitedAtLabel: "Yesterday",
+    invitedByName: "Mira Chen",
     polityName: "Garden Cooperative",
-    receivedLabel: "Yesterday",
   },
   {
     id: "invitation-book-circle",
-    invitedBy: "Alex Rivera",
+    invitedAtLabel: "3 days ago",
+    invitedByName: "Alex Rivera",
     polityName: "Local Book Circle",
-    receivedLabel: "3 days ago",
   },
   {
     id: "invitation-cabin-council",
-    invitedBy: "Jon Bell",
+    invitedAtLabel: "5 days ago",
+    invitedByName: "Jon Bell",
     polityName: "Cabin Council",
-    receivedLabel: "5 days ago",
   },
 ];
 
-export function findInvitationFixture(invitationId: string) {
-  return pendingInvitations.find(
+export function findMembershipInvitationFixture(invitationId: string) {
+  return membershipInvitations.find(
     (invitation) => invitation.id === invitationId,
   );
 }
 
-export function listInvitationFixtures() {
-  return pendingInvitations;
+export function listMembershipInvitationFixtures() {
+  return membershipInvitations;
 }
