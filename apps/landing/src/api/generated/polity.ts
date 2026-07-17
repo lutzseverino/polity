@@ -797,7 +797,7 @@ export interface components {
         /** @enum {string} */
         PolityPace: "fast" | "standard" | "deliberate";
         /** @enum {string} */
-        MembershipInvitationStatus: "pending" | "accepted";
+        MembershipInvitationStatus: "pending" | "accepted" | "cancelled";
         /** @enum {string} */
         VotingThreshold: "simple_majority_cast" | "majority_of_eligible" | "two_thirds_cast" | "two_thirds_eligible" | "office_election_result";
         /** @enum {string} */

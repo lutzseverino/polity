@@ -1,8 +1,6 @@
-import {
-  findMembershipInvitationFixture,
-  listMembershipInvitationFixtures,
-} from "@/domains/membership/lib/invitation-fixtures";
+import { createHttpClient } from "@/api/http-client";
 import type {
+  MembershipInvitation,
   MembershipInvitationCompletion,
   MembershipInvitationTokenContext,
 } from "@/domains/membership/lib/membership";
@@ -12,29 +10,67 @@ type RequestOptions = Readonly<{
   signal?: AbortSignal;
 }>;
 
-export function listMembershipInvitations({
-  signal,
-}: RequestOptions = {}): Promise<
-  ReturnType<typeof listMembershipInvitationFixtures>
-> {
-  signal?.throwIfAborted();
+type LocalizedRequestOptions = RequestOptions &
+  Readonly<{
+    acceptedLanguage: string;
+  }>;
 
-  return Promise.resolve(listMembershipInvitationFixtures());
+type MembershipInvitationResponse = Readonly<{
+  id: string;
+  invitedAt: string;
+  invitedByName: string;
+  polityName: string;
+}>;
+
+type MembershipInvitationPageResponse = Readonly<{
+  content: readonly MembershipInvitationResponse[];
+}>;
+
+const httpClient = createHttpClient();
+
+function toMembershipInvitation(
+  invitation: MembershipInvitationResponse,
+  acceptedLanguage: string,
+): MembershipInvitation {
+  return {
+    id: invitation.id,
+    invitedAtLabel: new Intl.DateTimeFormat(acceptedLanguage, {
+      dateStyle: "medium",
+    }).format(new Date(invitation.invitedAt)),
+    invitedByName: invitation.invitedByName,
+    polityName: invitation.polityName,
+  };
 }
 
-export function getMembershipInvitation(
+export async function listMembershipInvitations({
+  acceptedLanguage,
+  signal,
+}: LocalizedRequestOptions): Promise<readonly MembershipInvitation[]> {
+  const response = await httpClient.request<MembershipInvitationPageResponse>({
+    acceptedLanguage,
+    method: "GET",
+    params: { size: 100 },
+    signal,
+    url: "/invitations",
+  });
+
+  return response.content.map((invitation) =>
+    toMembershipInvitation(invitation, acceptedLanguage),
+  );
+}
+
+export async function getMembershipInvitation(
   invitationId: string,
-  { signal }: RequestOptions = {},
+  options: LocalizedRequestOptions,
 ) {
-  signal?.throwIfAborted();
+  const invitation = (await listMembershipInvitations(options)).find(
+    (candidate) => candidate.id === invitationId,
+  );
 
-  const invitation = findMembershipInvitationFixture(invitationId);
-
-  return invitation
-    ? Promise.resolve(invitation)
-    : Promise.reject(
-        new ResourceNotFoundError("Membership invitation", invitationId),
-      );
+  if (!invitation) {
+    throw new ResourceNotFoundError("Membership invitation", invitationId);
+  }
+  return invitation;
 }
 
 async function invitationTokenResponse<T>(

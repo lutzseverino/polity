@@ -16,6 +16,7 @@ import {
 } from "@/domains/membership";
 import { polityListQueryKey } from "@/domains/polity";
 import {
+  type AcceptedMembership,
   type AcceptMembershipInvitationInput,
   acceptMembershipInvitation,
 } from "@/features/accept-membership-invitation/api/accept-membership-invitation-request";
@@ -30,11 +31,15 @@ function acceptMembershipInvitationMutationOptions({
   queryClient,
 }: AcceptMembershipInvitationMutationOptions) {
   return mutationOptions<
-    AcceptMembershipInvitationInput,
+    AcceptedMembership,
     Error,
     AcceptMembershipInvitationInput
   >({
-    mutationFn: acceptMembershipInvitation,
+    mutationFn: (input) =>
+      acceptMembershipInvitation({
+        ...input,
+        acceptedLanguage: locale,
+      }),
     mutationKey: ["memberships", "invitations", "accept"],
     onSuccess: (_, { invitationId }) => {
       queryClient.setQueryData<readonly InboxItem[]>(

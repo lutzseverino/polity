@@ -110,7 +110,6 @@ cancellation transition; Cardo revocation must follow that local transition rath
 a second source of domain truth.
 
 Pending invitation rows created before this integration have no Cardo invitation UUID and no
-durable creation publication. They remain intentionally non-acceptable after migration. Before a
-production upgrade with such rows, choose an explicit product migration policy—reissue them through
-the new creation workflow or expire/cancel them through a Polity-owned transition—rather than
-silently sending new invitations during application startup.
+durable creation publication. Migration V3 marks those rows `CANCELLED` with a response timestamp,
+which releases the pending-email uniqueness constraint without silently sending remote invitations.
+An authorized member can then reissue the invitation through the new creation workflow.

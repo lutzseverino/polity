@@ -35,7 +35,11 @@ const membershipQueryKeys = {
 
 export function membershipInvitationsQueryOptions(input: LocalizedQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => listMembershipInvitations({ signal }),
+    queryFn: ({ signal }) =>
+      listMembershipInvitations({
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: membershipQueryKeys.membershipInvitations(input),
   });
 }
@@ -45,7 +49,10 @@ export function membershipInvitationQueryOptions(
 ) {
   return queryOptions({
     queryFn: ({ signal }) =>
-      getMembershipInvitation(input.invitationId, { signal }),
+      getMembershipInvitation(input.invitationId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: membershipQueryKeys.membershipInvitation(input),
   });
 }

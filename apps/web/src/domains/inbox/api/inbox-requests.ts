@@ -3,13 +3,20 @@ import { projectMembershipInvitationToInboxTask } from "@/domains/inbox/lib/inbo
 import { listMembershipInvitations } from "@/domains/membership";
 
 type RequestOptions = Readonly<{
+  acceptedLanguage: string;
   signal?: AbortSignal;
 }>;
 
-export async function listInboxItems({ signal }: RequestOptions = {}) {
+export async function listInboxItems({
+  acceptedLanguage,
+  signal,
+}: RequestOptions) {
   signal?.throwIfAborted();
 
-  const invitations = await listMembershipInvitations({ signal });
+  const invitations = await listMembershipInvitations({
+    acceptedLanguage,
+    signal,
+  });
 
   return [
     ...listInboxItemFixtures(),

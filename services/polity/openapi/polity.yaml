@@ -683,7 +683,7 @@ components:
     InstitutionKind: { type: string, enum: [assembly, council, judiciary] }
     PolitySetupPreset: { type: string, enum: [standard_constitutional_council_republic] }
     PolityPace: { type: string, enum: [fast, standard, deliberate] }
-    MembershipInvitationStatus: { type: string, enum: [pending, accepted] }
+    MembershipInvitationStatus: { type: string, enum: [pending, accepted, cancelled] }
     VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible, office_election_result] }
     OfficeElectionMethod: { type: string, enum: [plurality, ranked_choice] }
     ProcedureElectorate: { type: string, enum: [active_members, office_holders] }
