@@ -1,6 +1,17 @@
 {
-  "standards-version": 1,
-  "standards-release": "1.0.3",
+  "standards-version": 2,
+  "standards-release": "1.1.0",
+  "boundaries": [
+    {"path": ".", "type": "repository", "title": "Polity"},
+    {"path": "apps", "type": "collection", "title": "Applications"},
+    {"path": "apps/landing", "type": "project", "title": "Polity Landing"},
+    {"path": "apps/mobile", "type": "project", "title": "Polity Mobile"},
+    {"path": "apps/web", "type": "project", "title": "Polity Web"},
+    {"path": "packages", "type": "collection", "title": "Packages"},
+    {"path": "packages/design", "type": "project", "title": "Polity Design"},
+    {"path": "services", "type": "collection", "title": "Services"},
+    {"path": "services/polity", "type": "project", "title": "Polity Service"}
+  ],
   "profiles": ["common", "documentation", "pnpm-workspace", "vite-react", "spring-boot"],
   "variables": {},
   "local-fragments": {

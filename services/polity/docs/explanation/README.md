@@ -13,8 +13,8 @@ Explanation documents describe how the Polity service works and why its boundari
 ## Do Not Use This Section For
 
 - factual lookup material; use [Reference](../reference/README.md)
-- step-by-step tasks; use [How-To Guides](../how-to/README.md)
-- durable choices with rejected alternatives; use [Decisions](../decisions/README.md)
+- step-by-step tasks; use a how-to guide
+- durable choices with rejected alternatives; use a decision record
 - ephemeral notes that are not intended as durable documentation
 
 ## Required Shape
@@ -26,7 +26,8 @@ Every explanation document should include:
 - `Key Concepts`
 - `Implications`
 
-Use the [explanation template](../_templates/explanation.template.md) for new explanation documents.
+Use the [repository explanation template](../../../../docs/_templates/explanation.template.md)
+for new explanation documents.
 
 ## Documents
 
