@@ -43,7 +43,6 @@ describe("first governing journey", () => {
   it("renders public invitation onboarding without session or protected reads", async () => {
     let protectedReads = 0;
     apiMockServer.use(
-      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
       http.get("/api/v1/identity/sessions/current", () => {
         protectedReads += 1;
         return HttpResponse.json({}, { status: 401 });
@@ -56,6 +55,7 @@ describe("first governing journey", () => {
         protectedReads += 1;
         return HttpResponse.json({});
       }),
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
     );
     const router = createTestRouter(
       "/polities/invitations/invitation-supper-club",
@@ -99,6 +99,37 @@ describe("first governing journey", () => {
 
     renderRouter(router);
 
+    await user.type(
+      await screen.findByRole("textbox", { name: "Email" }),
+      "member@example.com",
+    );
+    await user.type(screen.getByLabelText("Password"), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Inbox" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/inbox");
+  });
+
+  it("resumes the inbox after invitation signup and sign in", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter(
+      "/polities/invitations/invitation-completed",
+    );
+
+    renderRouter(router);
+
+    await user.click(await screen.findByRole("button", { name: "Sign up" }));
+    const signInLink = await screen.findByRole("link", {
+      name: "Log in to review invitation",
+    });
+    expect(signInLink).toHaveAttribute("href", "/sign-in?returnTo=%2Finbox");
+    await user.click(signInLink);
     await user.type(
       await screen.findByRole("textbox", { name: "Email" }),
       "member@example.com",

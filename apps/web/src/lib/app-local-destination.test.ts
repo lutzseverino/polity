@@ -12,6 +12,7 @@ describe("app-local return destinations", () => {
     ["javascript:alert(1)", undefined],
     ["sign-in", undefined],
     ["/sign-in", undefined],
+    ["/sign-in/", undefined],
   ])("normalizes %s", (value, expected) => {
     expect(readAppLocalDestination(value)).toBe(expected);
   });
