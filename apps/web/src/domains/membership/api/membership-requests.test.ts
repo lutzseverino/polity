@@ -130,6 +130,26 @@ describe("membership invitation requests", () => {
     expect(completion).not.toHaveProperty("actionExpiresAt");
   });
 
+  it("rejects an unknown completion state instead of returning to signup", async () => {
+    apiMockServer.use(
+      http.post("/api/v1/invitation-tokens/:token/completion", () =>
+        HttpResponse.json(
+          {
+            attemptCount: 1,
+            createdAt: "2026-07-18T10:00:00Z",
+            status: "unknown",
+            updatedAt: "2026-07-18T10:01:00Z",
+          },
+          { status: 202 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestMembershipInvitationCompletion("invitation-malformed"),
+    ).rejects.toThrow("Invalid membership invitation completion response.");
+  });
+
   it("maps token transport dates to localized product copy", async () => {
     let acceptedLanguage: string | null = null;
     apiMockServer.use(
@@ -156,5 +176,24 @@ describe("membership invitation requests", () => {
       polityId: "polity-1",
       polityName: "Garden Cooperative",
     });
+  });
+
+  it("rejects malformed invitation token context", async () => {
+    apiMockServer.use(
+      http.get("/api/v1/invitation-tokens/:token", () =>
+        HttpResponse.json({
+          expiresAt: "not-a-date",
+          invitedEmail: "friend@example.com",
+          polityId: "polity-1",
+          polityName: "Garden Cooperative",
+        }),
+      ),
+    );
+
+    await expect(
+      getMembershipInvitationByToken("invitation-malformed", {
+        acceptedLanguage: "en",
+      }),
+    ).rejects.toThrow("Invalid membership invitation token response.");
   });
 });

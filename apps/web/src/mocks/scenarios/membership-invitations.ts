@@ -22,14 +22,21 @@ type InvitationResponse = Readonly<{
   status: "pending";
 }>;
 
-const completionCreatedAt = "2026-07-18T10:00:00Z";
-const completionUpdatedAt = "2026-07-18T10:01:00Z";
+type InvitationResponseData = Omit<InvitationResponse, "invitedAt">;
+type InvitationTokenResponse = Readonly<{
+  expiresAt: string;
+  invitedEmail: string;
+  polityId: string;
+  polityName: string;
+}>;
+type ScenarioOptions = Readonly<{
+  now?: Date;
+}>;
 
-const invitationResponses: readonly InvitationResponse[] = [
+const invitationResponseData: readonly InvitationResponseData[] = [
   {
     email: "guest+supper@example.com",
     id: "invitation-supper-club",
-    invitedAt: "2026-07-17T12:00:00Z",
     invitedByName: "Sam Ortega",
     polityId: "sunday-supper-club",
     polityName: "Sunday Supper Club",
@@ -38,7 +45,6 @@ const invitationResponses: readonly InvitationResponse[] = [
   {
     email: "guest+garden@example.com",
     id: "invitation-garden-cooperative",
-    invitedAt: "2026-07-16T12:00:00Z",
     invitedByName: "Mira Chen",
     polityId: "garden-cooperative",
     polityName: "Garden Cooperative",
@@ -47,7 +53,6 @@ const invitationResponses: readonly InvitationResponse[] = [
   {
     email: "guest+books@example.com",
     id: "invitation-book-circle",
-    invitedAt: "2026-07-14T12:00:00Z",
     invitedByName: "Alex Rivera",
     polityId: "local-book-circle",
     polityName: "Local Book Circle",
@@ -56,7 +61,6 @@ const invitationResponses: readonly InvitationResponse[] = [
   {
     email: "guest+cabin@example.com",
     id: "invitation-cabin-council",
-    invitedAt: "2026-07-12T12:00:00Z",
     invitedByName: "Jon Bell",
     polityId: "cabin-council",
     polityName: "Cabin Council",
@@ -64,54 +68,91 @@ const invitationResponses: readonly InvitationResponse[] = [
   },
 ];
 
-const invitationTokenContexts = {
+const invitationTokenResponseData = {
   "invitation-completed": {
-    expiresAt: "2026-07-20T10:00:00Z",
     invitedEmail: "completed@example.com",
     polityId: "sunday-supper-club",
     polityName: "Sunday Supper Club",
   },
   "invitation-failed": {
-    expiresAt: "2026-07-20T10:00:00Z",
     invitedEmail: "retry@example.com",
     polityId: "sunday-supper-club",
     polityName: "Sunday Supper Club",
   },
   "invitation-pending": {
-    expiresAt: "2026-07-20T10:00:00Z",
     invitedEmail: "pending@example.com",
     polityId: "sunday-supper-club",
     polityName: "Sunday Supper Club",
   },
   "invitation-supper-club": {
-    expiresAt: "2026-07-20T10:00:00Z",
     invitedEmail: "friend@example.com",
     polityId: "sunday-supper-club",
     polityName: "Sunday Supper Club",
   },
 } as const;
 
-type InvitationToken = keyof typeof invitationTokenContexts;
+type InvitationToken = keyof typeof invitationTokenResponseData;
 
 function isInvitationToken(token: string): token is InvitationToken {
-  return token in invitationTokenContexts;
+  return token in invitationTokenResponseData;
 }
 
-function completionResponse(state: CompletionState, status: CompletionStatus) {
+function dateTimeAtOffset(now: Date, offsetMs: number) {
+  return new Date(now.getTime() + offsetMs).toISOString();
+}
+
+function completionResponse(
+  state: CompletionState,
+  status: CompletionStatus,
+  now: Date,
+) {
   return {
     actionExpiresAt:
-      status === "awaiting_identity" ? "2026-07-18T10:16:00Z" : undefined,
+      status === "awaiting_identity"
+        ? dateTimeAtOffset(now, 15 * 60 * 1_000)
+        : undefined,
     attemptCount: state.attemptCount,
-    completedAt: status === "completed" ? "2026-07-18T10:01:00Z" : undefined,
-    createdAt: completionCreatedAt,
+    completedAt:
+      status === "completed" ? dateTimeAtOffset(now, 60 * 1_000) : undefined,
+    createdAt: now.toISOString(),
     lastError: status === "failed" ? "credential_action_expired" : undefined,
     status,
-    updatedAt: completionUpdatedAt,
+    updatedAt: dateTimeAtOffset(now, 60 * 1_000),
   };
 }
 
-export function createMembershipInvitationScenarioHandlers(): RequestHandler[] {
-  let invitations = [...invitationResponses];
+export function createMembershipInvitationScenarioHandlers({
+  now = new Date(),
+}: ScenarioOptions = {}): RequestHandler[] {
+  const dayMs = 24 * 60 * 60 * 1_000;
+  let invitations: InvitationResponse[] = invitationResponseData.map(
+    (invitation, index) => ({
+      ...invitation,
+      invitedAt: dateTimeAtOffset(now, -(index + 1) * dayMs),
+    }),
+  );
+  const invitationExpiresAt = dateTimeAtOffset(now, 7 * dayMs);
+  const invitationTokenContexts: Record<
+    InvitationToken,
+    InvitationTokenResponse
+  > = {
+    "invitation-completed": {
+      ...invitationTokenResponseData["invitation-completed"],
+      expiresAt: invitationExpiresAt,
+    },
+    "invitation-failed": {
+      ...invitationTokenResponseData["invitation-failed"],
+      expiresAt: invitationExpiresAt,
+    },
+    "invitation-pending": {
+      ...invitationTokenResponseData["invitation-pending"],
+      expiresAt: invitationExpiresAt,
+    },
+    "invitation-supper-club": {
+      ...invitationTokenResponseData["invitation-supper-club"],
+      expiresAt: invitationExpiresAt,
+    },
+  };
   const completions = new Map<InvitationToken, CompletionState>();
 
   return [
@@ -184,7 +225,7 @@ export function createMembershipInvitationScenarioHandlers(): RequestHandler[] {
       state.status = status;
       completions.set(token, state);
 
-      return HttpResponse.json(completionResponse(state, status), {
+      return HttpResponse.json(completionResponse(state, status, now), {
         status: 202,
       });
     }),
@@ -220,7 +261,7 @@ export function createMembershipInvitationScenarioHandlers(): RequestHandler[] {
         state.status = "completed";
       }
 
-      return HttpResponse.json(completionResponse(state, state.status));
+      return HttpResponse.json(completionResponse(state, state.status, now));
     }),
   ];
 }

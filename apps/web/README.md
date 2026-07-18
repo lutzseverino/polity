@@ -12,15 +12,15 @@ pnpm build:web
 pnpm check:ts:architecture:web
 ```
 
-Choose one API mode before starting web development. For the in-memory development scenario:
+With no `VITE_API_URL` configured, `pnpm dev:web` starts with the in-memory development scenario. To
+force that scenario when a live URL is configured:
 
 ```bash
 VITE_API_MOCKING=true pnpm dev:web
 ```
 
 For a live service, copy `.env.example` to `.env`, leave `VITE_API_MOCKING=false`, and configure
-`VITE_API_URL`. The development server stops with a configuration error when neither mode is selected,
-instead of serving the application HTML to an API request.
+`VITE_API_URL`. A configured URL selects the live proxy unless `VITE_API_MOCKING=true` forces mocks.
 
 The web app always requests the same-origin `/api/v1` path. In live-service mode, Vite proxies that path
 to `VITE_API_URL`. Mock mode starts the browser MSW worker before React and route loaders run. The mock

@@ -13,12 +13,12 @@ response handling without depending on a running Polity service.
 
 ## Decision
 
-Use Mock Service Worker (MSW) as the standard API-mocking boundary for Vitest and opt-in browser
-development. Product code always makes the same HTTP-shaped requests. Tests use `msw/node`; browser
-development dynamically imports `msw/browser` only when both Vite development mode and
-`VITE_API_MOCKING=true` are active. Application bootstrap awaits worker startup before React renders, so
-initial route-loader requests cannot race ahead of interception. Production builds do not activate or
-register the worker.
+Use Mock Service Worker (MSW) as the standard API-mocking boundary for Vitest and browser development.
+Product code always makes the same HTTP-shaped requests. Tests use `msw/node`; browser development uses
+`msw/browser` when no `VITE_API_URL` is configured, while a configured URL selects the live proxy.
+`VITE_API_MOCKING=true` forces browser mocking even when that URL exists. Application bootstrap awaits
+worker startup before React renders, so initial route-loader requests cannot race ahead of interception.
+Production builds do not activate or register the worker.
 
 The shared test setup starts one Node mock server before the suite, rejects unhandled requests, recreates
 default state and handlers after every test, and closes the server after the suite. The browser worker fails
@@ -50,8 +50,9 @@ They are not the API-mocking standard.
 - API-facing tests exercise the same Axios and HTTP behavior used by product code.
 - Any unexpected network request fails the test instead of reaching a real service or passing silently.
 - Per-test handlers keep scenarios explicit, and automatic resets prevent state from leaking between tests.
-- Opt-in browser development can exercise pending, completed, failed, retry, and acceptance flows without a
-  live service, while disabling it sends the identical relative requests through Vite to `VITE_API_URL`.
+- Browser development can exercise pending, completed, failed, retry, and acceptance flows without a live
+  service by default, while configuring `VITE_API_URL` sends the identical relative requests through Vite
+  unless the explicit mock flag overrides it.
 - Stateful browser scenarios reset on reload and never write to production persistence.
 - Pure domain logic and narrowly scoped component tests may still use direct values or function doubles when
   the HTTP boundary is outside the behavior under test.

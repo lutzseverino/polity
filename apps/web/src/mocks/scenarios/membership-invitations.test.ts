@@ -10,7 +10,11 @@ type CompletionResponse = Readonly<{
 }>;
 
 type InvitationPageResponse = Readonly<{
-  content: readonly Readonly<{ id: string }>[];
+  content: readonly Readonly<{ id: string; invitedAt: string }>[];
+}>;
+
+type InvitationTokenResponse = Readonly<{
+  expiresAt: string;
 }>;
 
 async function responseJson<T>(response: Response): Promise<T> {
@@ -28,6 +32,24 @@ async function completionPoll(token: string) {
 }
 
 describe("membership invitation development scenario", () => {
+  it("keeps user-visible dates current when the scenario is recreated", async () => {
+    apiMockServer.use(
+      ...createMembershipInvitationScenarioHandlers({
+        now: new Date("2030-04-10T12:00:00Z"),
+      }),
+    );
+
+    const invitations = await fetch("/api/v1/invitations").then((response) =>
+      responseJson<InvitationPageResponse>(response),
+    );
+    const token = await fetch(
+      "/api/v1/invitation-tokens/invitation-pending",
+    ).then((response) => responseJson<InvitationTokenResponse>(response));
+
+    expect(invitations.content[0]?.invitedAt).toBe("2030-04-09T12:00:00.000Z");
+    expect(token.expiresAt).toBe("2030-04-17T12:00:00.000Z");
+  });
+
   it("supports listing and acceptance with isolated in-memory state", async () => {
     apiMockServer.use(...createMembershipInvitationScenarioHandlers());
 
