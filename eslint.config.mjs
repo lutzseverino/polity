@@ -20,6 +20,7 @@ export default [
       "apps/web/src/app/i18n/generated/**",
       "apps/web/src/components/ui/**",
       "apps/web/src/routeTree.gen.ts",
+      "apps/web/public/mockServiceWorker.js",
       "apps/mobile/.expo/**",
     ],
   },

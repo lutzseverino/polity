@@ -12,6 +12,31 @@ pnpm build:web
 pnpm check:ts:architecture:web
 ```
 
+With no `VITE_API_URL` configured, `pnpm dev:web` starts with the in-memory development scenario. To
+force that scenario when a live URL is configured:
+
+```bash
+VITE_API_MOCKING=true pnpm dev:web
+```
+
+For a live service, copy `.env.example` to `.env`, leave `VITE_API_MOCKING=false`, and configure
+`VITE_API_URL`. A configured URL selects the live proxy unless `VITE_API_MOCKING=true` forces mocks.
+
+The web app always requests the same-origin `/api/v1` path. In live-service mode, Vite proxies that path
+to `VITE_API_URL`. Mock mode starts the browser MSW worker before React and route loaders run. The mock
+option is ignored outside development builds.
+
+The invitation development scenario is recreated in memory on every browser reload. Open these token
+routes to exercise its completion states after selecting **Sign up**:
+
+- `/polities/invitations/invitation-pending` progresses from requested to awaiting identity and completed.
+- `/polities/invitations/invitation-completed` completes immediately.
+- `/polities/invitations/invitation-failed` fails once, then progresses normally after **Try again**.
+- `/inbox` lists pending invitations; accepting one removes it from subsequent mock list responses.
+
+Browser mock ownership and extension conventions are recorded in
+[API mocking](docs/decisions/api-mocking-for-tests.md).
+
 ## Structure
 
 - `src/app/` owns providers, router construction, i18n runtime, and the application shell.
@@ -21,6 +46,7 @@ pnpm check:ts:architecture:web
 - `src/components/app/` owns owner-neutral product components and shadcn wrappers.
 - `src/components/ui/` is registry-managed shadcn source. It is strictly read-only.
 - `src/api/` is reserved for generated clients and transport adapters; `src/lib/` owns low-level helpers.
+- `src/mocks/` owns development-only HTTP scenarios and the browser MSW installation boundary.
 
 The authoritative ownership and import rules are in
 [Source architecture](docs/reference/source-architecture.md) and are checked with

@@ -6,7 +6,7 @@ export type MembershipInvitation = Readonly<{
 }>;
 
 export type MembershipInvitationTokenContext = Readonly<{
-  expiresAt: string;
+  expiresAtLabel: string;
   invitedEmail: string;
   polityId: string;
   polityName: string;
@@ -19,11 +19,5 @@ export type MembershipInvitationCompletionStatus =
   | "failed";
 
 export type MembershipInvitationCompletion = Readonly<{
-  actionExpiresAt?: string;
-  attemptCount: number;
-  completedAt?: string;
-  createdAt: string;
-  lastError?: string;
   status: MembershipInvitationCompletionStatus;
-  updatedAt: string;
 }>;

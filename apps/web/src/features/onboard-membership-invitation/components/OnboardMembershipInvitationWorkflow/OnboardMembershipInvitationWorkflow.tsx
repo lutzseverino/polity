@@ -48,8 +48,8 @@ export function MembershipInvitationOnboardingContent({
         </AppText>
         <AppText className="mt-2 max-w-prose" variant="supporting">
           <Trans>
-            This invitation was sent to {invitation.invitedEmail}. Set up your
-            identity, sign in, and then choose whether to accept membership.
+            This invitation was sent to {invitation.invitedEmail}. Sign up to
+            review it and decide whether you want to join.
           </Trans>
         </AppText>
       </header>
@@ -63,8 +63,8 @@ export function MembershipInvitationOnboardingContent({
             </AppAlertTitle>
             <AppAlertDescription>
               <Trans>
-                Cardo is preparing a secure Keycloak action. This page will
-                update automatically.
+                Use the link we sent to finish signing up. This page will update
+                automatically.
               </Trans>
             </AppAlertDescription>
           </AppAlert>
@@ -74,12 +74,12 @@ export function MembershipInvitationOnboardingContent({
           <AppAlert aria-live="polite">
             <CheckCircle2 aria-hidden="true" />
             <AppAlertTitle>
-              <Trans>Your identity is ready</Trans>
+              <Trans>You’re signed up</Trans>
             </AppAlertTitle>
             <AppAlertDescription>
               <Trans>
-                Sign in to review the pending invitation. Identity setup does
-                not accept polity membership.
+                Log in to review the invitation. You won’t join until you accept
+                it.
               </Trans>
             </AppAlertDescription>
           </AppAlert>
@@ -89,12 +89,10 @@ export function MembershipInvitationOnboardingContent({
           <AppAlert aria-live="assertive" variant="destructive">
             <AlertTriangle aria-hidden="true" />
             <AppAlertTitle>
-              <Trans>Identity setup failed</Trans>
+              <Trans>Couldn’t sign you up</Trans>
             </AppAlertTitle>
             <AppAlertDescription>
-              {completion.lastError ?? (
-                <Trans>Cardo could not complete identity setup.</Trans>
-              )}
+              <Trans>Something went wrong. Try again.</Trans>
             </AppAlertDescription>
           </AppAlert>
         ) : null}
@@ -103,39 +101,33 @@ export function MembershipInvitationOnboardingContent({
           <AppAlert aria-live="assertive" variant="destructive">
             <AlertTriangle aria-hidden="true" />
             <AppAlertTitle>
-              <Trans>Unable to continue</Trans>
+              <Trans>Couldn’t continue</Trans>
             </AppAlertTitle>
-            <AppAlertDescription>{error.message}</AppAlertDescription>
+            <AppAlertDescription>
+              <Trans>Check your connection and try again.</Trans>
+            </AppAlertDescription>
           </AppAlert>
         ) : null}
 
         <AppText variant="supporting">
-          <Trans>Invitation expires {invitation.expiresAt}.</Trans>
+          <Trans>Invitation expires {invitation.expiresAtLabel}.</Trans>
         </AppText>
-        {completion ? (
-          <AppText variant="supporting">
-            <Trans>Identity setup attempt {completion.attemptCount}.</Trans>
-          </AppText>
-        ) : null}
-        {completion?.actionExpiresAt ? (
-          <AppText variant="supporting">
-            <Trans>
-              The current identity action expires {completion.actionExpiresAt}.
-            </Trans>
-          </AppText>
-        ) : null}
       </div>
 
       <footer className="flex justify-end border-t bg-muted/50 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-4">
         {completed ? (
-          renderSignInLink(<Trans>Sign in to review invitation</Trans>)
+          renderSignInLink(<Trans>Log in to review invitation</Trans>)
         ) : (
           <AppButton
             disabled={isPending || inProgress}
             onClick={onRequestCompletion}
             size="lg"
           >
-            {failed ? <Trans>Try again</Trans> : <Trans>Set up identity</Trans>}
+            {failed || error ? (
+              <Trans>Try again</Trans>
+            ) : (
+              <Trans>Sign up</Trans>
+            )}
           </AppButton>
         )}
       </footer>

@@ -30,7 +30,149 @@ type MembershipInvitationPageResponse = Readonly<{
   }>;
 }>;
 
+type MembershipInvitationCompletionResponse = Readonly<{
+  actionExpiresAt?: string;
+  attemptCount: number;
+  completedAt?: string;
+  createdAt: string;
+  lastError?: string;
+  status: MembershipInvitationCompletion["status"];
+  updatedAt: string;
+}>;
+
+type MembershipInvitationTokenResponse = Readonly<{
+  expiresAt: string;
+  invitedEmail: string;
+  polityId: string;
+  polityName: string;
+}>;
+
 const httpClient = createHttpClient();
+const membershipInvitationCompletionStatuses = [
+  "requested",
+  "awaiting_identity",
+  "completed",
+  "failed",
+] as const satisfies readonly MembershipInvitationCompletion["status"][];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isDateTime(value: unknown): value is string {
+  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function isOptionalDateTime(value: unknown): value is string | undefined {
+  return value === undefined || isDateTime(value);
+}
+
+function isOptionalString(value: unknown): value is string | undefined {
+  return value === undefined || typeof value === "string";
+}
+
+function isMembershipInvitationCompletionStatus(
+  value: unknown,
+): value is MembershipInvitationCompletion["status"] {
+  return membershipInvitationCompletionStatuses.some(
+    (status) => status === value,
+  );
+}
+
+function parseMembershipInvitationCompletionResponse(
+  value: unknown,
+): MembershipInvitationCompletionResponse {
+  if (
+    !isRecord(value) ||
+    !isMembershipInvitationCompletionStatus(value.status) ||
+    !Number.isInteger(value.attemptCount) ||
+    Number(value.attemptCount) < 0 ||
+    !isDateTime(value.createdAt) ||
+    !isDateTime(value.updatedAt) ||
+    !isOptionalString(value.lastError) ||
+    !isOptionalDateTime(value.actionExpiresAt) ||
+    !isOptionalDateTime(value.completedAt)
+  ) {
+    throw new Error("Invalid membership invitation completion response.");
+  }
+
+  return {
+    actionExpiresAt: value.actionExpiresAt,
+    attemptCount: Number(value.attemptCount),
+    completedAt: value.completedAt,
+    createdAt: value.createdAt,
+    lastError: value.lastError,
+    status: value.status,
+    updatedAt: value.updatedAt,
+  };
+}
+
+function parseMembershipInvitationTokenResponse(
+  value: unknown,
+): MembershipInvitationTokenResponse {
+  if (
+    !isRecord(value) ||
+    !isDateTime(value.expiresAt) ||
+    typeof value.invitedEmail !== "string" ||
+    typeof value.polityId !== "string" ||
+    typeof value.polityName !== "string"
+  ) {
+    throw new Error("Invalid membership invitation token response.");
+  }
+
+  return {
+    expiresAt: value.expiresAt,
+    invitedEmail: value.invitedEmail,
+    polityId: value.polityId,
+    polityName: value.polityName,
+  };
+}
+
+function parseMembershipInvitationPageResponse(
+  value: unknown,
+): MembershipInvitationPageResponse {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.content) ||
+    !isRecord(value.page)
+  ) {
+    throw new Error("Invalid membership invitation response.");
+  }
+
+  const content = value.content.map((candidate) => {
+    if (
+      !isRecord(candidate) ||
+      typeof candidate.id !== "string" ||
+      typeof candidate.invitedAt !== "string" ||
+      typeof candidate.invitedByName !== "string" ||
+      typeof candidate.polityName !== "string"
+    ) {
+      throw new Error("Invalid membership invitation response.");
+    }
+
+    return {
+      id: candidate.id,
+      invitedAt: candidate.invitedAt,
+      invitedByName: candidate.invitedByName,
+      polityName: candidate.polityName,
+    };
+  });
+
+  if (
+    typeof value.page.number !== "number" ||
+    typeof value.page.totalPages !== "number"
+  ) {
+    throw new Error("Invalid membership invitation response.");
+  }
+
+  return {
+    content,
+    page: {
+      number: value.page.number,
+      totalPages: value.page.totalPages,
+    },
+  };
+}
 
 function toMembershipInvitation(
   invitation: MembershipInvitationResponse,
@@ -50,13 +192,15 @@ async function getMembershipInvitationPage(
   page: number,
   { acceptedLanguage, signal }: LocalizedRequestOptions,
 ): Promise<MembershipInvitationPageResponse> {
-  return httpClient.request<MembershipInvitationPageResponse>({
-    acceptedLanguage,
-    method: "GET",
-    params: { page, size: 100 },
-    signal,
-    url: "/invitations",
-  });
+  return parseMembershipInvitationPageResponse(
+    await httpClient.request<unknown>({
+      acceptedLanguage,
+      method: "GET",
+      params: { page, size: 100 },
+      signal,
+      url: "/invitations",
+    }),
+  );
 }
 
 export async function listMembershipInvitations({
@@ -106,10 +250,10 @@ export async function getMembershipInvitation(
   throw new ResourceNotFoundError("Membership invitation", invitationId);
 }
 
-async function invitationTokenResponse<T>(
+async function invitationTokenResponse(
   response: Response,
   token: string,
-): Promise<T> {
+): Promise<unknown> {
   if (response.status === 404) {
     throw new ResourceNotFoundError("Membership invitation token", token);
   }
@@ -121,25 +265,50 @@ async function invitationTokenResponse<T>(
       `Membership invitation request failed (${response.status}).`,
     );
   }
-  return (await response.json()) as T;
+  return response.json();
 }
 
 function invitationTokenPath(token: string, suffix = "") {
   return `/api/v1/invitation-tokens/${encodeURIComponent(token)}${suffix}`;
 }
 
+function toMembershipInvitationCompletion(
+  response: MembershipInvitationCompletionResponse,
+): MembershipInvitationCompletion {
+  return { status: response.status };
+}
+
+function toMembershipInvitationTokenContext(
+  response: MembershipInvitationTokenResponse,
+  acceptedLanguage: string,
+): MembershipInvitationTokenContext {
+  return {
+    expiresAtLabel: new Intl.DateTimeFormat(acceptedLanguage, {
+      dateStyle: "long",
+    }).format(new Date(response.expiresAt)),
+    invitedEmail: response.invitedEmail,
+    polityId: response.polityId,
+    polityName: response.polityName,
+  };
+}
+
 export async function getMembershipInvitationByToken(
   token: string,
-  { signal }: RequestOptions = {},
+  { acceptedLanguage, signal }: LocalizedRequestOptions,
 ) {
   const response = await fetch(invitationTokenPath(token), {
     cache: "no-store",
-    headers: { Accept: "application/json" },
+    headers: {
+      Accept: "application/json",
+      "Accept-Language": acceptedLanguage,
+    },
     signal,
   });
-  return invitationTokenResponse<MembershipInvitationTokenContext>(
-    response,
-    token,
+  return toMembershipInvitationTokenContext(
+    parseMembershipInvitationTokenResponse(
+      await invitationTokenResponse(response, token),
+    ),
+    acceptedLanguage,
   );
 }
 
@@ -149,9 +318,10 @@ export async function requestMembershipInvitationCompletion(token: string) {
     headers: { Accept: "application/json" },
     method: "POST",
   });
-  return invitationTokenResponse<MembershipInvitationCompletion>(
-    response,
-    token,
+  return toMembershipInvitationCompletion(
+    parseMembershipInvitationCompletionResponse(
+      await invitationTokenResponse(response, token),
+    ),
   );
 }
 
@@ -164,8 +334,9 @@ export async function getMembershipInvitationCompletion(
     headers: { Accept: "application/json" },
     signal,
   });
-  return invitationTokenResponse<MembershipInvitationCompletion>(
-    response,
-    token,
+  return toMembershipInvitationCompletion(
+    parseMembershipInvitationCompletionResponse(
+      await invitationTokenResponse(response, token),
+    ),
   );
 }

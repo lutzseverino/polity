@@ -21,6 +21,14 @@ module.exports = {
       to: { path: "^src/(?:app|components|domains|features|routes)/" },
     },
     {
+      name: "development-mocks-stay-outside-product-owners",
+      severity: "error",
+      comment:
+        "Development mock handlers model transport scenarios and cannot depend on application composition or product presentation owners.",
+      from: { path: "^src/mocks/" },
+      to: { path: "^src/(?:app|components|domains|features|routes)/" },
+    },
+    {
       name: "axios-is-owned-by-api",
       severity: "error",
       comment:
