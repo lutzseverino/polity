@@ -35,6 +35,7 @@ const membershipQueryKeys = {
 
 export function membershipInvitationsQueryOptions(input: LocalizedQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       listMembershipInvitations({
         acceptedLanguage: input.locale,
@@ -48,6 +49,7 @@ export function membershipInvitationQueryOptions(
   input: MembershipInvitationQuery,
 ) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getMembershipInvitation(input.invitationId, {
         acceptedLanguage: input.locale,

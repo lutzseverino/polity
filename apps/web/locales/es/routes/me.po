@@ -13,15 +13,19 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/me/index.tsx:31
+#: src/routes/me/index.tsx:38
 msgid "Account and Preferences"
 msgstr ""
 
-#: src/routes/me/index.tsx:12
-#: src/routes/me/index.tsx:23
+#: src/routes/me/index.tsx:15
+#: src/routes/me/index.tsx:30
 msgid "Me"
 msgstr ""
 
-#: src/routes/me/index.tsx:26
+#: src/routes/me/index.tsx:33
 msgid "Profile, account, language, accessibility, and appearance preferences will live here."
+msgstr ""
+
+#: src/routes/me/index.tsx:43
+msgid "Session"
 msgstr ""

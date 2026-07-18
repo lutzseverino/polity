@@ -54,7 +54,11 @@ function MembershipInvitationTokenRoute() {
         <OnboardMembershipInvitationWorkflow
           invitation={invitation}
           renderSignInLink={(label) => (
-            <AppLinkButton size="lg" to="/me">
+            <AppLinkButton
+              search={{ returnTo: "/inbox" }}
+              size="lg"
+              to="/sign-in"
+            >
               {label}
             </AppLinkButton>
           )}

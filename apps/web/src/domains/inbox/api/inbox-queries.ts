@@ -13,6 +13,7 @@ const inboxQueryKeys = {
 
 export function inboxItemsQueryOptions(input: InboxQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       listInboxItems({ acceptedLanguage: input.locale, signal }),
     queryKey: inboxQueryKeys.list(input),

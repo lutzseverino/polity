@@ -32,6 +32,7 @@ for new decision records.
 ## Decisions
 
 - [API mocking for tests](api-mocking-for-tests.md)
+- [Cardo session boundary](cardo-session-boundary.md)
 - [Data access and server state](data-access-and-server-state.md)
 - [Inbox as a user-attention read model](inbox-attention-model.md)
 - [Page layout measures](page-layout-measures.md)
