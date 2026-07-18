@@ -131,15 +131,29 @@ describe("polity requests", () => {
     );
   });
 
-  it("rejects invalid UUID and RFC 3339 date-time formats before projection", async () => {
+  it.each([
+    {
+      createdAt: "2026-01-01T00:00:00.000Z",
+      id: "not-a-uuid",
+      label: "UUID",
+    },
+    {
+      createdAt: "2025-02-30T12:00:00Z",
+      id: "11111111-1111-4111-8111-111111111111",
+      label: "impossible RFC 3339 date-time",
+    },
+  ])("rejects an invalid $label before projection", async ({
+    createdAt,
+    id,
+  }) => {
     apiMockServer.use(
       http.get("/api/v1/polities", () =>
         HttpResponse.json({
           content: [
             {
               constitutionVersion: 1,
-              createdAt: "12",
-              id: "not-a-uuid",
+              createdAt,
+              id,
               institutionName: "Assembly",
               jurisdictionName: "Example",
               name: "Example",

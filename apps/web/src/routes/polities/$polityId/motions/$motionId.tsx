@@ -156,9 +156,14 @@ function MotionDetailRoute() {
     polityId,
   });
   const participationPercent = motion.participation
-    ? Math.round(
-        (motion.participation.cast / motion.participation.eligible) * 100,
-      )
+    ? motion.participation.eligible > 0
+      ? Math.min(
+          Math.round(
+            (motion.participation.cast / motion.participation.eligible) * 100,
+          ),
+          100,
+        )
+      : 0
     : undefined;
 
   return (

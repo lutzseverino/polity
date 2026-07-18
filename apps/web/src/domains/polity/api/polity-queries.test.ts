@@ -4,6 +4,7 @@ import {
   politiesQueryOptions,
   polityActionsQueryOptions,
   polityMotionQueryOptions,
+  polityOptionsQueryOptions,
   polityQueryOptions,
 } from "@/domains/polity/api/polity-queries";
 
@@ -21,6 +22,7 @@ describe("polity queries", () => {
         motionId: "motion-1",
         polityId: "polity-1",
       }).queryKey,
+      polityOptionsQueryOptions({ locale: "en" }).queryKey,
     ];
     const spanish = [
       politiesQueryOptions({ locale: "es" }).queryKey,
@@ -34,6 +36,7 @@ describe("polity queries", () => {
         motionId: "motion-1",
         polityId: "polity-1",
       }).queryKey,
+      polityOptionsQueryOptions({ locale: "es" }).queryKey,
     ];
 
     expect(english).not.toEqual(spanish);

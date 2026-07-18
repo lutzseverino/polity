@@ -8,8 +8,8 @@ import {
   getPolity,
   getPolityActions,
   getPolityMotion,
+  listAllPolities,
   listPolities,
-  maximumPolityPageSize,
   normalizePolityPage,
   normalizePolityPageSize,
   normalizePolityQuery,
@@ -127,17 +127,13 @@ export function usePolityMotion(input: PolityMotionQuery) {
   return useSuspenseQuery(polityMotionQueryOptions(input));
 }
 
-function selectPolityOptions(
-  polities: Awaited<ReturnType<typeof listPolities>>,
-) {
-  return polities.content.map(({ id, name }) => ({ id, name }));
-}
-
 export function polityOptionsQueryOptions(input: LocalizedQuery) {
-  return {
-    ...politiesQueryOptions({ ...input, size: maximumPolityPageSize }),
-    select: selectPolityOptions,
-  };
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      listAllPolities({ acceptedLanguage: input.locale, signal }),
+    queryKey: ["polities", "options", { locale: input.locale }] as const,
+    select: (polities) => polities.map(({ id, name }) => ({ id, name })),
+  });
 }
 
 export function usePolityOptions(input: LocalizedQuery) {

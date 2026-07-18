@@ -19,7 +19,7 @@ import { ResourceNotFoundError } from "@/lib/resource-not-found";
 
 const defaultPolityPageSize = 50;
 const httpClient = createHttpClient();
-export const maximumPolityPageSize = 100;
+const maximumPolityPageSize = 100;
 
 type RequestOptions = Readonly<{
   acceptedLanguage: string;
@@ -145,7 +145,7 @@ function projectMotion(
       notice: `${procedure.minimumNoticeHours} hours`,
       threshold: thresholdLabel(procedure.threshold),
     },
-    ...(certification && recordEntry
+    ...(certification && recordEntry !== undefined
       ? {
           result: {
             no: certification.noCount ?? 0,
