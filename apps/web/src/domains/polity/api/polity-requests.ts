@@ -257,7 +257,6 @@ function projectOfficialRecordEntry(
     ...(entry.motionId ? { motionId: entry.motionId } : {}),
     occurredAtLabel: formatDateTime(entry.occurredAt, locale),
     title: entry.title,
-    type: entry.type,
   };
 }
 

@@ -64,4 +64,18 @@ describe("polity transport contract", () => {
       }),
     ).toThrow("Invalid official record response.");
   });
+
+  it("rejects inconsistent page totals before aggregate reads can truncate", () => {
+    expect(() =>
+      parseOfficialRecordPage({
+        content: [],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 101,
+          totalPages: 1,
+        },
+      }),
+    ).toThrow("Invalid official record page response.");
+  });
 });

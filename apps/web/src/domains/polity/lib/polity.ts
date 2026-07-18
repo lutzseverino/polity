@@ -127,5 +127,4 @@ export type PolityOfficialRecordEntry = Readonly<{
   motionId?: string;
   occurredAtLabel: string;
   title: string;
-  type: string;
 }>;

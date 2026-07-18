@@ -123,7 +123,6 @@ export type OfficialRecordResponse = Readonly<{
   motionId?: string;
   occurredAt: string;
   title: string;
-  type: string;
 }>;
 
 const effectTypes = [
@@ -135,28 +134,6 @@ const effectTypes = [
   "grant_appeal",
   "vacate_office_term",
   "void_official_act",
-] as const;
-
-const officialRecordTypes = [
-  "polity_founded",
-  "constitution_ratified",
-  "member_invited",
-  "member_admitted",
-  "member_resigned",
-  "motion_introduced",
-  "candidacy_responded",
-  "vote_cast",
-  "motion_certified",
-  "resolution_adopted",
-  "office_assigned",
-  "office_elected",
-  "office_term_vacated",
-  "sanction_applied",
-  "appeal_granted",
-  "official_act_voided",
-  "constitution_amended",
-  "polity_disbanded",
-  "motion_rejected",
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -282,14 +259,21 @@ function parsePage<Response, Product>(
   const response = requiredRecord(value, message);
   const page = requiredRecord(response.page, message);
   if (!Array.isArray(response.content)) throw new Error(message);
+  const number = requiredInteger(page.number, 0, message);
+  const size = requiredInteger(page.size, 1, message);
+  const totalElements = requiredInteger(page.totalElements, 0, message);
+  const totalPages = requiredInteger(page.totalPages, 0, message);
+  const expectedTotalPages =
+    totalElements === 0 ? 0 : Math.ceil(totalElements / size);
+  if (totalPages !== expectedTotalPages) throw new Error(message);
 
   return {
     content: response.content.map(parseItem).map(project),
     page: {
-      number: requiredInteger(page.number, 0, message),
-      size: requiredInteger(page.size, 1, message),
-      totalElements: requiredInteger(page.totalElements, 0, message),
-      totalPages: requiredInteger(page.totalPages, 0, message),
+      number,
+      size,
+      totalElements,
+      totalPages,
     },
   };
 }
@@ -610,7 +594,6 @@ export function parseOfficialRecordPage(value: unknown) {
         : { motionId: requiredUuid(item.motionId, message) }),
       occurredAt: requiredDateTime(item.occurredAt, message),
       title: requiredString(item.title, message),
-      type: enumValue(item.type, officialRecordTypes, message),
     };
   };
   return parsePage(
