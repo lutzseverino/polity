@@ -337,4 +337,37 @@ describe("polity requests", () => {
       getPolityOfficialRecord(uuid(1), { acceptedLanguage: "en" }),
     ).resolves.toHaveLength(101);
   });
+
+  it("rejects a short later record page instead of silently truncating", async () => {
+    const records = Array.from({ length: 100 }, (_, index) => ({
+      actorName: "Member",
+      body: "Record body",
+      constitutionVersion: 1,
+      entryNumber: index + 1,
+      id: uuid(index + 501),
+      occurredAt: "2026-01-01T00:00:00.000Z",
+      title: `Record ${index + 1}`,
+      type: "motion_introduced",
+    }));
+    apiMockServer.use(
+      http.get("/api/v1/polities/:polityId/record", ({ request }) => {
+        const pageNumber = Number(
+          new URL(request.url).searchParams.get("page") ?? 0,
+        );
+        return HttpResponse.json({
+          content: pageNumber === 0 ? records : [],
+          page: {
+            number: pageNumber,
+            size: 100,
+            totalElements: 101,
+            totalPages: 2,
+          },
+        });
+      }),
+    );
+
+    await expect(
+      getPolityOfficialRecord(uuid(1), { acceptedLanguage: "en" }),
+    ).rejects.toThrow("Invalid official record page response.");
+  });
 });

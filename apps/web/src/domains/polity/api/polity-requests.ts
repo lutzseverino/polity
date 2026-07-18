@@ -260,6 +260,27 @@ function projectOfficialRecordEntry(
   };
 }
 
+function flattenCompletePageSet<Item>(
+  pages: readonly PageResult<Item>[],
+  message: string,
+) {
+  const firstPage = pages[0];
+  if (!firstPage) throw new Error(message);
+  const metadata = firstPage.page;
+  const stablePageSet = pages.every(
+    (page, index) =>
+      page.page.number === index &&
+      page.page.size === metadata.size &&
+      page.page.totalElements === metadata.totalElements &&
+      page.page.totalPages === metadata.totalPages,
+  );
+  const content = pages.flatMap((page) => page.content);
+  if (!stablePageSet || content.length !== metadata.totalElements) {
+    throw new Error(message);
+  }
+  return content;
+}
+
 async function requestUnknown(
   path: string,
   { acceptedLanguage, signal }: RequestOptions,
@@ -312,10 +333,10 @@ export async function listAllPolities(options: RequestOptions) {
         }),
     ),
   );
-  return [
-    ...firstPage.content,
-    ...remainingPages.flatMap(({ content }) => content),
-  ];
+  return flattenCompletePageSet(
+    [firstPage, ...remainingPages],
+    "Invalid polity page response.",
+  );
 }
 
 async function requestAllMotionResponses(
@@ -341,10 +362,10 @@ async function requestAllMotionResponses(
         ),
     ),
   );
-  return [
-    ...firstPage.content,
-    ...remainingPages.flatMap(({ content }) => content),
-  ];
+  return flattenCompletePageSet(
+    [firstPage, ...remainingPages],
+    "Invalid motion page response.",
+  );
 }
 
 async function requestAllOfficialRecordEntries(
@@ -370,10 +391,10 @@ async function requestAllOfficialRecordEntries(
         ),
     ),
   );
-  return [
-    ...firstPage.content,
-    ...remainingPages.flatMap(({ content }) => content),
-  ];
+  return flattenCompletePageSet(
+    [firstPage, ...remainingPages],
+    "Invalid official record page response.",
+  );
 }
 
 async function getWorkspaceResources(
