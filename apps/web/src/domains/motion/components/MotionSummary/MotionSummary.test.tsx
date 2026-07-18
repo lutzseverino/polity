@@ -14,6 +14,7 @@ describe("MotionSummary", () => {
         <MotionSummary
           action={<span>Open motion</span>}
           motion={{
+            actionAvailability: { available: true },
             actionKind: "vote",
             body: "Approve the shared meal budget.",
             category: "Resolution",

@@ -117,6 +117,26 @@ function MotionDecision({
     return <MotionResultDetails motion={motion} polityId={polityId} />;
   }
 
+  if (!motion.actionAvailability.available) {
+    return (
+      <AppAlert>
+        <Info aria-hidden="true" />
+        <AppAlertTitle>
+          {motion.actionKind === "candidacy" ? (
+            <Trans>Response recorded</Trans>
+          ) : (
+            <Trans>No action needed right now</Trans>
+          )}
+        </AppAlertTitle>
+        <AppAlertDescription>
+          {motion.actionAvailability.reasonMessage ?? (
+            <Trans>This motion isn’t waiting on you.</Trans>
+          )}
+        </AppAlertDescription>
+      </AppAlert>
+    );
+  }
+
   return motion.actionKind === "vote" ? (
     <CastMotionVoteWorkflow motion={motion} polityId={polityId} />
   ) : (
@@ -135,9 +155,16 @@ function MotionDetailRoute() {
     motionId,
     polityId,
   });
-  const participationPercent = Math.round(
-    (motion.participation.cast / motion.participation.eligible) * 100,
-  );
+  const participationPercent = motion.participation
+    ? motion.participation.eligible > 0
+      ? Math.min(
+          Math.round(
+            (motion.participation.cast / motion.participation.eligible) * 100,
+          ),
+          100,
+        )
+      : 0
+    : undefined;
 
   return (
     <div className="space-y-5">
@@ -192,37 +219,42 @@ function MotionDetailRoute() {
         </div>
 
         <aside className="space-y-4" aria-label={t`Motion procedure`}>
-          <AppCard size="sm">
-            <AppCardHeader>
-              <AppCardTitle>
-                <Trans>Participation</Trans>
-              </AppCardTitle>
-              <AppCardDescription>
-                <Trans>
-                  {motion.participation.cast} of {motion.participation.eligible}{" "}
-                  eligible members have participated.
-                </Trans>
-              </AppCardDescription>
-            </AppCardHeader>
-            <AppCardContent>
-              <AppProgress value={participationPercent}>
-                <AppProgressLabel>
-                  <Trans>Quorum</Trans>
-                </AppProgressLabel>
-                <AppText
-                  as="span"
-                  className="ml-auto tabular-nums"
-                  variant="supporting"
-                >
-                  {motion.participation.quorumMet ? (
-                    <Trans>Met</Trans>
-                  ) : (
-                    <Trans>{motion.participation.quorumRequired} needed</Trans>
-                  )}
-                </AppText>
-              </AppProgress>
-            </AppCardContent>
-          </AppCard>
+          {motion.participation ? (
+            <AppCard size="sm">
+              <AppCardHeader>
+                <AppCardTitle>
+                  <Trans>Participation</Trans>
+                </AppCardTitle>
+                <AppCardDescription>
+                  <Trans>
+                    {motion.participation.cast} of{" "}
+                    {motion.participation.eligible} eligible members have
+                    participated.
+                  </Trans>
+                </AppCardDescription>
+              </AppCardHeader>
+              <AppCardContent>
+                <AppProgress value={participationPercent ?? null}>
+                  <AppProgressLabel>
+                    <Trans>Quorum</Trans>
+                  </AppProgressLabel>
+                  <AppText
+                    as="span"
+                    className="ml-auto tabular-nums"
+                    variant="supporting"
+                  >
+                    {motion.participation.quorumMet ? (
+                      <Trans>Met</Trans>
+                    ) : (
+                      <Trans>
+                        {motion.participation.quorumRequired} needed
+                      </Trans>
+                    )}
+                  </AppText>
+                </AppProgress>
+              </AppCardContent>
+            </AppCard>
+          ) : null}
 
           <AppCard size="sm">
             <AppCardHeader>

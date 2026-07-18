@@ -29,8 +29,8 @@ export function CastMotionVoteWorkflow({
   motion,
   polityId,
 }: CastMotionVoteWorkflowProps) {
-  const { t } = useLingui();
-  const castMotionVote = useCastMotionVote();
+  const { i18n, t } = useLingui();
+  const castMotionVote = useCastMotionVote(i18n.locale);
   const voteChoices: readonly Readonly<{
     description: string;
     label: string;
@@ -62,8 +62,8 @@ export function CastMotionVoteWorkflow({
     castMotionVote.mutate(
       { choice: selectedVote, motionId: motion.id, polityId },
       {
-        onSuccess: ({ choice }) => {
-          setRecordedVote(choice);
+        onSuccess: (response) => {
+          setRecordedVote(response.currentVote);
           setShowConfirmation(true);
         },
       },

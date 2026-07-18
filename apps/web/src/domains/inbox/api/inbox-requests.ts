@@ -1,6 +1,9 @@
-import { listInboxItemFixtures } from "@/domains/inbox/lib/inbox-fixtures";
-import { projectMembershipInvitationToInboxTask } from "@/domains/inbox/lib/inbox-projectors";
+import {
+  projectMembershipInvitationToInboxTask,
+  projectMotionToInboxItem,
+} from "@/domains/inbox/lib/inbox-projectors";
 import { listMembershipInvitations } from "@/domains/membership";
+import { listAllPolities, listPolityMotionResponses } from "@/domains/polity";
 
 type RequestOptions = Readonly<{
   acceptedLanguage: string;
@@ -13,13 +16,27 @@ export async function listInboxItems({
 }: RequestOptions) {
   signal?.throwIfAborted();
 
-  const invitations = await listMembershipInvitations({
-    acceptedLanguage,
-    signal,
-  });
+  const [invitations, polities] = await Promise.all([
+    listMembershipInvitations({ acceptedLanguage, signal }),
+    listAllPolities({ acceptedLanguage, signal }),
+  ]);
+  const motionPages = await Promise.all(
+    polities.map(async (polity) => ({
+      motions: await listPolityMotionResponses(polity.id, {
+        acceptedLanguage,
+        signal,
+      }),
+      polity,
+    })),
+  );
 
   return [
-    ...listInboxItemFixtures(),
+    ...motionPages.flatMap(({ motions, polity }) =>
+      motions.flatMap((motion) => {
+        const item = projectMotionToInboxItem(motion, polity, acceptedLanguage);
+        return item ? [item] : [];
+      }),
+    ),
     ...invitations.map(projectMembershipInvitationToInboxTask),
   ];
 }

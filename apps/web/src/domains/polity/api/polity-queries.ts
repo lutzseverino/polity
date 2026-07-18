@@ -8,8 +8,8 @@ import {
   getPolity,
   getPolityActions,
   getPolityMotion,
+  listAllPolities,
   listPolities,
-  maximumPolityPageSize,
   normalizePolityPage,
   normalizePolityPageSize,
   normalizePolityQuery,
@@ -57,7 +57,11 @@ const polityQueryKeys = {
 
 export function polityActionsQueryOptions(input: PolityQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => getPolityActions(input.polityId, { signal }),
+    queryFn: ({ signal }) =>
+      getPolityActions(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.actions(input),
   });
 }
@@ -75,6 +79,7 @@ export function politiesQueryOptions(input: PolityListQuery) {
   return queryOptions({
     queryFn: ({ signal }) =>
       listPolities({
+        acceptedLanguage: input.locale,
         page: normalizedInput.page,
         query: normalizedInput.query,
         signal,
@@ -86,7 +91,11 @@ export function politiesQueryOptions(input: PolityListQuery) {
 
 export function polityQueryOptions(input: PolityQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => getPolity(input.polityId, { signal }),
+    queryFn: ({ signal }) =>
+      getPolity(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.detail(input),
   });
 }
@@ -94,7 +103,10 @@ export function polityQueryOptions(input: PolityQuery) {
 export function polityMotionQueryOptions(input: PolityMotionQuery) {
   return queryOptions({
     queryFn: ({ signal }) =>
-      getPolityMotion(input.polityId, input.motionId, { signal }),
+      getPolityMotion(input.polityId, input.motionId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.motion(input),
   });
 }
@@ -115,17 +127,13 @@ export function usePolityMotion(input: PolityMotionQuery) {
   return useSuspenseQuery(polityMotionQueryOptions(input));
 }
 
-function selectPolityOptions(
-  polities: Awaited<ReturnType<typeof listPolities>>,
-) {
-  return polities.content.map(({ id, name }) => ({ id, name }));
-}
-
 export function polityOptionsQueryOptions(input: LocalizedQuery) {
-  return {
-    ...politiesQueryOptions({ ...input, size: maximumPolityPageSize }),
-    select: selectPolityOptions,
-  };
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      listAllPolities({ acceptedLanguage: input.locale, signal }),
+    queryKey: ["polities", "options", { locale: input.locale }] as const,
+    select: (polities) => polities.map(({ id, name }) => ({ id, name })),
+  });
 }
 
 export function usePolityOptions(input: LocalizedQuery) {

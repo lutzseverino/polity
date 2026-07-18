@@ -52,3 +52,7 @@ export function createHttpClient({
     },
   };
 }
+
+export function hasHttpResponseStatus(error: unknown, status: number) {
+  return axios.isAxiosError(error) && error.response?.status === status;
+}

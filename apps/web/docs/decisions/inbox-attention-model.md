@@ -58,8 +58,8 @@ constitutional eligibility or action validity.
 - Inbox rows remain visually consistent while consequential actions retain specialized feature surfaces.
 - Read persistence, cross-service aggregation, ranking, pagination, and retention remain explicit follow-up
   contracts instead of behavior hidden in components.
-- The temporary fixture adapters still reset on reload; real persistence arrives when their existing request
-  seams are mapped to HTTP.
+- Development scenario state resets on reload. Live persistence belongs to the service behind the same HTTP
+  requests used by the application.
 
 ## Alternatives Considered
 

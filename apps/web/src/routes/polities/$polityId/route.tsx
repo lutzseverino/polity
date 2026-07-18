@@ -127,6 +127,11 @@ function PolityWorkspaceRoute() {
                   <Trans>Forming</Trans>
                 </AppBadge>
               ) : null}
+              {polity.readiness === "unavailable" ? (
+                <AppBadge variant="outline">
+                  <Trans>Unavailable</Trans>
+                </AppBadge>
+              ) : null}
               <AppBadge variant="outline">
                 {polity.visibility === "public" ? (
                   <Trans>Public</Trans>
@@ -146,7 +151,6 @@ function PolityWorkspaceRoute() {
               {polity.name}
             </AppText>
             <AppText className="mt-2" variant="supporting">
-              {polity.role} ·{" "}
               <Plural
                 value={polity.memberCount}
                 one="# member"

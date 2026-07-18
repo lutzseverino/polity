@@ -2,6 +2,7 @@ export {
   inboxItemsQueryOptions,
   useInboxItems,
 } from "@/domains/inbox/api/inbox-queries";
+export { listInboxItems } from "@/domains/inbox/api/inbox-requests";
 export {
   InboxItemSummary,
   type RenderInboxItemLink,
