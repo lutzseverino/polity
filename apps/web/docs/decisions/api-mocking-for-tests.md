@@ -42,7 +42,16 @@ between real and mock request implementations.
 The shared browser scenarios cover current-user invitations and the governing journey. The latter provides
 transport-shaped polity directory, workspace, action, government, motion, record, vote, and candidacy
 resources. Vote and candidacy handlers update their in-memory motion responses, so subsequent reads observe
-the recorded choice. Future scenarios extend this boundary; application request code remains unchanged.
+the recorded choice. A separate stateful session scenario covers signed-out, signed-in, expired, revoked,
+invalid-credential, refresh, and logout behavior through the Cardo URLs. Future scenarios extend this
+boundary; application request code remains unchanged.
+
+Service-worker mocked responses cannot write browser cookies. Browser mock installation therefore
+materializes the development scenario's readable CSRF cookie before the worker starts. This remains inside
+`src/mocks/`; live and production startup depend exclusively on Cardo's `Set-Cookie` response. Because the
+service-worker request view may also omit the forbidden `Cookie` header, browser handlers require the known
+scenario CSRF header and compare the cookie too whenever that header is visible. Shared transport tests
+separately prove that application code derives the header from the readable cookie.
 
 ## Consequences
 

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PolitiesIndexRouteImport } from './routes/polities/index'
 import { Route as MeIndexRouteImport } from './routes/me/index'
@@ -26,6 +27,11 @@ import { Route as PolitiesPolitySlugGovernmentRouteImport } from './routes/polit
 import { Route as PolitiesPolitySlugMotionsIndexRouteImport } from './routes/polities/$politySlug/motions/index'
 import { Route as PolitiesPolitySlugMotionsMotionIdRouteImport } from './routes/polities/$politySlug/motions/$motionId'
 
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -115,6 +121,7 @@ const PolitiesPolitySlugMotionsMotionIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/polities/$politySlug': typeof PolitiesPolitySlugRouteRouteWithChildren
   '/actions/new': typeof ActionsNewRoute
   '/polities/new': typeof PolitiesNewRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/actions/new': typeof ActionsNewRoute
   '/polities/new': typeof PolitiesNewRoute
   '/explore': typeof ExploreIndexRoute
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/polities/$politySlug': typeof PolitiesPolitySlugRouteRouteWithChildren
   '/actions/new': typeof ActionsNewRoute
   '/polities/new': typeof PolitiesNewRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/sign-in'
     | '/polities/$politySlug'
     | '/actions/new'
     | '/polities/new'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sign-in'
     | '/actions/new'
     | '/polities/new'
     | '/explore'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/sign-in'
     | '/polities/$politySlug'
     | '/actions/new'
     | '/polities/new'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SignInRoute: typeof SignInRoute
   PolitiesPolitySlugRouteRoute: typeof PolitiesPolitySlugRouteRouteWithChildren
   ActionsNewRoute: typeof ActionsNewRoute
   PolitiesNewRoute: typeof PolitiesNewRoute
@@ -239,6 +252,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -379,6 +399,7 @@ const PolitiesPolitySlugRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SignInRoute: SignInRoute,
   PolitiesPolitySlugRouteRoute: PolitiesPolitySlugRouteRouteWithChildren,
   ActionsNewRoute: ActionsNewRoute,
   PolitiesNewRoute: PolitiesNewRoute,

@@ -7,15 +7,24 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { HttpResponse, http } from "msw";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { AppProviders } from "@/app/providers/AppProviders";
 import { createAppRouter } from "@/app/router";
 import { shellSectionDefinitions } from "@/app/shell/shell-route-context";
 import { membershipInvitationScenario } from "@/mocks/scenarios/membership-invitations";
+import { createSessionScenarioHandlers } from "@/mocks/scenarios/session";
+import { setTestCookie } from "@/test/cookies";
+import { apiMockServer } from "@/test/mocks/server";
+
+afterEach(() => {
+  setTestCookie("cardo.csrf=; Max-Age=0; Path=/");
+});
 
 const supperClubInvitationId =
   membershipInvitationScenario.invitationIds.supperClub;
+const completedInvitationToken = membershipInvitationScenario.tokens.completed;
 const supperClubInvitationToken =
   membershipInvitationScenario.tokens.supperClub;
 
@@ -38,6 +47,210 @@ const rootDestinationPaths = Object.values(shellSectionDefinitions).map(
 );
 
 describe("first governing journey", () => {
+  it("renders public invitation onboarding without session or protected reads", async () => {
+    let protectedReads = 0;
+    apiMockServer.use(
+      http.get("/api/v1/identity/sessions/current", () => {
+        protectedReads += 1;
+        return HttpResponse.json({}, { status: 401 });
+      }),
+      http.get("/api/v1/invitations", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
+      http.get("/api/v1/polities", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter(
+      `/polities/invitations/${supperClubInvitationToken}`,
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Join Sunday Supper Club" }),
+    ).toBeInTheDocument();
+    expect(protectedReads).toBe(0);
+    expect(
+      screen.queryByRole("navigation", { name: "Primary Navigation" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("redirects a protected destination to sign in and preserves it", async () => {
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter("/inbox?category=updates");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/sign-in");
+    expect(router.state.location.search).toEqual({
+      returnTo: "/inbox?category=updates",
+    });
+  });
+
+  it("signs in and resumes a validated local destination", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter("/sign-in?returnTo=%2Finbox");
+
+    renderRouter(router);
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Email" }),
+      "member@example.com",
+    );
+    await user.type(screen.getByLabelText("Password"), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Inbox" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/inbox");
+  });
+
+  it("resumes the inbox after invitation signup and sign in", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter(
+      `/polities/invitations/${completedInvitationToken}`,
+    );
+
+    renderRouter(router);
+
+    await user.click(await screen.findByRole("button", { name: "Sign up" }));
+    const signInLink = await screen.findByRole("link", {
+      name: "Log in to review invitation",
+    });
+    expect(signInLink).toHaveAttribute("href", "/sign-in?returnTo=%2Finbox");
+    await user.click(signInLink);
+    await user.type(
+      await screen.findByRole("textbox", { name: "Email" }),
+      "member@example.com",
+    );
+    await user.type(screen.getByLabelText("Password"), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Inbox" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/inbox");
+  });
+
+  it("rejects external return destinations", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter(
+      "/sign-in?returnTo=https%3A%2F%2Fattacker.test%2Fsteal",
+    );
+
+    renderRouter(router);
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Email" }),
+      "member@example.com",
+    );
+    await user.type(screen.getByLabelText("Password"), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Polities" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/polities");
+  });
+
+  it("shows a stable invalid-credentials error", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter("/sign-in");
+
+    renderRouter(router);
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Email" }),
+      "member@example.com",
+    );
+    await user.type(screen.getByLabelText("Password"), "wrong-password");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByText("Email or password not recognized"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("invalid_credentials")).not.toBeInTheDocument();
+  });
+
+  it("signs out, clears protected state, and returns to a public route", async () => {
+    const user = userEvent.setup();
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(...createSessionScenarioHandlers());
+    const router = createTestRouter("/me");
+
+    renderRouter(router);
+
+    expect(await screen.findByText("Mira Chen")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/sign-in");
+  });
+
+  it("transitions to signed out after a terminal protected read", async () => {
+    apiMockServer.use(
+      http.get("/api/v1/polities", () =>
+        HttpResponse.json({}, { status: 401 }),
+      ),
+    );
+    const router = createTestRouter("/polities");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/sign-in");
+    expect(router.state.location.search).toEqual({ returnTo: "/polities" });
+  });
+
+  it("redirects when a child-route read becomes terminally unauthorized", async () => {
+    apiMockServer.use(
+      http.get("/api/v1/polities/11111111-1111-4111-8111-111111111111", () =>
+        HttpResponse.json({}, { status: 401 }),
+      ),
+    );
+    const router = createTestRouter(
+      "/polities/11111111-1111-4111-8111-111111111111",
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.search).toEqual({
+      returnTo: "/polities/11111111-1111-4111-8111-111111111111",
+    });
+  });
   it.each([
     ["wide", "/polities"],
     ["standard", "/home"],

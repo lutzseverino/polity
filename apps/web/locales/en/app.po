@@ -83,7 +83,7 @@ msgstr "Primary Navigation"
 msgid "Skip to main content"
 msgstr "Skip to main content"
 
-#: src/app/shell/RouteErrorPage.tsx:22
+#: src/app/shell/RouteErrorPage.tsx:47
 msgid "Something went wrong while opening this page."
 msgstr "Something went wrong while opening this page."
 
@@ -91,11 +91,11 @@ msgstr "Something went wrong while opening this page."
 msgid "The destination you requested does not exist."
 msgstr "The destination you requested does not exist."
 
-#: src/app/shell/RouteErrorPage.tsx:26
+#: src/app/shell/RouteErrorPage.tsx:51
 #: src/app/shell/RouteNotFoundPage.tsx:25
 msgid "View my polities"
 msgstr "View my polities"
 
-#: src/app/shell/RouteErrorPage.tsx:19
+#: src/app/shell/RouteErrorPage.tsx:44
 msgid "We couldn’t open that page"
 msgstr "We couldn’t open that page"

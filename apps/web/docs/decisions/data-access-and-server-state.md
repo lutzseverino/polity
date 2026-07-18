@@ -8,7 +8,7 @@ Accepted
 
 The web client needs one predictable path from product code to the Polity service. Governing reads and
 actions use the service's HTTP resources even when browser development is backed by an in-memory MSW
-scenario. Authentication remains a separate integration concern.
+scenario. Cardo-backed browser sessions now share that transport boundary.
 The service can localize response text, so the active locale affects both requests and cache identity.
 
 TanStack Router already owns route loading and preloading. Adding TanStack Query should preserve that early
@@ -18,8 +18,9 @@ loading behavior while giving domains shared caching and features mutation orche
 
 Use `src/api/` for shared transport mechanics. The Axios client factory owns the service base URL,
 requires an accepted language for every request, applies `Accept-Language`, and returns response data rather
-than exposing `AxiosResponse` to product code. Authentication and normalized error policy can be added at
-this boundary when their contracts are available.
+than exposing `AxiosResponse` to product code. The client echoes Cardo's readable CSRF cookie for unsafe
+requests, preserves caller headers, and normalizes session-relevant unauthorized and forbidden responses
+without exposing Axios to product UI.
 
 Keep plain asynchronous operations with their product owner:
 
@@ -49,6 +50,8 @@ freshness requirements.
   not create an endpoint waterfall.
 - Cross-cutting query behavior belongs in `QueryClient`, while transport behavior belongs in the HTTP
   client; neither requires a generic hook API.
+- Session-dependent queries declare that dependency in query metadata. Session transitions remove those
+  entries without discarding public invitation-token state.
 - The source architecture check prevents Axios and TanStack Query from spreading outside their boundaries.
 
 ## Alternatives Considered
@@ -59,5 +62,6 @@ freshness requirements.
   shell and multiple routes and will need mutation invalidation.
 - Hooks that call Axios directly: rejected because transport calls would become React-only and unavailable
   to loaders, tests, and other non-component consumers.
-- Waiting for authentication before using HTTP: rejected because it would keep product code coupled to a
-  temporary data source. Session credentials can be attached later at the shared client boundary.
+- Waiting for authentication before using HTTP: rejected because it would have kept product code coupled to
+  a temporary data source. Cardo session mechanics were later added at the shared boundary without changing
+  product request modules.

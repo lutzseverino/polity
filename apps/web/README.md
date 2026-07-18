@@ -34,6 +34,11 @@ routes to exercise its completion states after selecting **Sign up**:
 - `/polities/invitations/invitation-failed` fails once, then progresses normally after **Try again**.
 - `/inbox` lists pending invitations; accepting one removes it from subsequent mock list responses.
 
+The development session scenario starts signed in as `member@example.com`. Sign out from `/me`, then use
+`member@example.com` and `correct-password` at `/sign-in` to exercise restoration, sign-in, and sign-out.
+The scenario keeps access and refresh credentials server-side and exposes only the readable Cardo CSRF
+cookie to application code.
+
 Browser mock ownership and extension conventions are recorded in
 [API mocking](docs/decisions/api-mocking-for-tests.md).
 
@@ -42,6 +47,7 @@ Browser mock ownership and extension conventions are recorded in
 - `src/app/` owns providers, router construction, i18n runtime, and the application shell.
 - `src/routes/` mirrors the URL tree and owns route params, search state, loaders, and page composition.
 - `src/domains/` owns reusable product nouns such as polities, motions, memberships, and inbox items.
+- `src/domains/session/` owns the validated current principal, restoration, and session query state.
 - `src/features/` owns reusable user actions such as launching an action, voting, or accepting an invitation.
 - `src/components/app/` owns owner-neutral product components and shadcn wrappers.
 - `src/components/ui/` is registry-managed shadcn source. It is strictly read-only.
@@ -79,6 +85,9 @@ The authoritative ownership and import rules are in
 
 - `src/api/` owns shared Axios mechanics; domains own reusable read operations and features own user-action
   requests.
+- The shared client echoes Cardo's readable CSRF cookie on unsafe requests and normalizes terminal session
+  responses. The root router restores the session before protected loaders run; sign-in and invitation-token
+  onboarding remain public.
 - Owner-local TanStack query and mutation options are the reusable convention. Semantic hooks stay thin and
   no application query wrapper is introduced.
 - Route loaders ensure critical query data before rendering, and components subscribe with the matching

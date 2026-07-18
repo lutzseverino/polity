@@ -71,6 +71,7 @@ const polityQueryKeys = {
 
 export function polityActionsQueryOptions(input: PolityQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getPolityActions(input.polityId, {
         acceptedLanguage: input.locale,
@@ -91,6 +92,7 @@ export function politiesQueryOptions(input: PolityListQuery) {
   };
 
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       listPolities({
         acceptedLanguage: input.locale,
@@ -105,6 +107,7 @@ export function politiesQueryOptions(input: PolityListQuery) {
 
 export function polityQueryOptions(input: PolityQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getPolity(input.polityId, {
         acceptedLanguage: input.locale,
@@ -127,6 +130,7 @@ export function polityReferenceQueryOptions(input: PolityReferenceQuery) {
 
 export function polityMotionQueryOptions(input: PolityMotionQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getPolityMotion(input.polityId, input.motionId, {
         acceptedLanguage: input.locale,
@@ -138,6 +142,7 @@ export function polityMotionQueryOptions(input: PolityMotionQuery) {
 
 export function polityGovernmentQueryOptions(input: PolityQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getPolityGovernment(input.polityId, {
         acceptedLanguage: input.locale,
@@ -149,6 +154,7 @@ export function polityGovernmentQueryOptions(input: PolityQuery) {
 
 export function polityRecordQueryOptions(input: PolityQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       getPolityOfficialRecord(input.polityId, {
         acceptedLanguage: input.locale,
@@ -184,6 +190,7 @@ export function usePolityRecord(input: PolityQuery) {
 
 export function polityOptionsQueryOptions(input: LocalizedQuery) {
   return queryOptions({
+    meta: { requiresSession: true },
     queryFn: ({ signal }) =>
       listAllPolities({ acceptedLanguage: input.locale, signal }),
     queryKey: ["polities", "options", { locale: input.locale }] as const,
