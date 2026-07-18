@@ -7,6 +7,7 @@ import {
   getPolityGovernment,
   getPolityMotion,
   getPolityOfficialRecord,
+  getPolityReference,
   listAllPolities,
   listPolities,
   listPolityMotionResponses,
@@ -62,6 +63,28 @@ describe("polity requests", () => {
       totalElements: 1,
       totalPages: 1,
     });
+  });
+
+  it("resolves canonical slugs and compatibility UUIDs to the same polity", async () => {
+    const [bySlug, byId] = await Promise.all([
+      getPolityReference("the-thursday-assembly", {
+        acceptedLanguage: "en",
+      }),
+      getPolityReference("11111111-1111-4111-8111-111111111111", {
+        acceptedLanguage: "en",
+      }),
+    ]);
+
+    expect(bySlug).toEqual(byId);
+    expect(bySlug.slug).toBe("the-thursday-assembly");
+  });
+
+  it("rejects malformed polity references before requesting them", async () => {
+    await expect(
+      getPolityReference("Not a route reference", {
+        acceptedLanguage: "en",
+      }),
+    ).rejects.toMatchObject({ name: "ResourceNotFoundError" });
   });
 
   it("returns backend-shaped availability for the selected polity", async () => {
@@ -225,6 +248,7 @@ describe("polity requests", () => {
               institutionName: "Assembly",
               jurisdictionName: "Example",
               name: "Example",
+              slug: "example",
               status: "active",
               visibility: "public",
             },
@@ -252,6 +276,7 @@ describe("polity requests", () => {
       institutionName: "Assembly",
       jurisdictionName: `Polity ${index + 1}`,
       name: `Polity ${index + 1}`,
+      slug: `polity-${index + 1}`,
       status: "active",
       visibility: "public",
     }));

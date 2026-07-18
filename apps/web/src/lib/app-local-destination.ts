@@ -5,7 +5,9 @@ export function readAppLocalDestination(value: unknown) {
     const base = new URL("https://polity.local");
     const destination = new URL(value, base);
     if (destination.origin !== base.origin) return undefined;
-    if (/^\/sign-in\/?$/.test(destination.pathname)) return undefined;
+    if (destination.pathname.replace(/\/+$/, "") === "/sign-in") {
+      return undefined;
+    }
     return `${destination.pathname}${destination.search}${destination.hash}`;
   } catch {
     return undefined;

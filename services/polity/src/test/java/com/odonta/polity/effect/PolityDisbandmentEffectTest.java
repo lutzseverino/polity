@@ -48,7 +48,7 @@ class PolityDisbandmentEffectTest {
     var actor = member(polityId, "Actor");
     var constitution = constitution(polityId);
     var motion = motion(polityId, actor, constitution, EffectType.DISBAND_POLITY);
-    Polity polity = new Polity("Commons", PolityVisibility.PRIVATE, UUID.randomUUID());
+    Polity polity = new Polity("Commons", "commons", PolityVisibility.PRIVATE, UUID.randomUUID());
     org.springframework.test.util.ReflectionTestUtils.setField(polity, "id", polityId);
     OfficeTerm term =
         new OfficeTerm(

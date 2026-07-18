@@ -63,6 +63,7 @@ export type Polity = Readonly<{
   readiness: "forming" | "ready" | "unavailable";
   readinessMessage: string;
   recentActivity: readonly OfficialActivity[];
+  slug: string;
   status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;
@@ -72,6 +73,7 @@ export type PolitySummary = Readonly<{
   id: string;
   institutionName: string;
   name: string;
+  slug: string;
   status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;

@@ -676,7 +676,8 @@ class PolityActionAvailabilityServiceTest {
   }
 
   private Polity polity(UUID polityId, UUID founderUserId) {
-    Polity polity = new Polity("Pocket Republic", PolityVisibility.PRIVATE, founderUserId);
+    Polity polity =
+        new Polity("Pocket Republic", "pocket-republic", PolityVisibility.PRIVATE, founderUserId);
     ReflectionTestUtils.setField(polity, "id", polityId);
     return polity;
   }

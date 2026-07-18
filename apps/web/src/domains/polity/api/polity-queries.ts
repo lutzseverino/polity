@@ -10,6 +10,7 @@ import {
   getPolityGovernment,
   getPolityMotion,
   getPolityOfficialRecord,
+  getPolityReference,
   listAllPolities,
   listPolities,
   normalizePolityPage,
@@ -45,6 +46,11 @@ type PolityMotionQuery = PolityQuery &
     motionId: string;
   }>;
 
+type PolityReferenceQuery = LocalizedQuery &
+  Readonly<{
+    polityReference: string;
+  }>;
+
 const polityQueryKeys = {
   all: ["polities"] as const,
   detail: ({ locale, polityId }: PolityQuery) =>
@@ -59,6 +65,8 @@ const polityQueryKeys = {
     ["polities", "detail", polityId, "motions", motionId, { locale }] as const,
   record: ({ locale, polityId }: PolityQuery) =>
     ["polities", "detail", polityId, "record", { locale }] as const,
+  reference: ({ locale, polityReference }: PolityReferenceQuery) =>
+    ["polities", "reference", polityReference, { locale }] as const,
 };
 
 export function polityActionsQueryOptions(input: PolityQuery) {
@@ -106,6 +114,17 @@ export function polityQueryOptions(input: PolityQuery) {
         signal,
       }),
     queryKey: polityQueryKeys.detail(input),
+  });
+}
+
+export function polityReferenceQueryOptions(input: PolityReferenceQuery) {
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      getPolityReference(input.polityReference, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
+    queryKey: polityQueryKeys.reference(input),
   });
 }
 
@@ -175,7 +194,8 @@ export function polityOptionsQueryOptions(input: LocalizedQuery) {
     queryFn: ({ signal }) =>
       listAllPolities({ acceptedLanguage: input.locale, signal }),
     queryKey: ["polities", "options", { locale: input.locale }] as const,
-    select: (polities) => polities.map(({ id, name }) => ({ id, name })),
+    select: (polities) =>
+      polities.map(({ id, name, slug }) => ({ id, name, slug })),
   });
 }
 

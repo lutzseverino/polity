@@ -17,10 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 class PolityServiceTest {
+  private final PolityAccessPolicy access = mock(PolityAccessPolicy.class);
   private final PolityRepository polities = mock(PolityRepository.class);
   private final PolitySummaryResolver summaries = mock(PolitySummaryResolver.class);
-  private final PolityService service =
-      new PolityService(mock(PolityAccessPolicy.class), polities, summaries);
+  private final PolityService service = new PolityService(access, polities, summaries);
 
   @Test
   void listTrimsThePolityQueryBeforeApplyingPagination() {

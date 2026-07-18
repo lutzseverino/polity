@@ -16,7 +16,7 @@ const items: readonly InboxItem[] = [
     source: {
       kind: "motion-result",
       motionId: "result-1",
-      polityId: "polity-1",
+      politySlug: "thursday-assembly",
     },
     timeLabel: "Today",
     title: "Result available",
@@ -29,7 +29,7 @@ const items: readonly InboxItem[] = [
     source: {
       kind: "motion-vote",
       motionId: "vote-1",
-      polityId: "polity-1",
+      politySlug: "thursday-assembly",
     },
     timeLabel: "Today",
     title: "Vote now",

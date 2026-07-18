@@ -437,7 +437,7 @@ class GovernmentAssessmentResolverTest {
   }
 
   private Polity polity(UUID polityId) {
-    Polity polity = new Polity("Commons", PolityVisibility.PUBLIC, UUID.randomUUID());
+    Polity polity = new Polity("Commons", "commons", PolityVisibility.PUBLIC, UUID.randomUUID());
     ReflectionTestUtils.setField(polity, "id", polityId);
     return polity;
   }

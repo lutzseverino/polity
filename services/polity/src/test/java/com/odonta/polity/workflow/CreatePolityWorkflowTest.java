@@ -20,6 +20,7 @@ import com.odonta.polity.repository.OfficeTermRepository;
 import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.resolver.PolitySummaryResolver;
 import com.odonta.polity.service.OfficialRecordService;
+import com.odonta.polity.service.PolitySlugService;
 import com.odonta.polity.template.ConstitutionTemplateSeeder;
 import io.github.lutzseverino.cardo.authorization.grant.Grants;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
@@ -56,6 +57,7 @@ class CreatePolityWorkflowTest {
           mock(OfficialRecordService.class),
           new PolityGrantPlanner(),
           polities,
+          mock(PolitySlugService.class),
           mock(PolitySummaryResolver.class));
 
   @Test

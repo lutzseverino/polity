@@ -13,6 +13,7 @@ describe("app-local return destinations", () => {
     ["sign-in", undefined],
     ["/sign-in", undefined],
     ["/sign-in/", undefined],
+    ["/sign-in//", undefined],
   ])("normalizes %s", (value, expected) => {
     expect(readAppLocalDestination(value)).toBe(expected);
   });

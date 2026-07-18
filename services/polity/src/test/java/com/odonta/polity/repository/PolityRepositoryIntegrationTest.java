@@ -209,6 +209,9 @@ class PolityRepositoryIntegrationTest {
     assertThat(accessible)
         .extracting(PolityProjection::getId)
         .containsExactly(memberPolityId, publicPolityId);
+    assertThat(accessible)
+        .extracting(PolityProjection::getSlug)
+        .containsExactly("polity-" + memberPolityId, "polity-" + publicPolityId);
 
     assertThat(
             polities
@@ -333,7 +336,7 @@ class PolityRepositoryIntegrationTest {
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    assertThat(successfulVersions).containsExactly("1", "2", "3");
+    assertThat(successfulVersions).containsExactly("1", "2", "3", "4");
     assertThat(indexes)
         .containsOnlyKeys(
             "idx_sanctions_active_target",
@@ -347,12 +350,13 @@ class PolityRepositoryIntegrationTest {
     jdbc.update(
         """
         insert into public.polities
-          (id, founder_id, name, visibility, status, created_at, updated_at)
-        values (?, ?, ?, ?, 'ACTIVE', ?, ?)
+          (id, founder_id, name, slug, visibility, status, created_at, updated_at)
+        values (?, ?, ?, ?, ?, 'ACTIVE', ?, ?)
         """,
         id,
         founderId,
         name,
+        "polity-" + id,
         visibility,
         createdAt,
         createdAt);

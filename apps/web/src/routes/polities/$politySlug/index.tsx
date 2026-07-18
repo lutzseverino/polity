@@ -23,9 +23,9 @@ import {
   type ActionLauncherEmptyActionLinkProps,
 } from "@/features/launch-action";
 
-const polityRoute = getRouteApi("/polities/$polityId");
+const polityRoute = getRouteApi("/polities/$politySlug");
 
-export const Route = createFileRoute("/polities/$polityId/")({
+export const Route = createFileRoute("/polities/$politySlug/")({
   component: PolityOverviewRoute,
   staticData: {
     shell: {
@@ -72,7 +72,8 @@ function renderEmptyActionLink({
 function AttentionCard({
   item,
   polityId,
-}: Readonly<{ item: AttentionItem; polityId: string }>) {
+  politySlug,
+}: Readonly<{ item: AttentionItem; polityId: string; politySlug: string }>) {
   const Icon =
     item.kind === "vote"
       ? CircleAlert
@@ -113,8 +114,8 @@ function AttentionCard({
 
   return (
     <AppLinkSurface
-      params={{ motionId: item.target.motionId, polityId }}
-      to="/polities/$polityId/motions/$motionId"
+      params={{ motionId: item.target.motionId, politySlug }}
+      to="/polities/$politySlug/motions/$motionId"
     >
       {content}
     </AppLinkSurface>
@@ -123,7 +124,8 @@ function AttentionCard({
 
 function PolityOverviewRoute() {
   const { i18n } = useLingui();
-  const { polityId } = polityRoute.useParams();
+  const { politySlug } = polityRoute.useParams();
+  const { polityId } = polityRoute.useLoaderData();
   const { data: polities } = usePolityOptions({ locale: i18n.locale });
   const { data: polity } = usePolity({
     locale: i18n.locale,
@@ -153,7 +155,12 @@ function PolityOverviewRoute() {
         {polity.attention.length > 0 ? (
           <div className="space-y-3">
             {polity.attention.map((item) => (
-              <AttentionCard item={item} key={item.id} polityId={polity.id} />
+              <AttentionCard
+                item={item}
+                key={item.id}
+                polityId={polity.id}
+                politySlug={politySlug}
+              />
             ))}
           </div>
         ) : (

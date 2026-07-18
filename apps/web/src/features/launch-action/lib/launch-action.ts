@@ -5,6 +5,7 @@ import type { ActionId } from "@/features/launch-action/lib/action-definitions";
 export type PolityOption = Readonly<{
   id: string;
   name: string;
+  slug: string;
 }>;
 
 export type ActionLauncherVariant = "compact" | "surface";

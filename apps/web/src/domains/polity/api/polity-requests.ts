@@ -21,6 +21,7 @@ import type {
 } from "@/domains/polity/lib/polity";
 import type { PageResult } from "@/lib/pagination";
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
+import { isUuid } from "@/lib/uuid";
 
 const defaultPolityPageSize = 50;
 const httpClient = createHttpClient();
@@ -57,6 +58,7 @@ function projectPolitySummary(response: PolityResponse): PolitySummary {
     id: response.id,
     institutionName: response.institutionName,
     name: response.name,
+    slug: response.slug,
     status: response.status,
     visibility: response.visibility,
   };
@@ -339,6 +341,34 @@ export async function listAllPolities(options: RequestOptions) {
   );
 }
 
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+export async function getPolityReference(
+  polityReference: string,
+  options: RequestOptions,
+): Promise<PolitySummary> {
+  const byId = isUuid(polityReference);
+  const bySlug =
+    polityReference.length <= 80 && slugPattern.test(polityReference);
+  if (!byId && !bySlug) {
+    throw new ResourceNotFoundError("Polity", polityReference);
+  }
+
+  const path = byId
+    ? `/polities/${encodeURIComponent(polityReference)}`
+    : `/polities/by-slug/${encodeURIComponent(polityReference)}`;
+  try {
+    return projectPolitySummary(
+      parsePolityResponse(await requestUnknown(path, options)),
+    );
+  } catch (error) {
+    if (hasHttpResponseStatus(error, 404)) {
+      throw new ResourceNotFoundError("Polity", polityReference);
+    }
+    throw error;
+  }
+}
+
 async function requestAllMotionResponses(
   polityId: string,
   options: RequestOptions,
@@ -493,6 +523,7 @@ export async function getPolity(
     memberCount: resources.government.formation.activeMemberCount,
     motions,
     name: resources.polity.name,
+    slug: resources.polity.slug,
     readiness:
       resources.actions.readiness.status === "ready"
         ? "ready"

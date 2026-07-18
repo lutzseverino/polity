@@ -5,6 +5,7 @@ import {
   Link,
   notFound,
   Outlet,
+  redirect,
   useMatches,
   useRouterState,
 } from "@tanstack/react-router";
@@ -26,26 +27,53 @@ import { AppText } from "@/components/app/AppText";
 import {
   polityOptionsQueryOptions,
   polityQueryOptions,
+  polityReferenceQueryOptions,
   usePolity,
   usePolityOptions,
 } from "@/domains/polity";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/polities/$polityId")({
+export const Route = createFileRoute("/polities/$politySlug")({
   component: PolityWorkspaceRoute,
-  loader: async ({ context, params }) => {
-    const input = { locale: context.getLocale(), polityId: params.polityId };
+  loader: async ({ context, location, params }) => {
+    const locale = context.getLocale();
 
     try {
+      const referenceInput = {
+        locale,
+        polityReference: params.politySlug,
+      };
+      const reference = await context.queryClient.ensureQueryData(
+        polityReferenceQueryOptions(referenceInput),
+      );
+      if (reference.slug !== params.politySlug) {
+        context.queryClient.setQueryData(
+          polityReferenceQueryOptions({
+            locale,
+            polityReference: reference.slug,
+          }).queryKey,
+          reference,
+        );
+        throw redirect({
+          href: location.href.replace(
+            `/polities/${params.politySlug}`,
+            `/polities/${reference.slug}`,
+          ),
+          replace: true,
+        });
+      }
+
       const [, polity] = await Promise.all([
         context.queryClient.ensureQueryData(
-          polityOptionsQueryOptions({ locale: input.locale }),
+          polityOptionsQueryOptions({ locale }),
         ),
-        context.queryClient.ensureQueryData(polityQueryOptions(input)),
+        context.queryClient.ensureQueryData(
+          polityQueryOptions({ locale, polityId: reference.id }),
+        ),
       ]);
 
-      return { shellLabel: polity.name };
+      return { polityId: reference.id, shellLabel: polity.name };
     } catch (error) {
       if (isResourceNotFoundError(error)) {
         throw notFound();
@@ -59,14 +87,15 @@ export const Route = createFileRoute("/polities/$polityId")({
       back: { label: msg`All polities`, target: { to: "/polities" } },
       level: "workspace",
       section: "polities",
-      target: { params: "polityId", to: "/polities/$polityId" },
+      target: { params: "politySlug", to: "/polities/$politySlug" },
     },
   },
 });
 
 function PolityWorkspaceRoute() {
   const { i18n, t } = useLingui();
-  const { polityId } = Route.useParams();
+  const { politySlug } = Route.useParams();
+  const { polityId } = Route.useLoaderData();
   const { data: polities } = usePolityOptions({ locale: i18n.locale });
   const { data: polity } = usePolity({
     locale: i18n.locale,
@@ -91,22 +120,22 @@ function PolityWorkspaceRoute() {
   const workspaceNavigation = [
     {
       label: t`Home`,
-      to: "/polities/$polityId",
+      to: "/polities/$politySlug",
       value: "home",
     },
     {
       label: t`Motions`,
-      to: "/polities/$polityId/motions",
+      to: "/polities/$politySlug/motions",
       value: "motions",
     },
     {
       label: t`Government`,
-      to: "/polities/$polityId/government",
+      to: "/polities/$politySlug/government",
       value: "government",
     },
     {
       label: t`Record`,
-      to: "/polities/$polityId/record",
+      to: "/polities/$politySlug/record",
       value: "record",
     },
   ] as const;
@@ -170,14 +199,14 @@ function PolityWorkspaceRoute() {
               name="polity-switcher"
               onChange={(event) => {
                 void navigate({
-                  params: { polityId: event.currentTarget.value },
-                  to: "/polities/$polityId",
+                  params: { politySlug: event.currentTarget.value },
+                  to: "/polities/$politySlug",
                 });
               }}
-              value={polity.id}
+              value={polity.slug}
             >
               {polities.map((option) => (
-                <AppNativeSelectOption key={option.id} value={option.id}>
+                <AppNativeSelectOption key={option.id} value={option.slug}>
                   {option.name}
                 </AppNativeSelectOption>
               ))}
@@ -205,7 +234,7 @@ function PolityWorkspaceRoute() {
                   nativeButton={false}
                   render={
                     <Link
-                      params={{ polityId: polity.id }}
+                      params={{ politySlug }}
                       preload="intent"
                       to={item.to}
                     />

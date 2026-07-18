@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record PolitySummaryResult(
     UUID id,
+    String slug,
     String name,
     PolityVisibility visibility,
     PolityStatus status,

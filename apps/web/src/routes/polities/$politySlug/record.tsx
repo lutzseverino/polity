@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, notFound } from "@tanstack/react-router";
 
 import { AppBadge } from "@/components/app/AppBadge";
 import {
@@ -12,17 +12,29 @@ import {
 } from "@/components/app/AppCard";
 import { AppLinkButton } from "@/components/app/AppLinkButton";
 import { AppText } from "@/components/app/AppText";
-import { polityRecordQueryOptions, usePolityRecord } from "@/domains/polity";
+import {
+  polityRecordQueryOptions,
+  polityReferenceQueryOptions,
+  usePolityRecord,
+} from "@/domains/polity";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 
-export const Route = createFileRoute("/polities/$polityId/record")({
+const polityRoute = getRouteApi("/polities/$politySlug");
+
+export const Route = createFileRoute("/polities/$politySlug/record")({
   component: RecordRoute,
   loader: async ({ context, params }) => {
     try {
+      const polity = await context.queryClient.ensureQueryData(
+        polityReferenceQueryOptions({
+          locale: context.getLocale(),
+          polityReference: params.politySlug,
+        }),
+      );
       await context.queryClient.ensureQueryData(
         polityRecordQueryOptions({
           locale: context.getLocale(),
-          polityId: params.polityId,
+          polityId: polity.id,
         }),
       );
     } catch (error) {
@@ -34,14 +46,15 @@ export const Route = createFileRoute("/polities/$polityId/record")({
     shell: {
       label: msg`Official record`,
       level: "workspace",
-      target: { params: "polityId", to: "/polities/$polityId/record" },
+      target: { params: "politySlug", to: "/polities/$politySlug/record" },
     },
   },
 });
 
 function RecordRoute() {
   const { i18n } = useLingui();
-  const { polityId } = Route.useParams();
+  const { politySlug } = Route.useParams();
+  const { polityId } = polityRoute.useLoaderData();
   const { data: entries } = usePolityRecord({
     locale: i18n.locale,
     polityId,
@@ -88,9 +101,9 @@ function RecordRoute() {
                 {entry.motionId ? (
                   <AppCardFooter className="justify-end">
                     <AppLinkButton
-                      params={{ motionId: entry.motionId, polityId }}
+                      params={{ motionId: entry.motionId, politySlug }}
                       size="sm"
-                      to="/polities/$polityId/motions/$motionId"
+                      to="/polities/$politySlug/motions/$motionId"
                       variant="ghost"
                     >
                       <Trans>View motion</Trans>

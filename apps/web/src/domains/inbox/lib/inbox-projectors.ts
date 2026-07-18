@@ -22,7 +22,7 @@ export function projectMembershipInvitationToInboxTask(
 
 export function projectMotionToInboxItem(
   motion: MotionResponse,
-  polity: Readonly<{ id: string; name: string }>,
+  polity: Readonly<{ name: string; slug: string }>,
   locale: string,
 ): InboxItem | undefined {
   const timeLabel = new Intl.DateTimeFormat(locale, {
@@ -38,7 +38,11 @@ export function projectMotionToInboxItem(
       id: `motion-vote:${motion.id}`,
       isUnread: true,
       polityName: polity.name,
-      source: { kind: "motion-vote", motionId: motion.id, polityId: polity.id },
+      source: {
+        kind: "motion-vote",
+        motionId: motion.id,
+        politySlug: polity.slug,
+      },
       timeLabel,
       title: `Vote on ${motion.title}`,
     };
@@ -54,7 +58,7 @@ export function projectMotionToInboxItem(
       source: {
         kind: "candidacy-response",
         motionId: motion.id,
-        polityId: polity.id,
+        politySlug: polity.slug,
       },
       timeLabel,
       title: "Respond to Your Nomination",
@@ -73,7 +77,7 @@ export function projectMotionToInboxItem(
       source: {
         kind: "motion-result",
         motionId: motion.id,
-        polityId: polity.id,
+        politySlug: polity.slug,
       },
       timeLabel,
       title: `${motion.title} Was ${motion.certification.passed ? "Adopted" : "Rejected"}`,

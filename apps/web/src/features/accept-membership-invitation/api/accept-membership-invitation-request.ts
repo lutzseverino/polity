@@ -1,4 +1,6 @@
 import { createHttpClient } from "@/api/http-client";
+import { ResourceNotFoundError } from "@/lib/resource-not-found";
+import { isUuid } from "@/lib/uuid";
 
 export type AcceptMembershipInvitationInput = Readonly<{
   invitationId: string;
@@ -20,6 +22,10 @@ export function acceptMembershipInvitation({
   acceptedLanguage,
   invitationId,
 }: AcceptMembershipInvitationRequest) {
+  if (!isUuid(invitationId)) {
+    throw new ResourceNotFoundError("Membership invitation", invitationId);
+  }
+
   return httpClient.request<AcceptedMembership>({
     acceptedLanguage,
     method: "POST",

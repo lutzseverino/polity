@@ -33,60 +33,77 @@ type ScenarioOptions = Readonly<{
   now?: Date;
 }>;
 
+export const membershipInvitationScenario = {
+  invitationIds: {
+    bookCircle: "91111111-1111-4111-8111-111111111113",
+    cabinCouncil: "91111111-1111-4111-8111-111111111114",
+    gardenCooperative: "91111111-1111-4111-8111-111111111112",
+    supperClub: "91111111-1111-4111-8111-111111111111",
+  },
+  tokens: {
+    completed: "mti_2pW7fN9vL4qR8xKc",
+    failed: "mti_6tY3jH8sD1mB5zQa",
+    pending: "mti_9kC4rV7nP2xF6wLs",
+    supperClub: "mti_4gM8qT1bN7sJ3yZd",
+  },
+} as const;
+
+const supperClubPolityId = "51111111-1111-4111-8111-111111111111";
+
 const invitationResponseData: readonly InvitationResponseData[] = [
   {
     email: "guest+supper@example.com",
-    id: "invitation-supper-club",
+    id: membershipInvitationScenario.invitationIds.supperClub,
     invitedByName: "Sam Ortega",
-    polityId: "sunday-supper-club",
+    polityId: supperClubPolityId,
     polityName: "Sunday Supper Club",
     status: "pending",
   },
   {
     email: "guest+garden@example.com",
-    id: "invitation-garden-cooperative",
+    id: membershipInvitationScenario.invitationIds.gardenCooperative,
     invitedByName: "Mira Chen",
-    polityId: "garden-cooperative",
+    polityId: "52222222-2222-4222-8222-222222222222",
     polityName: "Garden Cooperative",
     status: "pending",
   },
   {
     email: "guest+books@example.com",
-    id: "invitation-book-circle",
+    id: membershipInvitationScenario.invitationIds.bookCircle,
     invitedByName: "Alex Rivera",
-    polityId: "local-book-circle",
+    polityId: "53333333-3333-4333-8333-333333333333",
     polityName: "Local Book Circle",
     status: "pending",
   },
   {
     email: "guest+cabin@example.com",
-    id: "invitation-cabin-council",
+    id: membershipInvitationScenario.invitationIds.cabinCouncil,
     invitedByName: "Jon Bell",
-    polityId: "cabin-council",
+    polityId: "54444444-4444-4444-8444-444444444444",
     polityName: "Cabin Council",
     status: "pending",
   },
 ];
 
 const invitationTokenResponseData = {
-  "invitation-completed": {
+  [membershipInvitationScenario.tokens.completed]: {
     invitedEmail: "completed@example.com",
-    polityId: "sunday-supper-club",
+    polityId: supperClubPolityId,
     polityName: "Sunday Supper Club",
   },
-  "invitation-failed": {
+  [membershipInvitationScenario.tokens.failed]: {
     invitedEmail: "retry@example.com",
-    polityId: "sunday-supper-club",
+    polityId: supperClubPolityId,
     polityName: "Sunday Supper Club",
   },
-  "invitation-pending": {
+  [membershipInvitationScenario.tokens.pending]: {
     invitedEmail: "pending@example.com",
-    polityId: "sunday-supper-club",
+    polityId: supperClubPolityId,
     polityName: "Sunday Supper Club",
   },
-  "invitation-supper-club": {
+  [membershipInvitationScenario.tokens.supperClub]: {
     invitedEmail: "friend@example.com",
-    polityId: "sunday-supper-club",
+    polityId: supperClubPolityId,
     polityName: "Sunday Supper Club",
   },
 } as const;
@@ -136,20 +153,28 @@ export function createMembershipInvitationScenarioHandlers({
     InvitationToken,
     InvitationTokenResponse
   > = {
-    "invitation-completed": {
-      ...invitationTokenResponseData["invitation-completed"],
+    [membershipInvitationScenario.tokens.completed]: {
+      ...invitationTokenResponseData[
+        membershipInvitationScenario.tokens.completed
+      ],
       expiresAt: invitationExpiresAt,
     },
-    "invitation-failed": {
-      ...invitationTokenResponseData["invitation-failed"],
+    [membershipInvitationScenario.tokens.failed]: {
+      ...invitationTokenResponseData[
+        membershipInvitationScenario.tokens.failed
+      ],
       expiresAt: invitationExpiresAt,
     },
-    "invitation-pending": {
-      ...invitationTokenResponseData["invitation-pending"],
+    [membershipInvitationScenario.tokens.pending]: {
+      ...invitationTokenResponseData[
+        membershipInvitationScenario.tokens.pending
+      ],
       expiresAt: invitationExpiresAt,
     },
-    "invitation-supper-club": {
-      ...invitationTokenResponseData["invitation-supper-club"],
+    [membershipInvitationScenario.tokens.supperClub]: {
+      ...invitationTokenResponseData[
+        membershipInvitationScenario.tokens.supperClub
+      ],
       expiresAt: invitationExpiresAt,
     },
   };
@@ -185,7 +210,14 @@ export function createMembershipInvitationScenarioHandlers({
       );
 
       return HttpResponse.json(
-        { id: `membership-${invitation.polityId}`, status: "active" },
+        {
+          admittedAt: now.toISOString(),
+          email: invitation.email,
+          id: "58888888-8888-4888-8888-888888888888",
+          name: "Invited member",
+          status: "active",
+          userId: "59999999-9999-4999-8999-999999999999",
+        },
         { status: 201 },
       );
     }),
@@ -217,9 +249,9 @@ export function createMembershipInvitationScenarioHandlers({
         pollCount: 0,
       };
       const status =
-        token === "invitation-completed"
+        token === membershipInvitationScenario.tokens.completed
           ? "completed"
-          : token === "invitation-failed" && !previous
+          : token === membershipInvitationScenario.tokens.failed && !previous
             ? "failed"
             : "requested";
       state.status = status;

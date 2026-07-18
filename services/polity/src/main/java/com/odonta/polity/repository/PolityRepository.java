@@ -34,6 +34,7 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
       select
         p.id as id,
         p.name as name,
+        p.slug as slug,
         p.visibility as visibility,
         p.status as status,
         p.createdAt as createdAt
@@ -60,6 +61,10 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
 
   Optional<PolityProjection> findProjectedById(UUID id);
 
+  Optional<PolityProjection> findProjectedBySlug(String slug);
+
+  boolean existsBySlug(String slug);
+
   boolean existsByIdAndVisibility(UUID id, PolityVisibility visibility);
 
   @Query(
@@ -69,6 +74,9 @@ public interface PolityRepository extends JpaRepository<Polity, UUID> {
               + "))",
       nativeQuery = true)
   int lockFounderPrivatePolityQuota(UUID founderId);
+
+  @Query(value = "select 1 from pg_advisory_xact_lock(825702)", nativeQuery = true)
+  int lockPolitySlugClaims();
 
   long countByFounderIdAndVisibilityAndStatus(
       UUID founderId, PolityVisibility visibility, PolityStatus status);
