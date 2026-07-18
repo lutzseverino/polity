@@ -14,7 +14,7 @@ This reference is authoritative for source ownership, naming, and import directi
 | `src/components/ui/` | shadcn registry | generated registry components and hooks; read-only |
 | `src/api/` | transport | shared HTTP mechanics, generated OpenAPI clients, and transport contracts |
 | `src/lib/` | infrastructure | small framework- and product-neutral helpers |
-| `src/mocks/` | development transport | opt-in browser MSW installation, local scenario state, response data, and handlers |
+| `src/mocks/` | development transport | browser MSW selection and installation, local scenario state, response data, and handlers |
 
 Create only the subfolders an owner needs. A domain or feature can start with `index.ts` and one
 `components/` or `lib/` folder; it does not need an empty copy of the entire structure.
