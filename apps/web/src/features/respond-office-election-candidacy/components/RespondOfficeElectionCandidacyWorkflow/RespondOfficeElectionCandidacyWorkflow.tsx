@@ -39,8 +39,7 @@ export function RespondOfficeElectionCandidacyWorkflow({
     respondOfficeElectionCandidacy.mutate(
       { motionId: motion.id, polityId, response: nextResponse },
       {
-        onSuccess: ({ response: recordedResponse }) =>
-          setResponse(recordedResponse),
+        onSuccess: () => setResponse(nextResponse),
       },
     );
   }

@@ -13,10 +13,10 @@ export {
 } from "@/domains/polity/api/polity-queries";
 export {
   getPolityMotion,
-  listPolities,
+  listAllPolities,
   listPolityMotionResponses,
-  maximumPolityPageSize,
   parseMotionResponse,
+  reconcileMotionResponse,
 } from "@/domains/polity/api/polity-requests";
 export { PolityCard } from "@/domains/polity/components/PolityCard";
 export type {

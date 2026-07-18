@@ -1,6 +1,9 @@
 import { HttpResponse, http, type RequestHandler } from "msw";
 
 const available = { available: true } as const;
+const assemblyInstitutionId = "44444444-4444-4444-8444-444444444444";
+const ordinaryProcedureId = "66666666-6666-4666-8666-666666666661";
+const electionProcedureId = "66666666-6666-4666-8666-666666666662";
 const unavailable = (reason: string, reasonMessage: string) => ({
   available: false,
   reason,
@@ -97,7 +100,7 @@ const polities = [
   {
     constitutionVersion: 2,
     createdAt: "2025-01-10T12:00:00.000Z",
-    id: "thursday-assembly",
+    id: "11111111-1111-4111-8111-111111111111",
     institutionName: "Assembly",
     jurisdictionName: "The Thursday Assembly",
     name: "The Thursday Assembly",
@@ -107,7 +110,7 @@ const polities = [
   {
     constitutionVersion: 1,
     createdAt: "2025-05-14T12:00:00.000Z",
-    id: "neighbourhood-table",
+    id: "22222222-2222-4222-8222-222222222222",
     institutionName: "Assembly",
     jurisdictionName: "Neighbourhood Table",
     name: "Neighbourhood Table",
@@ -117,7 +120,7 @@ const polities = [
   {
     constitutionVersion: 1,
     createdAt: "2025-06-02T12:00:00.000Z",
-    id: "weekend-council",
+    id: "33333333-3333-4333-8333-333333333333",
     institutionName: "Council",
     jurisdictionName: "Weekend Council",
     name: "Weekend Council",
@@ -127,9 +130,9 @@ const polities = [
 ] as const;
 
 const memberCounts: Readonly<Record<string, number>> = {
-  "neighbourhood-table": 2,
-  "thursday-assembly": 8,
-  "weekend-council": 5,
+  "22222222-2222-4222-8222-222222222222": 2,
+  "11111111-1111-4111-8111-111111111111": 8,
+  "33333333-3333-4333-8333-333333333333": 5,
 };
 
 function procedure(
@@ -143,7 +146,7 @@ function procedure(
     effectType,
     electorate: "active_members",
     id,
-    institutionId: "institution-assembly",
+    institutionId: assemblyInstitutionId,
     minimumElectorCount: 1,
     minimumNoticeHours: 24,
     name,
@@ -159,11 +162,11 @@ function government(polityId: string) {
   return {
     constitution: {
       body: "A constitutional council republic.",
-      id: `constitution-${polityId}`,
+      id: polityId,
       institutions: [
         {
-          id: "institution-assembly",
-          jurisdictionId: `jurisdiction-${polityId}`,
+          id: assemblyInstitutionId,
+          jurisdictionId: polityId,
           kind: "assembly",
           name: "Assembly",
         },
@@ -172,13 +175,13 @@ function government(polityId: string) {
       powers: [],
       procedures: [
         procedure(
-          "ordinary-resolution",
+          ordinaryProcedureId,
           "Ordinary resolution",
           "simple_majority_cast",
           "adopt_resolution",
         ),
         procedure(
-          "office-election",
+          electionProcedureId,
           "Office election",
           "office_election_result",
           "elect_office",
@@ -199,7 +202,7 @@ function government(polityId: string) {
     },
     jurisdictions: [
       {
-        id: `jurisdiction-${polityId}`,
+        id: polityId,
         kind: "root",
         name: polities.find(({ id }) => id === polityId)?.name ?? polityId,
       },
@@ -269,7 +272,7 @@ function initialMotions(now: Date): MockMotion[] {
       actions: motionActions("vote"),
       body: "The Thursday Assembly will hold a shared dinner on the first Thursday of every month. The host rotates alphabetically among volunteers, and the assembly budget may reimburse up to €80 for ingredients.",
       effectType: "adopt_resolution",
-      id: "shared-dinner",
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
       introducedByName: "Mira Chen",
       procedureName: "Ordinary resolution",
       status: "voting",
@@ -305,19 +308,19 @@ function initialMotions(now: Date): MockMotion[] {
         seatsFilled: 0,
         winners: [],
       },
-      id: "tribune-election",
+      id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
       introducedByName: "System",
       officeElection: {
         candidates: [
           {
-            membershipId: "membership-current",
+            membershipId: "88888888-8888-4888-8888-888888888888",
             name: "Alex Rivera",
             status: "pending",
           },
         ],
         method: "ranked_choice",
         officeCode: "tribune",
-        officeId: "office-tribune",
+        officeId: "77777777-7777-4777-8777-777777777777",
         officeName: "Tribune",
         seatsAvailable: 1,
       },
@@ -344,7 +347,7 @@ function initialMotions(now: Date): MockMotion[] {
         yesCount: 5,
       },
       effectType: "adopt_resolution",
-      id: "autumn-cabin-budget",
+      id: "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
       introducedByName: "Jon Bell",
       procedureName: "Ordinary resolution",
       status: "enacted",
@@ -370,8 +373,8 @@ function records(now: Date) {
       body: "Voting opened.",
       constitutionVersion: 2,
       entryNumber: 43,
-      id: "record-43",
-      motionId: "shared-dinner",
+      id: "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+      motionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
       occurredAt: hoursFrom(now, -2),
       title: "Shared Thursday Dinner opened for voting",
       type: "motion_introduced",
@@ -381,8 +384,8 @@ function records(now: Date) {
       body: "Election opened.",
       constitutionVersion: 2,
       entryNumber: 42,
-      id: "record-42",
-      motionId: "tribune-election",
+      id: "dddddddd-dddd-4ddd-8ddd-ddddddddddd2",
+      motionId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
       occurredAt: hoursFrom(now, -24),
       title: "Tribune election opened",
       type: "motion_introduced",
@@ -392,8 +395,8 @@ function records(now: Date) {
       body: "The motion was adopted.",
       constitutionVersion: 2,
       entryNumber: 41,
-      id: "record-41",
-      motionId: "autumn-cabin-budget",
+      id: "dddddddd-dddd-4ddd-8ddd-ddddddddddd3",
+      motionId: "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
       occurredAt: hoursFrom(now, -96),
       title: "Autumn cabin budget adopted",
       type: "resolution_adopted",
@@ -432,7 +435,7 @@ export function createGoverningJourneyScenarioHandlers({
   const officialRecords = records(now);
 
   function polityMotions(polityId: string) {
-    return polityId === "thursday-assembly" ? motions : [];
+    return polityId === "11111111-1111-4111-8111-111111111111" ? motions : [];
   }
 
   return [
@@ -464,7 +467,11 @@ export function createGoverningJourneyScenarioHandlers({
       const polityId = String(params.polityId);
       if (!polities.some(({ id }) => id === polityId)) return notFound();
       return HttpResponse.json(
-        actionSet(polityId === "neighbourhood-table" ? "provisional" : "ready"),
+        actionSet(
+          polityId === "22222222-2222-4222-8222-222222222222"
+            ? "provisional"
+            : "ready",
+        ),
       );
     }),
     http.get("/api/v1/polities/:polityId/government", ({ params }) => {
@@ -498,7 +505,10 @@ export function createGoverningJourneyScenarioHandlers({
     http.get("/api/v1/polities/:polityId/record", ({ params }) => {
       const polityId = String(params.polityId);
       if (!polities.some(({ id }) => id === polityId)) return notFound();
-      const content = polityId === "thursday-assembly" ? officialRecords : [];
+      const content =
+        polityId === "11111111-1111-4111-8111-111111111111"
+          ? officialRecords
+          : [];
       return HttpResponse.json(page(content));
     }),
     http.put(
@@ -507,7 +517,10 @@ export function createGoverningJourneyScenarioHandlers({
         const motionIndex = motions.findIndex(
           ({ id }) => id === String(params.motionId),
         );
-        if (String(params.polityId) !== "thursday-assembly" || motionIndex < 0)
+        if (
+          String(params.polityId) !== "11111111-1111-4111-8111-111111111111" ||
+          motionIndex < 0
+        )
           return notFound();
         const body = (await request.json()) as { choice?: unknown };
         if (
@@ -540,7 +553,10 @@ export function createGoverningJourneyScenarioHandlers({
         const motionIndex = motions.findIndex(
           ({ id }) => id === String(params.motionId),
         );
-        if (String(params.polityId) !== "thursday-assembly" || motionIndex < 0)
+        if (
+          String(params.polityId) !== "11111111-1111-4111-8111-111111111111" ||
+          motionIndex < 0
+        )
           return notFound();
         const body = (await request.json()) as { accepted?: unknown };
         if (typeof body.accepted !== "boolean") {

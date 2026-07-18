@@ -62,8 +62,8 @@ export function CastMotionVoteWorkflow({
     castMotionVote.mutate(
       { choice: selectedVote, motionId: motion.id, polityId },
       {
-        onSuccess: ({ choice }) => {
-          setRecordedVote(choice);
+        onSuccess: (response) => {
+          setRecordedVote(response.currentVote);
           setShowConfirmation(true);
         },
       },

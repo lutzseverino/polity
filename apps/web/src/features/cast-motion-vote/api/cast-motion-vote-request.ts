@@ -13,7 +13,7 @@ export type CastMotionVoteInput = Readonly<{
 export async function castMotionVote(
   input: CastMotionVoteInput & Readonly<{ acceptedLanguage: string }>,
 ) {
-  parseMotionResponse(
+  return parseMotionResponse(
     await httpClient.request<unknown, { choice: VoteChoice }>({
       acceptedLanguage: input.acceptedLanguage,
       data: { choice: input.choice },
@@ -21,5 +21,4 @@ export async function castMotionVote(
       url: `/polities/${encodeURIComponent(input.polityId)}/motions/${encodeURIComponent(input.motionId)}/votes`,
     }),
   );
-  return input;
 }

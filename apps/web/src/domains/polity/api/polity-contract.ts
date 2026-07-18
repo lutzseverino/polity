@@ -111,6 +111,30 @@ function requiredString(value: unknown, message: string) {
   return value;
 }
 
+function requiredUuid(value: unknown, message: string) {
+  const uuid = requiredString(value, message);
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
+      uuid,
+    )
+  ) {
+    throw new Error(message);
+  }
+  return uuid;
+}
+
+function requiredDateTime(value: unknown, message: string) {
+  const dateTime = requiredString(value, message);
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(
+      dateTime,
+    ) ||
+    !Number.isFinite(Date.parse(dateTime))
+  )
+    throw new Error(message);
+  return dateTime;
+}
+
 function requiredNumber(value: unknown, message: string) {
   if (typeof value !== "number" || !Number.isFinite(value))
     throw new Error(message);
@@ -159,8 +183,8 @@ export function parsePolityResponse(value: unknown): PolityResponse {
   const response = requiredRecord(value, message);
   return {
     constitutionVersion: requiredNumber(response.constitutionVersion, message),
-    createdAt: requiredString(response.createdAt, message),
-    id: requiredString(response.id, message),
+    createdAt: requiredDateTime(response.createdAt, message),
+    id: requiredUuid(response.id, message),
     institutionName: requiredString(response.institutionName, message),
     jurisdictionName: requiredString(response.jurisdictionName, message),
     name: requiredString(response.name, message),
@@ -378,9 +402,9 @@ export function parseMotionResponse(value: unknown): MotionResponse {
       ],
       message,
     ),
-    id: requiredString(response.id, message),
+    id: requiredUuid(response.id, message),
     introducedByName: requiredString(response.introducedByName, message),
-    openedAt: requiredString(response.openedAt, message),
+    openedAt: requiredDateTime(response.openedAt, message),
     procedureName: requiredString(response.procedureName, message),
     status: enumValue(
       response.status,
@@ -388,7 +412,7 @@ export function parseMotionResponse(value: unknown): MotionResponse {
       message,
     ),
     title: requiredString(response.title, message),
-    votingClosesAt: requiredString(response.votingClosesAt, message),
+    votingClosesAt: requiredDateTime(response.votingClosesAt, message),
     ...(currentVote ? { currentVote } : {}),
     ...(tally ? { tally } : {}),
     ...(electionTally ? { electionTally } : {}),
@@ -412,11 +436,11 @@ export function parseOfficialRecordPage(value: unknown) {
     const item = requiredRecord(candidate, message);
     return {
       entryNumber: requiredNumber(item.entryNumber, message),
-      id: requiredString(item.id, message),
+      id: requiredUuid(item.id, message),
       ...(item.motionId === undefined
         ? {}
-        : { motionId: requiredString(item.motionId, message) }),
-      occurredAt: requiredString(item.occurredAt, message),
+        : { motionId: requiredUuid(item.motionId, message) }),
+      occurredAt: requiredDateTime(item.occurredAt, message),
       title: requiredString(item.title, message),
       type: requiredString(item.type, message),
     };

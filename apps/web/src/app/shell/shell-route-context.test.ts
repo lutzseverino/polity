@@ -11,7 +11,7 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "thursday-assembly" },
+          params: { polityId: "11111111-1111-4111-8111-111111111111" },
           shell: {
             back: { label: msg`All polities`, target: { to: "/polities" } },
             level: "workspace",
@@ -20,7 +20,7 @@ describe("resolveShellContext", () => {
           },
         },
         {
-          params: { polityId: "thursday-assembly" },
+          params: { polityId: "11111111-1111-4111-8111-111111111111" },
           shell: {
             label: msg`Motions`,
             target: {
@@ -40,7 +40,7 @@ describe("resolveShellContext", () => {
       "Motions",
     ]);
     expect(context.back?.label).toBe("All polities");
-    expect(context.polityId).toBe("thursday-assembly");
+    expect(context.polityId).toBe("11111111-1111-4111-8111-111111111111");
   });
 
   it("inherits the workspace title through a label-less index route", () => {
@@ -48,7 +48,7 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "thursday-assembly" },
+          params: { polityId: "11111111-1111-4111-8111-111111111111" },
           shell: {
             level: "workspace",
             section: "polities",
@@ -56,7 +56,7 @@ describe("resolveShellContext", () => {
           },
         },
         {
-          params: { polityId: "thursday-assembly" },
+          params: { polityId: "11111111-1111-4111-8111-111111111111" },
           shell: { showPrimaryAction: false },
         },
       ],
@@ -79,7 +79,7 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "thursday-assembly" },
+          params: { polityId: "11111111-1111-4111-8111-111111111111" },
           shell: {
             level: "workspace",
             section: "polities",
@@ -89,8 +89,8 @@ describe("resolveShellContext", () => {
         {
           loaderData: { shellLabel: "Shared Thursday Dinner" },
           params: {
-            motionId: "shared-dinner",
-            polityId: "thursday-assembly",
+            motionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+            polityId: "11111111-1111-4111-8111-111111111111",
           },
           shell: {
             back: {

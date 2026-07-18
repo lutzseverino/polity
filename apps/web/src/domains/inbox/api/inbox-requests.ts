@@ -3,11 +3,7 @@ import {
   projectMotionToInboxItem,
 } from "@/domains/inbox/lib/inbox-projectors";
 import { listMembershipInvitations } from "@/domains/membership";
-import {
-  listPolities,
-  listPolityMotionResponses,
-  maximumPolityPageSize,
-} from "@/domains/polity";
+import { listAllPolities, listPolityMotionResponses } from "@/domains/polity";
 
 type RequestOptions = Readonly<{
   acceptedLanguage: string;
@@ -20,16 +16,12 @@ export async function listInboxItems({
 }: RequestOptions) {
   signal?.throwIfAborted();
 
-  const [invitations, polityPage] = await Promise.all([
+  const [invitations, polities] = await Promise.all([
     listMembershipInvitations({ acceptedLanguage, signal }),
-    listPolities({
-      acceptedLanguage,
-      signal,
-      size: maximumPolityPageSize,
-    }),
+    listAllPolities({ acceptedLanguage, signal }),
   ]);
   const motionPages = await Promise.all(
-    polityPage.content.map(async (polity) => ({
+    polities.map(async (polity) => ({
       motions: await listPolityMotionResponses(polity.id, {
         acceptedLanguage,
         signal,

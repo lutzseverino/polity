@@ -160,6 +160,61 @@ function projectMotion(
   };
 }
 
+export function reconcileMotionResponse(
+  motion: Motion,
+  response: MotionResponse,
+  locale: string,
+): Motion {
+  const {
+    currentVote: _currentVote,
+    participation: _participation,
+    result: _result,
+    ...stableMotion
+  } = motion;
+  const tally = response.tally;
+  const electionTally = response.electionTally;
+  const participation = tally
+    ? {
+        cast: tally.yes + tally.no + tally.abstain,
+        eligible: tally.eligible,
+        quorumMet: tally.quorumMet,
+        quorumRequired: tally.quorumRequired,
+      }
+    : electionTally
+      ? {
+          cast: electionTally.participation,
+          eligible: electionTally.eligible,
+          quorumMet: electionTally.quorumMet,
+          quorumRequired: electionTally.quorumRequired,
+        }
+      : undefined;
+  const certification = response.certification;
+  const result = certification &&
+    motion.result && {
+      no: certification.noCount ?? 0,
+      outcome: certification.passed ? "Adopted" : "Rejected",
+      recordEntry: motion.result.recordEntry,
+      yes: certification.yesCount ?? 0,
+    };
+
+  return {
+    ...stableMotion,
+    actionAvailability: response.officeElection
+      ? response.actions.respondCandidacy
+      : response.actions.castVote,
+    actionKind: response.officeElection ? "candidacy" : "vote",
+    body: response.body,
+    category: effectLabel(response.effectType),
+    closesAtLabel: formatDateTime(response.votingClosesAt, locale),
+    ...(response.currentVote ? { currentVote: response.currentVote } : {}),
+    introducedBy: response.introducedByName,
+    ...(participation ? { participation } : {}),
+    ...(result ? { result } : {}),
+    status: response.status,
+    title: response.title,
+  };
+}
+
 async function requestUnknown(
   path: string,
   { acceptedLanguage, signal }: RequestOptions,
@@ -195,6 +250,87 @@ export async function listPolities({
   return { ...response, content: response.content.map(projectPolitySummary) };
 }
 
+export async function listAllPolities(options: RequestOptions) {
+  const firstPage = await listPolities({
+    ...options,
+    page: 0,
+    size: maximumPolityPageSize,
+  });
+  const remainingPages = await Promise.all(
+    Array.from(
+      { length: Math.max(firstPage.page.totalPages - 1, 0) },
+      (_, index) =>
+        listPolities({
+          ...options,
+          page: index + 1,
+          size: maximumPolityPageSize,
+        }),
+    ),
+  );
+  return [
+    ...firstPage.content,
+    ...remainingPages.flatMap(({ content }) => content),
+  ];
+}
+
+async function requestAllMotionResponses(
+  polityId: string,
+  options: RequestOptions,
+) {
+  const path = `/polities/${encodeURIComponent(polityId)}/motions`;
+  const firstPage = parseMotionPage(
+    await requestUnknown(path, options, {
+      page: 0,
+      size: maximumPolityPageSize,
+    }),
+  );
+  const remainingPages = await Promise.all(
+    Array.from(
+      { length: Math.max(firstPage.page.totalPages - 1, 0) },
+      async (_, index) =>
+        parseMotionPage(
+          await requestUnknown(path, options, {
+            page: index + 1,
+            size: maximumPolityPageSize,
+          }),
+        ),
+    ),
+  );
+  return [
+    ...firstPage.content,
+    ...remainingPages.flatMap(({ content }) => content),
+  ];
+}
+
+async function requestAllOfficialRecordEntries(
+  polityId: string,
+  options: RequestOptions,
+) {
+  const path = `/polities/${encodeURIComponent(polityId)}/record`;
+  const firstPage = parseOfficialRecordPage(
+    await requestUnknown(path, options, {
+      page: 0,
+      size: maximumPolityPageSize,
+    }),
+  );
+  const remainingPages = await Promise.all(
+    Array.from(
+      { length: Math.max(firstPage.page.totalPages - 1, 0) },
+      async (_, index) =>
+        parseOfficialRecordPage(
+          await requestUnknown(path, options, {
+            page: index + 1,
+            size: maximumPolityPageSize,
+          }),
+        ),
+    ),
+  );
+  return [
+    ...firstPage.content,
+    ...remainingPages.flatMap(({ content }) => content),
+  ];
+}
+
 async function getWorkspaceResources(
   polityId: string,
   options: RequestOptions,
@@ -211,21 +347,15 @@ async function getWorkspaceResources(
       requestUnknown(`/polities/${encodedId}/government`, options).then(
         parseGovernment,
       ),
-      requestUnknown(`/polities/${encodedId}/motions`, options, {
-        page: 0,
-        size: 100,
-      }).then(parseMotionPage),
-      requestUnknown(`/polities/${encodedId}/record`, options, {
-        page: 0,
-        size: 100,
-      }).then(parseOfficialRecordPage),
+      requestAllMotionResponses(polityId, options),
+      requestAllOfficialRecordEntries(polityId, options),
     ]);
     return {
       actions,
       government,
-      motions: motions.content,
+      motions,
       polity,
-      record: record.content,
+      record,
     };
   } catch (error) {
     if (hasHttpResponseStatus(error, 404))
@@ -337,13 +467,7 @@ export async function listPolityMotionResponses(
   polityId: string,
   options: RequestOptions,
 ) {
-  return parseMotionPage(
-    await requestUnknown(
-      `/polities/${encodeURIComponent(polityId)}/motions`,
-      options,
-      { page: 0, size: 100 },
-    ),
-  ).content;
+  return requestAllMotionResponses(polityId, options);
 }
 
 export async function getPolityMotion(
@@ -361,17 +485,9 @@ export async function getPolityMotion(
       requestUnknown(`/polities/${encodedPolityId}/government`, options).then(
         parseGovernment,
       ),
-      requestUnknown(`/polities/${encodedPolityId}/record`, options, {
-        page: 0,
-        size: 100,
-      }).then(parseOfficialRecordPage),
+      requestAllOfficialRecordEntries(polityId, options),
     ]);
-    return projectMotion(
-      motion,
-      government,
-      record.content,
-      options.acceptedLanguage,
-    );
+    return projectMotion(motion, government, record, options.acceptedLanguage);
   } catch (error) {
     if (hasHttpResponseStatus(error, 404))
       throw new ResourceNotFoundError("Motion", motionId);
