@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import {
   getPolity,
   getPolityActions,
+  getPolityGovernment,
   getPolityMotion,
+  getPolityOfficialRecord,
   listAllPolities,
   listPolities,
   listPolityMotionResponses,
@@ -116,6 +118,43 @@ describe("polity requests", () => {
       outcome: "Adopted",
       recordEntry: 41,
       yes: 5,
+    });
+  });
+
+  it("projects a government view from government and action resources", async () => {
+    const government = await getPolityGovernment(
+      "11111111-1111-4111-8111-111111111111",
+      { acceptedLanguage: "en" },
+    );
+
+    expect(government).toMatchObject({
+      constitution: { title: "Constitution", version: 2 },
+      formation: { activeMemberCount: 8, complete: true },
+      health: { status: "healthy" },
+      readiness: { status: "ready" },
+    });
+    expect(government.institutions[0]).toMatchObject({
+      kind: "assembly",
+      name: "Assembly",
+    });
+    expect(government.offices[0]).toMatchObject({
+      name: "Tribune",
+      seatCount: 1,
+    });
+  });
+
+  it("projects official-record evidence without dropping its owner fields", async () => {
+    const entries = await getPolityOfficialRecord(
+      "11111111-1111-4111-8111-111111111111",
+      { acceptedLanguage: "en" },
+    );
+
+    expect(entries[0]).toMatchObject({
+      actorName: "Mira Chen",
+      body: "Voting opened.",
+      constitutionVersion: 2,
+      entryNumber: 43,
+      motionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
     });
   });
 
@@ -236,6 +275,16 @@ describe("polity requests", () => {
       votingClosesAt: "2026-01-02T00:00:00.000Z",
       votingOpensAt: "2026-01-01T00:00:00.000Z",
     }));
+    const recordResponses = Array.from({ length: 101 }, (_, index) => ({
+      actorName: "Member",
+      body: "Record body",
+      constitutionVersion: 1,
+      entryNumber: index + 1,
+      id: uuid(index + 401),
+      occurredAt: "2026-01-01T00:00:00.000Z",
+      title: `Record ${index + 1}`,
+      type: "motion_introduced",
+    }));
     apiMockServer.use(
       http.get("/api/v1/polities", ({ request }) => {
         const page = Number(new URL(request.url).searchParams.get("page") ?? 0);
@@ -263,6 +312,19 @@ describe("polity requests", () => {
           },
         });
       }),
+      http.get("/api/v1/polities/:polityId/record", ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get("page") ?? 0);
+        const content = recordResponses.slice(page * 100, page * 100 + 100);
+        return HttpResponse.json({
+          content,
+          page: {
+            number: page,
+            size: 100,
+            totalElements: 101,
+            totalPages: 2,
+          },
+        });
+      }),
     );
 
     await expect(
@@ -270,6 +332,9 @@ describe("polity requests", () => {
     ).resolves.toHaveLength(101);
     await expect(
       listPolityMotionResponses(uuid(1), { acceptedLanguage: "en" }),
+    ).resolves.toHaveLength(101);
+    await expect(
+      getPolityOfficialRecord(uuid(1), { acceptedLanguage: "en" }),
     ).resolves.toHaveLength(101);
   });
 });

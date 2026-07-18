@@ -7,7 +7,9 @@ import {
 import {
   getPolity,
   getPolityActions,
+  getPolityGovernment,
   getPolityMotion,
+  getPolityOfficialRecord,
   listAllPolities,
   listPolities,
   normalizePolityPage,
@@ -51,8 +53,12 @@ const polityQueryKeys = {
     ["polities", "detail", polityId, "actions", { locale }] as const,
   list: ({ locale, page, query, size }: NormalizedPolityListQuery) =>
     ["polities", "list", { locale, page, query, size }] as const,
+  government: ({ locale, polityId }: PolityQuery) =>
+    ["polities", "detail", polityId, "government", { locale }] as const,
   motion: ({ locale, motionId, polityId }: PolityMotionQuery) =>
     ["polities", "detail", polityId, "motions", motionId, { locale }] as const,
+  record: ({ locale, polityId }: PolityQuery) =>
+    ["polities", "detail", polityId, "record", { locale }] as const,
 };
 
 export function polityActionsQueryOptions(input: PolityQuery) {
@@ -111,6 +117,28 @@ export function polityMotionQueryOptions(input: PolityMotionQuery) {
   });
 }
 
+export function polityGovernmentQueryOptions(input: PolityQuery) {
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      getPolityGovernment(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
+    queryKey: polityQueryKeys.government(input),
+  });
+}
+
+export function polityRecordQueryOptions(input: PolityQuery) {
+  return queryOptions({
+    queryFn: ({ signal }) =>
+      getPolityOfficialRecord(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
+    queryKey: polityQueryKeys.record(input),
+  });
+}
+
 export function usePolities(input: PolityListQuery) {
   return useSuspenseQuery(politiesQueryOptions(input));
 }
@@ -125,6 +153,14 @@ export function usePolityActions(input: PolityQuery) {
 
 export function usePolityMotion(input: PolityMotionQuery) {
   return useSuspenseQuery(polityMotionQueryOptions(input));
+}
+
+export function usePolityGovernment(input: PolityQuery) {
+  return useSuspenseQuery(polityGovernmentQueryOptions(input));
+}
+
+export function usePolityRecord(input: PolityQuery) {
+  return useSuspenseQuery(polityRecordQueryOptions(input));
 }
 
 export function polityOptionsQueryOptions(input: LocalizedQuery) {

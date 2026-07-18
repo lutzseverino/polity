@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   politiesQueryOptions,
   polityActionsQueryOptions,
+  polityGovernmentQueryOptions,
   polityMotionQueryOptions,
   polityOptionsQueryOptions,
   polityQueryOptions,
+  polityRecordQueryOptions,
 } from "@/domains/polity/api/polity-queries";
 
 describe("polity queries", () => {
@@ -16,6 +18,10 @@ describe("polity queries", () => {
         locale: "en",
         polityId: "polity-1",
       }).queryKey,
+      polityGovernmentQueryOptions({
+        locale: "en",
+        polityId: "polity-1",
+      }).queryKey,
       polityQueryOptions({ locale: "en", polityId: "polity-1" }).queryKey,
       polityMotionQueryOptions({
         locale: "en",
@@ -23,10 +29,18 @@ describe("polity queries", () => {
         polityId: "polity-1",
       }).queryKey,
       polityOptionsQueryOptions({ locale: "en" }).queryKey,
+      polityRecordQueryOptions({
+        locale: "en",
+        polityId: "polity-1",
+      }).queryKey,
     ];
     const spanish = [
       politiesQueryOptions({ locale: "es" }).queryKey,
       polityActionsQueryOptions({
+        locale: "es",
+        polityId: "polity-1",
+      }).queryKey,
+      polityGovernmentQueryOptions({
         locale: "es",
         polityId: "polity-1",
       }).queryKey,
@@ -37,6 +51,10 @@ describe("polity queries", () => {
         polityId: "polity-1",
       }).queryKey,
       polityOptionsQueryOptions({ locale: "es" }).queryKey,
+      polityRecordQueryOptions({
+        locale: "es",
+        polityId: "polity-1",
+      }).queryKey,
     ];
 
     expect(english).not.toEqual(spanish);

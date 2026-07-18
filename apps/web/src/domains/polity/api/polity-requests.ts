@@ -13,7 +13,12 @@ import {
   parsePolityPage,
   parsePolityResponse,
 } from "@/domains/polity/api/polity-contract";
-import type { Polity, PolitySummary } from "@/domains/polity/lib/polity";
+import type {
+  Polity,
+  PolityGovernment,
+  PolityOfficialRecordEntry,
+  PolitySummary,
+} from "@/domains/polity/lib/polity";
 import type { PageResult } from "@/lib/pagination";
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
 
@@ -65,7 +70,7 @@ function formatDateTime(value: string, locale: string) {
 }
 
 function thresholdLabel(
-  threshold: GovernmentResponse["procedures"][number]["threshold"],
+  threshold: GovernmentResponse["constitution"]["procedures"][number]["threshold"],
 ) {
   return {
     majority_of_eligible: "Majority of eligible members",
@@ -95,7 +100,7 @@ function projectMotion(
   record: readonly OfficialRecordResponse[],
   locale: string,
 ): Motion {
-  const procedure = government.procedures.find(
+  const procedure = government.constitution.procedures.find(
     ({ name }) => name === response.procedureName,
   );
   if (!procedure)
@@ -139,7 +144,7 @@ function projectMotion(
     procedure: {
       electorate:
         procedure.electorate === "active_members"
-          ? `All ${government.activeMemberCount} active members`
+          ? `All ${government.formation.activeMemberCount} active members`
           : "Current office holders",
       name: procedure.name,
       notice: `${procedure.minimumNoticeHours} hours`,
@@ -212,6 +217,47 @@ export function reconcileMotionResponse(
     ...(result ? { result } : {}),
     status: response.status,
     title: response.title,
+  };
+}
+
+function projectGovernment(
+  government: GovernmentResponse,
+  actions: ReturnType<typeof parsePolityActions>,
+  locale: string,
+): PolityGovernment {
+  return {
+    constitution: {
+      body: government.constitution.body,
+      ratifiedAtLabel: formatDateTime(
+        government.constitution.ratifiedAt,
+        locale,
+      ),
+      title: government.constitution.title,
+      version: government.constitution.version,
+    },
+    formation: government.formation,
+    health: actions.constitutionalHealth,
+    institutions: government.constitution.institutions,
+    offices: government.constitution.offices,
+    procedures: government.constitution.procedures,
+    readiness: actions.readiness,
+  };
+}
+
+function projectOfficialRecordEntry(
+  entry: OfficialRecordResponse,
+  locale: string,
+): PolityOfficialRecordEntry {
+  return {
+    actorName: entry.actorName,
+    body: entry.body,
+    constitutionVersion: entry.constitutionVersion,
+    entryNumber: entry.entryNumber,
+    id: entry.id,
+    ...(entry.motionId ? { motionId: entry.motionId } : {}),
+    occurredAtLabel: formatDateTime(entry.occurredAt, locale),
+    title: entry.title,
+    type: entry.type,
   };
 }
 
@@ -424,7 +470,7 @@ export async function getPolity(
     attention,
     constitutionVersion: resources.polity.constitutionVersion,
     id: resources.polity.id,
-    memberCount: resources.government.activeMemberCount,
+    memberCount: resources.government.formation.activeMemberCount,
     motions,
     name: resources.polity.name,
     readiness:
@@ -459,6 +505,43 @@ export async function getPolityActions(
   } catch (error) {
     if (hasHttpResponseStatus(error, 404))
       throw new ResourceNotFoundError("Polity actions", polityId);
+    throw error;
+  }
+}
+
+export async function getPolityGovernment(
+  polityId: string,
+  options: RequestOptions,
+) {
+  const encodedId = encodeURIComponent(polityId);
+  try {
+    const [government, actions] = await Promise.all([
+      requestUnknown(`/polities/${encodedId}/government`, options).then(
+        parseGovernment,
+      ),
+      requestUnknown(`/polities/${encodedId}/actions`, options).then(
+        parsePolityActions,
+      ),
+    ]);
+    return projectGovernment(government, actions, options.acceptedLanguage);
+  } catch (error) {
+    if (hasHttpResponseStatus(error, 404))
+      throw new ResourceNotFoundError("Polity government", polityId);
+    throw error;
+  }
+}
+
+export async function getPolityOfficialRecord(
+  polityId: string,
+  options: RequestOptions,
+) {
+  try {
+    return (await requestAllOfficialRecordEntries(polityId, options)).map(
+      (entry) => projectOfficialRecordEntry(entry, options.acceptedLanguage),
+    );
+  } catch (error) {
+    if (hasHttpResponseStatus(error, 404))
+      throw new ResourceNotFoundError("Polity official record", polityId);
     throw error;
   }
 }

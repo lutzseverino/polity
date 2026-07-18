@@ -708,4 +708,62 @@ describe("first governing journey", () => {
       "/polities/11111111-1111-4111-8111-111111111111/record",
     );
   });
+
+  it("shows how a polity is governed without roadmap placeholder copy", async () => {
+    const router = createTestRouter(
+      "/polities/11111111-1111-4111-8111-111111111111/government",
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Government status" }),
+    ).toBeVisible();
+    expect(screen.getByText("Tribune")).toBeVisible();
+    expect(screen.getByText("Ordinary resolution")).toBeVisible();
+    expect(
+      screen.getByText("A constitutional council republic."),
+    ).toBeVisible();
+    expect(
+      screen.queryByText("Planned polity destination"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows numbered official evidence with links back to its motion", async () => {
+    const router = createTestRouter(
+      "/polities/11111111-1111-4111-8111-111111111111/record",
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Official record" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText("Shared Thursday Dinner opened for voting"),
+    ).toBeVisible();
+    expect(screen.getByText("Voting opened.")).toBeVisible();
+    expect(
+      screen.getAllByRole("link", { name: "View motion" })[0],
+    ).toHaveAttribute(
+      "href",
+      "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+    );
+    expect(
+      screen.queryByText("Planned polity destination"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("uses a calm empty state when a polity has no official activity", async () => {
+    const router = createTestRouter(
+      "/polities/33333333-3333-4333-8333-333333333333/record",
+    );
+
+    renderRouter(router);
+
+    expect(await screen.findByText("No official activity yet")).toBeVisible();
+    expect(
+      screen.getByText("Formal decisions and changes will appear here."),
+    ).toBeVisible();
+  });
 });
