@@ -12,13 +12,13 @@ import { AppText } from "@/components/app/AppText";
 import { type Motion, MotionSummary } from "@/domains/motion";
 import { usePolity } from "@/domains/polity";
 
-const polityRoute = getRouteApi("/polities/$polityId");
+const polityRoute = getRouteApi("/polities/$politySlug");
 
 type MotionSectionProps = Readonly<{
   emptyMessage: ReactNode;
   headingId: string;
   motions: readonly Motion[];
-  polityId: string;
+  politySlug: string;
   title: ReactNode;
 }>;
 
@@ -26,7 +26,7 @@ function MotionSection({
   emptyMessage,
   headingId,
   motions,
-  polityId,
+  politySlug,
   title,
 }: MotionSectionProps) {
   return (
@@ -45,8 +45,8 @@ function MotionSection({
             <AppLinkSurface
               className="h-full"
               key={motion.id}
-              params={{ motionId: motion.id, polityId }}
-              to="/polities/$polityId/motions/$motionId"
+              params={{ motionId: motion.id, politySlug }}
+              to="/polities/$politySlug/motions/$motionId"
             >
               <MotionSummary
                 action={<AppLinkSurfaceIndicator />}
@@ -66,20 +66,21 @@ function MotionSection({
   );
 }
 
-export const Route = createFileRoute("/polities/$polityId/motions/")({
+export const Route = createFileRoute("/polities/$politySlug/motions/")({
   component: MotionListRoute,
   staticData: {
     shell: {
       label: msg`Motions`,
       level: "workspace",
-      target: { params: "polityId", to: "/polities/$polityId/motions" },
+      target: { params: "politySlug", to: "/polities/$politySlug/motions" },
     },
   },
 });
 
 function MotionListRoute() {
   const { i18n } = useLingui();
-  const { polityId } = polityRoute.useParams();
+  const { politySlug } = polityRoute.useParams();
+  const { polityId } = polityRoute.useLoaderData();
   const { data: polity } = usePolity({
     locale: i18n.locale,
     polityId,
@@ -109,7 +110,7 @@ function MotionListRoute() {
         emptyMessage={<Trans>There are no open motions.</Trans>}
         headingId="open-motions-heading"
         motions={activeMotions}
-        polityId={polity.id}
+        politySlug={politySlug}
         title={<Trans>Open now</Trans>}
       />
 
@@ -117,7 +118,7 @@ function MotionListRoute() {
         emptyMessage={<Trans>No motions have been completed yet.</Trans>}
         headingId="completed-motions-heading"
         motions={completedMotions}
-        polityId={polity.id}
+        politySlug={politySlug}
         title={<Trans>Completed</Trans>}
       />
     </div>

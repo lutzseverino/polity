@@ -291,7 +291,7 @@ class ResignMembershipWorkflowTest {
   }
 
   private Polity polity(UUID polityId, UUID founderUserId) {
-    Polity polity = new Polity("Friends", PolityVisibility.PUBLIC, founderUserId);
+    Polity polity = new Polity("Friends", "friends", PolityVisibility.PUBLIC, founderUserId);
     ReflectionTestUtils.setField(polity, "id", polityId);
     return polity;
   }

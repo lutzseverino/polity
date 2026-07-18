@@ -5,6 +5,7 @@ import type {
   MembershipInvitationTokenContext,
 } from "@/domains/membership/lib/membership";
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
+import { isUuid } from "@/lib/uuid";
 
 type RequestOptions = Readonly<{
   signal?: AbortSignal;
@@ -19,6 +20,7 @@ type MembershipInvitationResponse = Readonly<{
   id: string;
   invitedAt: string;
   invitedByName: string;
+  polityId: string;
   polityName: string;
 }>;
 
@@ -114,7 +116,7 @@ function parseMembershipInvitationTokenResponse(
     !isRecord(value) ||
     !isDateTime(value.expiresAt) ||
     typeof value.invitedEmail !== "string" ||
-    typeof value.polityId !== "string" ||
+    !isUuid(value.polityId) ||
     typeof value.polityName !== "string"
   ) {
     throw new Error("Invalid membership invitation token response.");
@@ -142,9 +144,10 @@ function parseMembershipInvitationPageResponse(
   const content = value.content.map((candidate) => {
     if (
       !isRecord(candidate) ||
-      typeof candidate.id !== "string" ||
-      typeof candidate.invitedAt !== "string" ||
+      !isUuid(candidate.id) ||
+      !isDateTime(candidate.invitedAt) ||
       typeof candidate.invitedByName !== "string" ||
+      !isUuid(candidate.polityId) ||
       typeof candidate.polityName !== "string"
     ) {
       throw new Error("Invalid membership invitation response.");
@@ -154,6 +157,7 @@ function parseMembershipInvitationPageResponse(
       id: candidate.id,
       invitedAt: candidate.invitedAt,
       invitedByName: candidate.invitedByName,
+      polityId: candidate.polityId,
       polityName: candidate.polityName,
     };
   });
@@ -232,6 +236,10 @@ export async function getMembershipInvitation(
   invitationId: string,
   options: LocalizedRequestOptions,
 ) {
+  if (!isUuid(invitationId)) {
+    throw new ResourceNotFoundError("Membership invitation", invitationId);
+  }
+
   let pageNumber = 0;
   let totalPages = 1;
 

@@ -74,7 +74,9 @@ class PolityBootstrapCompleterTest {
   }
 
   private Polity polity(UUID polityId) {
-    Polity polity = new Polity("Pocket Republic", PolityVisibility.PRIVATE, UUID.randomUUID());
+    Polity polity =
+        new Polity(
+            "Pocket Republic", "pocket-republic", PolityVisibility.PRIVATE, UUID.randomUUID());
     ReflectionTestUtils.setField(polity, "id", polityId);
     return polity;
   }

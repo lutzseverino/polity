@@ -65,6 +65,16 @@ paths:
       responses:
         "200": { description: Polity, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
         "404": { $ref: "#/components/responses/NotFound" }
+  /polities/by-slug/{slug}:
+    parameters: [{ $ref: "#/components/parameters/PolitySlug" }]
+    get:
+      tags: [Polities]
+      operationId: getPolityBySlug
+      summary: Resolve a polity by its canonical user-facing slug.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Polity, content: { application/json: { schema: { $ref: "#/components/schemas/PolityResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
   /polities/{polityId}/constitution:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -401,6 +411,7 @@ components:
     MotionId: { name: motionId, in: path, required: true, schema: { type: string, format: uuid } }
     MembershipInvitationId: { name: invitationId, in: path, required: true, schema: { type: string, format: uuid } }
     MembershipInvitationToken: { name: token, in: path, required: true, schema: { type: string, minLength: 1 } }
+    PolitySlug: { name: slug, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 80, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }
     SearchQuery:
       name: query
       in: query
@@ -747,9 +758,10 @@ components:
         - request_certification
     PolityResponse:
       type: object
-      required: [id, name, visibility, status, constitutionVersion, jurisdictionName, institutionName, createdAt]
+      required: [id, slug, name, visibility, status, constitutionVersion, jurisdictionName, institutionName, createdAt]
       properties:
         id: { type: string, format: uuid }
+        slug: { type: string, minLength: 1, maxLength: 80, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
         name: { type: string }
         visibility: { $ref: "#/components/schemas/PolityVisibility" }
         status: { $ref: "#/components/schemas/PolityStatus" }

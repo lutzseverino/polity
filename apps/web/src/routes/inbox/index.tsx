@@ -156,9 +156,9 @@ function InboxRoute() {
                       className={className}
                       params={{
                         motionId: linkedItem.source.motionId,
-                        polityId: linkedItem.source.polityId,
+                        politySlug: linkedItem.source.politySlug,
                       }}
-                      to="/polities/$polityId/motions/$motionId"
+                      to="/polities/$politySlug/motions/$motionId"
                     >
                       {children}
                     </Link>

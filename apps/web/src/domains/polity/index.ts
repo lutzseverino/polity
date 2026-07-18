@@ -7,6 +7,7 @@ export {
   polityOptionsQueryOptions,
   polityQueryOptions,
   polityRecordQueryOptions,
+  polityReferenceQueryOptions,
   usePolities,
   usePolity,
   usePolityActions,

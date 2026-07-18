@@ -32,6 +32,9 @@ public class Polity extends AuditedEntity implements TargetableAuthorizationReso
   @NotBlank @Size(max = 120) @Column(nullable = false)
   private String name;
 
+  @NotBlank @Size(max = 80) @Column(nullable = false, unique = true, updatable = false)
+  private String slug;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private PolityVisibility visibility;
@@ -46,8 +49,9 @@ public class Polity extends AuditedEntity implements TargetableAuthorizationReso
   @Column(name = "bootstrap_completed_at")
   private OffsetDateTime bootstrapCompletedAt;
 
-  public Polity(String name, PolityVisibility visibility, UUID founderId) {
+  public Polity(String name, String slug, PolityVisibility visibility, UUID founderId) {
     this.name = name;
+    this.slug = slug;
     this.visibility = visibility;
     this.founderId = founderId;
   }

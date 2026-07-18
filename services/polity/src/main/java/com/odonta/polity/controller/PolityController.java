@@ -5,6 +5,7 @@ import com.odonta.polity.api.model.CreatePolityRequest;
 import com.odonta.polity.api.model.PolityResponse;
 import com.odonta.polity.mapper.PolityTransportMapper;
 import com.odonta.polity.service.PolityService;
+import com.odonta.polity.service.PolitySlugLookupService;
 import com.odonta.polity.workflow.CreatePolityWorkflow;
 import com.odonta.polity.workflow.ProvisionPolityAccountWorkflow;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PolityController implements PolitiesApi {
   private final CreatePolityWorkflow createPolity;
   private final PolityService polities;
+  private final PolitySlugLookupService politySlugs;
   private final PolityTransportMapper mapper;
   private final ProvisionPolityAccountWorkflow provisionAccount;
   private final AuthenticatedUserReader users;
@@ -48,5 +50,10 @@ public class PolityController implements PolitiesApi {
   @Override
   public ResponseEntity<PolityResponse> getPolity(UUID polityId) {
     return ResponseEntity.ok(mapper.toResponse(polities.get(polityId, users.currentUser().id())));
+  }
+
+  @Override
+  public ResponseEntity<PolityResponse> getPolityBySlug(String slug) {
+    return ResponseEntity.ok(mapper.toResponse(politySlugs.get(slug, users.currentUser().id())));
   }
 }

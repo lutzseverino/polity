@@ -1,5 +1,6 @@
 import type { PolityActionAvailability } from "@/domains/polity/lib/polity";
 import type { PageResult } from "@/lib/pagination";
+import { isUuid } from "@/lib/uuid";
 
 export type PolityResponse = Readonly<{
   constitutionVersion: number;
@@ -8,6 +9,7 @@ export type PolityResponse = Readonly<{
   institutionName: string;
   jurisdictionName: string;
   name: string;
+  slug: string;
   status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;
@@ -152,14 +154,18 @@ function requiredString(value: unknown, message: string) {
 
 function requiredUuid(value: unknown, message: string) {
   const uuid = requiredString(value, message);
-  if (
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
-      uuid,
-    )
-  ) {
+  if (!isUuid(uuid)) {
     throw new Error(message);
   }
   return uuid;
+}
+
+function requiredSlug(value: unknown, message: string) {
+  const slug = requiredString(value, message);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug) || slug.length > 80) {
+    throw new Error(message);
+  }
+  return slug;
 }
 
 function requiredDateTime(value: unknown, message: string) {
@@ -288,6 +294,7 @@ export function parsePolityResponse(value: unknown): PolityResponse {
     institutionName: requiredString(response.institutionName, message),
     jurisdictionName: requiredString(response.jurisdictionName, message),
     name: requiredString(response.name, message),
+    slug: requiredSlug(response.slug, message),
     status: enumValue(response.status, ["active", "disbanded"], message),
     visibility: enumValue(response.visibility, ["private", "public"], message),
   };

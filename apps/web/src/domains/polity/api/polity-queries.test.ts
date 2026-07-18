@@ -8,6 +8,7 @@ import {
   polityOptionsQueryOptions,
   polityQueryOptions,
   polityRecordQueryOptions,
+  polityReferenceQueryOptions,
 } from "@/domains/polity/api/polity-queries";
 
 describe("polity queries", () => {
@@ -33,6 +34,10 @@ describe("polity queries", () => {
         locale: "en",
         polityId: "polity-1",
       }).queryKey,
+      polityReferenceQueryOptions({
+        locale: "en",
+        polityReference: "the-thursday-assembly",
+      }).queryKey,
     ];
     const spanish = [
       politiesQueryOptions({ locale: "es" }).queryKey,
@@ -54,6 +59,10 @@ describe("polity queries", () => {
       polityRecordQueryOptions({
         locale: "es",
         polityId: "polity-1",
+      }).queryKey,
+      polityReferenceQueryOptions({
+        locale: "es",
+        polityReference: "the-thursday-assembly",
       }).queryKey,
     ];
 

@@ -10,6 +10,8 @@ public interface PolityProjection {
 
   String getName();
 
+  String getSlug();
+
   PolityVisibility getVisibility();
 
   PolityStatus getStatus();

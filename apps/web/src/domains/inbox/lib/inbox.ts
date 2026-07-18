@@ -21,12 +21,12 @@ export type InboxTaskItem = InboxItemPresentation &
       | Readonly<{
           kind: "motion-vote";
           motionId: string;
-          polityId: string;
+          politySlug: string;
         }>
       | Readonly<{
           kind: "candidacy-response";
           motionId: string;
-          polityId: string;
+          politySlug: string;
         }>;
   }>;
 
@@ -36,7 +36,7 @@ export type InboxUpdateItem = InboxItemPresentation &
     source: Readonly<{
       kind: "motion-result";
       motionId: string;
-      polityId: string;
+      politySlug: string;
     }>;
   }>;
 

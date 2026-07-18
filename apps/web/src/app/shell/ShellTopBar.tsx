@@ -124,53 +124,53 @@ function ShellInternalLink({
     );
   }
 
-  const polityId = params.polityId;
+  const politySlug = params.politySlug;
 
-  if (!polityId) {
+  if (!politySlug) {
     return <span className={className}>{children}</span>;
   }
 
   switch (target.to) {
-    case "/polities/$polityId":
+    case "/polities/$politySlug":
       return (
         <Link
           aria-label={ariaLabel}
           className={className}
-          params={{ polityId }}
-          to="/polities/$polityId"
+          params={{ politySlug }}
+          to="/polities/$politySlug"
         >
           {children}
         </Link>
       );
-    case "/polities/$polityId/government":
+    case "/polities/$politySlug/government":
       return (
         <Link
           aria-label={ariaLabel}
           className={className}
-          params={{ polityId }}
-          to="/polities/$polityId/government"
+          params={{ politySlug }}
+          to="/polities/$politySlug/government"
         >
           {children}
         </Link>
       );
-    case "/polities/$polityId/motions":
+    case "/polities/$politySlug/motions":
       return (
         <Link
           aria-label={ariaLabel}
           className={className}
-          params={{ polityId }}
-          to="/polities/$polityId/motions"
+          params={{ politySlug }}
+          to="/polities/$politySlug/motions"
         >
           {children}
         </Link>
       );
-    case "/polities/$polityId/record":
+    case "/polities/$politySlug/record":
       return (
         <Link
           aria-label={ariaLabel}
           className={className}
-          params={{ polityId }}
-          to="/polities/$polityId/record"
+          params={{ politySlug }}
+          to="/polities/$politySlug/record"
         >
           {children}
         </Link>
@@ -245,6 +245,9 @@ export function ShellTopBar({
   polities,
 }: ShellTopBarProps) {
   const isCompact = layout === "compact";
+  const currentPolityId = polities.find(
+    ({ slug }) => slug === context.politySlug,
+  )?.id;
   const showDesktopBreadcrumbs = !isCompact && context.level !== "root";
 
   return (
@@ -288,7 +291,7 @@ export function ShellTopBar({
         <div className="flex shrink-0 items-center gap-1">
           {context.showPrimaryAction ? (
             <ActionLauncher
-              defaultPolityId={context.polityId}
+              defaultPolityId={currentPolityId}
               polities={polities}
               renderActionLink={renderActionLink}
               renderEmptyActionLink={renderEmptyActionLink}
@@ -318,9 +321,9 @@ export function ShellTopBar({
                       className={className}
                       params={{
                         motionId: item.source.motionId,
-                        polityId: item.source.polityId,
+                        politySlug: item.source.politySlug,
                       }}
-                      to="/polities/$polityId/motions/$motionId"
+                      to="/polities/$politySlug/motions/$motionId"
                     >
                       {children}
                     </Link>

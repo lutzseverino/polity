@@ -262,8 +262,8 @@ function PolityDirectoryRoute() {
           <Link
             className="focus-indicator group min-w-0 rounded-xl"
             key={polity.id}
-            params={{ polityId: polity.id }}
-            to="/polities/$polityId"
+            params={{ politySlug: polity.slug }}
+            to="/polities/$politySlug"
           >
             <PolityCard>
               <PolityCard.Header>
