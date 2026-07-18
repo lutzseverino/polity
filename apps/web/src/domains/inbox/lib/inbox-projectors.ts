@@ -30,6 +30,8 @@ export function projectMotionToInboxItem(
   }).format(new Date(motion.openedAt));
 
   if (motion.status === "voting" && motion.actions.castVote.available) {
+    if (motion.currentVote) return undefined;
+
     return {
       category: "needs-action",
       description: `Voting closes ${new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(motion.votingClosesAt))}.`,

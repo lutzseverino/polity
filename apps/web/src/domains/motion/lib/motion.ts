@@ -3,6 +3,10 @@ export type VoteChoice = "yes" | "no" | "abstain";
 export type MotionStatus = "voting" | "enacted" | "rejected";
 
 export type Motion = Readonly<{
+  actionAvailability: Readonly<{
+    available: boolean;
+    reasonMessage?: string;
+  }>;
   actionKind: "candidacy" | "vote";
   body: string;
   category: string;

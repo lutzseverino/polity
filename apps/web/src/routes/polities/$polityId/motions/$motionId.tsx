@@ -117,6 +117,26 @@ function MotionDecision({
     return <MotionResultDetails motion={motion} polityId={polityId} />;
   }
 
+  if (!motion.actionAvailability.available) {
+    return (
+      <AppAlert>
+        <Info aria-hidden="true" />
+        <AppAlertTitle>
+          {motion.actionKind === "candidacy" ? (
+            <Trans>Response recorded</Trans>
+          ) : (
+            <Trans>No action needed right now</Trans>
+          )}
+        </AppAlertTitle>
+        <AppAlertDescription>
+          {motion.actionAvailability.reasonMessage ?? (
+            <Trans>This motion isn’t waiting on you.</Trans>
+          )}
+        </AppAlertDescription>
+      </AppAlert>
+    );
+  }
+
   return motion.actionKind === "vote" ? (
     <CastMotionVoteWorkflow motion={motion} polityId={polityId} />
   ) : (

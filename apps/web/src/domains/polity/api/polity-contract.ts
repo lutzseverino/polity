@@ -29,11 +29,17 @@ export type GovernmentResponse = Readonly<{
   procedures: readonly ProcedureResponse[];
 }>;
 
+type ActionAvailabilityResponse = Readonly<{
+  available: boolean;
+  reason?: string;
+  reasonMessage?: string;
+}>;
+
 type MotionActions = Readonly<{
-  castElectionBallot: Readonly<{ available: boolean }>;
-  castVote: Readonly<{ available: boolean }>;
-  requestCertification: Readonly<{ available: boolean }>;
-  respondCandidacy: Readonly<{ available: boolean }>;
+  castElectionBallot: ActionAvailabilityResponse;
+  castVote: ActionAvailabilityResponse;
+  requestCertification: ActionAvailabilityResponse;
+  respondCandidacy: ActionAvailabilityResponse;
 }>;
 
 type EffectType =

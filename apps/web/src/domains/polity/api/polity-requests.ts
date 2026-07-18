@@ -125,6 +125,9 @@ function projectMotion(
   const certification = response.certification;
 
   return {
+    actionAvailability: response.officeElection
+      ? response.actions.respondCandidacy
+      : response.actions.castVote,
     actionKind: response.officeElection ? "candidacy" : "vote",
     body: response.body,
     category: effectLabel(response.effectType),
@@ -247,8 +250,10 @@ export async function getPolity(
   const attention: Polity["attention"] = [
     ...resources.motions
       .filter(
-        ({ actions, status }) =>
-          status === "voting" && actions.castVote.available,
+        ({ actions, currentVote, status }) =>
+          status === "voting" &&
+          actions.castVote.available &&
+          currentVote === undefined,
       )
       .map((motion) => ({
         description: motion.body,

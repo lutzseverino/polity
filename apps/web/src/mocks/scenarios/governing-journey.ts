@@ -558,7 +558,15 @@ export function createGoverningJourneyScenarioHandlers({
         if (!motion.officeElection) return notFound();
         const updated = {
           ...motion,
-          actions: motionActions("candidacy", false),
+          actions: {
+            ...motionActions("candidacy", false),
+            respondCandidacy: unavailable(
+              "candidacy_response_closed",
+              body.accepted
+                ? "You accepted the nomination."
+                : "You declined the nomination.",
+            ),
+          },
           officeElection: {
             ...motion.officeElection,
             candidates: motion.officeElection.candidates.map((candidate) => ({
