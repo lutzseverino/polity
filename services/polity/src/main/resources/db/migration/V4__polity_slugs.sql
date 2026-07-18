@@ -22,7 +22,9 @@ BEGIN
       base_slug := 'polity';
     END IF;
     base_slug := trim(TRAILING '-' FROM left(base_slug, 80));
-    IF base_slug IN ('new', 'invitations', 'membership-invitations') THEN
+    IF base_slug IN ('new', 'invitations', 'membership-invitations')
+      OR base_slug ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+    THEN
       base_slug := base_slug || '-polity';
     END IF;
 

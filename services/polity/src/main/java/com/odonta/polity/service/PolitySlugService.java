@@ -16,6 +16,8 @@ public class PolitySlugService {
   private static final Pattern APOSTROPHES = Pattern.compile("['’]");
   private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]+");
   private static final Pattern EDGE_HYPHENS = Pattern.compile("(^-+|-+$)");
+  private static final Pattern UUID_SHAPE =
+      Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
   private static final Set<String> RESERVED =
       Set.of("invitations", "membership-invitations", "new");
 
@@ -49,7 +51,7 @@ public class PolitySlugService {
                     .replaceAll("-"))
             .replaceAll("");
     slug = truncate(slug.isBlank() ? "polity" : slug, MAX_LENGTH);
-    return RESERVED.contains(slug)
+    return RESERVED.contains(slug) || UUID_SHAPE.matcher(slug).matches()
         ? truncate(slug, MAX_LENGTH - "-polity".length()) + "-polity"
         : slug;
   }

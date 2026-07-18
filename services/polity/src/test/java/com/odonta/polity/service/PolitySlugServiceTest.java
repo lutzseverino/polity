@@ -42,6 +42,12 @@ class PolitySlugServiceTest {
   }
 
   @Test
+  void keepsSlugsDistinctFromCompatibilityUuidRoutes() {
+    assertThat(slugs.claim("11111111-1111-4111-8111-111111111111"))
+        .isEqualTo("11111111-1111-4111-8111-111111111111-polity");
+  }
+
+  @Test
   void fallsBackForNamesWithoutAsciiLettersOrNumbers() {
     assertThat(slugs.claim("共同体")).isEqualTo("polity");
   }
