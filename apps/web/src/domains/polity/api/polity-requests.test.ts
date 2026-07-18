@@ -132,6 +132,35 @@ describe("polity requests", () => {
   });
 
   it.each([
+    { field: "number", value: -1 },
+    { field: "size", value: 0 },
+    { field: "totalElements", value: 1.5 },
+    { field: "totalPages", value: Number.MAX_SAFE_INTEGER + 1 },
+  ])("rejects invalid page metadata: $field=$value", async ({
+    field,
+    value,
+  }) => {
+    apiMockServer.use(
+      http.get("/api/v1/polities", () =>
+        HttpResponse.json({
+          content: [],
+          page: {
+            number: 0,
+            size: 50,
+            totalElements: 0,
+            totalPages: 0,
+            [field]: value,
+          },
+        }),
+      ),
+    );
+
+    await expect(listPolities({ acceptedLanguage: "en" })).rejects.toThrow(
+      "Invalid polity page response.",
+    );
+  });
+
+  it.each([
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: "not-a-uuid",

@@ -185,6 +185,16 @@ function requiredNumber(value: unknown, message: string) {
   return value;
 }
 
+function requiredInteger(value: unknown, minimum: number, message: string) {
+  if (
+    typeof value !== "number" ||
+    !Number.isSafeInteger(value) ||
+    value < minimum
+  )
+    throw new Error(message);
+  return value;
+}
+
 function requiredBoolean(value: unknown, message: string) {
   if (typeof value !== "boolean") throw new Error(message);
   return value;
@@ -214,10 +224,10 @@ function parsePage<Response, Product>(
   return {
     content: response.content.map(parseItem).map(project),
     page: {
-      number: requiredNumber(page.number, message),
-      size: requiredNumber(page.size, message),
-      totalElements: requiredNumber(page.totalElements, message),
-      totalPages: requiredNumber(page.totalPages, message),
+      number: requiredInteger(page.number, 0, message),
+      size: requiredInteger(page.size, 1, message),
+      totalElements: requiredInteger(page.totalElements, 0, message),
+      totalPages: requiredInteger(page.totalPages, 0, message),
     },
   };
 }
