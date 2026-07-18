@@ -60,9 +60,18 @@ export type Polity = Readonly<{
   memberCount: number;
   motions: readonly Motion[];
   name: string;
-  readiness: "forming" | "ready";
+  readiness: "forming" | "ready" | "unavailable";
   readinessMessage: string;
   recentActivity: readonly OfficialActivity[];
-  role: string;
+  status: "active" | "disbanded";
+  visibility: "private" | "public";
+}>;
+
+export type PolitySummary = Readonly<{
+  constitutionVersion: number;
+  id: string;
+  institutionName: string;
+  name: string;
+  status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;

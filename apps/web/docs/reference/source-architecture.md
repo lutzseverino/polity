@@ -8,7 +8,7 @@ This reference is authoritative for source ownership, naming, and import directi
 | --- | --- | --- |
 | `src/app/` | application | provider installation, router construction, i18n runtime, shell, route-state UI |
 | `src/routes/` | URL tree | file routes, params, search validation, loaders, and page composition |
-| `src/domains/<noun>/` | product noun | reusable domain types, read models, read operations/query options, fixtures/adapters, and noun-oriented components |
+| `src/domains/<noun>/` | product noun | reusable domain types, validated transport projections, read operations/query options, and noun-oriented components |
 | `src/features/<verb>/` | user capability | reusable action UI, action state, validation, request operations, and mutation orchestration |
 | `src/components/app/` | design system | owner-neutral product components and shadcn wrappers |
 | `src/components/ui/` | shadcn registry | generated registry components and hooks; read-only |

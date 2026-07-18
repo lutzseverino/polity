@@ -207,10 +207,10 @@ describe("first governing journey", () => {
       within(thursdayAssemblyLink).getByText("Public"),
     ).toBeInTheDocument();
     expect(
-      within(thursdayAssemblyLink).getByText("8 members"),
+      within(thursdayAssemblyLink).getByText("Assembly"),
     ).toBeInTheDocument();
     expect(
-      within(thursdayAssemblyLink).getByText("2 actions need you"),
+      within(thursdayAssemblyLink).getByText("Constitution v2"),
     ).toBeInTheDocument();
     expect(within(thursdayAssemblyLink).queryByText("Ready")).toBeNull();
 
@@ -218,16 +218,14 @@ describe("first governing journey", () => {
       name: /neighbourhood table/i,
     });
     expect(
-      within(neighbourhoodTableLink).getByText("Finish forming this polity"),
+      within(neighbourhoodTableLink).getByText("Constitution v1"),
     ).toBeInTheDocument();
     expect(within(neighbourhoodTableLink).queryByText("Forming")).toBeNull();
 
     const weekendCouncilLink = screen.getByRole("link", {
       name: /weekend council/i,
     });
-    expect(
-      within(weekendCouncilLink).getByText("You’re all caught up"),
-    ).toBeInTheDocument();
+    expect(within(weekendCouncilLink).getByText("Council")).toBeInTheDocument();
     expect(within(weekendCouncilLink).queryByText("Ready")).toBeNull();
   });
 

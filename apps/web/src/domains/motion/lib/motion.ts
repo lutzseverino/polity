@@ -10,7 +10,7 @@ export type Motion = Readonly<{
   currentVote?: VoteChoice;
   id: string;
   introducedBy: string;
-  participation: Readonly<{
+  participation?: Readonly<{
     cast: number;
     eligible: number;
     quorumMet: boolean;

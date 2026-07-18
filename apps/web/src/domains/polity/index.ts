@@ -1,3 +1,4 @@
+export type { MotionResponse } from "@/domains/polity/api/polity-contract";
 export {
   politiesQueryOptions,
   polityListQueryKey,
@@ -10,6 +11,13 @@ export {
   usePolityMotion,
   usePolityOptions,
 } from "@/domains/polity/api/polity-queries";
+export {
+  getPolityMotion,
+  listPolities,
+  listPolityMotionResponses,
+  maximumPolityPageSize,
+  parseMotionResponse,
+} from "@/domains/polity/api/polity-requests";
 export { PolityCard } from "@/domains/polity/components/PolityCard";
 export type {
   ActionAvailability,

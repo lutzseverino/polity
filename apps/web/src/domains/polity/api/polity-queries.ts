@@ -57,7 +57,11 @@ const polityQueryKeys = {
 
 export function polityActionsQueryOptions(input: PolityQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => getPolityActions(input.polityId, { signal }),
+    queryFn: ({ signal }) =>
+      getPolityActions(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.actions(input),
   });
 }
@@ -75,6 +79,7 @@ export function politiesQueryOptions(input: PolityListQuery) {
   return queryOptions({
     queryFn: ({ signal }) =>
       listPolities({
+        acceptedLanguage: input.locale,
         page: normalizedInput.page,
         query: normalizedInput.query,
         signal,
@@ -86,7 +91,11 @@ export function politiesQueryOptions(input: PolityListQuery) {
 
 export function polityQueryOptions(input: PolityQuery) {
   return queryOptions({
-    queryFn: ({ signal }) => getPolity(input.polityId, { signal }),
+    queryFn: ({ signal }) =>
+      getPolity(input.polityId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.detail(input),
   });
 }
@@ -94,7 +103,10 @@ export function polityQueryOptions(input: PolityQuery) {
 export function polityMotionQueryOptions(input: PolityMotionQuery) {
   return queryOptions({
     queryFn: ({ signal }) =>
-      getPolityMotion(input.polityId, input.motionId, { signal }),
+      getPolityMotion(input.polityId, input.motionId, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: polityQueryKeys.motion(input),
   });
 }

@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Landmark, Plus, Search, SearchX, X } from "lucide-react";
+import { Landmark, Plus, Search, SearchX, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppButton } from "@/components/app/AppButton";
@@ -24,7 +24,6 @@ import {
   politiesQueryOptions,
   usePolities,
 } from "@/domains/polity";
-import { cn } from "@/lib/utils";
 
 const maximumPolitySearchLength = 120;
 const polityDirectoryPageSize = 12;
@@ -273,72 +272,22 @@ function PolityDirectoryRoute() {
                     {polity.name}
                   </PolityCard.Title>
                   <PolityCard.Description className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span>{polity.role}</span>
-                    <span className="inline-flex items-center gap-2">
-                      <span aria-hidden="true">·</span>
-                      <span>
-                        {polity.visibility === "public" ? (
-                          <Trans>Public</Trans>
-                        ) : (
-                          <Trans>Private</Trans>
-                        )}
-                      </span>
-                      <span aria-hidden="true">·</span>
-                      <span>
-                        <Plural
-                          value={polity.memberCount}
-                          one="# member"
-                          other="# members"
-                        />
-                      </span>
+                    <span>{polity.institutionName}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                      {polity.visibility === "public" ? (
+                        <Trans>Public</Trans>
+                      ) : (
+                        <Trans>Private</Trans>
+                      )}
                     </span>
                   </PolityCard.Description>
                 </PolityCard.Identity>
               </PolityCard.Header>
-              {polity.readiness === "forming" &&
-              !polity.attention.some(({ kind }) => kind === "formation") ? (
-                <PolityCard.Content>
-                  <AppText variant="supporting">
-                    {polity.readinessMessage}
-                  </AppText>
-                </PolityCard.Content>
-              ) : null}
-              <PolityCard.Footer
-                className={cn(
-                  "mt-auto justify-between py-3 transition-colors",
-                  polity.attention.length > 0
-                    ? "bg-muted/40 group-hover:bg-muted/70"
-                    : "bg-transparent",
-                )}
-              >
-                {polity.attention.length > 0 ? (
-                  <>
-                    <AppText as="span" variant="strong">
-                      {polity.attention.length === 1 &&
-                      polity.attention[0]?.kind === "formation" ? (
-                        <Trans>Finish forming this polity</Trans>
-                      ) : (
-                        <Plural
-                          value={polity.attention.length}
-                          one="# action needs you"
-                          other="# actions need you"
-                        />
-                      )}
-                    </AppText>
-                    <ArrowRight
-                      aria-hidden="true"
-                      className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
-                    />
-                  </>
-                ) : (
-                  <AppText
-                    as="span"
-                    className="font-normal text-muted-foreground"
-                    variant="strong"
-                  >
-                    <Trans>You’re all caught up</Trans>
-                  </AppText>
-                )}
+              <PolityCard.Footer className="mt-auto bg-transparent py-3">
+                <AppText as="span" variant="supporting">
+                  <Trans>Constitution v{polity.constitutionVersion}</Trans>
+                </AppText>
               </PolityCard.Footer>
             </PolityCard>
           </Link>

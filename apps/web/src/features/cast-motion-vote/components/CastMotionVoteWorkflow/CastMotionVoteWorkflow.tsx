@@ -29,8 +29,8 @@ export function CastMotionVoteWorkflow({
   motion,
   polityId,
 }: CastMotionVoteWorkflowProps) {
-  const { t } = useLingui();
-  const castMotionVote = useCastMotionVote();
+  const { i18n, t } = useLingui();
+  const castMotionVote = useCastMotionVote(i18n.locale);
   const voteChoices: readonly Readonly<{
     description: string;
     label: string;

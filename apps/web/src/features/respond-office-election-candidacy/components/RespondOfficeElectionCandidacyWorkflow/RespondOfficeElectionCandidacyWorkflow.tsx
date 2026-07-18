@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Check } from "lucide-react";
 import { useState } from "react";
 
@@ -30,7 +30,10 @@ export function RespondOfficeElectionCandidacyWorkflow({
 }: RespondOfficeElectionCandidacyWorkflowProps) {
   const [response, setResponse] =
     useState<OfficeElectionCandidacyResponse | null>(null);
-  const respondOfficeElectionCandidacy = useRespondOfficeElectionCandidacy();
+  const { i18n } = useLingui();
+  const respondOfficeElectionCandidacy = useRespondOfficeElectionCandidacy(
+    i18n.locale,
+  );
 
   function respond(nextResponse: OfficeElectionCandidacyResponse) {
     respondOfficeElectionCandidacy.mutate(

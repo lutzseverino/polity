@@ -6,9 +6,9 @@ Accepted
 
 ## Context
 
-The web client needs one predictable path from product code to the Polity service. The first governing
-journey still uses fixture-backed adapters while authentication and the complete transport mapping are
-being integrated, but its consumers should not depend on fixture names or synchronous access patterns.
+The web client needs one predictable path from product code to the Polity service. Governing reads and
+actions use the service's HTTP resources even when browser development is backed by an in-memory MSW
+scenario. Authentication remains a separate integration concern.
 The service can localize response text, so the active locale affects both requests and cache identity.
 
 TanStack Router already owns route loading and preloading. Adding TanStack Query should preserve that early
@@ -27,8 +27,8 @@ Keep plain asynchronous operations with their product owner:
   items;
 - feature `api/*-request.ts` modules own user actions such as accepting an invitation, casting a vote, and
   responding to a nomination;
-- current fixture adapters remain private implementation details behind those operations until their HTTP
-  mappings can replace them without changing consumers.
+- domain request modules validate transport responses and project them into product-owned read models;
+  richer screens may deliberately compose several resources instead of expanding one service response.
 
 Use TanStack Query directly rather than introducing an application query wrapper. Owner-local query and
 mutation modules define stable keys, `queryOptions` or `mutationOptions`, and thin semantic hooks. Query keys
@@ -42,11 +42,11 @@ freshness requirements.
 
 ## Consequences
 
-- Product code no longer imports Axios or fixture functions directly.
+- Product code does not import Axios or mock scenario data directly.
 - Query keys, request functions, loader preloading, and component subscriptions remain colocated by owner.
 - Locale changes select a distinct cache entry instead of briefly presenting data in the previous language.
-- Replacing fixture-backed operations with HTTP is an internal owner change, not a route or component
-  migration.
+- Lightweight list projections remain distinct from richer workspace projections so directory requests do
+  not create an endpoint waterfall.
 - Cross-cutting query behavior belongs in `QueryClient`, while transport behavior belongs in the HTTP
   client; neither requires a generic hook API.
 - The source architecture check prevents Axios and TanStack Query from spreading outside their boundaries.
@@ -59,5 +59,5 @@ freshness requirements.
   shell and multiple routes and will need mutation invalidation.
 - Hooks that call Axios directly: rejected because transport calls would become React-only and unavailable
   to loaders, tests, and other non-component consumers.
-- Immediate replacement of fixtures with authenticated HTTP: deferred because the web app does not yet own
-  the bearer-token contract or complete mapping from service responses to its richer presentation models.
+- Waiting for authentication before using HTTP: rejected because it would keep product code coupled to a
+  temporary data source. Session credentials can be attached later at the shared client boundary.

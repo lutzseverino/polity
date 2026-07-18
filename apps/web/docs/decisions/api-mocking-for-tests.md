@@ -39,11 +39,10 @@ Mock handlers must not import application composition, routes, domains, features
 Product modules are not mocked when the behavior under test crosses the HTTP boundary, and they never select
 between real and mock request implementations.
 
-The initial shared browser scenario covers current-user invitation listing, token inspection, completion
-request and polling, retry, and acceptance. Future Polity or Identity scenarios extend this boundary with
-owner-local handlers and state; application request code remains unchanged. Fixture-backed product request
-modules remain temporary runtime adapters until their real HTTP and authentication mappings are available.
-They are not the API-mocking standard.
+The shared browser scenarios cover current-user invitations and the governing journey. The latter provides
+transport-shaped polity directory, workspace, action, government, motion, record, vote, and candidacy
+resources. Vote and candidacy handlers update their in-memory motion responses, so subsequent reads observe
+the recorded choice. Future scenarios extend this boundary; application request code remains unchanged.
 
 ## Consequences
 

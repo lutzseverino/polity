@@ -6,8 +6,22 @@ export type RespondOfficeElectionCandidacyInput = Readonly<{
   response: OfficeElectionCandidacyResponse;
 }>;
 
-export function respondOfficeElectionCandidacy(
-  input: RespondOfficeElectionCandidacyInput,
+export async function respondOfficeElectionCandidacy(
+  input: RespondOfficeElectionCandidacyInput &
+    Readonly<{ acceptedLanguage: string }>,
 ) {
-  return Promise.resolve(input);
+  parseMotionResponse(
+    await httpClient.request<unknown, { accepted: boolean }>({
+      acceptedLanguage: input.acceptedLanguage,
+      data: { accepted: input.response === "accepted" },
+      method: "PUT",
+      url: `/polities/${encodeURIComponent(input.polityId)}/motions/${encodeURIComponent(input.motionId)}/candidacy`,
+    }),
+  );
+  return input;
 }
+
+import { createHttpClient } from "@/api/http-client";
+import { parseMotionResponse } from "@/domains/polity";
+
+const httpClient = createHttpClient();
