@@ -66,7 +66,10 @@ export function membershipInvitationTokenQueryOptions(
 ) {
   return queryOptions({
     queryFn: ({ signal }) =>
-      getMembershipInvitationByToken(input.token, { signal }),
+      getMembershipInvitationByToken(input.token, {
+        acceptedLanguage: input.locale,
+        signal,
+      }),
     queryKey: membershipQueryKeys.membershipInvitationToken(input),
   });
 }

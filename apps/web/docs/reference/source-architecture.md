@@ -14,6 +14,7 @@ This reference is authoritative for source ownership, naming, and import directi
 | `src/components/ui/` | shadcn registry | generated registry components and hooks; read-only |
 | `src/api/` | transport | shared HTTP mechanics, generated OpenAPI clients, and transport contracts |
 | `src/lib/` | infrastructure | small framework- and product-neutral helpers |
+| `src/mocks/` | development transport | opt-in browser MSW installation, local scenario state, response data, and handlers |
 
 Create only the subfolders an owner needs. A domain or feature can start with `index.ts` and one
 `components/` or `lib/` folder; it does not need an empty copy of the entire structure.
@@ -67,6 +68,9 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   queries include locale in their query key.
 - Do not introduce `pages`, `widgets`, `entities`, or top-level `shared` folders. Classify code by actual
   ownership instead.
+- Keep `src/mocks/` development-only. Mock handlers model transport behavior and must not import application
+  composition, routes, product owners, or presentation components. Product request modules never import
+  this boundary or choose between mock and real implementations.
 
 `pnpm check:architecture` enforces the mechanically checkable part of this graph, including acyclic
 dependencies, shadcn isolation, upward-import bans, transitive domain and feature routing ownership, and

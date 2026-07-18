@@ -30,7 +30,74 @@ type MembershipInvitationPageResponse = Readonly<{
   }>;
 }>;
 
+type MembershipInvitationCompletionResponse = Readonly<{
+  actionExpiresAt?: string;
+  attemptCount: number;
+  completedAt?: string;
+  createdAt: string;
+  lastError?: string;
+  status: MembershipInvitationCompletion["status"];
+  updatedAt: string;
+}>;
+
+type MembershipInvitationTokenResponse = Readonly<{
+  expiresAt: string;
+  invitedEmail: string;
+  polityId: string;
+  polityName: string;
+}>;
+
 const httpClient = createHttpClient();
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseMembershipInvitationPageResponse(
+  value: unknown,
+): MembershipInvitationPageResponse {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.content) ||
+    !isRecord(value.page)
+  ) {
+    throw new Error("Invalid membership invitation response.");
+  }
+
+  const content = value.content.map((candidate) => {
+    if (
+      !isRecord(candidate) ||
+      typeof candidate.id !== "string" ||
+      typeof candidate.invitedAt !== "string" ||
+      typeof candidate.invitedByName !== "string" ||
+      typeof candidate.polityName !== "string"
+    ) {
+      throw new Error("Invalid membership invitation response.");
+    }
+
+    return {
+      id: candidate.id,
+      invitedAt: candidate.invitedAt,
+      invitedByName: candidate.invitedByName,
+      polityName: candidate.polityName,
+    };
+  });
+
+  if (
+    typeof value.page.number !== "number" ||
+    typeof value.page.totalPages !== "number"
+  ) {
+    throw new Error("Invalid membership invitation response.");
+  }
+
+  return {
+    content,
+    page: {
+      number: value.page.number,
+      totalPages: value.page.totalPages,
+    },
+  };
+}
 
 function toMembershipInvitation(
   invitation: MembershipInvitationResponse,
@@ -50,13 +117,15 @@ async function getMembershipInvitationPage(
   page: number,
   { acceptedLanguage, signal }: LocalizedRequestOptions,
 ): Promise<MembershipInvitationPageResponse> {
-  return httpClient.request<MembershipInvitationPageResponse>({
-    acceptedLanguage,
-    method: "GET",
-    params: { page, size: 100 },
-    signal,
-    url: "/invitations",
-  });
+  return parseMembershipInvitationPageResponse(
+    await httpClient.request<unknown>({
+      acceptedLanguage,
+      method: "GET",
+      params: { page, size: 100 },
+      signal,
+      url: "/invitations",
+    }),
+  );
 }
 
 export async function listMembershipInvitations({
@@ -128,18 +197,44 @@ function invitationTokenPath(token: string, suffix = "") {
   return `/api/v1/invitation-tokens/${encodeURIComponent(token)}${suffix}`;
 }
 
+function toMembershipInvitationCompletion(
+  response: MembershipInvitationCompletionResponse,
+): MembershipInvitationCompletion {
+  return { status: response.status };
+}
+
+function toMembershipInvitationTokenContext(
+  response: MembershipInvitationTokenResponse,
+  acceptedLanguage: string,
+): MembershipInvitationTokenContext {
+  return {
+    expiresAtLabel: new Intl.DateTimeFormat(acceptedLanguage, {
+      dateStyle: "long",
+    }).format(new Date(response.expiresAt)),
+    invitedEmail: response.invitedEmail,
+    polityId: response.polityId,
+    polityName: response.polityName,
+  };
+}
+
 export async function getMembershipInvitationByToken(
   token: string,
-  { signal }: RequestOptions = {},
+  { acceptedLanguage, signal }: LocalizedRequestOptions,
 ) {
   const response = await fetch(invitationTokenPath(token), {
     cache: "no-store",
-    headers: { Accept: "application/json" },
+    headers: {
+      Accept: "application/json",
+      "Accept-Language": acceptedLanguage,
+    },
     signal,
   });
-  return invitationTokenResponse<MembershipInvitationTokenContext>(
-    response,
-    token,
+  return toMembershipInvitationTokenContext(
+    await invitationTokenResponse<MembershipInvitationTokenResponse>(
+      response,
+      token,
+    ),
+    acceptedLanguage,
   );
 }
 
@@ -149,9 +244,11 @@ export async function requestMembershipInvitationCompletion(token: string) {
     headers: { Accept: "application/json" },
     method: "POST",
   });
-  return invitationTokenResponse<MembershipInvitationCompletion>(
-    response,
-    token,
+  return toMembershipInvitationCompletion(
+    await invitationTokenResponse<MembershipInvitationCompletionResponse>(
+      response,
+      token,
+    ),
   );
 }
 
@@ -164,8 +261,10 @@ export async function getMembershipInvitationCompletion(
     headers: { Accept: "application/json" },
     signal,
   });
-  return invitationTokenResponse<MembershipInvitationCompletion>(
-    response,
-    token,
+  return toMembershipInvitationCompletion(
+    await invitationTokenResponse<MembershipInvitationCompletionResponse>(
+      response,
+      token,
+    ),
   );
 }

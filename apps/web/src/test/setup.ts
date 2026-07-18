@@ -3,7 +3,10 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 
-import { apiMockServer } from "@/test/mocks/server";
+import {
+  apiMockServer,
+  resetDefaultApiMockHandlers,
+} from "@/test/mocks/server";
 
 Object.defineProperty(window, "scrollTo", {
   value: vi.fn(),
@@ -30,7 +33,7 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup();
-  apiMockServer.resetHandlers();
+  resetDefaultApiMockHandlers();
 });
 
 afterAll(() => {

@@ -13,28 +13,23 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:96
-msgid "Cardo could not complete identity setup."
-msgstr ""
-
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:65
-msgid "Cardo is preparing a secure Keycloak action. This page will update automatically."
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:107
+msgid "Check your connection and try again."
 msgstr ""
 
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:62
 msgid "Check your email"
 msgstr ""
 
-#. placeholder {0}: completion.attemptCount
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:117
-msgid "Identity setup attempt {0}."
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:104
+msgid "Couldn’t continue"
 msgstr ""
 
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:92
-msgid "Identity setup failed"
+msgid "Couldn’t sign you up"
 msgstr ""
 
-#. placeholder {0}: invitation.expiresAt
+#. placeholder {0}: invitation.expiresAtLabel
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:113
 msgid "Invitation expires {0}."
 msgstr ""
@@ -44,40 +39,39 @@ msgstr ""
 msgid "Join {0}"
 msgstr ""
 
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:119
+msgid "Log in to review invitation"
+msgstr ""
+
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:80
+msgid "Log in to review the invitation. You won’t join until you accept it."
+msgstr ""
+
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:44
 msgid "Membership invitation"
 msgstr ""
 
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:138
-msgid "Set up identity"
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:129
+msgid "Sign up"
 msgstr ""
 
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:131
-msgid "Sign in to review invitation"
-msgstr ""
-
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:80
-msgid "Sign in to review the pending invitation. Identity setup does not accept polity membership."
-msgstr ""
-
-#. placeholder {0}: completion.actionExpiresAt
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:122
-msgid "The current identity action expires {0}."
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:95
+msgid "Something went wrong. Try again."
 msgstr ""
 
 #. placeholder {0}: invitation.invitedEmail
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:50
-msgid "This invitation was sent to {0}. Set up your identity, sign in, and then choose whether to accept membership."
+msgid "This invitation was sent to {0}. Sign up to review it and decide whether you want to join."
 msgstr ""
 
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:138
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:127
 msgid "Try again"
 msgstr ""
 
-#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:106
-msgid "Unable to continue"
+#: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:65
+msgid "Use the link we sent to finish signing up. This page will update automatically."
 msgstr ""
 
 #: src/features/onboard-membership-invitation/components/OnboardMembershipInvitationWorkflow/OnboardMembershipInvitationWorkflow.tsx:77
-msgid "Your identity is ready"
+msgid "You’re signed up"
 msgstr ""

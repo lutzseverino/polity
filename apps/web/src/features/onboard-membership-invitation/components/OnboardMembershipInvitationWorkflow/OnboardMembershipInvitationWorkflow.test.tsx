@@ -8,7 +8,7 @@ import { MembershipInvitationOnboardingContent } from "@/features/onboard-member
 
 const i18n = setupI18n({ locale: "en", messages: { en: {} } });
 const invitation = {
-  expiresAt: "2026-07-20T10:00:00Z",
+  expiresAtLabel: "July 20, 2026",
   invitedEmail: "friend@example.com",
   polityId: "polity-1",
   polityName: "Friend Republic",
@@ -17,12 +17,7 @@ const invitation = {
 function completion(
   status: MembershipInvitationCompletion["status"],
 ): MembershipInvitationCompletion {
-  return {
-    attemptCount: 1,
-    createdAt: "2026-07-18T10:00:00Z",
-    status,
-    updatedAt: "2026-07-18T10:01:00Z",
-  };
+  return { status };
 }
 
 function renderContent(
@@ -44,40 +39,71 @@ function renderContent(
 }
 
 describe("membership invitation onboarding", () => {
-  it("starts passwordless identity setup without presenting credential fields", () => {
+  it("starts passwordless signup without presenting credential fields", () => {
     const request = renderContent();
 
-    fireEvent.click(screen.getByRole("button", { name: "Set up identity" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
 
     expect(request).toHaveBeenCalledOnce();
     expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
   });
 
-  it("stops at identity completion and hands off to sign-in", () => {
+  it("stops at signup completion and hands off to login", () => {
     renderContent(completion("completed"));
 
-    expect(screen.getByText("Your identity is ready")).toBeInTheDocument();
+    expect(screen.getByText("You’re signed up")).toBeInTheDocument();
     expect(
-      screen.getByText(/does not accept polity membership/i),
+      screen.getByText(/won’t join until you accept it/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Sign in to review invitation" }),
+      screen.getByRole("link", { name: "Log in to review invitation" }),
     ).toHaveAttribute("href", "/sign-in");
   });
 
-  it("shows Cardo's terminal failure and permits an explicit retry", () => {
-    const request = vi.fn();
-    renderContent(
-      { ...completion("failed"), lastError: "credential_action_expired" },
-      request,
-    );
+  it("presents pending setup without implementation language", () => {
+    renderContent(completion("awaiting_identity"));
 
-    expect(screen.getByText("credential_action_expired")).toBeInTheDocument();
+    expect(screen.getByText("Check your email")).toBeInTheDocument();
+    expect(screen.getByText(/finish signing up/i)).toBeInTheDocument();
+    expect(screen.queryByText(/cardo|keycloak/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign up" })).toBeDisabled();
+  });
+
+  it("shows a product-owned terminal failure and permits an explicit retry", () => {
+    const request = vi.fn();
+    renderContent(completion("failed"), request);
+
+    expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText("credential_action_expired"),
+    ).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(request).toHaveBeenCalledOnce();
   });
 
-  it("polls only Cardo's non-terminal completion states", () => {
+  it("shows a product-owned request error and retry affordance", () => {
+    const request = vi.fn();
+    render(
+      <I18nProvider i18n={i18n}>
+        <MembershipInvitationOnboardingContent
+          error={new Error("upstream_internal_failure")}
+          invitation={invitation}
+          isPending={false}
+          onRequestCompletion={request}
+          renderSignInLink={(label) => <a href="/sign-in">{label}</a>}
+        />
+      </I18nProvider>,
+    );
+
+    expect(
+      screen.queryByText("upstream_internal_failure"),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(/check your connection/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(request).toHaveBeenCalledOnce();
+  });
+
+  it("polls only non-terminal completion states", () => {
     expect(shouldPollMembershipInvitationCompletion("requested")).toBe(true);
     expect(shouldPollMembershipInvitationCompletion("awaiting_identity")).toBe(
       true,

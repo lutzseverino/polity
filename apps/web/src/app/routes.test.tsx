@@ -415,9 +415,7 @@ describe("first governing journey", () => {
         level: 1,
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Set up identity" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sign up" })).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Join polity" }),
     ).not.toBeInTheDocument();
