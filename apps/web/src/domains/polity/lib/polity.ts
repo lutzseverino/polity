@@ -75,3 +75,56 @@ export type PolitySummary = Readonly<{
   status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;
+
+export type PolityGovernment = Readonly<{
+  constitution: Readonly<{
+    body: string;
+    ratifiedAtLabel: string;
+    title: string;
+    version: number;
+  }>;
+  formation: Readonly<{
+    activeMemberCount: number;
+    complete: boolean;
+    minimumFullGovernmentMembers: number;
+    standingMemberCount: number;
+  }>;
+  health: PolityActionAvailability["constitutionalHealth"];
+  institutions: readonly Readonly<{
+    id: string;
+    kind: "assembly" | "council" | "judiciary";
+    name: string;
+  }>[];
+  offices: readonly Readonly<{
+    description: string;
+    id: string;
+    name: string;
+    seatCount: number;
+    termLengthDays: number;
+  }>[];
+  procedures: readonly Readonly<{
+    electorate: "active_members" | "office_holders";
+    id: string;
+    minimumNoticeHours: number;
+    name: string;
+    threshold:
+      | "majority_of_eligible"
+      | "office_election_result"
+      | "simple_majority_cast"
+      | "two_thirds_cast"
+      | "two_thirds_eligible";
+    votingPeriodHours: number;
+  }>[];
+  readiness: PolityActionAvailability["readiness"];
+}>;
+
+export type PolityOfficialRecordEntry = Readonly<{
+  actorName: string;
+  body: string;
+  constitutionVersion: number;
+  entryNumber: number;
+  id: string;
+  motionId?: string;
+  occurredAtLabel: string;
+  title: string;
+}>;

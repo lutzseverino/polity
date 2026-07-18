@@ -13,36 +13,60 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#. placeholder {0}: polity.attention.length
-#: src/routes/polities/index.tsx:321
-msgid "{0, plural, one {# action needs you} other {# actions need you}}"
+#. placeholder {0}: government.formation.activeMemberCount
+#: src/routes/polities/$polityId/government.tsx:151
+msgid "{0, plural, one {# active member} other {# active members}}"
+msgstr ""
+
+#. placeholder {0}: office.termLengthDays
+#: src/routes/polities/$polityId/government.tsx:247
+msgid "{0, plural, one {# day per term} other {# days per term}}"
+msgstr ""
+
+#. placeholder {0}: government.formation.standingMemberCount
+#: src/routes/polities/$polityId/government.tsx:157
+msgid "{0, plural, one {# in good standing} other {# in good standing}}"
 msgstr ""
 
 #. placeholder {0}: polity.memberCount
-#: src/routes/polities/$polityId/route.tsx:150
-#: src/routes/polities/index.tsx:288
+#: src/routes/polities/$polityId/route.tsx:154
 msgid "{0, plural, one {# member} other {# members}}"
 msgstr ""
 
 #. placeholder {0}: pageMetadata.totalElements
-#: src/routes/polities/index.tsx:254
+#: src/routes/polities/index.tsx:253
 msgid "{0, plural, one {# polity} other {# polities}}"
 msgstr ""
 
+#. placeholder {0}: office.seatCount
+#: src/routes/polities/$polityId/government.tsx:241
+msgid "{0, plural, one {# seat} other {# seats}}"
+msgstr ""
+
+#. placeholder {0}: procedure.minimumNoticeHours
+#. placeholder {1}: procedure.votingPeriodHours
+#: src/routes/polities/$polityId/government.tsx:305
+msgid "{0} hours’ notice · {1} hours to vote"
+msgstr ""
+
 #. placeholder {0}: polity.name
-#: src/routes/polities/$polityId/route.tsx:193
+#: src/routes/polities/$polityId/route.tsx:197
 msgid "{0} navigation"
 msgstr ""
 
 #. placeholder {0}: motion.participation.quorumRequired
-#: src/routes/polities/$polityId/motions/$motionId.tsx:220
+#: src/routes/polities/$polityId/motions/$motionId.tsx:249
 msgid "{0} needed"
 msgstr ""
 
 #. placeholder {0}: motion.participation.cast
 #. placeholder {1}: motion.participation.eligible
-#: src/routes/polities/$polityId/motions/$motionId.tsx:201
+#: src/routes/polities/$polityId/motions/$motionId.tsx:229
 msgid "{0} of {1} eligible members have participated."
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:90
+msgid "All active members"
 msgstr ""
 
 #: src/routes/polities/$polityId/motions/$motionId.tsx:51
@@ -51,6 +75,10 @@ msgstr ""
 
 #: src/routes/polities/$polityId/route.tsx:59
 msgid "All polities"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:78
+msgid "Assembly"
 msgstr ""
 
 #: src/routes/polities/membership-invitations/$invitationId.tsx:36
@@ -62,25 +90,29 @@ msgstr ""
 msgid "Certified result"
 msgstr ""
 
-#: src/routes/polities/index.tsx:232
+#: src/routes/polities/index.tsx:231
 msgid "Clear polity search"
 msgstr ""
 
-#: src/routes/polities/index.tsx:375
+#: src/routes/polities/index.tsx:324
 msgid "Clear search"
 msgstr ""
 
+#: src/routes/polities/$polityId/government.tsx:58
+msgid "Closed"
+msgstr ""
+
 #. placeholder {0}: motion.closesAtLabel.toLowerCase()
-#: src/routes/polities/$polityId/motions/$motionId.tsx:162
+#: src/routes/polities/$polityId/motions/$motionId.tsx:189
 msgid "Closed {0}"
 msgstr ""
 
 #. placeholder {0}: motion.closesAtLabel.toLowerCase()
-#: src/routes/polities/$polityId/motions/$motionId.tsx:160
+#: src/routes/polities/$polityId/motions/$motionId.tsx:187
 msgid "Closes {0}"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:185
+#: src/routes/polities/$polityId/motions/$motionId.tsx:212
 msgid "Comments and reactions will appear here when the social layer is introduced. They will never change votes, eligibility, or the official result."
 msgstr ""
 
@@ -88,25 +120,48 @@ msgstr ""
 msgid "Completed"
 msgstr ""
 
+#. placeholder {0}: entry.constitutionVersion
 #. placeholder {0}: polity.constitutionVersion
-#: src/routes/polities/$polityId/route.tsx:138
+#: src/routes/polities/$polityId/record.tsx:85
+#: src/routes/polities/$polityId/route.tsx:143
+#: src/routes/polities/index.tsx:289
 msgid "Constitution v{0}"
 msgstr ""
 
-#: src/routes/polities/index.tsx:183
+#: src/routes/polities/$polityId/government.tsx:169
+msgid "Constitutional health"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:321
+msgid "Constitutional procedures will appear here."
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:80
+msgid "Council"
+msgstr ""
+
+#: src/routes/polities/index.tsx:182
 msgid "Create a new space and establish how it will govern itself."
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:92
+msgid "Current office holders"
 msgstr ""
 
 #: src/routes/polities/$polityId/index.tsx:149
 msgid "Decisions and requests waiting on you."
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:182
+#: src/routes/polities/$polityId/motions/$motionId.tsx:209
 msgid "Discussion is separate from government action"
 msgstr ""
 
-#: src/routes/polities/index.tsx:319
-msgid "Finish forming this polity"
+#: src/routes/polities/$polityId/government.tsx:275
+msgid "Each kind of decision follows its constitutional procedure."
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:109
+msgid "Election result"
 msgstr ""
 
 #: src/routes/polities/$polityId/index.tsx:146
@@ -117,32 +172,59 @@ msgstr ""
 msgid "Formal changes and decisions from this polity."
 msgstr ""
 
+#: src/routes/polities/$polityId/record.tsx:110
+msgid "Formal decisions and changes will appear here."
+msgstr ""
+
 #: src/routes/polities/$polityId/route.tsx:127
 msgid "Forming"
 msgstr ""
 
-#: src/routes/polities/index.tsx:180
+#: src/routes/polities/$polityId/government.tsx:52
+msgid "Forming offices"
+msgstr ""
+
+#: src/routes/polities/index.tsx:179
 #: src/routes/polities/new.tsx:14
 #: src/routes/polities/new.tsx:33
 msgid "Found a polity"
 msgstr ""
 
-#: src/routes/polities/$polityId/government.tsx:11
-#: src/routes/polities/$polityId/government.tsx:29
+#: src/routes/polities/$polityId/government.tsx:54
+msgid "Getting started"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:38
 #: src/routes/polities/$polityId/route.tsx:103
 msgid "Government"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:130
+msgid "Government status"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:65
+msgid "Healthy"
 msgstr ""
 
 #: src/routes/polities/$polityId/route.tsx:93
 msgid "Home"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:230
+#: src/routes/polities/$polityId/government.tsx:272
+msgid "How decisions are made"
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:262
 msgid "How this decision works"
 msgstr ""
 
+#: src/routes/polities/$polityId/government.tsx:212
+msgid "Institutions"
+msgstr ""
+
 #. placeholder {0}: motion.introducedBy
-#: src/routes/polities/$polityId/motions/$motionId.tsx:170
+#: src/routes/polities/$polityId/motions/$motionId.tsx:197
 msgid "Introduced by {0}"
 msgstr ""
 
@@ -155,15 +237,23 @@ msgstr ""
 msgid "It’s quiet here for now"
 msgstr ""
 
+#: src/routes/polities/$polityId/government.tsx:82
+msgid "Judiciary"
+msgstr ""
+
 #: src/routes/polities/$polityId/index.tsx:180
 msgid "Latest"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:218
+#: src/routes/polities/$polityId/government.tsx:103
+msgid "Majority of eligible members"
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:247
 msgid "Met"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:254
+#: src/routes/polities/$polityId/motions/$motionId.tsx:286
 msgid "Minimum notice"
 msgstr ""
 
@@ -171,7 +261,7 @@ msgstr ""
 msgid "Motion"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:194
+#: src/routes/polities/$polityId/motions/$motionId.tsx:221
 msgid "Motion procedure"
 msgstr ""
 
@@ -179,6 +269,11 @@ msgstr ""
 #: src/routes/polities/$polityId/motions/index.tsx:98
 #: src/routes/polities/$polityId/route.tsx:98
 msgid "Motions"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:56
+#: src/routes/polities/$polityId/government.tsx:69
+msgid "Needs attention"
 msgstr ""
 
 #: src/routes/polities/$polityId/index.tsx:170
@@ -189,7 +284,19 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/routes/polities/index.tsx:359
+#: src/routes/polities/$polityId/motions/$motionId.tsx:128
+msgid "No action needed right now"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:318
+msgid "No decision procedures yet"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:260
+msgid "No institutions or offices yet"
+msgstr ""
+
+#: src/routes/polities/index.tsx:308
 msgid "No matching polities"
 msgstr ""
 
@@ -197,24 +304,33 @@ msgstr ""
 msgid "No motions have been completed yet."
 msgstr ""
 
-#: src/routes/polities/index.tsx:366
+#: src/routes/polities/$polityId/record.tsx:107
+msgid "No official activity yet"
+msgstr ""
+
+#: src/routes/polities/index.tsx:315
 msgid "No polities match “{query}”."
 msgstr ""
 
-#: src/routes/polities/index.tsx:361
+#: src/routes/polities/index.tsx:310
 msgid "No polities yet"
 msgstr ""
 
-#: src/routes/polities/$polityId/government.tsx:23
-msgid "Offices, people, constitutional rules, and government health will be developed after proceedings are validated."
+#. placeholder {0}: entry.entryNumber
+#: src/routes/polities/$polityId/record.tsx:72
+msgid "No. {0}"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:234
+msgid "Office"
 msgstr ""
 
 #: src/routes/polities/$polityId/index.tsx:209
 msgid "Official activity will collect here as it happens."
 msgstr ""
 
-#: src/routes/polities/$polityId/record.tsx:11
-#: src/routes/polities/$polityId/record.tsx:29
+#: src/routes/polities/$polityId/record.tsx:35
+#: src/routes/polities/$polityId/record.tsx:54
 msgid "Official record"
 msgstr ""
 
@@ -227,82 +343,156 @@ msgstr ""
 msgid "Open now"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:198
+#: src/routes/polities/$polityId/motions/$motionId.tsx:226
 msgid "Participation"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:246
+#: src/routes/polities/$polityId/government.tsx:296
+#: src/routes/polities/$polityId/motions/$motionId.tsx:278
 msgid "Passing rule"
 msgstr ""
 
-#: src/routes/polities/$polityId/government.tsx:28
-#: src/routes/polities/$polityId/record.tsx:28
 #: src/routes/polities/new.tsx:32
 msgid "Planned polity destination"
 msgstr ""
 
-#: src/routes/polities/index.tsx:78
-#: src/routes/polities/index.tsx:160
+#: src/routes/polities/index.tsx:77
+#: src/routes/polities/index.tsx:159
 msgid "Polities"
 msgstr ""
 
-#: src/routes/polities/index.tsx:368
+#: src/routes/polities/index.tsx:317
 msgid "Polities you join will appear here."
 msgstr ""
 
-#: src/routes/polities/$polityId/route.tsx:134
-#: src/routes/polities/index.tsx:283
+#: src/routes/polities/$polityId/route.tsx:139
+#: src/routes/polities/index.tsx:281
 msgid "Private"
 msgstr ""
 
-#: src/routes/polities/$polityId/route.tsx:132
-#: src/routes/polities/index.tsx:281
+#: src/routes/polities/$polityId/route.tsx:137
+#: src/routes/polities/index.tsx:279
 msgid "Public"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:210
+#: src/routes/polities/$polityId/motions/$motionId.tsx:239
 msgid "Quorum"
+msgstr ""
+
+#. placeholder {0}: government.constitution.ratifiedAtLabel
+#: src/routes/polities/$polityId/government.tsx:192
+msgid "Ratified {0}"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:140
+msgid "Readiness"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:50
+msgid "Ready"
 msgstr ""
 
 #: src/routes/polities/$polityId/route.tsx:108
 msgid "Record"
 msgstr ""
 
+#. placeholder {0}: entry.actorName
+#: src/routes/polities/$polityId/record.tsx:83
+msgid "Recorded by {0}"
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:126
+msgid "Response recorded"
+msgstr ""
+
 #: src/routes/polities/$polityId/motions/index.tsx:101
 msgid "Review active proceedings, cast eligible votes, and find certified results."
 msgstr ""
 
-#: src/routes/polities/index.tsx:212
+#: src/routes/polities/index.tsx:211
 msgid "Search polities"
 msgstr ""
 
-#: src/routes/polities/index.tsx:226
+#: src/routes/polities/index.tsx:225
 msgid "Search polities…"
 msgstr ""
 
-#: src/routes/polities/$polityId/route.tsx:159
-#: src/routes/polities/$polityId/route.tsx:162
+#: src/routes/polities/$polityId/government.tsx:101
+msgid "Simple majority of votes cast"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:67
+msgid "Some paths are unavailable"
+msgstr ""
+
+#: src/routes/polities/$polityId/route.tsx:163
+#: src/routes/polities/$polityId/route.tsx:166
 msgid "Switch polity"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:215
+msgid "The bodies and offices entrusted with governing."
 msgstr ""
 
 #: src/routes/polities/new.tsx:27
 msgid "The founding flow is the next product slice after the core governing journey."
 msgstr ""
 
-#: src/routes/polities/$polityId/record.tsx:23
-msgid "The permanent, numbered official record will be the next read-focused polity destination."
+#: src/routes/polities/$polityId/record.tsx:57
+msgid "The permanent history of formal decisions and changes in this polity."
 msgstr ""
 
 #: src/routes/polities/$polityId/motions/index.tsx:109
 msgid "There are no open motions."
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:152
+#: src/routes/polities/$polityId/government.tsx:263
+msgid "They will appear here as this polity forms."
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:133
+msgid "This motion isn’t waiting on you."
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:302
+msgid "Timing"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:107
+msgid "Two thirds of eligible members"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:105
+msgid "Two thirds of votes cast"
+msgstr ""
+
+#: src/routes/polities/$polityId/route.tsx:132
+msgid "Unavailable"
+msgstr ""
+
+#. placeholder {0}: government.constitution.version
+#: src/routes/polities/$polityId/government.tsx:189
+msgid "Version {0}"
+msgstr ""
+
+#: src/routes/polities/$polityId/record.tsx:96
+msgid "View motion"
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:179
 msgid "Voting open"
 msgstr ""
 
-#: src/routes/polities/$polityId/motions/$motionId.tsx:238
+#: src/routes/polities/$polityId/government.tsx:133
+msgid "Whether this polity can make and carry out decisions."
+msgstr ""
+
+#: src/routes/polities/$polityId/motions/$motionId.tsx:270
 msgid "Who participates"
+msgstr ""
+
+#: src/routes/polities/$polityId/government.tsx:290
+msgid "Who votes"
 msgstr ""
 
 #: src/routes/polities/$polityId/motions/$motionId.tsx:83
@@ -310,6 +500,5 @@ msgid "Yes"
 msgstr ""
 
 #: src/routes/polities/$polityId/index.tsx:167
-#: src/routes/polities/index.tsx:339
 msgid "You’re all caught up"
 msgstr ""

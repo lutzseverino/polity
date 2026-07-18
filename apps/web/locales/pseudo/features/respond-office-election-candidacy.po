@@ -13,27 +13,27 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:63
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:65
 msgid "Accept nomination"
 msgstr ""
 
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:70
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:72
 msgid "Decline"
 msgstr ""
 
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:52
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:54
 msgid "Only accepted candidates can appear on ballots or be elected."
 msgstr ""
 
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:49
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:51
 msgid "Respond to your nomination"
 msgstr ""
 
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:77
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:79
 msgid "Response recorded"
 msgstr ""
 
 #. placeholder {0}: motion.closesAtLabel.toLowerCase()
-#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:80
+#: src/features/respond-office-election-candidacy/components/RespondOfficeElectionCandidacyWorkflow/RespondOfficeElectionCandidacyWorkflow.tsx:82
 msgid "You {response} the nomination. You can update your response until {0}."
 msgstr ""

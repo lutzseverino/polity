@@ -4,6 +4,7 @@ const available = { available: true } as const;
 const assemblyInstitutionId = "44444444-4444-4444-8444-444444444444";
 const ordinaryProcedureId = "66666666-6666-4666-8666-666666666661";
 const electionProcedureId = "66666666-6666-4666-8666-666666666662";
+const tribuneOfficeId = "77777777-7777-4777-8777-777777777777";
 const unavailable = (reason: string, reasonMessage: string) => ({
   available: false,
   reason,
@@ -171,7 +172,18 @@ function government(polityId: string) {
           name: "Assembly",
         },
       ],
-      offices: [],
+      offices: [
+        {
+          code: "tribune",
+          description:
+            "Coordinates meetings and represents the assembly between sessions.",
+          id: tribuneOfficeId,
+          jurisdictionId: polityId,
+          name: "Tribune",
+          seatCount: 1,
+          termLengthDays: 365,
+        },
+      ],
       powers: [],
       procedures: [
         procedure(
@@ -320,7 +332,7 @@ function initialMotions(now: Date): MockMotion[] {
         ],
         method: "ranked_choice",
         officeCode: "tribune",
-        officeId: "77777777-7777-4777-8777-777777777777",
+        officeId: tribuneOfficeId,
         officeName: "Tribune",
         seatsAvailable: 1,
       },

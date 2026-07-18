@@ -14,8 +14,10 @@ export type PolityResponse = Readonly<{
 
 export type ProcedureResponse = Readonly<{
   electorate: "active_members" | "office_holders";
+  id: string;
   minimumNoticeHours: number;
   name: string;
+  votingPeriodHours: number;
   threshold:
     | "majority_of_eligible"
     | "office_election_result"
@@ -25,8 +27,32 @@ export type ProcedureResponse = Readonly<{
 }>;
 
 export type GovernmentResponse = Readonly<{
-  activeMemberCount: number;
-  procedures: readonly ProcedureResponse[];
+  constitution: Readonly<{
+    body: string;
+    id: string;
+    institutions: readonly Readonly<{
+      id: string;
+      kind: "assembly" | "council" | "judiciary";
+      name: string;
+    }>[];
+    offices: readonly Readonly<{
+      description: string;
+      id: string;
+      name: string;
+      seatCount: number;
+      termLengthDays: number;
+    }>[];
+    procedures: readonly ProcedureResponse[];
+    ratifiedAt: string;
+    title: string;
+    version: number;
+  }>;
+  formation: Readonly<{
+    activeMemberCount: number;
+    complete: boolean;
+    minimumFullGovernmentMembers: number;
+    standingMemberCount: number;
+  }>;
 }>;
 
 type ActionAvailabilityResponse = Readonly<{
@@ -89,13 +115,26 @@ export type MotionResponse = Readonly<{
 }>;
 
 export type OfficialRecordResponse = Readonly<{
+  actorName: string;
+  body: string;
+  constitutionVersion: number;
   entryNumber: number;
   id: string;
   motionId?: string;
   occurredAt: string;
   title: string;
-  type: string;
 }>;
+
+const effectTypes = [
+  "adopt_resolution",
+  "amend_constitution",
+  "apply_sanction",
+  "disband_polity",
+  "elect_office",
+  "grant_appeal",
+  "vacate_office_term",
+  "void_official_act",
+] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -220,14 +259,21 @@ function parsePage<Response, Product>(
   const response = requiredRecord(value, message);
   const page = requiredRecord(response.page, message);
   if (!Array.isArray(response.content)) throw new Error(message);
+  const number = requiredInteger(page.number, 0, message);
+  const size = requiredInteger(page.size, 1, message);
+  const totalElements = requiredInteger(page.totalElements, 0, message);
+  const totalPages = requiredInteger(page.totalPages, 0, message);
+  const expectedTotalPages =
+    totalElements === 0 ? 0 : Math.ceil(totalElements / size);
+  if (totalPages !== expectedTotalPages) throw new Error(message);
 
   return {
     content: response.content.map(parseItem).map(project),
     page: {
-      number: requiredInteger(page.number, 0, message),
-      size: requiredInteger(page.size, 1, message),
-      totalElements: requiredInteger(page.totalElements, 0, message),
-      totalPages: requiredInteger(page.totalPages, 0, message),
+      number,
+      size,
+      totalElements,
+      totalPages,
     },
   };
 }
@@ -339,35 +385,93 @@ export function parseGovernment(value: unknown): GovernmentResponse {
   const response = requiredRecord(value, message);
   const constitution = requiredRecord(response.constitution, message);
   const formation = requiredRecord(response.formation, message);
-  if (!Array.isArray(constitution.procedures)) throw new Error(message);
+  if (
+    !Array.isArray(constitution.institutions) ||
+    !Array.isArray(constitution.offices) ||
+    !Array.isArray(constitution.procedures)
+  )
+    throw new Error(message);
   return {
-    activeMemberCount: requiredNumber(formation.activeMemberCount, message),
-    procedures: constitution.procedures.map((candidate) => {
-      const procedure = requiredRecord(candidate, message);
-      return {
-        electorate: enumValue(
-          procedure.electorate,
-          ["active_members", "office_holders"],
-          message,
-        ),
-        minimumNoticeHours: requiredNumber(
-          procedure.minimumNoticeHours,
-          message,
-        ),
-        name: requiredString(procedure.name, message),
-        threshold: enumValue(
-          procedure.threshold,
-          [
-            "majority_of_eligible",
-            "office_election_result",
-            "simple_majority_cast",
-            "two_thirds_cast",
-            "two_thirds_eligible",
-          ],
-          message,
-        ),
-      };
-    }),
+    constitution: {
+      body: requiredString(constitution.body, message),
+      id: requiredUuid(constitution.id, message),
+      institutions: constitution.institutions.map((candidate) => {
+        const institution = requiredRecord(candidate, message);
+        return {
+          id: requiredUuid(institution.id, message),
+          kind: enumValue(
+            institution.kind,
+            ["assembly", "council", "judiciary"],
+            message,
+          ),
+          name: requiredString(institution.name, message),
+        };
+      }),
+      offices: constitution.offices.map((candidate) => {
+        const office = requiredRecord(candidate, message);
+        return {
+          description: requiredString(office.description, message),
+          id: requiredUuid(office.id, message),
+          name: requiredString(office.name, message),
+          seatCount: requiredInteger(office.seatCount, 1, message),
+          termLengthDays: requiredInteger(office.termLengthDays, 1, message),
+        };
+      }),
+      procedures: constitution.procedures.map((candidate) => {
+        const procedure = requiredRecord(candidate, message);
+        return {
+          electorate: enumValue(
+            procedure.electorate,
+            ["active_members", "office_holders"],
+            message,
+          ),
+          id: requiredUuid(procedure.id, message),
+          minimumNoticeHours: requiredInteger(
+            procedure.minimumNoticeHours,
+            0,
+            message,
+          ),
+          name: requiredString(procedure.name, message),
+          threshold: enumValue(
+            procedure.threshold,
+            [
+              "majority_of_eligible",
+              "office_election_result",
+              "simple_majority_cast",
+              "two_thirds_cast",
+              "two_thirds_eligible",
+            ],
+            message,
+          ),
+          votingPeriodHours: requiredInteger(
+            procedure.votingPeriodHours,
+            1,
+            message,
+          ),
+        };
+      }),
+      ratifiedAt: requiredDateTime(constitution.ratifiedAt, message),
+      title: requiredString(constitution.title, message),
+      version: requiredInteger(constitution.version, 1, message),
+    },
+    formation: {
+      activeMemberCount: requiredInteger(
+        formation.activeMemberCount,
+        0,
+        message,
+      ),
+      complete: requiredBoolean(formation.complete, message),
+      minimumFullGovernmentMembers: requiredInteger(
+        formation.minimumFullGovernmentMembers,
+        1,
+        message,
+      ),
+      standingMemberCount: requiredInteger(
+        formation.standingMemberCount,
+        0,
+        message,
+      ),
+    },
   };
 }
 
@@ -442,20 +546,7 @@ export function parseMotionResponse(value: unknown): MotionResponse {
   return {
     actions: parseMotionActions(response.actions, message),
     body: requiredString(response.body, message),
-    effectType: enumValue(
-      response.effectType,
-      [
-        "adopt_resolution",
-        "amend_constitution",
-        "apply_sanction",
-        "disband_polity",
-        "elect_office",
-        "grant_appeal",
-        "vacate_office_term",
-        "void_official_act",
-      ],
-      message,
-    ),
+    effectType: enumValue(response.effectType, effectTypes, message),
     id: requiredUuid(response.id, message),
     introducedByName: requiredString(response.introducedByName, message),
     openedAt: requiredDateTime(response.openedAt, message),
@@ -489,14 +580,20 @@ export function parseOfficialRecordPage(value: unknown) {
     const message = "Invalid official record response.";
     const item = requiredRecord(candidate, message);
     return {
-      entryNumber: requiredNumber(item.entryNumber, message),
+      actorName: requiredString(item.actorName, message),
+      body: requiredString(item.body, message),
+      constitutionVersion: requiredInteger(
+        item.constitutionVersion,
+        1,
+        message,
+      ),
+      entryNumber: requiredInteger(item.entryNumber, 1, message),
       id: requiredUuid(item.id, message),
       ...(item.motionId === undefined
         ? {}
         : { motionId: requiredUuid(item.motionId, message) }),
       occurredAt: requiredDateTime(item.occurredAt, message),
       title: requiredString(item.title, message),
-      type: requiredString(item.type, message),
     };
   };
   return parsePage(
