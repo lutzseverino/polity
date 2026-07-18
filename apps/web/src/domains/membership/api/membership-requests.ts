@@ -5,6 +5,7 @@ import type {
   MembershipInvitationTokenContext,
 } from "@/domains/membership/lib/membership";
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
+import { isUuid } from "@/lib/uuid";
 
 type RequestOptions = Readonly<{
   signal?: AbortSignal;
@@ -62,15 +63,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isDateTime(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
-}
-
-function isUuid(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
-      value,
-    )
-  );
 }
 
 function isOptionalDateTime(value: unknown): value is string | undefined {
@@ -244,6 +236,10 @@ export async function getMembershipInvitation(
   invitationId: string,
   options: LocalizedRequestOptions,
 ) {
+  if (!isUuid(invitationId)) {
+    throw new ResourceNotFoundError("Membership invitation", invitationId);
+  }
+
   let pageNumber = 0;
   let totalPages = 1;
 

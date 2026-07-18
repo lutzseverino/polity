@@ -14,9 +14,11 @@ BEGIN
     ORDER BY id
   LOOP
     base_slug := trim(BOTH '-' FROM regexp_replace(
-      translate(lower(replace(replace(polity_row.name, '''', ''), '’', '')),
-        'áàäâãåéèëêíìïîóòöôõúùüûñçýÿ',
-        'aaaaaaeeeeiiiiooooouuuuncyy'),
+      replace(lower(
+        regexp_replace(
+          normalize(polity_row.name, NFKD),
+          '[^\u0001-\u007F]', '', 'g') COLLATE "C"),
+        '''', ''),
       '[^a-z0-9]+', '-', 'g'));
     IF base_slug = '' THEN
       base_slug := 'polity';

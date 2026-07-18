@@ -1,5 +1,6 @@
 import type { PolityActionAvailability } from "@/domains/polity/lib/polity";
 import type { PageResult } from "@/lib/pagination";
+import { isUuid } from "@/lib/uuid";
 
 export type PolityResponse = Readonly<{
   constitutionVersion: number;
@@ -153,11 +154,7 @@ function requiredString(value: unknown, message: string) {
 
 function requiredUuid(value: unknown, message: string) {
   const uuid = requiredString(value, message);
-  if (
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
-      uuid,
-    )
-  ) {
+  if (!isUuid(uuid)) {
     throw new Error(message);
   }
   return uuid;

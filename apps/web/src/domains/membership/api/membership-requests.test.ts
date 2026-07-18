@@ -10,6 +10,24 @@ import {
 import { apiMockServer } from "@/test/mocks/server";
 
 describe("membership invitation requests", () => {
+  it("rejects a malformed invitation id before loading invitation pages", async () => {
+    let requestCount = 0;
+    apiMockServer.use(
+      http.get("/api/v1/invitations", () => {
+        requestCount += 1;
+        return HttpResponse.json({
+          content: [],
+          page: { number: 0, size: 100, totalElements: 0, totalPages: 0 },
+        });
+      }),
+    );
+
+    await expect(
+      getMembershipInvitation("not-a-uuid", { acceptedLanguage: "en" }),
+    ).rejects.toThrow("Membership invitation not-a-uuid was not found.");
+    expect(requestCount).toBe(0);
+  });
+
   it("loads the authenticated user's pending invitations from Polity", async () => {
     let acceptedLanguage: string | null = null;
     let requestedPage: string | null = null;

@@ -20,6 +20,11 @@ class PolitySlugServiceTest {
   }
 
   @Test
+  void normalizesExtendedLatinNamesWithTheMigrationPolicy() {
+    assertThat(slugs.claim("Święto")).isEqualTo("swieto");
+  }
+
+  @Test
   void appendsFirstAvailableSuffixForDuplicateNames() {
     when(polities.existsBySlug("thursday-assembly")).thenReturn(true);
     when(polities.existsBySlug("thursday-assembly-2")).thenReturn(true);

@@ -21,6 +21,7 @@ import type {
 } from "@/domains/polity/lib/polity";
 import type { PageResult } from "@/lib/pagination";
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
+import { isUuid } from "@/lib/uuid";
 
 const defaultPolityPageSize = 50;
 const httpClient = createHttpClient();
@@ -340,15 +341,13 @@ export async function listAllPolities(options: RequestOptions) {
   );
 }
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
 export async function getPolityReference(
   polityReference: string,
   options: RequestOptions,
 ): Promise<PolitySummary> {
-  const byId = uuidPattern.test(polityReference);
+  const byId = isUuid(polityReference);
   const bySlug =
     polityReference.length <= 80 && slugPattern.test(polityReference);
   if (!byId && !bySlug) {

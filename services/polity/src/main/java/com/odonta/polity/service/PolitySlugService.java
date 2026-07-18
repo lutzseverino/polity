@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PolitySlugService {
   public static final int MAX_LENGTH = 80;
-  private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
+  private static final Pattern NON_ASCII = Pattern.compile("[^\\x01-\\x7f]+");
   private static final Pattern APOSTROPHES = Pattern.compile("['’]");
   private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]+");
   private static final Pattern EDGE_HYPHENS = Pattern.compile("(^-+|-+$)");
@@ -39,15 +39,16 @@ public class PolitySlugService {
   }
 
   static String base(String name) {
-    String normalized = Normalizer.normalize(name, Normalizer.Form.NFKD).toLowerCase(Locale.ROOT);
+    String normalized =
+        NON_ASCII
+            .matcher(Normalizer.normalize(name, Normalizer.Form.NFKD))
+            .replaceAll("")
+            .toLowerCase(Locale.ROOT);
     String slug =
         EDGE_HYPHENS
             .matcher(
                 NON_ALPHANUMERIC
-                    .matcher(
-                        APOSTROPHES
-                            .matcher(COMBINING_MARKS.matcher(normalized).replaceAll(""))
-                            .replaceAll(""))
+                    .matcher(APOSTROPHES.matcher(normalized).replaceAll(""))
                     .replaceAll("-"))
             .replaceAll("");
     slug = truncate(slug.isBlank() ? "polity" : slug, MAX_LENGTH);

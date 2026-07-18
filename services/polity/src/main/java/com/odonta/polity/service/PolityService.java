@@ -48,13 +48,6 @@ public class PolityService {
         polities.findProjectedById(polityId).orElseThrow(PolityResource.POLITY::notFound));
   }
 
-  public PolitySummaryResult getBySlug(String slug, UUID userId) {
-    PolityProjection polity =
-        polities.findProjectedBySlug(slug).orElseThrow(PolityResource.POLITY::notFound);
-    access.requireReadable(polity.getId(), userId);
-    return summaries.resolve(polity);
-  }
-
   public void requireActive(UUID polityId) {
     PolityStatus status =
         polities
