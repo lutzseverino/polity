@@ -8,6 +8,7 @@ export type PolityResponse = Readonly<{
   institutionName: string;
   jurisdictionName: string;
   name: string;
+  slug: string;
   status: "active" | "disbanded";
   visibility: "private" | "public";
 }>;
@@ -162,6 +163,14 @@ function requiredUuid(value: unknown, message: string) {
   return uuid;
 }
 
+function requiredSlug(value: unknown, message: string) {
+  const slug = requiredString(value, message);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug) || slug.length > 80) {
+    throw new Error(message);
+  }
+  return slug;
+}
+
 function requiredDateTime(value: unknown, message: string) {
   const dateTime = requiredString(value, message);
   const components =
@@ -288,6 +297,7 @@ export function parsePolityResponse(value: unknown): PolityResponse {
     institutionName: requiredString(response.institutionName, message),
     jurisdictionName: requiredString(response.jurisdictionName, message),
     name: requiredString(response.name, message),
+    slug: requiredSlug(response.slug, message),
     status: enumValue(response.status, ["active", "disbanded"], message),
     visibility: enumValue(response.visibility, ["private", "public"], message),
   };

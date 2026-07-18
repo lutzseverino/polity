@@ -11,21 +11,21 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "11111111-1111-4111-8111-111111111111" },
+          params: { politySlug: "11111111-1111-4111-8111-111111111111" },
           shell: {
             back: { label: msg`All polities`, target: { to: "/polities" } },
             level: "workspace",
             section: "polities",
-            target: { params: "polityId", to: "/polities/$polityId" },
+            target: { params: "politySlug", to: "/polities/$politySlug" },
           },
         },
         {
-          params: { polityId: "11111111-1111-4111-8111-111111111111" },
+          params: { politySlug: "11111111-1111-4111-8111-111111111111" },
           shell: {
             label: msg`Motions`,
             target: {
-              params: "polityId",
-              to: "/polities/$polityId/motions",
+              params: "politySlug",
+              to: "/polities/$politySlug/motions",
             },
           },
         },
@@ -40,7 +40,7 @@ describe("resolveShellContext", () => {
       "Motions",
     ]);
     expect(context.back?.label).toBe("All polities");
-    expect(context.polityId).toBe("11111111-1111-4111-8111-111111111111");
+    expect(context.politySlug).toBe("11111111-1111-4111-8111-111111111111");
   });
 
   it("inherits the workspace title through a label-less index route", () => {
@@ -48,15 +48,15 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "11111111-1111-4111-8111-111111111111" },
+          params: { politySlug: "11111111-1111-4111-8111-111111111111" },
           shell: {
             level: "workspace",
             section: "polities",
-            target: { params: "polityId", to: "/polities/$polityId" },
+            target: { params: "politySlug", to: "/polities/$politySlug" },
           },
         },
         {
-          params: { polityId: "11111111-1111-4111-8111-111111111111" },
+          params: { politySlug: "11111111-1111-4111-8111-111111111111" },
           shell: { showPrimaryAction: false },
         },
       ],
@@ -79,25 +79,25 @@ describe("resolveShellContext", () => {
       [
         {
           loaderData: { shellLabel: "Thursday Assembly" },
-          params: { polityId: "11111111-1111-4111-8111-111111111111" },
+          params: { politySlug: "11111111-1111-4111-8111-111111111111" },
           shell: {
             level: "workspace",
             section: "polities",
-            target: { params: "polityId", to: "/polities/$polityId" },
+            target: { params: "politySlug", to: "/polities/$politySlug" },
           },
         },
         {
           loaderData: { shellLabel: "Shared Thursday Dinner" },
           params: {
             motionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
-            polityId: "11111111-1111-4111-8111-111111111111",
+            politySlug: "11111111-1111-4111-8111-111111111111",
           },
           shell: {
             back: {
               label: msg`All motions`,
               target: {
-                params: "polityId",
-                to: "/polities/$polityId/motions",
+                params: "politySlug",
+                to: "/polities/$politySlug/motions",
               },
             },
             compactLabel: msg`Motion`,

@@ -11,14 +11,14 @@ type ShellStaticPath = "/explore" | "/home" | "/inbox" | "/me" | "/polities";
 export type ShellSectionTarget = Readonly<{ to: ShellStaticPath }>;
 
 type ShellPolityPath =
-  | "/polities/$polityId"
-  | "/polities/$polityId/government"
-  | "/polities/$polityId/motions"
-  | "/polities/$polityId/record";
+  | "/polities/$politySlug"
+  | "/polities/$politySlug/government"
+  | "/polities/$politySlug/motions"
+  | "/polities/$politySlug/record";
 
 export type ShellLinkTarget =
   | Readonly<{ to: ShellStaticPath }>
-  | Readonly<{ params: "polityId"; to: ShellPolityPath }>;
+  | Readonly<{ params: "politySlug"; to: ShellPolityPath }>;
 
 type ShellBackTarget = Readonly<{
   label: MessageDescriptor;
@@ -83,7 +83,7 @@ export type ResolvedShellContext = Readonly<{
   breadcrumbs: readonly ResolvedShellBreadcrumb[];
   compactNavigation: "hidden" | "visible";
   level: ShellRouteLevel;
-  polityId?: string;
+  politySlug?: string;
   section: ShellSection;
   showPrimaryAction: boolean;
   title: string;
@@ -224,7 +224,7 @@ export function resolveShellContext(
     Boolean(context.shell.level),
   );
   const polityContext = findLastMatching(routeContexts, (context) =>
-    Boolean(context.params.polityId),
+    Boolean(context.params.politySlug),
   );
   const back = backContext?.shell.back;
 
@@ -239,7 +239,7 @@ export function resolveShellContext(
     breadcrumbs,
     compactNavigation: visibilityContext?.shell.compactNavigation ?? "visible",
     level: levelContext?.shell.level ?? "root",
-    polityId: polityContext?.params.polityId,
+    politySlug: polityContext?.params.politySlug,
     section,
     showPrimaryAction: actionContext?.shell.showPrimaryAction ?? true,
     title,

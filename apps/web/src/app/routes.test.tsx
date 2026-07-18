@@ -12,6 +12,12 @@ import { describe, expect, it } from "vitest";
 import { AppProviders } from "@/app/providers/AppProviders";
 import { createAppRouter } from "@/app/router";
 import { shellSectionDefinitions } from "@/app/shell/shell-route-context";
+import { membershipInvitationScenario } from "@/mocks/scenarios/membership-invitations";
+
+const supperClubInvitationId =
+  membershipInvitationScenario.invitationIds.supperClub;
+const supperClubInvitationToken =
+  membershipInvitationScenario.tokens.supperClub;
 
 function createTestRouter(initialEntry: string) {
   return createAppRouter(
@@ -36,7 +42,7 @@ describe("first governing journey", () => {
     ["wide", "/polities"],
     ["standard", "/home"],
     ["focused", "/polities/new"],
-    ["narrow", "/polities/invitations/invitation-supper-club"],
+    ["narrow", `/polities/invitations/${supperClubInvitationToken}`],
   ] as const)("uses the %s page measure at %s", async (measure, pathname) => {
     const router = createTestRouter(pathname);
 
@@ -71,7 +77,7 @@ describe("first governing journey", () => {
   it("lets an eligible member understand and record an official vote", async () => {
     const user = userEvent.setup();
     const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+      "/polities/the-thursday-assembly/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
     );
 
     renderRouter(router);
@@ -109,7 +115,7 @@ describe("first governing journey", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /the thursday assembly/i }),
-    ).toHaveAttribute("href", "/polities/11111111-1111-4111-8111-111111111111");
+    ).toHaveAttribute("href", "/polities/the-thursday-assembly");
     const primaryNavigation = screen.getByRole("navigation", {
       name: "Primary Navigation",
     });
@@ -130,6 +136,21 @@ describe("first governing journey", () => {
     );
     expect(accountLink.querySelector('[data-slot="avatar"]')).not.toBeNull();
     expect(within(accountLink).getByText("Account")).toBeInTheDocument();
+  });
+
+  it("redirects a nested UUID bookmark to the canonical polity slug", async () => {
+    const router = createTestRouter(
+      "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1?from=bookmark#result",
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Shared Thursday Dinner" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.href).toBe(
+      "/polities/the-thursday-assembly/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1?from=bookmark#result",
+    );
   });
 
   it("keeps the polity directory focused on existing memberships", async () => {
@@ -308,10 +329,10 @@ describe("first governing journey", () => {
 
     expect(router.state.location.pathname).toBe("/inbox");
     expect(router.state.location.maskedLocation?.pathname).toBe(
-      "/polities/membership-invitations/invitation-supper-club",
+      `/polities/membership-invitations/${supperClubInvitationId}`,
     );
     expect(router.history.location.pathname).toBe(
-      "/polities/membership-invitations/invitation-supper-club",
+      `/polities/membership-invitations/${supperClubInvitationId}`,
     );
     const invitationDialog = await screen.findByRole("dialog");
     expect(
@@ -402,7 +423,7 @@ describe("first governing journey", () => {
 
   it("renders a direct invitation URL as passwordless token onboarding", async () => {
     const router = createTestRouter(
-      "/polities/invitations/invitation-supper-club",
+      `/polities/invitations/${supperClubInvitationToken}`,
     );
 
     renderRouter(router);
@@ -437,7 +458,7 @@ describe("first governing journey", () => {
     });
     expect(invitationLink).toHaveAttribute(
       "href",
-      "/polities/membership-invitations/invitation-supper-club",
+      `/polities/membership-invitations/${supperClubInvitationId}`,
     );
 
     await user.click(invitationLink);
@@ -589,9 +610,7 @@ describe("first governing journey", () => {
   });
 
   it("presents the polity home as one actionable feed", async () => {
-    const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111",
-    );
+    const router = createTestRouter("/polities/the-thursday-assembly");
 
     renderRouter(router);
 
@@ -612,21 +631,18 @@ describe("first governing journey", () => {
     });
     expect(homeTab.tagName).toBe("A");
     expect(homeTab).toHaveAttribute("aria-selected", "true");
-    expect(homeTab).toHaveAttribute(
-      "href",
-      "/polities/11111111-1111-4111-8111-111111111111",
-    );
+    expect(homeTab).toHaveAttribute("href", "/polities/the-thursday-assembly");
     expect(workspaceNavigation.nextElementSibling).toHaveAttribute(
       "data-slot",
       "separator",
     );
     expect(dinnerLink).toHaveAttribute(
       "href",
-      "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+      "/polities/the-thursday-assembly/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
     );
     expect(candidacyLink).toHaveAttribute(
       "href",
-      "/polities/11111111-1111-4111-8111-111111111111/motions/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+      "/polities/the-thursday-assembly/motions/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
     );
     expect(dinnerLink).toHaveAttribute("data-slot", "link-surface");
     expect(
@@ -646,7 +662,7 @@ describe("first governing journey", () => {
         .filter(
           (link) =>
             link.getAttribute("href") ===
-            "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+            "/polities/the-thursday-assembly/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
         ),
     ).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "For you" })).toBeVisible();
@@ -674,7 +690,7 @@ describe("first governing journey", () => {
   it("keeps candidacy consent distinct from voting", async () => {
     const user = userEvent.setup();
     const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111/motions/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+      "/polities/the-thursday-assembly/motions/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
     );
 
     renderRouter(router);
@@ -694,7 +710,7 @@ describe("first governing journey", () => {
 
   it("shows a completed motion as a certified result with an official-record path", async () => {
     const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111/motions/cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+      "/polities/the-thursday-assembly/motions/cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
     );
 
     renderRouter(router);
@@ -703,15 +719,12 @@ describe("first governing journey", () => {
     expect(screen.getAllByText("Adopted")).not.toHaveLength(0);
     expect(
       screen.getByRole("link", { name: "Official record No. 41" }),
-    ).toHaveAttribute(
-      "href",
-      "/polities/11111111-1111-4111-8111-111111111111/record",
-    );
+    ).toHaveAttribute("href", "/polities/the-thursday-assembly/record");
   });
 
   it("shows how a polity is governed without roadmap placeholder copy", async () => {
     const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111/government",
+      "/polities/the-thursday-assembly/government",
     );
 
     renderRouter(router);
@@ -730,9 +743,7 @@ describe("first governing journey", () => {
   });
 
   it("shows numbered official evidence with links back to its motion", async () => {
-    const router = createTestRouter(
-      "/polities/11111111-1111-4111-8111-111111111111/record",
-    );
+    const router = createTestRouter("/polities/the-thursday-assembly/record");
 
     renderRouter(router);
 
@@ -747,7 +758,7 @@ describe("first governing journey", () => {
       screen.getAllByRole("link", { name: "View motion" })[0],
     ).toHaveAttribute(
       "href",
-      "/polities/11111111-1111-4111-8111-111111111111/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+      "/polities/the-thursday-assembly/motions/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
     );
     expect(
       screen.queryByText("Planned polity destination"),

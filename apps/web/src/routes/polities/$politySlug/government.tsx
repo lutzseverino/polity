@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, notFound } from "@tanstack/react-router";
 
 import { AppBadge } from "@/components/app/AppBadge";
 import {
@@ -14,18 +14,27 @@ import { AppText } from "@/components/app/AppText";
 import {
   type PolityGovernment,
   polityGovernmentQueryOptions,
+  polityReferenceQueryOptions,
   usePolityGovernment,
 } from "@/domains/polity";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 
-export const Route = createFileRoute("/polities/$polityId/government")({
+const polityRoute = getRouteApi("/polities/$politySlug");
+
+export const Route = createFileRoute("/polities/$politySlug/government")({
   component: GovernmentRoute,
   loader: async ({ context, params }) => {
     try {
+      const polity = await context.queryClient.ensureQueryData(
+        polityReferenceQueryOptions({
+          locale: context.getLocale(),
+          polityReference: params.politySlug,
+        }),
+      );
       await context.queryClient.ensureQueryData(
         polityGovernmentQueryOptions({
           locale: context.getLocale(),
-          polityId: params.polityId,
+          polityId: polity.id,
         }),
       );
     } catch (error) {
@@ -37,7 +46,7 @@ export const Route = createFileRoute("/polities/$polityId/government")({
     shell: {
       label: msg`Government`,
       level: "workspace",
-      target: { params: "polityId", to: "/polities/$polityId/government" },
+      target: { params: "politySlug", to: "/polities/$politySlug/government" },
     },
   },
 });
@@ -112,7 +121,7 @@ function thresholdLabel(
 
 function GovernmentRoute() {
   const { i18n } = useLingui();
-  const { polityId } = Route.useParams();
+  const { polityId } = polityRoute.useLoaderData();
   const { data: government } = usePolityGovernment({
     locale: i18n.locale,
     polityId,

@@ -24,10 +24,10 @@ describe("membership invitation requests", () => {
           content: [
             {
               email: "friend@example.com",
-              id: "invitation-1",
+              id: "91111111-1111-4111-8111-111111111111",
               invitedAt: "2026-07-17T12:00:00Z",
               invitedByName: "Mira Chen",
-              polityId: "polity-1",
+              polityId: "51111111-1111-4111-8111-111111111111",
               polityName: "Garden Cooperative",
               status: "pending",
             },
@@ -46,7 +46,7 @@ describe("membership invitation requests", () => {
     expect(requestedSize).toBe("100");
     expect(invitations).toEqual([
       {
-        id: "invitation-1",
+        id: "91111111-1111-4111-8111-111111111111",
         invitedAtLabel: "Jul 17, 2026",
         invitedByName: "Mira Chen",
         polityName: "Garden Cooperative",
@@ -66,10 +66,10 @@ describe("membership invitation requests", () => {
               ? [
                   {
                     email: "friend@example.com",
-                    id: "invitation-101",
+                    id: "91111111-1111-4111-8111-111111111115",
                     invitedAt: "2026-07-17T12:00:00Z",
                     invitedByName: "Mira Chen",
-                    polityId: "polity-1",
+                    polityId: "51111111-1111-4111-8111-111111111111",
                     polityName: "Garden Cooperative",
                     status: "pending",
                   },
@@ -85,12 +85,15 @@ describe("membership invitation requests", () => {
       }),
     );
 
-    const invitation = await getMembershipInvitation("invitation-101", {
-      acceptedLanguage: "en",
-    });
+    const invitation = await getMembershipInvitation(
+      "91111111-1111-4111-8111-111111111115",
+      {
+        acceptedLanguage: "en",
+      },
+    );
 
     expect(requestedPages).toEqual(["0", "1"]);
-    expect(invitation.id).toBe("invitation-101");
+    expect(invitation.id).toBe("91111111-1111-4111-8111-111111111115");
   });
 
   it("rejects a successful response with an invalid transport shape", async () => {
@@ -158,7 +161,7 @@ describe("membership invitation requests", () => {
         return HttpResponse.json({
           expiresAt: "2026-07-20T10:00:00Z",
           invitedEmail: "friend@example.com",
-          polityId: "polity-1",
+          polityId: "51111111-1111-4111-8111-111111111111",
           polityName: "Garden Cooperative",
         });
       }),
@@ -173,7 +176,7 @@ describe("membership invitation requests", () => {
     expect(invitation).toEqual({
       expiresAtLabel: "July 20, 2026",
       invitedEmail: "friend@example.com",
-      polityId: "polity-1",
+      polityId: "51111111-1111-4111-8111-111111111111",
       polityName: "Garden Cooperative",
     });
   });
@@ -184,7 +187,7 @@ describe("membership invitation requests", () => {
         HttpResponse.json({
           expiresAt: "not-a-date",
           invitedEmail: "friend@example.com",
-          polityId: "polity-1",
+          polityId: "51111111-1111-4111-8111-111111111111",
           polityName: "Garden Cooperative",
         }),
       ),

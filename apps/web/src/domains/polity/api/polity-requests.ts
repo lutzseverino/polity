@@ -57,6 +57,7 @@ function projectPolitySummary(response: PolityResponse): PolitySummary {
     id: response.id,
     institutionName: response.institutionName,
     name: response.name,
+    slug: response.slug,
     status: response.status,
     visibility: response.visibility,
   };
@@ -339,6 +340,36 @@ export async function listAllPolities(options: RequestOptions) {
   );
 }
 
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+export async function getPolityReference(
+  polityReference: string,
+  options: RequestOptions,
+): Promise<PolitySummary> {
+  const byId = uuidPattern.test(polityReference);
+  const bySlug =
+    polityReference.length <= 80 && slugPattern.test(polityReference);
+  if (!byId && !bySlug) {
+    throw new ResourceNotFoundError("Polity", polityReference);
+  }
+
+  const path = byId
+    ? `/polities/${encodeURIComponent(polityReference)}`
+    : `/polities/by-slug/${encodeURIComponent(polityReference)}`;
+  try {
+    return projectPolitySummary(
+      parsePolityResponse(await requestUnknown(path, options)),
+    );
+  } catch (error) {
+    if (hasHttpResponseStatus(error, 404)) {
+      throw new ResourceNotFoundError("Polity", polityReference);
+    }
+    throw error;
+  }
+}
+
 async function requestAllMotionResponses(
   polityId: string,
   options: RequestOptions,
@@ -493,6 +524,7 @@ export async function getPolity(
     memberCount: resources.government.formation.activeMemberCount,
     motions,
     name: resources.polity.name,
+    slug: resources.polity.slug,
     readiness:
       resources.actions.readiness.status === "ready"
         ? "ready"

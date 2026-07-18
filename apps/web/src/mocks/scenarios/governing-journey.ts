@@ -105,6 +105,7 @@ const polities = [
     institutionName: "Assembly",
     jurisdictionName: "The Thursday Assembly",
     name: "The Thursday Assembly",
+    slug: "the-thursday-assembly",
     status: "active",
     visibility: "public",
   },
@@ -115,6 +116,7 @@ const polities = [
     institutionName: "Assembly",
     jurisdictionName: "Neighbourhood Table",
     name: "Neighbourhood Table",
+    slug: "neighbourhood-table",
     status: "active",
     visibility: "private",
   },
@@ -125,6 +127,7 @@ const polities = [
     institutionName: "Council",
     jurisdictionName: "Weekend Council",
     name: "Weekend Council",
+    slug: "weekend-council",
     status: "active",
     visibility: "public",
   },
@@ -473,6 +476,10 @@ export function createGoverningJourneyScenarioHandlers({
     }),
     http.get("/api/v1/polities/:polityId", ({ params }) => {
       const polity = polities.find(({ id }) => id === String(params.polityId));
+      return polity ? HttpResponse.json(polity) : notFound();
+    }),
+    http.get("/api/v1/polities/by-slug/:slug", ({ params }) => {
+      const polity = polities.find(({ slug }) => slug === String(params.slug));
       return polity ? HttpResponse.json(polity) : notFound();
     }),
     http.get("/api/v1/polities/:polityId/actions", ({ params }) => {

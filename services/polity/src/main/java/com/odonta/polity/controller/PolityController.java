@@ -49,4 +49,9 @@ public class PolityController implements PolitiesApi {
   public ResponseEntity<PolityResponse> getPolity(UUID polityId) {
     return ResponseEntity.ok(mapper.toResponse(polities.get(polityId, users.currentUser().id())));
   }
+
+  @Override
+  public ResponseEntity<PolityResponse> getPolityBySlug(String slug) {
+    return ResponseEntity.ok(mapper.toResponse(polities.getBySlug(slug, users.currentUser().id())));
+  }
 }

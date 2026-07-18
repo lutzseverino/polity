@@ -19,6 +19,7 @@ type MembershipInvitationResponse = Readonly<{
   id: string;
   invitedAt: string;
   invitedByName: string;
+  polityId: string;
   polityName: string;
 }>;
 
@@ -61,6 +62,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isDateTime(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function isUuid(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
+      value,
+    )
+  );
 }
 
 function isOptionalDateTime(value: unknown): value is string | undefined {
@@ -114,7 +124,7 @@ function parseMembershipInvitationTokenResponse(
     !isRecord(value) ||
     !isDateTime(value.expiresAt) ||
     typeof value.invitedEmail !== "string" ||
-    typeof value.polityId !== "string" ||
+    !isUuid(value.polityId) ||
     typeof value.polityName !== "string"
   ) {
     throw new Error("Invalid membership invitation token response.");
@@ -142,9 +152,10 @@ function parseMembershipInvitationPageResponse(
   const content = value.content.map((candidate) => {
     if (
       !isRecord(candidate) ||
-      typeof candidate.id !== "string" ||
-      typeof candidate.invitedAt !== "string" ||
+      !isUuid(candidate.id) ||
+      !isDateTime(candidate.invitedAt) ||
       typeof candidate.invitedByName !== "string" ||
+      !isUuid(candidate.polityId) ||
       typeof candidate.polityName !== "string"
     ) {
       throw new Error("Invalid membership invitation response.");
@@ -154,6 +165,7 @@ function parseMembershipInvitationPageResponse(
       id: candidate.id,
       invitedAt: candidate.invitedAt,
       invitedByName: candidate.invitedByName,
+      polityId: candidate.polityId,
       polityName: candidate.polityName,
     };
   });

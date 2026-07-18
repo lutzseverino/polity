@@ -3,11 +3,28 @@ import { describe, expect, it } from "vitest";
 import {
   parseGovernment,
   parseOfficialRecordPage,
+  parsePolityResponse,
 } from "@/domains/polity/api/polity-contract";
 
 const polityId = "11111111-1111-4111-8111-111111111111";
 
 describe("polity transport contract", () => {
+  it("rejects a non-canonical polity slug", () => {
+    expect(() =>
+      parsePolityResponse({
+        constitutionVersion: 1,
+        createdAt: "2026-01-01T00:00:00Z",
+        id: polityId,
+        institutionName: "Assembly",
+        jurisdictionName: "Example polity",
+        name: "Example polity",
+        slug: "Example Polity",
+        status: "active",
+        visibility: "public",
+      }),
+    ).toThrow("Invalid polity response.");
+  });
+
   it("rejects malformed government fields consumed by the government view", () => {
     expect(() =>
       parseGovernment({

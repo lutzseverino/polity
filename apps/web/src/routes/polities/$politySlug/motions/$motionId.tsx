@@ -1,6 +1,11 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  getRouteApi,
+  Link,
+  notFound,
+} from "@tanstack/react-router";
 import { Info } from "lucide-react";
 import {
   AppAlert,
@@ -19,51 +24,65 @@ import {
 import { AppProgress, AppProgressLabel } from "@/components/app/AppProgress";
 import { AppText } from "@/components/app/AppText";
 import type { Motion } from "@/domains/motion";
-import { polityMotionQueryOptions, usePolityMotion } from "@/domains/polity";
+import {
+  polityMotionQueryOptions,
+  polityReferenceQueryOptions,
+  usePolityMotion,
+} from "@/domains/polity";
 import { CastMotionVoteWorkflow } from "@/features/cast-motion-vote";
 import { RespondOfficeElectionCandidacyWorkflow } from "@/features/respond-office-election-candidacy";
 import { isResourceNotFoundError } from "@/lib/resource-not-found";
 
-export const Route = createFileRoute("/polities/$polityId/motions/$motionId")({
-  component: MotionDetailRoute,
-  loader: async ({ context, params }) => {
-    try {
-      const motion = await context.queryClient.ensureQueryData(
-        polityMotionQueryOptions({
-          locale: context.getLocale(),
-          motionId: params.motionId,
-          polityId: params.polityId,
-        }),
-      );
+const polityRoute = getRouteApi("/polities/$politySlug");
 
-      return { shellLabel: motion.title };
-    } catch (error) {
-      if (isResourceNotFoundError(error)) {
-        throw notFound();
+export const Route = createFileRoute("/polities/$politySlug/motions/$motionId")(
+  {
+    component: MotionDetailRoute,
+    loader: async ({ context, params }) => {
+      try {
+        const polity = await context.queryClient.ensureQueryData(
+          polityReferenceQueryOptions({
+            locale: context.getLocale(),
+            polityReference: params.politySlug,
+          }),
+        );
+        const motion = await context.queryClient.ensureQueryData(
+          polityMotionQueryOptions({
+            locale: context.getLocale(),
+            motionId: params.motionId,
+            polityId: polity.id,
+          }),
+        );
+
+        return { shellLabel: motion.title };
+      } catch (error) {
+        if (isResourceNotFoundError(error)) {
+          throw notFound();
+        }
+
+        throw error;
       }
-
-      throw error;
-    }
-  },
-  staticData: {
-    shell: {
-      back: {
-        label: msg`All motions`,
-        target: { params: "polityId", to: "/polities/$polityId/motions" },
+    },
+    staticData: {
+      shell: {
+        back: {
+          label: msg`All motions`,
+          target: { params: "politySlug", to: "/polities/$politySlug/motions" },
+        },
+        compactLabel: msg`Motion`,
+        compactNavigation: "hidden",
+        compactWorkspaceChrome: "hidden",
+        level: "detail",
+        showPrimaryAction: false,
       },
-      compactLabel: msg`Motion`,
-      compactNavigation: "hidden",
-      compactWorkspaceChrome: "hidden",
-      level: "detail",
-      showPrimaryAction: false,
     },
   },
-});
+);
 
 function MotionResultDetails({
   motion,
-  polityId,
-}: Readonly<{ motion: Motion; polityId: string }>) {
+  politySlug,
+}: Readonly<{ motion: Motion; politySlug: string }>) {
   if (!motion.result) {
     return null;
   }
@@ -99,8 +118,8 @@ function MotionResultDetails({
       <AppCardFooter>
         <Link
           className="text-sm font-medium hover:underline"
-          params={{ polityId }}
-          to="/polities/$polityId/record"
+          params={{ politySlug }}
+          to="/polities/$politySlug/record"
         >
           <Trans>Official record No. {motion.result.recordEntry}</Trans>
         </Link>
@@ -112,9 +131,10 @@ function MotionResultDetails({
 function MotionDecision({
   motion,
   polityId,
-}: Readonly<{ motion: Motion; polityId: string }>) {
+  politySlug,
+}: Readonly<{ motion: Motion; polityId: string; politySlug: string }>) {
   if (motion.status !== "voting") {
-    return <MotionResultDetails motion={motion} polityId={polityId} />;
+    return <MotionResultDetails motion={motion} politySlug={politySlug} />;
   }
 
   if (!motion.actionAvailability.available) {
@@ -149,7 +169,8 @@ function MotionDecision({
 
 function MotionDetailRoute() {
   const { i18n, t } = useLingui();
-  const { motionId, polityId } = Route.useParams();
+  const { motionId, politySlug } = Route.useParams();
+  const { polityId } = polityRoute.useLoaderData();
   const { data: motion } = usePolityMotion({
     locale: i18n.locale,
     motionId,
@@ -201,7 +222,11 @@ function MotionDetailRoute() {
             </AppText>
           </article>
 
-          <MotionDecision motion={motion} polityId={polityId} />
+          <MotionDecision
+            motion={motion}
+            polityId={polityId}
+            politySlug={politySlug}
+          />
 
           <AppAlert>
             <Info aria-hidden="true" />

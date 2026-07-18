@@ -31,6 +31,7 @@ import com.odonta.polity.repository.PolityRepository;
 import com.odonta.polity.resolver.PolitySummaryResolver;
 import com.odonta.polity.result.PolitySummaryResult;
 import com.odonta.polity.service.OfficialRecordService;
+import com.odonta.polity.service.PolitySlugService;
 import com.odonta.polity.template.ConstitutionTemplateSeeder;
 import io.github.lutzseverino.cardo.authorization.grant.Grants;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
@@ -66,6 +67,7 @@ public class CreatePolityWorkflow {
   private final OfficialRecordService officialRecords;
   private final PolityGrantPlanner grantPlanner;
   private final PolityRepository polities;
+  private final PolitySlugService politySlugs;
   private final PolitySummaryResolver summaries;
 
   @Transactional
@@ -76,8 +78,9 @@ public class CreatePolityWorkflow {
     IdentityUser identity = identityUsers.get(founder.id());
     PolitySetupPreset setupPreset = input.setupPresetOrDefault();
     PolityPace pace = input.paceOrDefault();
+    String slug = politySlugs.claim(input.name());
     Polity polity =
-        polities.saveAndFlush(new Polity(input.name(), input.visibility(), founder.id()));
+        polities.saveAndFlush(new Polity(input.name(), slug, input.visibility(), founder.id()));
     Jurisdiction jurisdiction =
         jurisdictions.saveAndFlush(
             new Jurisdiction(polity.getId(), input.name(), JurisdictionKind.ROOT));
