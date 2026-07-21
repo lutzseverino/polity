@@ -2,8 +2,11 @@ package com.odonta.polity.controller;
 
 import com.odonta.polity.api.PolitiesApi;
 import com.odonta.polity.api.model.CreatePolityRequest;
+import com.odonta.polity.api.model.PolityAccountResponse;
 import com.odonta.polity.api.model.PolityResponse;
+import com.odonta.polity.mapper.PolityAccountTransportMapper;
 import com.odonta.polity.mapper.PolityTransportMapper;
+import com.odonta.polity.service.PolityAccountService;
 import com.odonta.polity.service.PolityService;
 import com.odonta.polity.service.PolitySlugLookupService;
 import com.odonta.polity.workflow.CreatePolityWorkflow;
@@ -26,13 +29,21 @@ public class PolityController implements PolitiesApi {
   private final PolityService polities;
   private final PolitySlugLookupService politySlugs;
   private final PolityTransportMapper mapper;
+  private final PolityAccountService accounts;
+  private final PolityAccountTransportMapper accountMapper;
   private final ProvisionPolityAccountWorkflow provisionAccount;
   private final AuthenticatedUserReader users;
 
   @Override
-  public ResponseEntity<Void> provisionPolityAccount() {
-    provisionAccount.provision(users.currentUser());
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<PolityAccountResponse> getPolityAccount() {
+    return ResponseEntity.ok(accountMapper.toResponse(accounts.get(users.currentUser().id())));
+  }
+
+  @Override
+  public ResponseEntity<PolityAccountResponse> provisionPolityAccount() {
+    var result = provisionAccount.provision(users.currentUser());
+    return ResponseEntity.status(result.created() ? HttpStatus.CREATED : HttpStatus.OK)
+        .body(accountMapper.toResponse(result.account()));
   }
 
   @Override
