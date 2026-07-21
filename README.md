@@ -19,6 +19,7 @@ authorization, and billing capabilities provided by [Cardo](https://github.com/l
 | `apps/mobile` | Expo mobile application |
 | `packages/design` | Shared product design system |
 | `services/polity` | Spring Boot product service and OpenAPI contract |
+| `deploy` | Environment-neutral runtime images and same-origin gateway |
 | `docs` | Repository-level durable documentation |
 
 ## Development

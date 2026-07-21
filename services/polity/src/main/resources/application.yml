@@ -48,7 +48,16 @@ cardo:
       base-url: ${INVITE_BASE_URL:http://localhost:8083/api/v1}
 server:
   port: ${POLITY_PORT:8084}
+  forward-headers-strategy: framework
+  shutdown: graceful
 management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db
+      probes:
+        enabled: true
   endpoints:
     web:
       exposure:
