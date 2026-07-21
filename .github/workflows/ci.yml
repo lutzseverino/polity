@@ -54,7 +54,7 @@ jobs:
         with:
           repository: lutzseverino/cardo
           path: cardo
-          ref: 7613f98a178dbf7f341b017ce620cf8c922fa27a
+          ref: 07264c9603ede38b233c570c5343b1c34dbf553d
       - name: Set up Java
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:

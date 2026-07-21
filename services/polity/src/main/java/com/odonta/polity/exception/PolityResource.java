@@ -4,6 +4,7 @@ import io.github.lutzseverino.cardo.common.api.ApiException;
 
 public enum PolityResource {
   MEMBER("member_not_found", "Member not found."),
+  POLITY_ACCOUNT("polity_account_not_found", "Polity account not found."),
   OFFICE("office_not_found", "Office not found."),
   POLITY("polity_not_found", "Polity not found."),
   CONSTITUTION("constitution_not_found", "Constitution not found."),
