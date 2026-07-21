@@ -10,12 +10,21 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  repository:
+    name: CI / Repository
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Validate workflows
+        run: python3 .github/scripts/check-workflows.py
+
   javascript:
-    name: JavaScript
+    name: CI / JavaScript
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
@@ -31,9 +40,11 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run JavaScript validation
         run: pnpm check:js
+      - name: Check dependency hygiene
+        run: pnpm check:deps
 
   service:
-    name: Service
+    name: CI / Service
     runs-on: ubuntu-24.04
     steps:
       - name: Check out Polity
@@ -43,6 +54,7 @@ jobs:
         with:
           repository: lutzseverino/cardo
           path: cardo
+          ref: 7613f98a178dbf7f341b017ce620cf8c922fa27a
       - name: Set up Java
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
@@ -53,3 +65,22 @@ jobs:
         run: ./cardo/mvnw --batch-mode --no-transfer-progress -f cardo/pom.xml install -DskipTests
       - name: Verify Polity service
         run: ./mvnw --batch-mode --no-transfer-progress -f services/polity/pom.xml verify spotbugs:check
+
+  required:
+    name: CI / Required
+    if: ${{ always() }}
+    needs: [repository, javascript, service]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Enforce required jobs
+        env:
+          JAVASCRIPT_RESULT: ${{ needs.javascript.result }}
+          REPOSITORY_RESULT: ${{ needs.repository.result }}
+          SERVICE_RESULT: ${{ needs.service.result }}
+        run: |
+          for result in "$REPOSITORY_RESULT" "$JAVASCRIPT_RESULT" "$SERVICE_RESULT"; do
+            if [ "$result" != "success" ]; then
+              echo "Required CI job concluded with: $result" >&2
+              exit 1
+            fi
+          done
