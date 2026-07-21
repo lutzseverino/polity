@@ -324,6 +324,10 @@ msgstr ""
 msgid "No. {0}"
 msgstr ""
 
+#: src/routes/polities/index.tsx:324
+msgid "Nothing to respond to"
+msgstr ""
+
 #: src/routes/polities/$politySlug/government.tsx:243
 msgid "Office"
 msgstr ""
@@ -503,6 +507,5 @@ msgid "Yes"
 msgstr ""
 
 #: src/routes/polities/$politySlug/index.tsx:174
-#: src/routes/polities/index.tsx:324
 msgid "You’re all caught up"
 msgstr ""

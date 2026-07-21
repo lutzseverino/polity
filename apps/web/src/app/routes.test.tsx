@@ -455,7 +455,7 @@ describe("first governing journey", () => {
       name: /neighbourhood table/i,
     });
     expect(
-      within(neighbourhoodTableLink).getByText("You’re all caught up"),
+      within(neighbourhoodTableLink).getByText("Nothing to respond to"),
     ).toBeInTheDocument();
     expect(within(neighbourhoodTableLink).queryByText("Forming")).toBeNull();
 
