@@ -10,7 +10,7 @@
     "tailwindcss",
     "tw-animate-css"
   ],
-  "ignoreBinaries": ["mvnw"],
+  "ignoreBinaries": ["python3"],
   "ignoreIssues": {
     "apps/landing/src/components/app/**": ["exports", "types"],
     "apps/landing/src/components/ui/**": ["exports", "types"],

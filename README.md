@@ -37,11 +37,17 @@ pnpm dev:landing
 pnpm dev:web
 pnpm dev:mobile
 pnpm check
-pnpm quality
 ```
+
+`pnpm check` is the canonical gate. It runs workflow, formatting, lint, generated-artifact, type,
+architecture, production-build, web and service test, SpotBugs, and dependency-hygiene checks.
 
 The pnpm install unit is the workspace. Run installs from the root so workspace dependencies are
 linked consistently.
+
+Required CI installs Cardo from an explicit source revision so a Cardo merge cannot silently change
+Polity's merge gate. The scheduled `Cardo Compatibility` workflow verifies Polity separately against
+Cardo's current `main` branch.
 
 ## Documentation
 
