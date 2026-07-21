@@ -321,7 +321,7 @@ function PolityDirectoryRoute() {
                       className="font-normal text-muted-foreground"
                       variant="strong"
                     >
-                      <Trans>No motion responses pending</Trans>
+                      <Trans>Nothing to respond to</Trans>
                     </AppText>
                   )}
                 </PolityCard.Footer>

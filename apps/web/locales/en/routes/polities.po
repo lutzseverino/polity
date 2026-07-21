@@ -303,10 +303,6 @@ msgstr "No institutions or offices yet"
 msgid "No matching polities"
 msgstr "No matching polities"
 
-#: src/routes/polities/index.tsx:324
-msgid "No motion responses pending"
-msgstr "No motion responses pending"
-
 #: src/routes/polities/$politySlug/motions/index.tsx:118
 msgid "No motions have been completed yet."
 msgstr "No motions have been completed yet."
@@ -327,6 +323,10 @@ msgstr "No polities yet"
 #: src/routes/polities/$politySlug/record.tsx:85
 msgid "No. {0}"
 msgstr "No. {0}"
+
+#: src/routes/polities/index.tsx:324
+msgid "Nothing to respond to"
+msgstr "Nothing to respond to"
 
 #: src/routes/polities/$politySlug/government.tsx:243
 msgid "Office"

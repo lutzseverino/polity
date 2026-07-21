@@ -455,7 +455,7 @@ describe("first governing journey", () => {
       name: /neighbourhood table/i,
     });
     expect(
-      within(neighbourhoodTableLink).getByText("No motion responses pending"),
+      within(neighbourhoodTableLink).getByText("Nothing to respond to"),
     ).toBeInTheDocument();
     expect(within(neighbourhoodTableLink).queryByText("Forming")).toBeNull();
 
