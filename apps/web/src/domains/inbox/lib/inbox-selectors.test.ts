@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { InboxItem } from "@/domains/inbox/lib/inbox";
 import {
   countOpenInboxTasks,
+  countOpenInboxTasksForPolity,
   removeMembershipInvitationInboxTask,
   selectInboxPreviewItems,
 } from "@/domains/inbox/lib/inbox-selectors";
@@ -51,6 +52,11 @@ const items: readonly InboxItem[] = [
 describe("Inbox attention selectors", () => {
   it("counts open tasks independently from unread state", () => {
     expect(countOpenInboxTasks(items)).toBe(2);
+  });
+
+  it("counts only actionable motion tasks owned by a polity", () => {
+    expect(countOpenInboxTasksForPolity(items, "thursday-assembly")).toBe(1);
+    expect(countOpenInboxTasksForPolity(items, "weekend-council")).toBe(0);
   });
 
   it("prioritizes open tasks in the preview", () => {

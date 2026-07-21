@@ -12,6 +12,18 @@ export function countOpenInboxTasks(items: readonly InboxItem[]) {
   return items.filter(isOpenInboxTask).length;
 }
 
+export function countOpenInboxTasksForPolity(
+  items: readonly InboxItem[],
+  politySlug: string,
+) {
+  return items.filter(
+    (item) =>
+      isOpenInboxTask(item) &&
+      item.source.kind !== "membership-invitation" &&
+      item.source.politySlug === politySlug,
+  ).length;
+}
+
 export function filterInboxItemsByCategory(
   items: readonly InboxItem[],
   category: InboxCategory,

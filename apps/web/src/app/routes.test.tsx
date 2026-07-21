@@ -444,15 +444,18 @@ describe("first governing journey", () => {
       within(thursdayAssemblyLink).getByText("Assembly"),
     ).toBeInTheDocument();
     expect(
-      within(thursdayAssemblyLink).getByText("Constitution v2"),
+      within(thursdayAssemblyLink).getByText("2 actions need you"),
     ).toBeInTheDocument();
+    expect(
+      within(thursdayAssemblyLink).queryByText(/constitution v/i),
+    ).toBeNull();
     expect(within(thursdayAssemblyLink).queryByText("Ready")).toBeNull();
 
     const neighbourhoodTableLink = screen.getByRole("link", {
       name: /neighbourhood table/i,
     });
     expect(
-      within(neighbourhoodTableLink).getByText("Constitution v1"),
+      within(neighbourhoodTableLink).getByText("You’re all caught up"),
     ).toBeInTheDocument();
     expect(within(neighbourhoodTableLink).queryByText("Forming")).toBeNull();
 

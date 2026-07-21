@@ -34,7 +34,7 @@ msgid "{0, plural, one {# member} other {# members}}"
 msgstr ""
 
 #. placeholder {0}: pageMetadata.totalElements
-#: src/routes/polities/index.tsx:253
+#: src/routes/polities/index.tsx:256
 msgid "{0, plural, one {# polity} other {# polities}}"
 msgstr ""
 
@@ -65,6 +65,10 @@ msgstr ""
 msgid "{0} of {1} eligible members have participated."
 msgstr ""
 
+#: src/routes/polities/index.tsx:307
+msgid "{openTaskCount, plural, one {# action needs you} other {# actions need you}}"
+msgstr ""
+
 #: src/routes/polities/$politySlug/government.tsx:99
 msgid "All active members"
 msgstr ""
@@ -90,11 +94,11 @@ msgstr ""
 msgid "Certified result"
 msgstr ""
 
-#: src/routes/polities/index.tsx:231
+#: src/routes/polities/index.tsx:234
 msgid "Clear polity search"
 msgstr ""
 
-#: src/routes/polities/index.tsx:324
+#: src/routes/polities/index.tsx:361
 msgid "Clear search"
 msgstr ""
 
@@ -124,7 +128,6 @@ msgstr ""
 #. placeholder {0}: polity.constitutionVersion
 #: src/routes/polities/$politySlug/record.tsx:98
 #: src/routes/polities/$politySlug/route.tsx:172
-#: src/routes/polities/index.tsx:289
 msgid "Constitution v{0}"
 msgstr ""
 
@@ -140,7 +143,7 @@ msgstr ""
 msgid "Council"
 msgstr ""
 
-#: src/routes/polities/index.tsx:182
+#: src/routes/polities/index.tsx:185
 msgid "Create a new space and establish how it will govern itself."
 msgstr ""
 
@@ -184,7 +187,7 @@ msgstr ""
 msgid "Forming offices"
 msgstr ""
 
-#: src/routes/polities/index.tsx:179
+#: src/routes/polities/index.tsx:182
 #: src/routes/polities/new.tsx:14
 #: src/routes/polities/new.tsx:33
 msgid "Found a polity"
@@ -296,7 +299,7 @@ msgstr ""
 msgid "No institutions or offices yet"
 msgstr ""
 
-#: src/routes/polities/index.tsx:308
+#: src/routes/polities/index.tsx:345
 msgid "No matching polities"
 msgstr ""
 
@@ -308,11 +311,11 @@ msgstr ""
 msgid "No official activity yet"
 msgstr ""
 
-#: src/routes/polities/index.tsx:315
+#: src/routes/polities/index.tsx:352
 msgid "No polities match “{query}”."
 msgstr ""
 
-#: src/routes/polities/index.tsx:310
+#: src/routes/polities/index.tsx:347
 msgid "No polities yet"
 msgstr ""
 
@@ -356,22 +359,22 @@ msgstr ""
 msgid "Planned polity destination"
 msgstr ""
 
-#: src/routes/polities/index.tsx:77
-#: src/routes/polities/index.tsx:159
+#: src/routes/polities/index.tsx:79
+#: src/routes/polities/index.tsx:162
 msgid "Polities"
 msgstr ""
 
-#: src/routes/polities/index.tsx:317
+#: src/routes/polities/index.tsx:354
 msgid "Polities you join will appear here."
 msgstr ""
 
 #: src/routes/polities/$politySlug/route.tsx:168
-#: src/routes/polities/index.tsx:281
+#: src/routes/polities/index.tsx:290
 msgid "Private"
 msgstr ""
 
 #: src/routes/polities/$politySlug/route.tsx:166
-#: src/routes/polities/index.tsx:279
+#: src/routes/polities/index.tsx:288
 msgid "Public"
 msgstr ""
 
@@ -409,11 +412,11 @@ msgstr ""
 msgid "Review active proceedings, cast eligible votes, and find certified results."
 msgstr ""
 
-#: src/routes/polities/index.tsx:211
+#: src/routes/polities/index.tsx:214
 msgid "Search polities"
 msgstr ""
 
-#: src/routes/polities/index.tsx:225
+#: src/routes/polities/index.tsx:228
 msgid "Search polities…"
 msgstr ""
 
@@ -500,5 +503,6 @@ msgid "Yes"
 msgstr ""
 
 #: src/routes/polities/$politySlug/index.tsx:174
+#: src/routes/polities/index.tsx:324
 msgid "You’re all caught up"
 msgstr ""
