@@ -16,6 +16,7 @@ export type {
 } from "@/domains/inbox/lib/inbox";
 export {
   countOpenInboxTasks,
+  countOpenInboxTasksForPolity,
   filterInboxItemsByCategory,
   removeMembershipInvitationInboxTask,
 } from "@/domains/inbox/lib/inbox-selectors";

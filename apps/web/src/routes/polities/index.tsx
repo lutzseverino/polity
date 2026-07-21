@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Landmark, Plus, Search, SearchX, X } from "lucide-react";
+import { ArrowRight, Landmark, Plus, Search, SearchX, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppButton } from "@/components/app/AppButton";
@@ -19,11 +19,13 @@ import { AppPageLayout } from "@/components/app/AppPageLayout";
 import { AppPagination } from "@/components/app/AppPagination";
 import { AppSeparator } from "@/components/app/AppSeparator";
 import { AppText } from "@/components/app/AppText";
+import { countOpenInboxTasksForPolity, useInboxItems } from "@/domains/inbox";
 import {
   PolityCard,
   politiesQueryOptions,
   usePolities,
 } from "@/domains/polity";
+import { cn } from "@/lib/utils";
 
 const maximumPolitySearchLength = 120;
 const polityDirectoryPageSize = 12;
@@ -93,6 +95,7 @@ function PolityDirectoryRoute() {
     query,
     size: polityDirectoryPageSize,
   });
+  const { data: inboxItems } = useInboxItems({ locale: i18n.locale });
   const hasQuery = Boolean(query);
   const { content: polities, page: pageMetadata } = polityPage;
 
@@ -258,40 +261,74 @@ function PolityDirectoryRoute() {
           </AppText>
         </div>
 
-        {polities.map((polity) => (
-          <Link
-            className="focus-indicator group min-w-0 rounded-xl"
-            key={polity.id}
-            params={{ politySlug: polity.slug }}
-            to="/polities/$politySlug"
-          >
-            <PolityCard>
-              <PolityCard.Header>
-                <PolityCard.Identity>
-                  <PolityCard.Title className="wrap-break-word">
-                    {polity.name}
-                  </PolityCard.Title>
-                  <PolityCard.Description className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span>{polity.institutionName}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                      {polity.visibility === "public" ? (
-                        <Trans>Public</Trans>
-                      ) : (
-                        <Trans>Private</Trans>
-                      )}
-                    </span>
-                  </PolityCard.Description>
-                </PolityCard.Identity>
-              </PolityCard.Header>
-              <PolityCard.Footer className="mt-auto bg-transparent py-3">
-                <AppText as="span" variant="supporting">
-                  <Trans>Constitution v{polity.constitutionVersion}</Trans>
-                </AppText>
-              </PolityCard.Footer>
-            </PolityCard>
-          </Link>
-        ))}
+        {polities.map((polity) => {
+          const openTaskCount = countOpenInboxTasksForPolity(
+            inboxItems,
+            polity.slug,
+          );
+
+          return (
+            <Link
+              className="focus-indicator group min-w-0 rounded-xl"
+              key={polity.id}
+              params={{ politySlug: polity.slug }}
+              to="/polities/$politySlug"
+            >
+              <PolityCard>
+                <PolityCard.Header>
+                  <PolityCard.Identity>
+                    <PolityCard.Title className="wrap-break-word">
+                      {polity.name}
+                    </PolityCard.Title>
+                    <PolityCard.Description className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span>{polity.institutionName}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>
+                        {polity.visibility === "public" ? (
+                          <Trans>Public</Trans>
+                        ) : (
+                          <Trans>Private</Trans>
+                        )}
+                      </span>
+                    </PolityCard.Description>
+                  </PolityCard.Identity>
+                </PolityCard.Header>
+                <PolityCard.Footer
+                  className={cn(
+                    "mt-auto justify-between py-3 transition-colors",
+                    openTaskCount > 0
+                      ? "bg-muted/40 group-hover:bg-muted/70"
+                      : "bg-transparent",
+                  )}
+                >
+                  {openTaskCount > 0 ? (
+                    <>
+                      <AppText as="span" variant="strong">
+                        <Plural
+                          value={openTaskCount}
+                          one="# action needs you"
+                          other="# actions need you"
+                        />
+                      </AppText>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
+                      />
+                    </>
+                  ) : (
+                    <AppText
+                      as="span"
+                      className="font-normal text-muted-foreground"
+                      variant="strong"
+                    >
+                      <Trans>You’re all caught up</Trans>
+                    </AppText>
+                  )}
+                </PolityCard.Footer>
+              </PolityCard>
+            </Link>
+          );
+        })}
 
         {polities.length === 0 ? (
           <AppEmpty className="border py-12 lg:col-span-1 xl:col-span-2">
