@@ -24,6 +24,7 @@ class PolityResourceTest {
         .extracting(PolityResource::notFoundCode, PolityResource::notFoundMessage)
         .containsExactly(
             tuple("member_not_found", "Member not found."),
+            tuple("polity_account_not_found", "Polity account not found."),
             tuple("office_not_found", "Office not found."),
             tuple("polity_not_found", "Polity not found."),
             tuple("constitution_not_found", "Constitution not found."),

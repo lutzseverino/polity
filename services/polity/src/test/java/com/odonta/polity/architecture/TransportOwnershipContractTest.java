@@ -19,6 +19,8 @@ class TransportOwnershipContractTest {
 
   private static final Map<String, String> CANONICAL_OPERATION_OWNERS =
       Map.ofEntries(
+          Map.entry("getPolityAccount", "Polities"),
+          Map.entry("provisionPolityAccount", "Polities"),
           Map.entry("getPolityConstitution", "Constitutions"),
           Map.entry("getPolityGovernment", "Government Structures"),
           Map.entry("getPolityActions", "Polity Action Availability"),
@@ -71,6 +73,20 @@ class TransportOwnershipContractTest {
             "InvitationStatus",
             "MemberInvitationResponse",
             "MemberInvitationPageResponse");
+  }
+
+  @Test
+  void accountProvisioningPublishesDurableGrantConvergence() throws IOException {
+    Map<String, Object> schemas = map(map(openApiSpecification().get("components")).get("schemas"));
+
+    assertThat(schemas).containsKeys("PolityAccountResponse", "GrantConvergenceResponse");
+    assertThat(list(map(schemas.get("GrantConvergenceStatus")).get("enum")))
+        .containsExactly("pending", "applied", "failed");
+    assertThat(
+            map(
+                map(map(schemas.get("GrantConvergenceResponse")).get("properties"))
+                    .get("failureCode")))
+        .containsEntry("nullable", true);
   }
 
   private Map<String, String> operationOwners(Map<String, Object> specification) {
