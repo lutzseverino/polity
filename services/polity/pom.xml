@@ -28,7 +28,7 @@
     <cardo.version>0.1.0-SNAPSHOT</cardo.version>
     <openapi-generator.version>7.22.0</openapi-generator.version>
     <archunit.version>1.4.2</archunit.version>
-    <spotbugs.version>4.10.2.0</spotbugs.version>
+    <spotbugs.version>4.10.3.0</spotbugs.version>
     <spotless.version>3.4.0</spotless.version>
   </properties>
 
