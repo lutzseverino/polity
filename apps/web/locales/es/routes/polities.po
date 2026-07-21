@@ -303,6 +303,10 @@ msgstr ""
 msgid "No matching polities"
 msgstr ""
 
+#: src/routes/polities/index.tsx:324
+msgid "No motion responses pending"
+msgstr ""
+
 #: src/routes/polities/$politySlug/motions/index.tsx:118
 msgid "No motions have been completed yet."
 msgstr ""
@@ -503,6 +507,5 @@ msgid "Yes"
 msgstr ""
 
 #: src/routes/polities/$politySlug/index.tsx:174
-#: src/routes/polities/index.tsx:324
 msgid "You’re all caught up"
 msgstr ""
