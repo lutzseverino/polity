@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { AlertTriangle, CheckCircle2, MailCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import {
@@ -146,7 +146,8 @@ export function OnboardMembershipInvitationWorkflow({
   renderSignInLink,
   token,
 }: OnboardMembershipInvitationWorkflowProps) {
-  const completion = useMembershipInvitationCompletion(token);
+  const { i18n } = useLingui();
+  const completion = useMembershipInvitationCompletion(token, i18n.locale);
 
   return (
     <MembershipInvitationOnboardingContent
