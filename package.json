@@ -10,7 +10,7 @@
     "check": "node scripts/run-package-script.mjs root check:repository && node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service && node scripts/run-package-script.mjs root check:deps",
     "check:deps": "knip",
     "check:js": "node scripts/run-package-script.mjs root lint && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root check:ts:architecture && node scripts/run-package-script.mjs root test:web && node scripts/run-package-script.mjs root build",
-    "check:repository": "python3 .github/scripts/check-workflows.py",
+    "check:repository": "python3 .github/scripts/check-workflows.py && ./deploy/test-runtime-source-pins.sh",
     "check:service": "./mvnw -f services/polity/pom.xml verify spotbugs:check",
     "check:service:architecture": "./mvnw -f services/polity/pom.xml -Dtest=PolityArchitectureTest,PolityRepositoryBoundaryTest,PolityApplicationBoundaryTest test",
     "check:service:static": "./mvnw -f services/polity/pom.xml compile spotbugs:check",
