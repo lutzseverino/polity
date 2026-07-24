@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.claude
+.env
+**/.env
+**/node_modules
+**/dist
+**/target
+!services/polity/target/
+!services/polity/target/polity-*.jar
+**/*.tsbuildinfo
+coverage

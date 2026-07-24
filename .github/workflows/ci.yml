@@ -61,10 +61,16 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
       - name: Install Cardo
         run: ./cardo/mvnw --batch-mode --no-transfer-progress -f cardo/pom.xml install -DskipTests
       - name: Verify Polity service
         run: ./mvnw --batch-mode --no-transfer-progress -f services/polity/pom.xml verify spotbugs:check
+      - name: Build and smoke runtime images
+        run: ./deploy/test-runtime-images.sh
 
   required:
     name: CI / Required
