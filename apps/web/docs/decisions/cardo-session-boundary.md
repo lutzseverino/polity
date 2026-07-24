@@ -14,8 +14,9 @@ resume local destinations.
 ## Decision
 
 The root router classifies only `/sign-in` and invitation-token paths as public. Public paths skip the
-application shell loader. Every other path ensures the owner-local current-session query before protected
-shell and route loaders run, redirecting an unrefreshable session to `/sign-in`.
+application shell loader. Every other path ensures the owner-local current-session query and then the
+separate Polity account-convergence query before protected shell and route loaders run, redirecting an
+unrefreshable session to `/sign-in`.
 
 The `session` domain validates Cardo's principal response and owns current-session reads, query state, and a
 single-flight refresh. Restoration performs one current-session read, at most one coordinated refresh, and
@@ -33,13 +34,22 @@ Session-dependent TanStack Query entries opt in through `meta.requiresSession`. 
 terminal unauthorized transitions clear those entries while preserving public onboarding state. A terminal
 unauthorized transition is coordinated so concurrent failures do not overwrite the first return destination.
 
+The `account` domain validates Polity's durable account receipt and owns GET-first, POST-on-not-found
+provisioning. The root waits at a fixed interval while the stored receipt is pending and reads only the
+existing account during that wait. Applied convergence unlocks protected route loading. Failed convergence
+is terminal: it stops polling, does not restage the receipt, and offers sign-out rather than an invented
+repair action. Account convergence remains separate from both session state and future membership-access
+convergence.
+
 ## Consequences
 
 - Browser mock and live modes use identical request modules and relative `/api/v1` URLs.
 - Public invitation rendering issues no current-session, inbox, or polity reads.
+- Public routes issue no Polity account reads or provisioning requests.
+- Protected product reads cannot race ahead of baseline account grant convergence.
 - Refresh is constrained to session restoration and cannot create unsafe request replay.
-- Product authorization convergence remains a backend dependency; the browser does not infer grants or
-  store bearer tokens.
+- The browser observes Polity's durable convergence state without inferring grants, restaging failed work,
+  or storing bearer tokens.
 
 ## Alternatives Considered
 
