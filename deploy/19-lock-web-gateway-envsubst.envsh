@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Keep the stock renderer constrained to the image-owned template and its
+# validated runtime inputs. This file is sourced by the Nginx entrypoint, so
+# these values override container runtime environment values for later hooks.
+export NGINX_ENVSUBST_FILTER='^(CARDO_IDENTITY_UPSTREAM|POLITY_EXTERNAL_HOST|POLITY_EXTERNAL_PORT|POLITY_EXTERNAL_SCHEME|POLITY_SERVICE_UPSTREAM|POLITY_WEB_PORT)$'
+export NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+export NGINX_ENVSUBST_STREAM_OUTPUT_DIR=/etc/nginx/stream-conf.d
+export NGINX_ENVSUBST_STREAM_TEMPLATE_SUFFIX=.stream-template
+export NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+export NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template
