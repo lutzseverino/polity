@@ -1,13 +1,20 @@
 import { HttpResponse, http } from "msw";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
+import { setTerminalUnauthorizedHandler } from "@/api/http-client";
 import {
   getMembershipInvitation,
   getMembershipInvitationByToken,
+  getMembershipInvitationCompletion,
   listMembershipInvitations,
   requestMembershipInvitationCompletion,
 } from "@/domains/membership/api/membership-requests";
+import { setTestCookie } from "@/test/cookies";
 import { apiMockServer } from "@/test/mocks/server";
+
+afterEach(() => {
+  setTestCookie("cardo.csrf=; Max-Age=0; Path=/");
+});
 
 describe("membership invitation requests", () => {
   it("rejects a malformed invitation id before loading invitation pages", async () => {
@@ -127,25 +134,37 @@ describe("membership invitation requests", () => {
   });
 
   it("maps remote completion details to product-owned state", async () => {
+    let acceptedLanguage: string | null = null;
+    let csrfToken: string | null = null;
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
     apiMockServer.use(
-      http.post("/api/v1/invitation-tokens/:token/completion", () =>
-        HttpResponse.json(
-          {
-            actionExpiresAt: "2026-07-18T10:16:00Z",
-            attemptCount: 3,
-            createdAt: "2026-07-18T10:00:00Z",
-            lastError: "credential_action_expired",
-            status: "failed",
-            updatedAt: "2026-07-18T10:01:00Z",
-          },
-          { status: 202 },
-        ),
+      http.post(
+        "/api/v1/invitation-tokens/:token/completion",
+        ({ request }) => {
+          acceptedLanguage = request.headers.get("Accept-Language");
+          csrfToken = request.headers.get("X-CSRF-TOKEN");
+          return HttpResponse.json(
+            {
+              actionExpiresAt: "2026-07-18T10:16:00Z",
+              attemptCount: 3,
+              createdAt: "2026-07-18T10:00:00Z",
+              lastError: "credential_action_expired",
+              status: "failed",
+              updatedAt: "2026-07-18T10:01:00Z",
+            },
+            { status: 202 },
+          );
+        },
       ),
     );
 
-    const completion =
-      await requestMembershipInvitationCompletion("invitation-failed");
+    const completion = await requestMembershipInvitationCompletion(
+      "invitation-failed",
+      { acceptedLanguage: "es" },
+    );
 
+    expect(acceptedLanguage).toBe("es");
+    expect(csrfToken).toBe("mock-csrf-token");
     expect(completion).toEqual({ status: "failed" });
     expect(completion).not.toHaveProperty("lastError");
     expect(completion).not.toHaveProperty("actionExpiresAt");
@@ -167,15 +186,42 @@ describe("membership invitation requests", () => {
     );
 
     await expect(
-      requestMembershipInvitationCompletion("invitation-malformed"),
+      requestMembershipInvitationCompletion("invitation-malformed", {
+        acceptedLanguage: "en",
+      }),
     ).rejects.toThrow("Invalid membership invitation completion response.");
+  });
+
+  it("carries the accepted language while polling completion", async () => {
+    let acceptedLanguage: string | null = null;
+    apiMockServer.use(
+      http.get("/api/v1/invitation-tokens/:token/completion", ({ request }) => {
+        acceptedLanguage = request.headers.get("Accept-Language");
+        return HttpResponse.json({
+          attemptCount: 1,
+          createdAt: "2026-07-18T10:00:00Z",
+          status: "requested",
+          updatedAt: "2026-07-18T10:01:00Z",
+        });
+      }),
+    );
+
+    const completion = await getMembershipInvitationCompletion(
+      "invitation-pending",
+      { acceptedLanguage: "es" },
+    );
+
+    expect(acceptedLanguage).toBe("es");
+    expect(completion).toEqual({ status: "requested" });
   });
 
   it("maps token transport dates to localized product copy", async () => {
     let acceptedLanguage: string | null = null;
+    let browserCache: RequestCache | undefined;
     apiMockServer.use(
       http.get("/api/v1/invitation-tokens/:token", ({ request }) => {
         acceptedLanguage = request.headers.get("Accept-Language");
+        browserCache = request.cache;
         return HttpResponse.json({
           expiresAt: "2026-07-20T10:00:00Z",
           invitedEmail: "friend@example.com",
@@ -191,6 +237,7 @@ describe("membership invitation requests", () => {
     );
 
     expect(acceptedLanguage).toBe("en");
+    expect(browserCache).toBe("no-store");
     expect(invitation).toEqual({
       expiresAtLabel: "July 20, 2026",
       invitedEmail: "friend@example.com",
@@ -216,5 +263,69 @@ describe("membership invitation requests", () => {
         acceptedLanguage: "en",
       }),
     ).rejects.toThrow("Invalid membership invitation token response.");
+  });
+
+  it.each([
+    {
+      expectedMessage:
+        "Membership invitation token invitation-missing was not found.",
+      status: 404,
+      token: "invitation-missing",
+    },
+    {
+      expectedMessage: "This membership invitation is no longer available.",
+      status: 410,
+      token: "invitation-expired",
+    },
+  ])("preserves public token handling for $status responses", async ({
+    expectedMessage,
+    status,
+    token,
+  }) => {
+    let terminalUnauthorizedCount = 0;
+    const removeTerminalUnauthorizedHandler = setTerminalUnauthorizedHandler(
+      () => {
+        terminalUnauthorizedCount += 1;
+      },
+    );
+    apiMockServer.use(
+      http.get("/api/v1/invitation-tokens/:token", () =>
+        HttpResponse.json({}, { status }),
+      ),
+    );
+
+    try {
+      await expect(
+        getMembershipInvitationByToken(token, { acceptedLanguage: "en" }),
+      ).rejects.toThrow(expectedMessage);
+      expect(terminalUnauthorizedCount).toBe(0);
+    } finally {
+      removeTerminalUnauthorizedHandler();
+    }
+  });
+
+  it("does not turn an unauthorized public token lookup into a terminal session event", async () => {
+    let terminalUnauthorizedCount = 0;
+    const removeTerminalUnauthorizedHandler = setTerminalUnauthorizedHandler(
+      () => {
+        terminalUnauthorizedCount += 1;
+      },
+    );
+    apiMockServer.use(
+      http.get("/api/v1/invitation-tokens/:token", () =>
+        HttpResponse.json({}, { status: 401 }),
+      ),
+    );
+
+    try {
+      await expect(
+        getMembershipInvitationByToken("invitation-public", {
+          acceptedLanguage: "en",
+        }),
+      ).rejects.toThrow("Membership invitation request failed (401).");
+      expect(terminalUnauthorizedCount).toBe(0);
+    } finally {
+      removeTerminalUnauthorizedHandler();
+    }
   });
 });

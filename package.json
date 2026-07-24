@@ -9,7 +9,7 @@
     "build:web": "node scripts/run-package-script.mjs workspace apps/web build",
     "check": "node scripts/run-package-script.mjs root check:repository && node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service && node scripts/run-package-script.mjs root check:deps",
     "check:deps": "knip",
-    "check:js": "node scripts/run-package-script.mjs root lint && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root check:ts:architecture && node scripts/run-package-script.mjs root test:web && node scripts/run-package-script.mjs root build",
+    "check:js": "node scripts/run-package-script.mjs root lint && node scripts/run-package-script.mjs root test:eslint-config && node scripts/run-package-script.mjs workspace apps/landing check:theme && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root check:ts:architecture && node scripts/run-package-script.mjs root test:web && node scripts/run-package-script.mjs root build",
     "check:repository": "python3 .github/scripts/check-workflows.py",
     "check:service": "./mvnw -f services/polity/pom.xml verify spotbugs:check",
     "check:service:architecture": "./mvnw -f services/polity/pom.xml -Dtest=PolityArchitectureTest,PolityRepositoryBoundaryTest,PolityApplicationBoundaryTest test",
@@ -30,6 +30,7 @@
     "lint:mobile": "node scripts/run-package-script.mjs workspace apps/mobile lint",
     "lint:ts": "eslint --config eslint.config.mjs --max-warnings 0 .",
     "lint:ts:web": "eslint --config eslint.config.mjs --max-warnings 0 apps/web",
+    "test:eslint-config": "node --test eslint.config.test.mjs",
     "test:service": "./mvnw -f services/polity/pom.xml test",
     "test:web": "node scripts/run-package-script.mjs workspace apps/web test:run",
     "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace apps/web typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"

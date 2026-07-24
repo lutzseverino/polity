@@ -16,6 +16,7 @@ type HttpRequestConfig<RequestData = unknown> = Omit<
 > &
   Readonly<{
     acceptedLanguage: string;
+    browserCache?: RequestCache;
     headers?: AxiosHeaders | Record<string, AxiosHeaderValue>;
     notifyOnUnauthorized?: boolean;
   }>;
@@ -79,6 +80,11 @@ function notifyTerminalUnauthorized() {
   unauthorizedListener?.();
 }
 
+function resolveBrowserBaseUrl(baseUrl: string | undefined) {
+  if (!baseUrl || typeof document === "undefined") return baseUrl;
+  return new URL(baseUrl, document.baseURI).toString();
+}
+
 export function createHttpClient({
   axiosConfig,
   baseUrl = "/api/v1",
@@ -91,6 +97,7 @@ export function createHttpClient({
   return {
     async request<ResponseData, RequestData = unknown>({
       acceptedLanguage,
+      browserCache,
       headers,
       notifyOnUnauthorized = true,
       ...config
@@ -111,6 +118,16 @@ export function createHttpClient({
       try {
         const response = await client.request<ResponseData>({
           ...config,
+          ...(browserCache
+            ? {
+                adapter: "fetch",
+                baseURL: resolveBrowserBaseUrl(client.defaults.baseURL),
+                fetchOptions: {
+                  ...config.fetchOptions,
+                  cache: browserCache,
+                },
+              }
+            : {}),
           headers: requestHeaders,
         });
 
@@ -131,11 +148,14 @@ export function createHttpClient({
   };
 }
 
+export function getHttpResponseStatus(error: unknown) {
+  if (error instanceof HttpSessionError) return error.status;
+  if (axios.isAxiosError(error)) return error.response?.status;
+  return undefined;
+}
+
 export function hasHttpResponseStatus(error: unknown, status: number) {
-  return (
-    (error instanceof HttpSessionError && error.status === status) ||
-    (axios.isAxiosError(error) && error.response?.status === status)
-  );
+  return getHttpResponseStatus(error) === status;
 }
 
 export function hasHttpResponseCode(error: unknown, code: string) {
