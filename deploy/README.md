@@ -61,6 +61,22 @@ in [the service readme](../services/polity/README.md). It exposes liveness and r
 `/healthz`; upstream readiness should be checked independently so routing failures remain
 diagnosable.
 
+### Updating base image pins
+
+Every registry-backed `FROM` source keeps a readable, non-`latest` tag alongside a multi-platform
+OCI index digest. The immutable `scratch` source and reuse of an earlier named build stage are
+exempt. Repository validation accepts static `FROM` instructions, standard backslash continuations,
+and static `--platform` flags; dynamic sources, alternate escape directives, and unsupported
+Dockerfile forms such as heredocs fail closed.
+Resolve an update with `docker buildx imagetools inspect <image>:<tag>` and copy its top-level
+`sha256` digest, not a child platform manifest digest. Review the tag and digest together, update
+every matching source, then run the repository's single validation path:
+
+```bash
+pnpm check
+./deploy/test-runtime-images.sh
+```
+
 Production Cardo Identity must use its production cookie mode and set its externally visible refresh
 cookie path to `/api/v1/identity/sessions/current`. The repository intentionally does not contain DNS,
 host addresses, TLS certificates, homelab, or WireGuard configuration.
