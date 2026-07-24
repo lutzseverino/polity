@@ -11,8 +11,13 @@ import { HttpResponse, http } from "msw";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { AppProviders } from "@/app/providers/AppProviders";
+import { createAppQueryClient } from "@/app/query/create-query-client";
 import { createAppRouter } from "@/app/router";
 import { shellSectionDefinitions } from "@/app/shell/shell-route-context";
+import {
+  clearCurrentSession,
+  clearSessionDependentQueries,
+} from "@/domains/session";
 import { membershipInvitationScenario } from "@/mocks/scenarios/membership-invitations";
 import { createSessionScenarioHandlers } from "@/mocks/scenarios/session";
 import { setTestCookie } from "@/test/cookies";
@@ -62,6 +67,14 @@ describe("first governing journey", () => {
         protectedReads += 1;
         return HttpResponse.json({});
       }),
+      http.get("/api/v1/polity/account", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
+      http.post("/api/v1/polity/account", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
       ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
     );
     const router = createTestRouter(
@@ -79,8 +92,236 @@ describe("first governing journey", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("redirects a protected destination to sign in and preserves it", async () => {
+  it("keeps the public sign-in route outside account provisioning", async () => {
+    let accountRequests = 0;
     apiMockServer.use(
+      http.get("/api/v1/polity/account", () => {
+        accountRequests += 1;
+        return HttpResponse.json({});
+      }),
+      http.post("/api/v1/polity/account", () => {
+        accountRequests += 1;
+        return HttpResponse.json({});
+      }),
+      ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
+    );
+    const router = createTestRouter("/sign-in");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(accountRequests).toBe(0);
+  });
+
+  it("waits for account grants before loading protected product data", async () => {
+    let accountExists = false;
+    let accountReads = 0;
+    let accountPosts = 0;
+    let accessApplied = false;
+    let protectedReads = 0;
+    let protectedReadBeforeApplied = false;
+    const accountResponse = (status: "applied" | "pending") => ({
+      grants: {
+        failureCode: null,
+        receiptId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        status,
+      },
+      userId: "99999999-9999-4999-8999-999999999999",
+    });
+    const emptyPage = {
+      content: [],
+      page: { number: 0, size: 100, totalElements: 0, totalPages: 0 },
+    };
+
+    apiMockServer.use(
+      http.get("/api/v1/polity/account", () => {
+        accountReads += 1;
+        if (!accountExists) {
+          return HttpResponse.json({}, { status: 404 });
+        }
+        accessApplied = accountReads >= 3;
+        return HttpResponse.json(
+          accountResponse(accessApplied ? "applied" : "pending"),
+        );
+      }),
+      http.post("/api/v1/polity/account", () => {
+        accountPosts += 1;
+        accountExists = true;
+        return HttpResponse.json(accountResponse("pending"), {
+          status: 201,
+        });
+      }),
+      http.get("/api/v1/invitations", () => {
+        protectedReads += 1;
+        protectedReadBeforeApplied ||= !accessApplied;
+        return HttpResponse.json(emptyPage);
+      }),
+      http.get("/api/v1/polities", () => {
+        protectedReads += 1;
+        protectedReadBeforeApplied ||= !accessApplied;
+        return HttpResponse.json(emptyPage);
+      }),
+    );
+    const router = createTestRouter("/polities");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Preparing your Polity account",
+      }),
+    ).toBeInTheDocument();
+    expect(protectedReads).toBe(0);
+    expect(
+      await screen.findByRole(
+        "heading",
+        { name: "Polities" },
+        { timeout: 4_000 },
+      ),
+    ).toBeInTheDocument();
+    expect(accountReads).toBe(3);
+    expect(accountPosts).toBe(1);
+    expect(protectedReads).toBeGreaterThan(0);
+    expect(protectedReadBeforeApplied).toBe(false);
+  }, 6_000);
+
+  it("clears pending account state before bootstrapping a new session", async () => {
+    const queryClient = createAppQueryClient();
+    let session = "first";
+    const secondSessionAccountRequests: string[] = [];
+    const accountResponse = (status: "applied" | "pending") => ({
+      grants: {
+        failureCode: null,
+        receiptId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        status,
+      },
+      userId: "99999999-9999-4999-8999-999999999999",
+    });
+
+    apiMockServer.use(
+      http.get("/api/v1/polity/account", () => {
+        if (session === "first") {
+          return HttpResponse.json(accountResponse("pending"));
+        }
+        secondSessionAccountRequests.push("GET");
+        return HttpResponse.json({}, { status: 404 });
+      }),
+      http.post("/api/v1/polity/account", () => {
+        secondSessionAccountRequests.push("POST");
+        return HttpResponse.json(accountResponse("applied"), { status: 201 });
+      }),
+    );
+    const router = createAppRouter(
+      createMemoryHistory({ initialEntries: ["/polities"] }),
+      queryClient,
+    );
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Preparing your Polity account",
+      }),
+    ).toBeInTheDocument();
+    const accountQuery = queryClient
+      .getQueryCache()
+      .find({ queryKey: ["account", "current"] });
+    expect(accountQuery?.meta).toEqual({ requiresSession: true });
+    expect(accountQuery?.options.queryFn).toEqual(expect.any(Function));
+
+    await router.navigate({ to: "/sign-in" });
+    clearSessionDependentQueries(queryClient);
+    clearCurrentSession(queryClient);
+
+    expect(queryClient.getQueryData(["account", "current"])).toBeUndefined();
+
+    session = "second";
+    await router.navigate({ to: "/polities" });
+
+    expect(
+      await screen.findByRole("heading", { name: "Polities" }),
+    ).toBeInTheDocument();
+    expect(secondSessionAccountRequests).toEqual(["GET", "POST"]);
+  });
+
+  it("keeps failed account grants terminal across reloads", async () => {
+    const user = userEvent.setup();
+    let accountExists = false;
+    let accountPosts = 0;
+    let protectedReads = 0;
+    const failedAccountResponse = {
+      grants: {
+        failureCode: "grant_application_failed",
+        receiptId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        status: "failed",
+      },
+      userId: "99999999-9999-4999-8999-999999999999",
+    } as const;
+    const failedAccountHandlers = [
+      http.get("/api/v1/polity/account", () =>
+        accountExists
+          ? HttpResponse.json(failedAccountResponse)
+          : HttpResponse.json({}, { status: 404 }),
+      ),
+      http.post("/api/v1/polity/account", () => {
+        accountExists = true;
+        accountPosts += 1;
+        return HttpResponse.json(failedAccountResponse, { status: 201 });
+      }),
+      http.get("/api/v1/invitations", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
+      http.get("/api/v1/polities", () => {
+        protectedReads += 1;
+        return HttpResponse.json({});
+      }),
+    ];
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(...failedAccountHandlers);
+
+    const firstRender = renderRouter(createTestRouter("/polities"));
+    expect(
+      await screen.findByRole("heading", {
+        name: "We couldn’t finish your Polity access",
+      }),
+    ).toBeInTheDocument();
+    firstRender.unmount();
+
+    renderRouter(createTestRouter("/polities"));
+    expect(
+      await screen.findByRole("heading", {
+        name: "We couldn’t finish your Polity access",
+      }),
+    ).toBeInTheDocument();
+    expect(accountPosts).toBe(1);
+    expect(protectedReads).toBe(0);
+    expect(screen.queryByRole("button", { name: /retry/i })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Sign out" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(accountPosts).toBe(1);
+  });
+
+  it("redirects a protected destination to sign in and preserves it", async () => {
+    let accountRequests = 0;
+    apiMockServer.use(
+      http.get("/api/v1/polity/account", () => {
+        accountRequests += 1;
+        return HttpResponse.json({});
+      }),
+      http.post("/api/v1/polity/account", () => {
+        accountRequests += 1;
+        return HttpResponse.json({});
+      }),
       ...createSessionScenarioHandlers({ initialSession: "signed-out" }),
     );
     const router = createTestRouter("/inbox?category=updates");
@@ -94,6 +335,7 @@ describe("first governing journey", () => {
     expect(router.state.location.search).toEqual({
       returnTo: "/inbox?category=updates",
     });
+    expect(accountRequests).toBe(0);
   });
 
   it("signs in and resumes a validated local destination", async () => {
