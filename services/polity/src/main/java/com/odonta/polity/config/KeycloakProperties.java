@@ -4,4 +4,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "polity.keycloak")
 public record KeycloakProperties(
-    String baseUrl, String realm, String clientId, String clientSecret) {}
+    String baseUrl,
+    String realm,
+    String clientId,
+    String clientSecret,
+    String catalogClientId,
+    String catalogClientSecret,
+    String realmAdminClientId,
+    String realmAdminClientSecret) {}

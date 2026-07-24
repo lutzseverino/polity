@@ -13,7 +13,11 @@ public interface MembershipInvitationApplicationMapper {
         "invitedUserId",
         "cardoInvitationId",
         "cardoExpiresAt",
-        "invitedBy"
+        "invitedBy",
+        "acceptanceStatus",
+        "acceptanceRequestedAt",
+        "acceptanceCompletedAt",
+        "acceptanceFailureCode"
       })
   MembershipInvitationResult toResult(
       MembershipInvitationProjection projection, String polityName, String invitedByName);

@@ -119,7 +119,10 @@ public class CreatePolityWorkflow {
                 membership.getId(),
                 now,
                 now.plusDays(steward.getTermLengthDays())));
-    grants.stage(grantPlanner.membership(founder.authorizationSubject(), polity.getId()));
+    var grantReceipt =
+        grants.stage(grantPlanner.membership(founder.authorizationSubject(), polity.getId()));
+    membership.retainGrantReceipt(grantReceipt.id());
+    memberships.saveAndFlush(membership);
     appendFoundingRecords(
         input,
         setupPreset,

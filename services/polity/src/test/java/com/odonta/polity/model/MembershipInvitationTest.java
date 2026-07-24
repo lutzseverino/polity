@@ -56,6 +56,25 @@ class MembershipInvitationTest {
         .hasMessage("Membership invitation is linked to another invited user.");
   }
 
+  @Test
+  void completionRequiresAnExplicitRequestedPendingTransition() {
+    MembershipInvitation invitation = invitation();
+    OffsetDateTime acceptedAt = OffsetDateTime.parse("2026-07-18T12:00:00Z");
+
+    assertThatThrownBy(() -> invitation.completeAcceptance(acceptedAt, acceptedAt))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Only requested pending acceptances can be completed.");
+
+    invitation.requestAcceptance(acceptedAt);
+    invitation.completeAcceptance(acceptedAt, acceptedAt.plusMinutes(1));
+
+    assertThat(invitation.getStatus()).isEqualTo(MembershipInvitationStatus.ACCEPTED);
+    assertThat(invitation.getAcceptanceStatus())
+        .isEqualTo(MembershipInvitationAcceptanceStatus.COMPLETED);
+    assertThat(invitation.getRespondedAt()).isEqualTo(acceptedAt);
+    assertThat(invitation.getAcceptanceCompletedAt()).isEqualTo(acceptedAt.plusMinutes(1));
+  }
+
   private MembershipInvitation invitation() {
     return new MembershipInvitation(
         UUID.randomUUID(),

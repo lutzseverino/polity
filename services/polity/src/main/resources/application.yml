@@ -33,19 +33,26 @@ polity:
   keycloak:
     base-url: ${KEYCLOAK_BASE_URL:http://localhost:8080}
     realm: ${KEYCLOAK_REALM:odonta}
-    client-id: ${KEYCLOAK_POLITY_CLIENT_ID:polity}
-    client-secret: ${KEYCLOAK_POLITY_CLIENT_SECRET:polity-secret}
+    client-id: ${KEYCLOAK_POLITY_CLIENT_ID:polity-outbound}
+    client-secret: ${KEYCLOAK_POLITY_CLIENT_SECRET:polity-outbound-secret}
+    catalog-client-id: ${KEYCLOAK_POLITY_CATALOG_CLIENT_ID:polity}
+    catalog-client-secret: ${KEYCLOAK_POLITY_CATALOG_CLIENT_SECRET:polity-catalog-secret}
+    realm-admin-client-id: ${KEYCLOAK_POLITY_REALM_ADMIN_CLIENT_ID:polity-realm-admin}
+    realm-admin-client-secret: ${KEYCLOAK_POLITY_REALM_ADMIN_CLIENT_SECRET:polity-realm-admin-secret}
 
 cardo:
   billing:
     client:
       base-url: ${BILLING_BASE_URL:http://localhost:8085/api/v1}
+      service-token-scope: billing
   identity:
     client:
       base-url: ${IDENTITY_BASE_URL:http://localhost:8081/api/v1}
+      service-token-scope: identity
   invite:
     client:
       base-url: ${INVITE_BASE_URL:http://localhost:8083/api/v1}
+      service-token-scope: cardo-invite
 server:
   port: ${POLITY_PORT:8084}
   forward-headers-strategy: framework
