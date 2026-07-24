@@ -6,6 +6,10 @@ The service owns Polity's domain behavior, API contract, persistence, permission
 decisions. Shared authorization, identity, billing, and API mechanics come from
 [Cardo](https://github.com/lutzseverino/cardo).
 
+Durable authorization-grant receipts require Cardo revision
+`07264c9603ede38b233c570c5343b1c34dbf553d` from
+[Cardo PR #18](https://github.com/lutzseverino/cardo/pull/18), which is also pinned in CI.
+
 ## Development
 
 Install Cardo into the local Maven repository, then run service checks from the repository root:

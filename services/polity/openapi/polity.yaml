@@ -25,13 +25,23 @@ tags:
   - name: Official Record
 paths:
   /polity/account:
+    get:
+      tags: [Polities]
+      operationId: getPolityAccount
+      summary: Read baseline Polity grant convergence for the current account.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Current account and durable grant convergence, content: { application/json: { schema: { $ref: "#/components/schemas/PolityAccountResponse" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
     post:
       tags: [Polities]
       operationId: provisionPolityAccount
       summary: Provision baseline Polity grants for the current account.
+      description: Idempotently creates the product account lifecycle and returns the current durable grant state. Pending does not mean that product access is usable.
       security: [{ bearerAuth: [] }]
       responses:
-        "204": { description: Baseline account grants were staged. }
+        "200": { description: Existing account and current durable grant convergence, content: { application/json: { schema: { $ref: "#/components/schemas/PolityAccountResponse" } } } }
+        "201": { description: Account lifecycle created with durable grant convergence, content: { application/json: { schema: { $ref: "#/components/schemas/PolityAccountResponse" } } } }
         "403": { $ref: "#/components/responses/Forbidden" }
   /polities:
     get:
@@ -447,6 +457,25 @@ components:
       description: Resource is no longer available.
       content: { application/json: { schema: { $ref: "#/components/schemas/ApiError" } } }
   schemas:
+    GrantConvergenceStatus:
+      type: string
+      enum: [pending, applied, failed]
+    GrantConvergenceResponse:
+      type: object
+      required: [receiptId, status]
+      properties:
+        receiptId: { type: string, format: uuid }
+        status: { $ref: "#/components/schemas/GrantConvergenceStatus" }
+        failureCode:
+          type: string
+          nullable: true
+          description: Stable failure code populated only when status is failed.
+    PolityAccountResponse:
+      type: object
+      required: [userId, grants]
+      properties:
+        userId: { type: string, format: uuid }
+        grants: { $ref: "#/components/schemas/GrantConvergenceResponse" }
     ApiError:
       type: object
       required: [error]

@@ -7,6 +7,7 @@ import com.odonta.polity.model.InstitutionKind;
 import com.odonta.polity.model.JurisdictionKind;
 import com.odonta.polity.model.MembershipStatus;
 import com.odonta.polity.model.OfficeTermStatus;
+import com.odonta.polity.model.PolityAccount;
 import com.odonta.polity.model.PolityVisibility;
 import com.odonta.polity.model.PowerCode;
 import com.odonta.polity.model.PowerHolderScope;
@@ -64,6 +65,7 @@ class PolityRepositoryIntegrationTest {
   @Autowired private InstitutionRepository institutions;
   @Autowired private JurisdictionRepository jurisdictions;
   @Autowired private OfficeTermRepository officeTerms;
+  @Autowired private PolityAccountRepository accounts;
   @Autowired private PolityRepository polities;
   @Autowired private ProcedureRepository procedures;
   @Autowired private SanctionRepository sanctions;
@@ -141,6 +143,23 @@ class PolityRepositoryIntegrationTest {
         UUID.randomUUID(),
         polityId,
         constitutionId);
+  }
+
+  @Test
+  void polityAccountPersistsItsDurableGrantReceipt() {
+    UUID userId = UUID.randomUUID();
+    UUID receiptId = UUID.randomUUID();
+
+    assertThat(accounts.lockProvisioning(userId)).isOne();
+    accounts.saveAndFlush(new PolityAccount(userId, "account-subject", receiptId));
+
+    assertThat(accounts.findById(userId))
+        .get()
+        .satisfies(
+            account -> {
+              assertThat(account.getAuthorizationSubject()).isEqualTo("account-subject");
+              assertThat(account.getGrantReceiptId()).isEqualTo(receiptId);
+            });
   }
 
   @Test
@@ -336,7 +355,7 @@ class PolityRepositoryIntegrationTest {
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    assertThat(successfulVersions).containsExactly("1", "2", "3", "4");
+    assertThat(successfulVersions).containsExactly("1", "2", "3", "4", "5");
     assertThat(indexes)
         .containsOnlyKeys(
             "idx_sanctions_active_target",
