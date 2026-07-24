@@ -39,6 +39,26 @@ describe("HTTP client", () => {
     expect(result).toEqual({ id: "polity-1" });
   });
 
+  it("materializes browser cache intent through the Fetch adapter", async () => {
+    let browserCache: RequestCache | undefined;
+    apiMockServer.use(
+      http.get(`${serviceBaseUrl}/invitation-token`, ({ request }) => {
+        browserCache = request.cache;
+        return HttpResponse.json({ token: "invitation-token" });
+      }),
+    );
+    const client = createHttpClient({ baseUrl: serviceBaseUrl });
+
+    await client.request({
+      acceptedLanguage: "en",
+      browserCache: "no-store",
+      method: "GET",
+      url: "/invitation-token",
+    });
+
+    expect(browserCache).toBe("no-store");
+  });
+
   it("lets an individual request override ordinary instance headers", async () => {
     let requestSource: string | null = null;
     apiMockServer.use(

@@ -18,11 +18,15 @@ function completionQueryKey(token: string) {
   return ["memberships", "invitation-tokens", token, "completion"] as const;
 }
 
-export function useMembershipInvitationCompletion(token: string) {
+export function useMembershipInvitationCompletion(
+  token: string,
+  acceptedLanguage: string,
+) {
   const queryClient = useQueryClient();
   const [polling, setPolling] = useState(false);
   const request = useMutation({
-    mutationFn: () => requestMembershipInvitationCompletion(token),
+    mutationFn: () =>
+      requestMembershipInvitationCompletion(token, { acceptedLanguage }),
     mutationKey: completionQueryKey(token),
     onSuccess: (completion) => {
       queryClient.setQueryData(completionQueryKey(token), completion);
@@ -32,7 +36,7 @@ export function useMembershipInvitationCompletion(token: string) {
   const completion = useQuery({
     enabled: polling,
     queryFn: ({ signal }) =>
-      getMembershipInvitationCompletion(token, { signal }),
+      getMembershipInvitationCompletion(token, { acceptedLanguage, signal }),
     queryKey: completionQueryKey(token),
     refetchInterval: (query) =>
       shouldPollMembershipInvitationCompletion(query.state.data?.status)
