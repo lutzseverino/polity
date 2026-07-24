@@ -20,7 +20,8 @@ Use `src/api/` for shared transport mechanics. The Axios client factory owns the
 requires an accepted language for every request, applies `Accept-Language`, and returns response data rather
 than exposing `AxiosResponse` to product code. The client echoes Cardo's readable CSRF cookie for unsafe
 requests, preserves caller headers, and normalizes session-relevant unauthorized and forbidden responses
-without exposing Axios to product UI.
+without exposing Axios to product UI. Requests that require an explicit browser cache policy declare that
+intent through the client, which owns Fetch-adapter selection and relative base-URL resolution.
 
 Keep plain asynchronous operations with their product owner:
 
@@ -44,6 +45,8 @@ freshness requirements.
 ## Consequences
 
 - Product code does not import Axios or mock scenario data directly.
+- Web linting rejects direct production `fetch` calls outside `src/api/`; tests and development mocks may
+  exercise HTTP directly at their own boundaries.
 - Query keys, request functions, loader preloading, and component subscriptions remain colocated by owner.
 - Locale changes select a distinct cache entry instead of briefly presenting data in the previous language.
 - Lightweight list projections remain distinct from richer workspace projections so directory requests do

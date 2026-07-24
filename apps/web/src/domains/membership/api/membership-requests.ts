@@ -1,4 +1,4 @@
-import { createHttpClient } from "@/api/http-client";
+import { createHttpClient, getHttpResponseStatus } from "@/api/http-client";
 import type {
   MembershipInvitation,
   MembershipInvitationCompletion,
@@ -7,14 +7,10 @@ import type {
 import { ResourceNotFoundError } from "@/lib/resource-not-found";
 import { isUuid } from "@/lib/uuid";
 
-type RequestOptions = Readonly<{
+type LocalizedRequestOptions = Readonly<{
+  acceptedLanguage: string;
   signal?: AbortSignal;
 }>;
-
-type LocalizedRequestOptions = RequestOptions &
-  Readonly<{
-    acceptedLanguage: string;
-  }>;
 
 type MembershipInvitationResponse = Readonly<{
   id: string;
@@ -258,26 +254,44 @@ export async function getMembershipInvitation(
   throw new ResourceNotFoundError("Membership invitation", invitationId);
 }
 
-async function invitationTokenResponse(
-  response: Response,
+async function requestInvitationToken(
   token: string,
+  {
+    acceptedLanguage,
+    method = "GET",
+    signal,
+    suffix = "",
+  }: LocalizedRequestOptions &
+    Readonly<{
+      method?: "GET" | "POST";
+      suffix?: string;
+    }>,
 ): Promise<unknown> {
-  if (response.status === 404) {
-    throw new ResourceNotFoundError("Membership invitation token", token);
+  try {
+    return await httpClient.request<unknown>({
+      acceptedLanguage,
+      browserCache: "no-store",
+      headers: { Accept: "application/json" },
+      method,
+      notifyOnUnauthorized: false,
+      signal,
+      url: invitationTokenPath(token, suffix),
+    });
+  } catch (error) {
+    const status = getHttpResponseStatus(error);
+    if (status === 404) {
+      throw new ResourceNotFoundError("Membership invitation token", token);
+    }
+    if (status === 410) {
+      throw new Error("This membership invitation is no longer available.");
+    }
+    if (status === undefined) throw error;
+    throw new Error(`Membership invitation request failed (${status}).`);
   }
-  if (response.status === 410) {
-    throw new Error("This membership invitation is no longer available.");
-  }
-  if (!response.ok) {
-    throw new Error(
-      `Membership invitation request failed (${response.status}).`,
-    );
-  }
-  return response.json();
 }
 
 function invitationTokenPath(token: string, suffix = "") {
-  return `/api/v1/invitation-tokens/${encodeURIComponent(token)}${suffix}`;
+  return `/invitation-tokens/${encodeURIComponent(token)}${suffix}`;
 }
 
 function toMembershipInvitationCompletion(
@@ -304,47 +318,39 @@ export async function getMembershipInvitationByToken(
   token: string,
   { acceptedLanguage, signal }: LocalizedRequestOptions,
 ) {
-  const response = await fetch(invitationTokenPath(token), {
-    cache: "no-store",
-    headers: {
-      Accept: "application/json",
-      "Accept-Language": acceptedLanguage,
-    },
-    signal,
-  });
   return toMembershipInvitationTokenContext(
     parseMembershipInvitationTokenResponse(
-      await invitationTokenResponse(response, token),
+      await requestInvitationToken(token, { acceptedLanguage, signal }),
     ),
     acceptedLanguage,
   );
 }
 
-export async function requestMembershipInvitationCompletion(token: string) {
-  const response = await fetch(invitationTokenPath(token, "/completion"), {
-    cache: "no-store",
-    headers: { Accept: "application/json" },
-    method: "POST",
-  });
+export async function requestMembershipInvitationCompletion(
+  token: string,
+  options: LocalizedRequestOptions,
+) {
   return toMembershipInvitationCompletion(
     parseMembershipInvitationCompletionResponse(
-      await invitationTokenResponse(response, token),
+      await requestInvitationToken(token, {
+        ...options,
+        method: "POST",
+        suffix: "/completion",
+      }),
     ),
   );
 }
 
 export async function getMembershipInvitationCompletion(
   token: string,
-  { signal }: RequestOptions = {},
+  options: LocalizedRequestOptions,
 ) {
-  const response = await fetch(invitationTokenPath(token, "/completion"), {
-    cache: "no-store",
-    headers: { Accept: "application/json" },
-    signal,
-  });
   return toMembershipInvitationCompletion(
     parseMembershipInvitationCompletionResponse(
-      await invitationTokenResponse(response, token),
+      await requestInvitationToken(token, {
+        ...options,
+        suffix: "/completion",
+      }),
     ),
   );
 }

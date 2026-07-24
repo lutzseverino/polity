@@ -93,6 +93,47 @@ export default [
     },
   },
   {
+    files: ["apps/web/src/**/*.{ts,tsx}"],
+    ignores: [
+      "apps/web/src/api/**",
+      "apps/web/src/mocks/**",
+      "apps/web/src/test/**",
+      "apps/web/src/**/*.test.{ts,tsx}",
+      "apps/web/src/**/*.spec.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          message:
+            "Production web HTTP calls must use the shared src/api HTTP boundary.",
+          object: "globalThis",
+          property: "fetch",
+        },
+        {
+          message:
+            "Production web HTTP calls must use the shared src/api HTTP boundary.",
+          object: "self",
+          property: "fetch",
+        },
+        {
+          message:
+            "Production web HTTP calls must use the shared src/api HTTP boundary.",
+          object: "window",
+          property: "fetch",
+        },
+      ],
+      "no-restricted-globals": [
+        "error",
+        {
+          message:
+            "Production web HTTP calls must use the shared src/api HTTP boundary.",
+          name: "fetch",
+        },
+      ],
+    },
+  },
+  {
     files: ["apps/web/src/routes/**/*.{ts,tsx}"],
     rules: {
       "react-refresh/only-export-components": "off",
