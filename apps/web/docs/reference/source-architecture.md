@@ -67,6 +67,9 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
 - The `session` domain is the nearest owner for the validated authenticated principal, restoration, and
   current-session query state. Sign-in and sign-out remain separate action features; the root route owns
   public/protected classification and redirects.
+- The `account` domain owns the validated Polity account and its durable baseline grant convergence.
+  The root route composes session restoration before account convergence and does not use account readiness
+  as session or membership state.
 - Only `src/api/` imports Axios. Callers provide the active accepted language explicitly, and localized
   queries include locale in their query key.
 - Do not introduce `pages`, `widgets`, `entities`, or top-level `shared` folders. Classify code by actual

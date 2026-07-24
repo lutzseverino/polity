@@ -1,15 +1,25 @@
 import {
   createRootRouteWithContext,
+  type ErrorComponentProps,
   Outlet,
   redirect,
 } from "@tanstack/react-router";
 
 import { hasHttpResponseStatus } from "@/api/http-client";
 import type { AppRouterContext } from "@/app/router";
+import {
+  AccountConvergenceFailedPage,
+  RootPendingPage,
+} from "@/app/shell/AccountConvergencePage";
 import { AppShell } from "@/app/shell/AppShell";
 import { RouteErrorPage } from "@/app/shell/RouteErrorPage";
 import { RouteLoadingPage } from "@/app/shell/RouteLoadingPage";
 import { RouteNotFoundPage } from "@/app/shell/RouteNotFoundPage";
+import {
+  AccountGrantFailedError,
+  ensureCurrentAccountConverged,
+  isAccountGrantFailedError,
+} from "@/domains/account";
 import { inboxItemsQueryOptions } from "@/domains/inbox";
 import { membershipInvitationQueryOptions } from "@/domains/membership";
 import { polityOptionsQueryOptions } from "@/domains/polity";
@@ -52,12 +62,24 @@ function RootRoute() {
   return isPublic ? <PublicRouteFrame /> : <AppShell />;
 }
 
+function RootRouteErrorPage(props: ErrorComponentProps) {
+  return isAccountGrantFailedError(props.error) ? (
+    <AccountConvergenceFailedPage />
+  ) : (
+    <RouteErrorPage {...props} />
+  );
+}
+
+function RootRoutePendingPage() {
+  return <RootPendingPage fallback={<RouteLoadingPage />} />;
+}
+
 export const Route = createRootRouteWithContext<AppRouterContext>()({
   validateSearch: (search): AppSearch => ({
     returnTo: readAppLocalDestination(search.returnTo),
     task: readAcceptMembershipInvitationTask(search.task),
   }),
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: async ({ abortController, context, location }) => {
     if (isPublicPath(location.pathname)) {
       return {
         isAuthenticated: Boolean(
@@ -71,6 +93,13 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
       await context.queryClient.ensureQueryData(
         currentSessionQueryOptions({ locale: context.getLocale() }),
       );
+      const account = await ensureCurrentAccountConverged(context.queryClient, {
+        locale: context.getLocale(),
+        signal: abortController.signal,
+      });
+      if (account.grants.status === "failed") {
+        throw new AccountGrantFailedError(account);
+      }
       return { isAuthenticated: true, isPublic: false };
     } catch (error) {
       if (!isSessionUnavailableError(error)) throw error;
@@ -83,7 +112,7 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
     }
   },
   component: RootRoute,
-  errorComponent: RouteErrorPage,
+  errorComponent: RootRouteErrorPage,
   loaderDeps: ({ search }) => ({ task: search.task }),
   loader: async ({ context, deps, location }) => {
     if (context.isPublic) return;
@@ -113,5 +142,5 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
     }
   },
   notFoundComponent: RouteNotFoundPage,
-  pendingComponent: RouteLoadingPage,
+  pendingComponent: RootRoutePendingPage,
 });

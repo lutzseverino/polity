@@ -74,6 +74,10 @@ msgstr ""
 msgid "Polities"
 msgstr ""
 
+#: src/app/shell/AccountConvergencePage.tsx:32
+msgid "Preparing your Polity account"
+msgstr ""
+
 #: src/app/shell/ShellNavigation.tsx:197
 #: src/app/shell/ShellNavigation.tsx:216
 msgid "Primary Navigation"
@@ -96,6 +100,18 @@ msgstr ""
 msgid "View my polities"
 msgstr ""
 
+#: src/app/shell/AccountConvergencePage.tsx:55
+msgid "We couldn’t finish your Polity access"
+msgstr ""
+
 #: src/app/shell/RouteErrorPage.tsx:44
 msgid "We couldn’t open that page"
+msgstr ""
+
+#: src/app/shell/AccountConvergencePage.tsx:36
+msgid "Your account is ready. We’re finishing access to Polity before loading your workspace."
+msgstr ""
+
+#: src/app/shell/AccountConvergencePage.tsx:59
+msgid "Your account was created, but its access could not be applied. Signing in again will not repair it. Please contact support before continuing."
 msgstr ""
