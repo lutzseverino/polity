@@ -14,11 +14,15 @@ RUN pnpm build:web
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine
 
+COPY deploy/15-validate-web-gateway-env.sh /docker-entrypoint.d/15-validate-web-gateway-env.sh
+COPY deploy/19-lock-web-gateway-envsubst.envsh /docker-entrypoint.d/19-lock-web-gateway-envsubst.envsh
 COPY deploy/web-gateway.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /workspace/apps/web/dist /usr/share/nginx/html
 
 ENV CARDO_IDENTITY_UPSTREAM=identity:8081 \
-    NGINX_ENVSUBST_FILTER="^(CARDO_IDENTITY_UPSTREAM|POLITY_SERVICE_UPSTREAM|POLITY_WEB_PORT)$" \
+    POLITY_EXTERNAL_HOST=localhost \
+    POLITY_EXTERNAL_PORT=8080 \
+    POLITY_EXTERNAL_SCHEME=http \
     POLITY_SERVICE_UPSTREAM=polity:8084 \
     POLITY_WEB_PORT=8080
 
