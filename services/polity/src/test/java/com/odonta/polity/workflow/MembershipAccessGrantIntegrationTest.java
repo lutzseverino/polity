@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.odonta.polity.PolityApplication;
+import com.odonta.polity.PolityPermissions;
 import com.odonta.polity.input.CreatePolityInput;
 import com.odonta.polity.model.ConstitutionVersion;
 import com.odonta.polity.model.Jurisdiction;
@@ -57,6 +58,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -271,8 +275,19 @@ class MembershipAccessGrantIntegrationTest {
     long receiptsBefore = receiptCount();
     long publicationsBefore = publicationCount();
 
-    creation.create(
-        founder, new CreatePolityInput("Founder receipt", PolityVisibility.PUBLIC, null, null));
+    SecurityContextHolder.getContext()
+        .setAuthentication(
+            UsernamePasswordAuthenticationToken.authenticated(
+                founderId.toString(),
+                "n/a",
+                java.util.List.of(
+                    new SimpleGrantedAuthority(PolityPermissions.POLITY_CREATE_AUTHORITY))));
+    try {
+      creation.create(
+          founder, new CreatePolityInput("Founder receipt", PolityVisibility.PUBLIC, null, null));
+    } finally {
+      SecurityContextHolder.clearContext();
+    }
 
     Polity polity =
         polities
