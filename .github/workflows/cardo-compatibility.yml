@@ -32,6 +32,6 @@ jobs:
           java-version: 21
           cache: maven
       - name: Install Cardo main
-        run: ./cardo/mvnw --batch-mode --no-transfer-progress -f cardo/pom.xml install -DskipTests
+        run: ./cardo/mvnw --batch-mode --no-transfer-progress -f cardo/pom.xml install -DskipTests -Drevision=0.1.0-SNAPSHOT
       - name: Verify Polity compatibility
-        run: ./mvnw --batch-mode --no-transfer-progress -f services/polity/pom.xml verify spotbugs:check
+        run: ./mvnw --batch-mode --no-transfer-progress -f services/polity/pom.xml verify spotbugs:check -Dcardo.version=0.1.0-SNAPSHOT

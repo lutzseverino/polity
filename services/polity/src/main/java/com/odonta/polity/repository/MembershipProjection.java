@@ -18,4 +18,6 @@ public interface MembershipProjection {
   MembershipStatus getStatus();
 
   OffsetDateTime getAdmittedAt();
+
+  UUID getGrantReceiptId();
 }

@@ -30,6 +30,23 @@ class CardoInvitationIntegrationContractTest {
         .isEqualTo(Propagation.REQUIRES_NEW);
   }
 
+  @Test
+  void localCompletionAndTerminalFailureUseIndependentTransactions() throws Exception {
+    Method completion =
+        com.odonta.polity.workflow.CompleteMembershipInvitationWorkflow.class.getDeclaredMethod(
+            "complete",
+            java.util.UUID.class,
+            io.github.lutzseverino.cardo.identity.client.IdentityUser.class,
+            java.time.OffsetDateTime.class);
+    Method failure =
+        CardoInvitationState.class.getDeclaredMethod("fail", java.util.UUID.class, String.class);
+
+    assertThat(completion.getAnnotation(Transactional.class).propagation())
+        .isEqualTo(Propagation.REQUIRES_NEW);
+    assertThat(failure.getAnnotation(Transactional.class).propagation())
+        .isEqualTo(Propagation.REQUIRES_NEW);
+  }
+
   private void assertNoTransaction(String methodName, Class<?> eventType) throws Exception {
     Method listener = CardoInvitationListener.class.getDeclaredMethod(methodName, eventType);
 

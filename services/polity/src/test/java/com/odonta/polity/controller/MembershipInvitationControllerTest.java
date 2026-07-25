@@ -4,16 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odonta.polity.api.model.MembershipInvitationAcceptanceResponse;
 import com.odonta.polity.api.model.MembershipInvitationCompletionResponse;
 import com.odonta.polity.api.model.MembershipInvitationTokenResponse;
 import com.odonta.polity.mapper.MembershipInvitationTransportMapper;
-import com.odonta.polity.mapper.MembershipTransportMapper;
+import com.odonta.polity.model.MembershipInvitationAcceptanceStatus;
+import com.odonta.polity.result.MembershipInvitationAcceptanceResult;
 import com.odonta.polity.result.MembershipInvitationCompletionResult;
 import com.odonta.polity.result.MembershipInvitationCompletionStatus;
 import com.odonta.polity.result.MembershipInvitationTokenResult;
 import com.odonta.polity.service.MembershipInvitationService;
 import com.odonta.polity.workflow.AcceptMembershipInvitationWorkflow;
 import com.odonta.polity.workflow.CreateMembershipInvitationWorkflow;
+import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -23,14 +26,36 @@ class MembershipInvitationControllerTest {
   private final MembershipInvitationService invitations = mock(MembershipInvitationService.class);
   private final MembershipInvitationTransportMapper invitationMapper =
       mock(MembershipInvitationTransportMapper.class);
+  private final AcceptMembershipInvitationWorkflow acceptance =
+      mock(AcceptMembershipInvitationWorkflow.class);
+  private final AuthenticatedUserReader users = mock(AuthenticatedUserReader.class);
   private final MembershipInvitationController controller =
       new MembershipInvitationController(
           invitations,
-          mock(AcceptMembershipInvitationWorkflow.class),
+          acceptance,
           mock(CreateMembershipInvitationWorkflow.class),
           invitationMapper,
-          mock(MembershipTransportMapper.class),
-          mock(AuthenticatedUserReader.class));
+          users);
+
+  @Test
+  void pendingAcceptanceIsReturnedAsAcceptedRequestInsteadOfMember() {
+    UUID invitationId = UUID.randomUUID();
+    AuthenticatedUser user = new AuthenticatedUser(UUID.randomUUID(), "subject:friend", "Friend");
+    OffsetDateTime requestedAt = OffsetDateTime.parse("2026-07-20T10:00:00Z");
+    MembershipInvitationAcceptanceResult result =
+        new MembershipInvitationAcceptanceResult(
+            invitationId, MembershipInvitationAcceptanceStatus.REQUESTED, requestedAt, null, null);
+    MembershipInvitationAcceptanceResponse response =
+        mock(MembershipInvitationAcceptanceResponse.class);
+    when(users.currentUser()).thenReturn(user);
+    when(acceptance.accept(invitationId, user)).thenReturn(result);
+    when(invitationMapper.toResponse(result)).thenReturn(response);
+
+    var entity = controller.acceptMembershipInvitation(invitationId);
+
+    assertThat(entity.getStatusCode().value()).isEqualTo(202);
+    assertThat(entity.getBody()).isSameAs(response);
+  }
 
   @Test
   void secretTokenInspectionIsNeverStoredByIntermediaries() {

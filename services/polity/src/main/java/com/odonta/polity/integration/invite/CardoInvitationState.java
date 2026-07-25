@@ -2,6 +2,7 @@ package com.odonta.polity.integration.invite;
 
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.repository.MembershipInvitationRepository;
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 class CardoInvitationState {
+  private final Clock clock;
   private final MembershipInvitationRepository invitations;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -20,6 +22,16 @@ class CardoInvitationState {
             .findEntityById(invitationId)
             .orElseThrow(() -> new IllegalStateException("Membership invitation not found."));
     invitation.registerCardoInvitation(cardoInvitationId, invitedUserId, expiresAt);
+    invitations.saveAndFlush(invitation);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void fail(UUID invitationId, String failureCode) {
+    MembershipInvitation invitation =
+        invitations
+            .findEntityByIdForUpdate(invitationId)
+            .orElseThrow(() -> new IllegalStateException("Membership invitation not found."));
+    invitation.failAcceptance(failureCode, OffsetDateTime.now(clock));
     invitations.saveAndFlush(invitation);
   }
 }

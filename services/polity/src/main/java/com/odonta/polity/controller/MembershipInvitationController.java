@@ -2,12 +2,11 @@ package com.odonta.polity.controller;
 
 import com.odonta.polity.api.MembershipInvitationsApi;
 import com.odonta.polity.api.model.CreateMembershipInvitationRequest;
-import com.odonta.polity.api.model.MemberResponse;
+import com.odonta.polity.api.model.MembershipInvitationAcceptanceResponse;
 import com.odonta.polity.api.model.MembershipInvitationCompletionResponse;
 import com.odonta.polity.api.model.MembershipInvitationResponse;
 import com.odonta.polity.api.model.MembershipInvitationTokenResponse;
 import com.odonta.polity.mapper.MembershipInvitationTransportMapper;
-import com.odonta.polity.mapper.MembershipTransportMapper;
 import com.odonta.polity.service.MembershipInvitationService;
 import com.odonta.polity.workflow.AcceptMembershipInvitationWorkflow;
 import com.odonta.polity.workflow.CreateMembershipInvitationWorkflow;
@@ -30,7 +29,6 @@ public class MembershipInvitationController implements MembershipInvitationsApi 
   private final AcceptMembershipInvitationWorkflow acceptance;
   private final CreateMembershipInvitationWorkflow creation;
   private final MembershipInvitationTransportMapper invitationMapper;
-  private final MembershipTransportMapper memberMapper;
   private final AuthenticatedUserReader users;
 
   @Override
@@ -59,9 +57,14 @@ public class MembershipInvitationController implements MembershipInvitationsApi 
   }
 
   @Override
-  public ResponseEntity<MemberResponse> acceptMembershipInvitation(UUID invitationId) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(memberMapper.toResponse(acceptance.accept(invitationId, users.currentUser())));
+  public ResponseEntity<MembershipInvitationAcceptanceResponse> acceptMembershipInvitation(
+      UUID invitationId) {
+    var result = acceptance.accept(invitationId, users.currentUser());
+    HttpStatus status =
+        result.status() == com.odonta.polity.model.MembershipInvitationAcceptanceStatus.REQUESTED
+            ? HttpStatus.ACCEPTED
+            : HttpStatus.OK;
+    return ResponseEntity.status(status).body(invitationMapper.toResponse(result));
   }
 
   @Override

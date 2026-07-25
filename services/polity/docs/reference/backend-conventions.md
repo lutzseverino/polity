@@ -89,7 +89,8 @@ Polity keeps the resulting product decisions in Polity-owned terms.
   implementation types.
 
 Membership invitations use Cardo Invite for token, delivery, provisional identity, expiry, and
-captured authorization-grant mechanics. Polity retains the membership-invitation record,
+lifecycle acceptance. Polity retains the membership-invitation record, owns and retains the
+membership grant receipt,
 constitutional admission authority, official records, membership admission, and its public read
 model. The detailed ordering and retry contract is documented in
 [Membership Invitation Integration](membership-invitation-integration.md).

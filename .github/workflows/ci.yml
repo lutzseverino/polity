@@ -49,12 +49,6 @@ jobs:
     steps:
       - name: Check out Polity
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Check out Cardo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          repository: lutzseverino/cardo
-          path: cardo
-          ref: 07264c9603ede38b233c570c5343b1c34dbf553d
       - name: Set up Java
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
@@ -65,8 +59,6 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-      - name: Install Cardo
-        run: ./cardo/mvnw --batch-mode --no-transfer-progress -f cardo/pom.xml install -DskipTests
       - name: Verify Polity service
         run: ./mvnw --batch-mode --no-transfer-progress -f services/polity/pom.xml verify spotbugs:check
       - name: Build and smoke runtime images

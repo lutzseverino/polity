@@ -16,7 +16,9 @@ public interface PolityProjection {
 
   PolityStatus getStatus();
 
-  boolean isBootstrapComplete();
+  default boolean isBootstrapComplete() {
+    return getBootstrapCompletedAt() != null;
+  }
 
   OffsetDateTime getBootstrapCompletedAt();
 

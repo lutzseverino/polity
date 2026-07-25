@@ -51,6 +51,19 @@ public class MembershipInvitation extends AuditedEntity implements PersonalDataE
   @Column(name = "responded_at")
   private OffsetDateTime respondedAt;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "acceptance_status")
+  private MembershipInvitationAcceptanceStatus acceptanceStatus;
+
+  @Column(name = "acceptance_requested_at")
+  private OffsetDateTime acceptanceRequestedAt;
+
+  @Column(name = "acceptance_completed_at")
+  private OffsetDateTime acceptanceCompletedAt;
+
+  @Column(name = "acceptance_failure_code")
+  private String acceptanceFailureCode;
+
   public MembershipInvitation(
       UUID polityId, String email, UUID invitedBy, OffsetDateTime invitedAt) {
     this.polityId = polityId;
@@ -60,9 +73,41 @@ public class MembershipInvitation extends AuditedEntity implements PersonalDataE
     this.invitedAt = invitedAt;
   }
 
-  public void accept(OffsetDateTime acceptedAt) {
+  public void completeAcceptance(OffsetDateTime acceptedAt, OffsetDateTime completedAt) {
+    if (status != MembershipInvitationStatus.PENDING
+        || acceptanceStatus != MembershipInvitationAcceptanceStatus.REQUESTED) {
+      throw new IllegalStateException("Only requested pending acceptances can be completed.");
+    }
     this.status = MembershipInvitationStatus.ACCEPTED;
-    this.respondedAt = acceptedAt;
+    this.respondedAt = Objects.requireNonNull(acceptedAt, "Acceptance timestamp is required.");
+    this.acceptanceStatus = MembershipInvitationAcceptanceStatus.COMPLETED;
+    this.acceptanceCompletedAt =
+        Objects.requireNonNull(completedAt, "Acceptance completion timestamp is required.");
+    this.acceptanceFailureCode = null;
+  }
+
+  public boolean requestAcceptance(OffsetDateTime requestedAt) {
+    Objects.requireNonNull(requestedAt, "Acceptance request timestamp is required.");
+    if (acceptanceStatus != null) {
+      return false;
+    }
+    if (status != MembershipInvitationStatus.PENDING) {
+      throw new IllegalStateException("Only pending invitations can request acceptance.");
+    }
+    this.acceptanceStatus = MembershipInvitationAcceptanceStatus.REQUESTED;
+    this.acceptanceRequestedAt = requestedAt;
+    return true;
+  }
+
+  public void failAcceptance(String failureCode, OffsetDateTime failedAt) {
+    if (acceptanceStatus != MembershipInvitationAcceptanceStatus.REQUESTED) {
+      return;
+    }
+    this.status = MembershipInvitationStatus.CANCELLED;
+    this.respondedAt = failedAt;
+    this.acceptanceStatus = MembershipInvitationAcceptanceStatus.FAILED;
+    this.acceptanceCompletedAt = Objects.requireNonNull(failedAt);
+    this.acceptanceFailureCode = Objects.requireNonNull(failureCode);
   }
 
   public void registerCardoInvitation(UUID invitationId, UUID userId, OffsetDateTime expiresAt) {
