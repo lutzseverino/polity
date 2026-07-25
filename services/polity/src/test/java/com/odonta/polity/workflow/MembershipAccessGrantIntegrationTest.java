@@ -53,6 +53,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -63,6 +66,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.client.RestClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -79,6 +83,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
       "spring.modulith.events.jdbc.schema=polity_events",
       "cardo.authorization.plans.max-attempts=1"
     })
+@Import(MembershipAccessGrantIntegrationTest.RestClientConfiguration.class)
 @Testcontainers(disabledWithoutDocker = true)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class MembershipAccessGrantIntegrationTest {
@@ -405,4 +410,12 @@ class MembershipAccessGrantIntegrationTest {
   }
 
   private record CompletionFixture(UUID polityId, UUID invitationId, IdentityUser identity) {}
+
+  @TestConfiguration(proxyBeanMethods = false)
+  static class RestClientConfiguration {
+    @Bean
+    RestClient.Builder restClientBuilder() {
+      return RestClient.builder();
+    }
+  }
 }
