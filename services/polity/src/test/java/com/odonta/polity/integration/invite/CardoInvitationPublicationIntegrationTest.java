@@ -71,7 +71,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
     classes = PolityApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
     properties = {
-      "spring.flyway.baseline-on-migrate=false",
+      "spring.flyway.baseline-on-migrate=true",
       "spring.flyway.locations=classpath:db/migration,classpath:db/authorization/publications",
       "spring.flyway.placeholders.authorizationSchema=polity_events",
       "spring.flyway.table=flyway_schema_history_cardo_invitation_publications",
