@@ -70,7 +70,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest(
     classes = PolityApplication.class,
-    webEnvironment = SpringBootTest.WebEnvironment.NONE,
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     properties = {
       "spring.flyway.baseline-on-migrate=true",
       "spring.flyway.locations=classpath:db/migration,classpath:db/authorization/publications",
