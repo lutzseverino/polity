@@ -28,16 +28,18 @@ export type HttpClient = Readonly<{
 }>;
 
 class HttpSessionError extends Error {
+  readonly code: string | undefined;
   readonly kind: "forbidden" | "unauthorized";
   readonly status: 401 | 403;
 
-  constructor(status: 401 | 403) {
+  constructor(status: 401 | 403, code: string | undefined) {
     super(
       status === 401
         ? "The session is not authenticated."
         : "The request was rejected.",
     );
     this.name = "HttpSessionError";
+    this.code = code;
     this.kind = status === 401 ? "unauthorized" : "forbidden";
     this.status = status;
   }
@@ -78,6 +80,14 @@ function readCsrfToken() {
 
 function notifyTerminalUnauthorized() {
   unauthorizedListener?.();
+}
+
+function readApiErrorCode(data: unknown) {
+  if (!data || typeof data !== "object") return undefined;
+  const body = data as { error?: unknown };
+  if (!body.error || typeof body.error !== "object") return undefined;
+  const code = (body.error as { code?: unknown }).code;
+  return typeof code === "string" && code ? code : undefined;
 }
 
 function resolveBrowserBaseUrl(baseUrl: string | undefined) {
@@ -139,7 +149,10 @@ export function createHttpClient({
             if (status === 401 && notifyOnUnauthorized) {
               notifyTerminalUnauthorized();
             }
-            throw new HttpSessionError(status);
+            throw new HttpSessionError(
+              status,
+              readApiErrorCode(error.response?.data),
+            );
           }
         }
         throw error;
@@ -158,11 +171,12 @@ export function hasHttpResponseStatus(error: unknown, status: number) {
   return getHttpResponseStatus(error) === status;
 }
 
+export function getHttpResponseCode(error: unknown) {
+  if (error instanceof HttpSessionError) return error.code;
+  if (axios.isAxiosError(error)) return readApiErrorCode(error.response?.data);
+  return undefined;
+}
+
 export function hasHttpResponseCode(error: unknown, code: string) {
-  if (!axios.isAxiosError(error)) return false;
-  const data: unknown = error.response?.data;
-  if (!data || typeof data !== "object") return false;
-  const body = data as { error?: unknown };
-  if (!body.error || typeof body.error !== "object") return false;
-  return (body.error as { code?: unknown }).code === code;
+  return getHttpResponseCode(error) === code;
 }
