@@ -128,11 +128,12 @@ describe("session requests", () => {
     let refreshes = 0;
     setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
     apiMockServer.use(
-      ...createSessionScenarioHandlers({ initialSession: "expired" }),
+      // The counting handler must precede the scenario's own so it is the one that matches.
       http.post("/api/v1/identity/sessions/current/refresh", () => {
         refreshes += 1;
         return HttpResponse.json(renewedSessionPrincipalResponse);
       }),
+      ...createSessionScenarioHandlers({ initialSession: "expired" }),
     );
 
     await expect(
@@ -215,6 +216,73 @@ describe("session requests", () => {
     const session = await renewCurrentSession({ acceptedLanguage: "en" });
 
     expect(session.principal.email).toBe("member@example.com");
+  });
+
+  it("waits out a competing rotation that outlasts the first re-read", async () => {
+    let reads = 0;
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      http.get("/api/v1/identity/sessions/current", () => {
+        reads += 1;
+        // The competing tab publishes its rotated credential only on the third read.
+        return reads < 3
+          ? HttpResponse.json({}, { status: 401 })
+          : HttpResponse.json(renewedSessionPrincipalResponse);
+      }),
+      http.post("/api/v1/identity/sessions/current/refresh", () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: "session_refresh_in_progress",
+              message: "The browser session is already being refreshed.",
+            },
+          },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    const session = await renewCurrentSession({ acceptedLanguage: "en" });
+
+    expect(session.principal.email).toBe("member@example.com");
+    expect(reads).toBe(3);
+  });
+
+  it("stops converging as soon as a read states a lifecycle reason", async () => {
+    let reads = 0;
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    apiMockServer.use(
+      http.get("/api/v1/identity/sessions/current", () => {
+        reads += 1;
+        return HttpResponse.json(
+          {
+            error: {
+              code: "session_absolute_expired",
+              message: "The browser session reached its absolute deadline.",
+            },
+          },
+          { status: 401 },
+        );
+      }),
+      http.post("/api/v1/identity/sessions/current/refresh", () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: "session_refresh_in_progress",
+              message: "The browser session is already being refreshed.",
+            },
+          },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    await expect(
+      renewCurrentSession({ acceptedLanguage: "en" }),
+    ).rejects.toSatisfy(
+      (error: unknown) => endReason(error) === "session_absolute_expired",
+    );
+    expect(reads).toBe(1);
   });
 
   it("ends the session when a superseded refresh cannot converge", async () => {

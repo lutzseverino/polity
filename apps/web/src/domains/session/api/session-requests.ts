@@ -1,9 +1,9 @@
 import { createHttpClient } from "@/api/http-client";
 import { parseSession, type Session } from "@/domains/session/lib/session";
 import {
+  isRecoverableSessionEnd,
   isRefreshConflict,
   readSessionEndReason,
-  type SessionEndReason,
   SessionUnavailableError,
 } from "@/domains/session/lib/session-lifecycle";
 
@@ -16,11 +16,14 @@ const httpClient = createHttpClient();
 let refreshInFlight: Promise<Session> | undefined;
 
 /**
- * A refresh that another browser tab already owns has not finished rotating credentials yet, so one
- * bounded re-read gives that tab time to publish the new cookies before the session is given up.
+ * A refresh that another browser tab already owns has not finished rotating credentials yet. Cardo's
+ * conflict carries no retry signal, so convergence re-reads on a bounded backoff to cover ordinary
+ * provider latency: four attempts waiting 150ms, 300ms, and 600ms, about one second in the worst
+ * case. A read that states a lifecycle reason ends the wait immediately, so the full budget is spent
+ * only while the outcome is genuinely still unknown.
  */
-const conflictConvergenceAttempts = 2;
-const conflictConvergenceDelayMs = 150;
+const conflictConvergenceAttempts = 4;
+const conflictConvergenceBaseDelayMs = 150;
 
 export function bootstrapSessionCsrf({
   acceptedLanguage,
@@ -92,20 +95,27 @@ function delay(milliseconds: number) {
 }
 
 async function convergeOnConcurrentRefresh(request: SessionRequest) {
-  let lastReason: SessionEndReason = "unauthenticated";
+  let backoffMs = conflictConvergenceBaseDelayMs;
 
   for (let attempt = 0; attempt < conflictConvergenceAttempts; attempt += 1) {
-    if (attempt > 0) await delay(conflictConvergenceDelayMs);
+    if (attempt > 0) {
+      await delay(backoffMs);
+      backoffMs *= 2;
+    }
+
     try {
       return await getCurrentSession(request);
     } catch (error) {
       const reason = readSessionEndReason(error);
       if (!reason) throw error;
-      lastReason = reason;
+      // A stated reason is authoritative: the competing refresh did not leave a usable session.
+      if (!isRecoverableSessionEnd(reason))
+        throw new SessionUnavailableError(reason);
     }
   }
 
-  throw new SessionUnavailableError(lastReason);
+  // Every attempt saw an expired authorization credential and no rotated one ever arrived.
+  throw new SessionUnavailableError("unauthenticated");
 }
 
 /**

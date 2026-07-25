@@ -100,6 +100,33 @@ describe("session restoration", () => {
     expect(queryClient.getQueryData(currentSessionQueryKey)).toEqual(restored);
   });
 
+  it("refreshes a cached session whose authorization credential expired while stale", async () => {
+    let refreshes = 0;
+    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+    const queryClient = createQueryClient();
+    apiMockServer.use(
+      // The counting handler must precede the scenario's own so it is the one that matches.
+      http.post("/api/v1/identity/sessions/current/refresh", () => {
+        refreshes += 1;
+        return HttpResponse.json(renewedSessionPrincipalResponse);
+      }),
+      ...createSessionScenarioHandlers({ initialSession: "expired" }),
+    );
+    // A session cached longer ago than staleTime must not be accepted on its age alone.
+    setCurrentSession(queryClient, session);
+    queryClient
+      .getQueryCache()
+      .find({ queryKey: currentSessionQueryKey })
+      ?.setState({ dataUpdatedAt: Date.now() - 120_000 });
+
+    const restored = await ensureRestoredSession(queryClient, { locale: "en" });
+
+    expect(refreshes).toBe(1);
+    expect(restored.browserSession?.idleExpiresAt).toBe(
+      renewedSessionPrincipalResponse.browserSession.idleExpiresAt,
+    );
+  });
+
   it("reuses a cached session without any request", async () => {
     let reads = 0;
     const queryClient = createQueryClient();
@@ -125,11 +152,12 @@ describe("session restoration", () => {
     setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
     const queryClient = createQueryClient();
     apiMockServer.use(
-      ...createSessionScenarioHandlers({ initialSession }),
+      // The counting handler must precede the scenario's own so it is the one that matches.
       http.post("/api/v1/identity/sessions/current/refresh", () => {
         refreshes += 1;
         return HttpResponse.json(renewedSessionPrincipalResponse);
       }),
+      ...createSessionScenarioHandlers({ initialSession }),
     );
 
     await expect(

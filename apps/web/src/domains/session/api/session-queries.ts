@@ -39,15 +39,18 @@ export function currentSessionQueryOptions({ locale }: CurrentSessionQuery) {
  * session is reused, otherwise one read runs, and only an expired authorization credential
  * escalates to a single coordinated refresh. Every stated lifecycle reason ends the session here
  * because Identity has already closed it and no refresh can recover it.
+ *
+ * This fetches rather than ensures, because `ensureQueryData` returns any cached value regardless of
+ * age. A session cached past `staleTime` would otherwise be accepted while its authorization
+ * credential has already expired, sending a still-refreshable session to sign-in on the first
+ * protected read.
  */
 export async function ensureRestoredSession(
   queryClient: QueryClient,
   { locale }: CurrentSessionQuery,
 ) {
   try {
-    return await queryClient.ensureQueryData(
-      currentSessionQueryOptions({ locale }),
-    );
+    return await queryClient.fetchQuery(currentSessionQueryOptions({ locale }));
   } catch (error) {
     if (!isSessionUnavailableError(error)) throw error;
     if (!isRecoverableSessionEnd(error.reason)) throw error;
