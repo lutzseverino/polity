@@ -86,8 +86,10 @@ The authoritative ownership and import rules are in
 - `src/api/` owns shared Axios mechanics; domains own reusable read operations and features own user-action
   requests.
 - The shared client echoes Cardo's readable CSRF cookie on unsafe requests and normalizes terminal session
-  responses. The root router restores the session before protected loaders run; sign-in and invitation-token
-  onboarding remain public.
+  responses, preserving Cardo's stable error code. The root router restores the session before protected
+  loaders run; sign-in and invitation-token onboarding remain public.
+- Reading the current session never refreshes it. Only restoration refreshes, because Cardo renews the idle
+  deadline solely on an explicit refresh.
 - Owner-local TanStack query and mutation options are the reusable convention. Semantic hooks stay thin and
   no application query wrapper is introduced.
 - Route loaders ensure critical query data before rendering, and components subscribe with the matching
