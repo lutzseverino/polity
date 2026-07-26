@@ -474,6 +474,23 @@ describe("first governing journey", () => {
     expect(router.state.location.search).toEqual({ returnTo: "/polities" });
   });
 
+  it("redirects when the account gate becomes terminally unauthorized", async () => {
+    apiMockServer.use(
+      http.get("/api/v1/polity/account", () =>
+        HttpResponse.json({}, { status: 401 }),
+      ),
+    );
+    const router = createTestRouter("/polities");
+
+    renderRouter(router);
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/sign-in");
+    expect(router.state.location.search).toEqual({ returnTo: "/polities" });
+  });
+
   it("redirects when a child-route read becomes terminally unauthorized", async () => {
     apiMockServer.use(
       http.get("/api/v1/polities/11111111-1111-4111-8111-111111111111", () =>

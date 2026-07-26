@@ -102,7 +102,11 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
       }
       return { isAuthenticated: true, isPublic: false };
     } catch (error) {
-      if (!isSessionUnavailableError(error)) throw error;
+      if (
+        !isSessionUnavailableError(error) &&
+        !hasHttpResponseStatus(error, 401)
+      )
+        throw error;
       throw redirect({
         search: {
           returnTo: readAppLocalDestination(location.href),
