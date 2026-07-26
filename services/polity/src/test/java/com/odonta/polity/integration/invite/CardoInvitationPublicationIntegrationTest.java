@@ -80,6 +80,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
       "spring.modulith.events.jdbc.schema=polity_events",
       "cardo.authorization.plans.max-attempts=1",
       "polity.membership-invitations.retry-delay=PT24H",
+      "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/realms/test/protocol/openid-connect/certs",
       "cardo.identity.product-auth.identity-session-audience=cardo-identity-test",
       "cardo.identity.product-auth.product-audience=polity-test"
     })
