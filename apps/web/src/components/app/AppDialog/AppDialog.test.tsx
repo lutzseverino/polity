@@ -216,17 +216,20 @@ describe("AppDialog", () => {
   it.each([
     ["desktop", false],
     ["mobile", true],
-  ] as const)("provides the app close affordance on %s while forwarding content props", async (_viewport, isMobile) => {
-    const user = userEvent.setup();
-    setMobileViewport(isMobile);
-    renderAppDialogWithDefaultClose();
+  ] as const)(
+    "provides the app close affordance on %s while forwarding content props",
+    async (_viewport, isMobile) => {
+      const user = userEvent.setup();
+      setMobileViewport(isMobile);
+      renderAppDialogWithDefaultClose();
 
-    await user.click(screen.getByRole("button", { name: "Open settings" }));
+      await user.click(screen.getByRole("button", { name: "Open settings" }));
 
-    expect(screen.getByRole("dialog")).toHaveClass("test-content");
+      expect(screen.getByRole("dialog")).toHaveClass("test-content");
 
-    await user.click(screen.getByRole("button", { name: "Close" }));
+      await user.click(screen.getByRole("button", { name: "Close" }));
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    },
+  );
 });

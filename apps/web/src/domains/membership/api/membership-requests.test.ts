@@ -277,32 +277,31 @@ describe("membership invitation requests", () => {
       status: 410,
       token: "invitation-expired",
     },
-  ])("preserves public token handling for $status responses", async ({
-    expectedMessage,
-    status,
-    token,
-  }) => {
-    let terminalUnauthorizedCount = 0;
-    const removeTerminalUnauthorizedHandler = setTerminalUnauthorizedHandler(
-      () => {
-        terminalUnauthorizedCount += 1;
-      },
-    );
-    apiMockServer.use(
-      http.get("/api/v1/invitation-tokens/:token", () =>
-        HttpResponse.json({}, { status }),
-      ),
-    );
+  ])(
+    "preserves public token handling for $status responses",
+    async ({ expectedMessage, status, token }) => {
+      let terminalUnauthorizedCount = 0;
+      const removeTerminalUnauthorizedHandler = setTerminalUnauthorizedHandler(
+        () => {
+          terminalUnauthorizedCount += 1;
+        },
+      );
+      apiMockServer.use(
+        http.get("/api/v1/invitation-tokens/:token", () =>
+          HttpResponse.json({}, { status }),
+        ),
+      );
 
-    try {
-      await expect(
-        getMembershipInvitationByToken(token, { acceptedLanguage: "en" }),
-      ).rejects.toThrow(expectedMessage);
-      expect(terminalUnauthorizedCount).toBe(0);
-    } finally {
-      removeTerminalUnauthorizedHandler();
-    }
-  });
+      try {
+        await expect(
+          getMembershipInvitationByToken(token, { acceptedLanguage: "en" }),
+        ).rejects.toThrow(expectedMessage);
+        expect(terminalUnauthorizedCount).toBe(0);
+      } finally {
+        removeTerminalUnauthorizedHandler();
+      }
+    },
+  );
 
   it("does not turn an unauthorized public token lookup into a terminal session event", async () => {
     let terminalUnauthorizedCount = 0;

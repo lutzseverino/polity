@@ -146,14 +146,17 @@ describe("session requests", () => {
     ["idle-expired", "session_idle_expired"],
     ["absolute-expired", "session_absolute_expired"],
     ["revoked", "session_revoked"],
-  ] as const)("preserves the %s lifecycle reason", async (initialSession, reason) => {
-    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
-    apiMockServer.use(...createSessionScenarioHandlers({ initialSession }));
+  ] as const)(
+    "preserves the %s lifecycle reason",
+    async (initialSession, reason) => {
+      setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+      apiMockServer.use(...createSessionScenarioHandlers({ initialSession }));
 
-    await expect(
-      readCurrentSession({ acceptedLanguage: "en" }),
-    ).rejects.toSatisfy((error: unknown) => endReason(error) === reason);
-  });
+      await expect(
+        readCurrentSession({ acceptedLanguage: "en" }),
+      ).rejects.toSatisfy((error: unknown) => endReason(error) === reason);
+    },
+  );
 
   it("reports an unstated rejection as unauthenticated so older Cardo stays compatible", async () => {
     apiMockServer.use(
