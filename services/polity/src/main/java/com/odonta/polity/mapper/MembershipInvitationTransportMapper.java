@@ -1,10 +1,12 @@
 package com.odonta.polity.mapper;
 
 import com.odonta.polity.api.model.CreateMembershipInvitationRequest;
+import com.odonta.polity.api.model.MembershipInvitationAcceptanceResponse;
 import com.odonta.polity.api.model.MembershipInvitationCompletionResponse;
 import com.odonta.polity.api.model.MembershipInvitationResponse;
 import com.odonta.polity.api.model.MembershipInvitationTokenResponse;
 import com.odonta.polity.input.CreateMembershipInvitationInput;
+import com.odonta.polity.result.MembershipInvitationAcceptanceResult;
 import com.odonta.polity.result.MembershipInvitationCompletionResult;
 import com.odonta.polity.result.MembershipInvitationResult;
 import com.odonta.polity.result.MembershipInvitationTokenResult;
@@ -21,6 +23,8 @@ public interface MembershipInvitationTransportMapper {
   MembershipInvitationTokenResponse toResponse(MembershipInvitationTokenResult result);
 
   MembershipInvitationCompletionResponse toResponse(MembershipInvitationCompletionResult result);
+
+  MembershipInvitationAcceptanceResponse toResponse(MembershipInvitationAcceptanceResult result);
 
   List<MembershipInvitationResponse> toResponses(List<MembershipInvitationResult> results);
 }

@@ -1,5 +1,6 @@
 package com.odonta.polity.repository;
 
+import com.odonta.polity.model.MembershipInvitationAcceptanceStatus;
 import com.odonta.polity.model.MembershipInvitationStatus;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -24,4 +25,12 @@ public interface MembershipInvitationProjection {
   OffsetDateTime getInvitedAt();
 
   OffsetDateTime getRespondedAt();
+
+  MembershipInvitationAcceptanceStatus getAcceptanceStatus();
+
+  OffsetDateTime getAcceptanceRequestedAt();
+
+  OffsetDateTime getAcceptanceCompletedAt();
+
+  String getAcceptanceFailureCode();
 }

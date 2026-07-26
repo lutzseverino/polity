@@ -2,6 +2,7 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipStatus;
+import jakarta.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
   Optional<Membership> findEntityById(UUID id);
@@ -17,6 +20,14 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
       UUID polityId, UUID userId, MembershipStatus status);
 
   Optional<Membership> findEntityByPolityIdAndUserId(UUID polityId, UUID userId);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query(
+      """
+      select membership from Membership membership
+      where membership.polityId = :polityId and membership.userId = :userId
+      """)
+  Optional<Membership> findEntityByPolityIdAndUserIdForUpdate(UUID polityId, UUID userId);
 
   List<Membership> findEntitiesByPolityIdAndStatusOrderByAdmittedAtAsc(
       UUID polityId, MembershipStatus status);

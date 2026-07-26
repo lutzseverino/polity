@@ -11,6 +11,7 @@ import {
   AppAlertTitle,
 } from "@/components/app/AppAlert";
 import { AppLinkButton } from "@/components/app/AppLinkButton";
+import { isSessionUnavailableError } from "@/domains/session";
 import { readAppLocalDestination } from "@/lib/app-local-destination";
 
 function TerminalUnauthorizedRedirect() {
@@ -31,7 +32,7 @@ function TerminalUnauthorizedRedirect() {
 }
 
 export function RouteErrorPage({ error }: ErrorComponentProps) {
-  if (hasHttpResponseStatus(error, 401)) {
+  if (isSessionUnavailableError(error) || hasHttpResponseStatus(error, 401)) {
     return <TerminalUnauthorizedRedirect />;
   }
 

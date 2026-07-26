@@ -24,10 +24,10 @@ authorization, and billing capabilities provided by [Cardo](https://github.com/l
 
 ## Development
 
-Install Cardo into your local Maven repository, then install the JavaScript workspace:
+Cardo Java artifacts resolve from Maven Central through the service's published BOM. Install the
+JavaScript workspace:
 
 ```bash
-../cardo/mvnw -f ../cardo/pom.xml install
 pnpm install
 ```
 
@@ -46,9 +46,9 @@ architecture, production-build, web and service test, SpotBugs, and dependency-h
 The pnpm install unit is the workspace. Run installs from the root so workspace dependencies are
 linked consistently.
 
-Required CI installs Cardo from an explicit source revision so a Cardo merge cannot silently change
-Polity's merge gate. The scheduled `Cardo Compatibility` workflow verifies Polity separately against
-Cardo's current `main` branch.
+Required CI uses Cardo `0.1.0-rc.5` from Maven Central. The scheduled `Cardo Compatibility`
+workflow installs Cardo `main` explicitly as `0.1.0-SNAPSHOT` and verifies Polity with that override,
+without changing the required release baseline.
 
 ## Documentation
 

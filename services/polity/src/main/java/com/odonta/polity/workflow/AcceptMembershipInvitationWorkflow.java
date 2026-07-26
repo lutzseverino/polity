@@ -2,22 +2,11 @@ package com.odonta.polity.workflow;
 
 import com.odonta.polity.exception.PolityResource;
 import com.odonta.polity.integration.invite.CardoInvitationDispatch;
-import com.odonta.polity.mapper.MembershipApplicationMapper;
-import com.odonta.polity.model.Jurisdiction;
-import com.odonta.polity.model.Membership;
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.model.MembershipInvitationStatus;
-import com.odonta.polity.model.MembershipStatus;
-import com.odonta.polity.model.OfficialRecordContext;
-import com.odonta.polity.model.OfficialRecordTemplate;
-import com.odonta.polity.model.OfficialRecordTemplateKey;
-import com.odonta.polity.model.OfficialRecordType;
-import com.odonta.polity.model.TemplateParameters;
 import com.odonta.polity.repository.MembershipInvitationRepository;
 import com.odonta.polity.repository.MembershipRepository;
-import com.odonta.polity.resolver.PolityContextResolver;
-import com.odonta.polity.result.MembershipResult;
-import com.odonta.polity.service.OfficialRecordService;
+import com.odonta.polity.result.MembershipInvitationAcceptanceResult;
 import com.odonta.polity.service.PolityService;
 import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUser;
 import io.github.lutzseverino.cardo.common.api.ApiException;
@@ -39,19 +28,15 @@ public class AcceptMembershipInvitationWorkflow {
   private final IdentityUsersClient identityUsers;
   private final MembershipInvitationRepository invitations;
   private final MembershipRepository memberships;
-  private final MembershipApplicationMapper memberMapper;
-  private final PolityBootstrapCompleter bootstrap;
-  private final PolityContextResolver polityContext;
   private final PolityService polities;
-  private final OfficialRecordService officialRecords;
 
   @Transactional
-  public MembershipResult accept(UUID invitationId, AuthenticatedUser actor) {
+  public MembershipInvitationAcceptanceResult accept(UUID invitationId, AuthenticatedUser actor) {
     OffsetDateTime now = OffsetDateTime.now(clock);
     IdentityUser identity = identityUsers.get(actor.id());
     MembershipInvitation invitation =
         invitations
-            .findEntityByIdAndStatus(invitationId, MembershipInvitationStatus.PENDING)
+            .findEntityByIdForUpdate(invitationId)
             .orElseThrow(PolityResource.MEMBERSHIP_INVITATION::notFound);
     if (invitation.getCardoInvitationId() == null
         || invitation.getInvitedUserId() == null
@@ -59,69 +44,27 @@ public class AcceptMembershipInvitationWorkflow {
       throw ApiException.conflict(
           "invitation_not_ready", "This invitation is still being prepared. Try again shortly.");
     }
+    requireInvitee(invitation, identity);
+    if (invitation.getAcceptanceStatus() != null) {
+      return MembershipInvitationAcceptanceResult.from(invitation);
+    }
+    if (invitation.getStatus() != MembershipInvitationStatus.PENDING) {
+      throw PolityResource.MEMBERSHIP_INVITATION.notFound();
+    }
     if (!invitation.getCardoExpiresAt().isAfter(now)) {
       throw ApiException.gone("invitation_expired", "This invitation has expired.");
     }
     polities.requireActive(invitation.getPolityId());
-    requireInvitee(invitation, identity);
-    Membership admitted = admit(invitation, identity, now);
-    invitation.accept(now);
+    if (memberships.existsByPolityIdAndUserIdAndStatus(
+        invitation.getPolityId(), identity.id(), com.odonta.polity.model.MembershipStatus.ACTIVE)) {
+      throw ApiException.conflict("member_exists", "This user is already a member.");
+    }
+    if (!invitation.requestAcceptance(now)) {
+      return MembershipInvitationAcceptanceResult.from(invitation);
+    }
     invitations.saveAndFlush(invitation);
-    bootstrap.completeIfReady(invitation.getPolityId(), now);
-    recordAdmission(invitation, admitted, now);
     invitationDispatch.stageAcceptance(invitation.getId(), now);
-    return memberMapper.toResult(
-        memberships
-            .findProjectedById(admitted.getId())
-            .orElseThrow(PolityResource.MEMBER::notFound));
-  }
-
-  private Membership admit(
-      MembershipInvitation invitation, IdentityUser identity, OffsetDateTime now) {
-    return memberships
-        .findEntityByPolityIdAndUserId(invitation.getPolityId(), identity.id())
-        .map(
-            membership -> {
-              if (membership.getStatus() == MembershipStatus.ACTIVE) {
-                throw ApiException.conflict("member_exists", "This user is already a member.");
-              }
-              membership.reactivate(
-                  identity.authorizationSubject(),
-                  identity.email(),
-                  displayName(identity),
-                  now,
-                  invitation.getInvitedBy());
-              return memberships.saveAndFlush(membership);
-            })
-        .orElseGet(
-            () ->
-                memberships.saveAndFlush(
-                    new Membership(
-                        invitation.getPolityId(),
-                        identity.id(),
-                        identity.authorizationSubject(),
-                        identity.email(),
-                        displayName(identity),
-                        now,
-                        invitation.getInvitedBy())));
-  }
-
-  private void recordAdmission(
-      MembershipInvitation invitation, Membership admitted, OffsetDateTime now) {
-    var constitution = polityContext.constitution(invitation.getPolityId());
-    Jurisdiction jurisdiction = polityContext.rootJurisdiction(invitation.getPolityId());
-    officialRecords.append(
-        invitation.getPolityId(),
-        jurisdiction.getId(),
-        constitution.getId(),
-        admitted.getId(),
-        OfficialRecordType.MEMBER_ADMITTED,
-        admitted.getId(),
-        OfficialRecordContext.none(),
-        OfficialRecordTemplate.of(
-            OfficialRecordTemplateKey.MEMBER_ADMITTED,
-            TemplateParameters.of("memberName", admitted.getDisplayName())),
-        now);
+    return MembershipInvitationAcceptanceResult.from(invitation);
   }
 
   private void requireInvitee(MembershipInvitation invitation, IdentityUser identity) {
@@ -135,9 +78,5 @@ public class AcceptMembershipInvitationWorkflow {
 
   private String normalize(String email) {
     return email.trim().toLowerCase(Locale.ROOT);
-  }
-
-  private String displayName(IdentityUser user) {
-    return user.name() == null || user.name().isBlank() ? user.email() : user.name();
   }
 }

@@ -50,6 +50,9 @@ public class Membership extends AuditedEntity implements PersonalDataEntity {
   @Column(name = "resigned_at")
   private OffsetDateTime resignedAt;
 
+  @Column(name = "grant_receipt_id", unique = true)
+  private UUID grantReceiptId;
+
   public Membership(
       UUID polityId,
       UUID userId,
@@ -81,7 +84,8 @@ public class Membership extends AuditedEntity implements PersonalDataEntity {
       String email,
       String displayName,
       OffsetDateTime admittedAt,
-      UUID admittedBy) {
+      UUID admittedBy,
+      UUID grantReceiptId) {
     if (status == MembershipStatus.ACTIVE) {
       throw new IllegalStateException("Only inactive memberships can be reactivated");
     }
@@ -92,5 +96,13 @@ public class Membership extends AuditedEntity implements PersonalDataEntity {
     this.admittedAt = admittedAt;
     this.admittedBy = admittedBy;
     this.resignedAt = null;
+    this.grantReceiptId = java.util.Objects.requireNonNull(grantReceiptId);
+  }
+
+  public void retainGrantReceipt(UUID grantReceiptId) {
+    if (this.grantReceiptId != null) {
+      throw new IllegalStateException("Membership already retains a grant receipt");
+    }
+    this.grantReceiptId = java.util.Objects.requireNonNull(grantReceiptId);
   }
 }

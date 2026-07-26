@@ -24,6 +24,8 @@ class TransportOwnershipContractTest {
           Map.entry("getPolityConstitution", "Constitutions"),
           Map.entry("getPolityGovernment", "Government Structures"),
           Map.entry("getPolityActions", "Polity Action Availability"),
+          Map.entry("getCurrentUserMembershipAccess", "Members"),
+          Map.entry("reconcileCurrentUserMembershipAccess", "Members"),
           Map.entry("listPolityMembershipInvitations", "Membership Invitations"),
           Map.entry("createPolityMembershipInvitation", "Membership Invitations"),
           Map.entry("listCurrentUserMembershipInvitations", "Membership Invitations"),
@@ -87,6 +89,27 @@ class TransportOwnershipContractTest {
                 map(map(schemas.get("GrantConvergenceResponse")).get("properties"))
                     .get("failureCode")))
         .containsEntry("nullable", true);
+  }
+
+  @Test
+  void invitationAcceptanceAndMembershipAccessExposeOwnedConvergenceOnly() throws IOException {
+    Map<String, Object> specification = openApiSpecification();
+    Map<String, Object> schemas = map(map(specification.get("components")).get("schemas"));
+    Map<String, Object> memberProperties =
+        map(map(schemas.get("MemberResponse")).get("properties"));
+
+    assertThat(memberProperties)
+        .doesNotContainKeys("receiptId", "failureCode", "grantReceiptId", "grants");
+    assertThat(list(map(schemas.get("MembershipInvitationAcceptanceStatus")).get("enum")))
+        .containsExactly("requested", "completed", "failed");
+    assertThat(list(map(schemas.get("MembershipAccessConvergenceStatus")).get("enum")))
+        .containsExactly("legacy", "pending", "applied", "failed");
+
+    Map<String, Object> accept =
+        map(
+            map(map(specification.get("paths")).get("/invitations/{invitationId}/accept"))
+                .get("post"));
+    assertThat(map(accept.get("responses"))).containsKeys("200", "202").doesNotContainKey("201");
   }
 
   private Map<String, String> operationOwners(Map<String, Object> specification) {

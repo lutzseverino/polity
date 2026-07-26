@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(config = PolityMapperConfig.class)
 public interface MembershipApplicationMapper {
 
-  @BeanMapping(ignoreUnmappedSourceProperties = "polityId")
+  @BeanMapping(ignoreUnmappedSourceProperties = {"polityId", "grantReceiptId"})
   @Mapping(target = "name", source = "displayName")
   MembershipResult toResult(MembershipProjection projection);
 

@@ -135,6 +135,27 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "410": { $ref: "#/components/responses/Gone" }
+  /polities/{polityId}/members/me/access:
+    parameters: [{ $ref: "#/components/parameters/PolityId" }]
+    get:
+      tags: [Members]
+      operationId: getCurrentUserMembershipAccess
+      summary: Read product-owned membership access convergence for the current user.
+      description: Proves membership ownership from the authenticated user before reading convergence. This route does not require the membership grant it is converging.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Current membership access convergence, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipAccessConvergenceResponse" } } } }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Members]
+      operationId: reconcileCurrentUserMembershipAccess
+      summary: Reconcile a legacy active membership without a product-owned grant receipt.
+      description: Idempotently stages the membership plan once. Existing receipt-backed convergence is returned without duplicate work.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200": { description: Existing receipt-backed membership convergence, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipAccessConvergenceResponse" } } } }
+        "202": { description: Membership access reconciliation staged, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipAccessConvergenceResponse" } } } }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /polities/{polityId}/invitations:
     parameters: [{ $ref: "#/components/parameters/PolityId" }]
     get:
@@ -199,7 +220,9 @@ paths:
       operationId: acceptMembershipInvitation
       security: [{ bearerAuth: [] }]
       responses:
-        "201": { description: Invitation accepted and membership created, content: { application/json: { schema: { $ref: "#/components/schemas/MemberResponse" } } } }
+        "200": { description: Terminal acceptance outcome, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationAcceptanceResponse" } } } }
+        "202": { description: Durable invitation acceptance is pending, content: { application/json: { schema: { $ref: "#/components/schemas/MembershipInvitationAcceptanceResponse" } } } }
+        "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
         "410": { $ref: "#/components/responses/Gone" }
@@ -470,6 +493,24 @@ components:
           type: string
           nullable: true
           description: Stable failure code populated only when status is failed.
+    MembershipAccessConvergenceStatus:
+      type: string
+      enum: [legacy, pending, applied, failed]
+    MembershipAccessConvergenceResponse:
+      type: object
+      required: [membershipId, status]
+      properties:
+        membershipId: { type: string, format: uuid }
+        receiptId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Product-owned durable grant receipt. Absent only for a legacy membership.
+        status: { $ref: "#/components/schemas/MembershipAccessConvergenceStatus" }
+        failureCode:
+          type: string
+          nullable: true
+          description: Stable failure code populated only when status is failed.
     PolityAccountResponse:
       type: object
       required: [userId, grants]
@@ -724,6 +765,7 @@ components:
     PolitySetupPreset: { type: string, enum: [standard_constitutional_council_republic] }
     PolityPace: { type: string, enum: [fast, standard, deliberate] }
     MembershipInvitationStatus: { type: string, enum: [pending, accepted, cancelled] }
+    MembershipInvitationAcceptanceStatus: { type: string, enum: [requested, completed, failed] }
     VotingThreshold: { type: string, enum: [simple_majority_cast, majority_of_eligible, two_thirds_cast, two_thirds_eligible, office_election_result] }
     OfficeElectionMethod: { type: string, enum: [plurality, ranked_choice] }
     ProcedureElectorate: { type: string, enum: [active_members, office_holders] }
@@ -1054,6 +1096,21 @@ components:
         completedAt: { type: string, format: date-time }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+    MembershipInvitationAcceptanceResponse:
+      type: object
+      required: [invitationId, status, requestedAt]
+      properties:
+        invitationId: { type: string, format: uuid }
+        status: { $ref: "#/components/schemas/MembershipInvitationAcceptanceStatus" }
+        requestedAt:
+          type: string
+          format: date-time
+          description: Original acceptance intent timestamp, preserved across every retry.
+        completedAt: { type: string, format: date-time }
+        failureCode:
+          type: string
+          nullable: true
+          description: Stable terminal Cardo failure code populated only when status is failed.
     VoteTallyResponse:
       type: object
       required: ["yes", "no", abstain, eligible, quorumRequired, quorumMet, outcomeReason]

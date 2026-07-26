@@ -10,10 +10,14 @@ import static org.mockito.Mockito.when;
 import com.odonta.polity.config.MembershipInvitationProperties;
 import com.odonta.polity.repository.MembershipInvitationProjection;
 import com.odonta.polity.repository.MembershipInvitationRepository;
+import com.odonta.polity.workflow.CompleteMembershipInvitationWorkflow;
+import io.github.lutzseverino.cardo.common.api.ApiException;
+import io.github.lutzseverino.cardo.identity.client.IdentityUser;
+import io.github.lutzseverino.cardo.identity.client.IdentityUserStatus;
+import io.github.lutzseverino.cardo.identity.client.IdentityUsersClient;
 import io.github.lutzseverino.cardo.invite.client.CreateInvitation;
 import io.github.lutzseverino.cardo.invite.client.CreatedInvitation;
 import io.github.lutzseverino.cardo.invite.client.Invitation;
-import io.github.lutzseverino.cardo.invite.client.InvitationGrant;
 import io.github.lutzseverino.cardo.invite.client.InvitationStatus;
 import io.github.lutzseverino.cardo.invite.client.InvitationsClient;
 import java.net.URI;
@@ -29,15 +33,23 @@ class CardoInvitationProcessorTest {
       URI.create("https://polity.example.com/polities/invitations");
 
   private final InvitationsClient client = mock(InvitationsClient.class);
+  private final IdentityUsersClient identityUsers = mock(IdentityUsersClient.class);
   private final MembershipInvitationRepository invitations =
       mock(MembershipInvitationRepository.class);
   private final CardoInvitationState state = mock(CardoInvitationState.class);
+  private final CompleteMembershipInvitationWorkflow completion =
+      mock(CompleteMembershipInvitationWorkflow.class);
   private final CardoInvitationProcessor processor =
       new CardoInvitationProcessor(
-          client, invitations, new MembershipInvitationProperties(ACCEPT_URL), state);
+          client,
+          identityUsers,
+          invitations,
+          new MembershipInvitationProperties(ACCEPT_URL),
+          state,
+          completion);
 
   @Test
-  void createsCardoInvitationFromProductOwnedSnapshotAndRegistersIdentity() {
+  void createsLifecycleOnlyCardoInvitationAndRegistersIdentity() {
     UUID invitationId = UUID.randomUUID();
     UUID polityId = UUID.randomUUID();
     UUID inviterMembershipId = UUID.randomUUID();
@@ -62,11 +74,6 @@ class CardoInvitationProcessorTest {
     assertThat(input.getValue().tenantId()).isEqualTo(polityId);
     assertThat(input.getValue().tenantResourceType()).isEqualTo("polity:polity");
     assertThat(input.getValue().email()).isEqualTo("friend@example.com");
-    assertThat(input.getValue().accessProfile()).isEqualTo("polity:member");
-    assertThat(input.getValue().grants())
-        .containsExactly(
-            new InvitationGrant("polity:polity", "read"),
-            new InvitationGrant("polity:polity", "participate"));
     assertThat(input.getValue().invitedBy()).isEqualTo(inviterUserId);
     assertThat(input.getValue().acceptUrlBase()).isEqualTo(ACCEPT_URL);
     verify(state).register(invitationId, cardoInvitationId, inviteeUserId, NOW.plusDays(3));
@@ -84,10 +91,32 @@ class CardoInvitationProcessorTest {
             "friend@example.com",
             cardoInvitationId);
     when(invitations.findProjectedById(invitationId)).thenReturn(Optional.of(local));
+    UUID polityId = local.getPolityId();
+    UUID invitedUserId = local.getInvitedUserId();
+    String email = local.getEmail();
+    IdentityUser identity = identity(invitedUserId);
+    when(identityUsers.get(invitedUserId)).thenReturn(identity);
+    when(client.accept(cardoInvitationId, NOW))
+        .thenReturn(
+            new Invitation(
+                cardoInvitationId,
+                invitationId,
+                polityId,
+                "polity:polity",
+                email,
+                invitedUserId,
+                UUID.randomUUID(),
+                InvitationStatus.ACCEPTED,
+                NOW.plusDays(3),
+                NOW,
+                null,
+                NOW.minusDays(1),
+                NOW));
 
     processor.accept(new CardoInvitationAcceptanceRequested(invitationId, NOW));
 
     verify(client).accept(cardoInvitationId, NOW);
+    verify(completion).complete(invitationId, identity, NOW);
   }
 
   @Test
@@ -104,6 +133,31 @@ class CardoInvitationProcessorTest {
 
     verify(client, never())
         .accept(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+  }
+
+  @Test
+  void terminalCardoAcceptanceFailureIsPersistedWithoutRetry() {
+    UUID invitationId = UUID.randomUUID();
+    UUID cardoInvitationId = UUID.randomUUID();
+    MembershipInvitationProjection local =
+        invitation(
+            invitationId,
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "friend@example.com",
+            cardoInvitationId);
+    when(invitations.findProjectedById(invitationId)).thenReturn(Optional.of(local));
+    when(client.accept(cardoInvitationId, NOW))
+        .thenThrow(ApiException.gone("invitation_expired", "Expired"));
+
+    processor.accept(new CardoInvitationAcceptanceRequested(invitationId, NOW));
+
+    verify(state).fail(invitationId, "invitation_expired");
+    verify(completion, never())
+        .complete(
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.any());
   }
 
   @Test
@@ -146,6 +200,7 @@ class CardoInvitationProcessorTest {
     when(invitation.getInvitedBy()).thenReturn(inviterMembershipId);
     when(invitation.getEmail()).thenReturn(email);
     when(invitation.getCardoInvitationId()).thenReturn(cardoInvitationId);
+    when(invitation.getInvitedUserId()).thenReturn(UUID.randomUUID());
     return invitation;
   }
 
@@ -156,7 +211,6 @@ class CardoInvitationProcessorTest {
         requestId,
         polityId,
         "polity:polity",
-        "polity:member",
         "friend@example.com",
         inviteeUserId,
         inviterUserId,
@@ -166,5 +220,18 @@ class CardoInvitationProcessorTest {
         null,
         NOW,
         NOW);
+  }
+
+  private IdentityUser identity(UUID id) {
+    return new IdentityUser(
+        id,
+        "subject:friend",
+        "friend@example.com",
+        "Friend",
+        null,
+        IdentityUserStatus.ACTIVE,
+        true,
+        NOW.minusDays(2),
+        NOW.minusDays(1));
   }
 }

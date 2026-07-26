@@ -2,17 +2,23 @@ package com.odonta.polity.repository;
 
 import com.odonta.polity.model.MembershipInvitation;
 import com.odonta.polity.model.MembershipInvitationStatus;
+import jakarta.persistence.LockModeType;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface MembershipInvitationRepository extends JpaRepository<MembershipInvitation, UUID> {
 
   Optional<MembershipInvitation> findEntityById(UUID id);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select invitation from MembershipInvitation invitation where invitation.id = :id")
+  Optional<MembershipInvitation> findEntityByIdForUpdate(UUID id);
 
   boolean existsByPolityIdAndEmailIgnoreCaseAndStatus(
       UUID polityId, String email, MembershipInvitationStatus status);

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   createHttpClient,
+  getHttpResponseCode,
   setTerminalUnauthorizedHandler,
 } from "@/api/http-client";
 import { apiMockServer } from "@/test/mocks/server";
@@ -217,5 +218,78 @@ describe("HTTP client", () => {
 
     await expect(request).rejects.toMatchObject({ status });
     expect(unauthorizedCount).toBe(status === 401 ? 1 : 0);
+  });
+
+  it("preserves the service error code through a normalized session rejection", async () => {
+    setTerminalUnauthorizedHandler(() => {});
+    apiMockServer.use(
+      http.get(`${serviceBaseUrl}/session`, () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: "session_idle_expired",
+              message: "The browser session expired after inactivity.",
+            },
+          },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    const request = createHttpClient({ baseUrl: serviceBaseUrl }).request({
+      acceptedLanguage: "en",
+      method: "GET",
+      url: "/session",
+    });
+
+    await expect(request).rejects.toSatisfy(
+      (error: unknown) => getHttpResponseCode(error) === "session_idle_expired",
+    );
+  });
+
+  it("reads the service error code from an unnormalized conflict", async () => {
+    apiMockServer.use(
+      http.post(`${serviceBaseUrl}/session/refresh`, () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: "session_refresh_in_progress",
+              message: "The browser session is already being refreshed.",
+            },
+          },
+          { status: 409 },
+        ),
+      ),
+    );
+
+    const request = createHttpClient({ baseUrl: serviceBaseUrl }).request({
+      acceptedLanguage: "en",
+      method: "POST",
+      url: "/session/refresh",
+    });
+
+    await expect(request).rejects.toSatisfy(
+      (error: unknown) =>
+        getHttpResponseCode(error) === "session_refresh_in_progress",
+    );
+  });
+
+  it("reports no code when the service rejection carries none", async () => {
+    setTerminalUnauthorizedHandler(() => {});
+    apiMockServer.use(
+      http.get(`${serviceBaseUrl}/session`, () =>
+        HttpResponse.json({}, { status: 401 }),
+      ),
+    );
+
+    const request = createHttpClient({ baseUrl: serviceBaseUrl }).request({
+      acceptedLanguage: "en",
+      method: "GET",
+      url: "/session",
+    });
+
+    await expect(request).rejects.toSatisfy(
+      (error: unknown) => getHttpResponseCode(error) === undefined,
+    );
   });
 });
