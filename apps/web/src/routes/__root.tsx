@@ -15,7 +15,7 @@ import { membershipInvitationQueryOptions } from "@/domains/membership";
 import { polityOptionsQueryOptions } from "@/domains/polity";
 import {
   currentSessionQueryKey,
-  currentSessionQueryOptions,
+  ensureRestoredSession,
   isSessionUnavailableError,
   type Session,
 } from "@/domains/session";
@@ -68,9 +68,9 @@ export const Route = createRootRouteWithContext<AppRouterContext>()({
     }
 
     try {
-      await context.queryClient.ensureQueryData(
-        currentSessionQueryOptions({ locale: context.getLocale() }),
-      );
+      await ensureRestoredSession(context.queryClient, {
+        locale: context.getLocale(),
+      });
       return { isAuthenticated: true, isPublic: false };
     } catch (error) {
       if (!isSessionUnavailableError(error)) throw error;
