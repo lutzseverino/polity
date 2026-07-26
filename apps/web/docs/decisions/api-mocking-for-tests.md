@@ -43,8 +43,10 @@ The shared browser scenarios cover current-user invitations and the governing jo
 transport-shaped polity directory, workspace, action, government, motion, record, vote, and candidacy
 resources. Vote and candidacy handlers update their in-memory motion responses, so subsequent reads observe
 the recorded choice. A separate stateful session scenario covers signed-out, signed-in, expired, revoked,
-invalid-credential, refresh, and logout behavior through the Cardo URLs. Future scenarios extend this
-boundary; application request code remains unchanged.
+invalid-credential, refresh, and logout behavior through the Cardo URLs. The account scenario models
+first-time provisioning, immediate application, pending-to-applied convergence, durable failure, and
+subsequent reads without changing product request code. Future scenarios extend this boundary; application
+request code remains unchanged.
 
 Service-worker mocked responses cannot write browser cookies. Browser mock installation therefore
 materializes the development scenario's readable CSRF cookie before the worker starts. This remains inside
