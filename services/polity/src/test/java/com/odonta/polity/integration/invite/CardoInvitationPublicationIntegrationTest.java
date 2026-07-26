@@ -79,7 +79,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
       "spring.jpa.hibernate.ddl-auto=validate",
       "spring.modulith.events.jdbc.schema=polity_events",
       "cardo.authorization.plans.max-attempts=1",
-      "polity.membership-invitations.retry-delay=PT24H"
+      "polity.membership-invitations.retry-delay=PT24H",
+      "cardo.identity.product-auth.identity-session-audience=cardo-identity-test",
+      "cardo.identity.product-auth.product-audience=polity-test"
     })
 @Import(CardoInvitationPublicationIntegrationTest.DeterministicAsyncConfiguration.class)
 @Testcontainers(disabledWithoutDocker = true)

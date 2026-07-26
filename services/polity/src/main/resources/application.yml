@@ -49,6 +49,26 @@ cardo:
     client:
       base-url: ${IDENTITY_BASE_URL:http://localhost:8081/api/v1}
       service-token-scope: identity
+    product-auth:
+      # Deliberately defaulted only where a wrong value is inert. The two audiences have no
+      # default: Cardo rejects a blank or duplicated audience at startup, so a misconfigured
+      # deployment fails closed instead of validating tokens against the wrong client.
+      identity-session-audience: ${CARDO_IDENTITY_SESSION_AUDIENCE}
+      product-audience: ${CARDO_POLITY_PRODUCT_AUDIENCE}
+      session-cookie-name: ${CARDO_SESSION_COOKIE_NAME:cardo.session}
+      csrf-cookie-name: ${CARDO_CSRF_COOKIE_NAME:cardo.csrf}
+      token-exchange:
+        connect-timeout: ${CARDO_PRODUCT_TOKEN_CONNECT_TIMEOUT:PT2S}
+        read-timeout: ${CARDO_PRODUCT_TOKEN_READ_TIMEOUT:PT2S}
+      active-token-validation:
+        enabled: ${CARDO_ACTIVE_TOKEN_VALIDATION_ENABLED:false}
+        introspection-uri: ${CARDO_ACTIVE_TOKEN_INTROSPECTION_URI:}
+        client-id: ${CARDO_ACTIVE_TOKEN_CLIENT_ID:}
+        client-secret: ${CARDO_ACTIVE_TOKEN_CLIENT_SECRET:}
+        cache-ttl: ${CARDO_ACTIVE_TOKEN_CACHE_TTL:PT10S}
+        cache-max-entries: ${CARDO_ACTIVE_TOKEN_CACHE_MAX_ENTRIES:2048}
+        connect-timeout: ${CARDO_ACTIVE_TOKEN_CONNECT_TIMEOUT:PT2S}
+        read-timeout: ${CARDO_ACTIVE_TOKEN_READ_TIMEOUT:PT2S}
   invite:
     client:
       base-url: ${INVITE_BASE_URL:http://localhost:8083/api/v1}
