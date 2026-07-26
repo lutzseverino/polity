@@ -85,7 +85,10 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
       "spring.flyway.table=flyway_schema_history_membership_access_grants",
       "spring.jpa.hibernate.ddl-auto=validate",
       "spring.modulith.events.jdbc.schema=polity_events",
-      "cardo.authorization.plans.max-attempts=1"
+      "cardo.authorization.plans.max-attempts=1",
+      "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/realms/test/protocol/openid-connect/certs",
+      "cardo.identity.product-auth.identity-session-audience=cardo-identity-test",
+      "cardo.identity.product-auth.product-audience=polity-test"
     })
 @Import(MembershipAccessGrantIntegrationTest.RestClientConfiguration.class)
 @Testcontainers(disabledWithoutDocker = true)

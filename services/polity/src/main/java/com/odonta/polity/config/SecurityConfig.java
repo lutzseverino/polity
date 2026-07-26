@@ -1,79 +1,45 @@
 package com.odonta.polity.config;
 
-import io.github.lutzseverino.cardo.authorization.keycloak.KeycloakAuthoritiesConverter;
-import io.github.lutzseverino.cardo.authorization.spring.AuthenticatedUserReader;
-import io.github.lutzseverino.cardo.authorization.spring.ResourcePermissionEvaluator;
+import io.github.lutzseverino.cardo.identity.productauth.ProductRequestPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Polity's product route policy.
+ *
+ * <p>Cardo's {@code identity-product-auth} owns the filter chain, CSRF selection, browser-session
+ * validation, server-side product-token acquisition, and authority construction. It permits {@code
+ * /actuator/health}, {@code /actuator/info}, and the API documentation routes itself, applies this
+ * policy, and then denies every request no rule matched.
+ *
+ * <p>Rules are method-aware so an unsupported method on a supported path falls through to that
+ * denial rather than reaching a controller.
+ */
 @Configuration
-@EnableMethodSecurity
 public class SecurityConfig {
   @Bean
-  KeycloakAuthoritiesConverter keycloakAuthoritiesConverter() {
-    return new KeycloakAuthoritiesConverter();
-  }
-
-  @Bean
-  PermissionEvaluator permissionEvaluator() {
-    return new ResourcePermissionEvaluator();
-  }
-
-  @Bean
-  AuthenticatedUserReader authenticatedUserReader() {
-    return new AuthenticatedUserReader();
-  }
-
-  @Bean
-  MethodSecurityExpressionHandler methodSecurityExpressionHandler(
-      PermissionEvaluator permissionEvaluator) {
-    DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-    handler.setPermissionEvaluator(permissionEvaluator);
-    return handler;
-  }
-
-  @Bean
-  SecurityFilterChain security(
-      HttpSecurity http,
-      @Value("${polity.api.base-path}") String basePath,
-      KeycloakAuthoritiesConverter authorities) {
-    JwtAuthenticationConverter jwt = new JwtAuthenticationConverter();
-    jwt.setJwtGrantedAuthoritiesConverter(authorities);
-    return http.csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(
-            requests ->
-                requests
-                    .requestMatchers(
-                        "/actuator/health",
-                        "/actuator/health/**",
-                        "/actuator/info",
-                        "/openapi.json",
-                        "/docs/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.GET, basePath + "/invitation-tokens/*")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.GET, basePath + "/invitation-tokens/*/completion")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, basePath + "/invitation-tokens/*/completion")
-                    .permitAll()
-                    .requestMatchers(basePath + "/**")
-                    .authenticated()
-                    .anyRequest()
-                    .denyAll())
-        .oauth2ResourceServer(
-            oauth2 -> oauth2.jwt(configurer -> configurer.jwtAuthenticationConverter(jwt)))
-        .build();
+  ProductRequestPolicy productRequestPolicy(@Value("${polity.api.base-path}") String basePath) {
+    return rules ->
+        rules
+            // Container probes read the liveness and readiness groups beneath `/actuator/health`,
+            // which Cardo's own permit does not cover.
+            .permitAll("/actuator/health/**")
+            // Invitation-token onboarding completes before a session exists.
+            .permitAll(HttpMethod.GET, basePath + "/invitation-tokens/*")
+            .permitAll(HttpMethod.GET, basePath + "/invitation-tokens/*/completion")
+            .permitAll(HttpMethod.POST, basePath + "/invitation-tokens/*/completion")
+            // Convergence surfaces authenticate the principal but must never require the product
+            // grant they exist to converge. They are listed ahead of the general product rules so
+            // tightening those cannot silently lock a user out of their own recovery path.
+            .authenticated(HttpMethod.GET, basePath + "/polity/account")
+            .authenticated(HttpMethod.POST, basePath + "/polity/account")
+            .authenticated(HttpMethod.GET, basePath + "/polities/*/members/me/access")
+            .authenticated(HttpMethod.POST, basePath + "/polities/*/members/me/access")
+            // The Polity API supports these methods and no others.
+            .authenticated(HttpMethod.GET, basePath + "/**")
+            .authenticated(HttpMethod.POST, basePath + "/**")
+            .authenticated(HttpMethod.PUT, basePath + "/**");
   }
 }

@@ -32,3 +32,5 @@ for new reference documents.
 ## Documents
 
 - [Backend Conventions](backend-conventions.md)
+- [Membership Invitation Integration](membership-invitation-integration.md)
+- [Product Authentication](product-authentication.md)
