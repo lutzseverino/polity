@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -23,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -43,6 +47,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
       "cardo.identity.product-auth.identity-session-audience=cardo-identity-test",
       "cardo.identity.product-auth.product-audience=polity-test"
     })
+@Import(ProductRequestPolicyIntegrationTest.RestClientConfiguration.class)
 @Testcontainers(disabledWithoutDocker = true)
 class ProductRequestPolicyIntegrationTest {
   private static final String BASE_PATH = "/api/v1";
@@ -128,5 +133,13 @@ class ProductRequestPolicyIntegrationTest {
 
   private String describe(MvcResult result) {
     return result.getRequest().getMethod() + " " + result.getRequest().getRequestURI();
+  }
+
+  @TestConfiguration(proxyBeanMethods = false)
+  static class RestClientConfiguration {
+    @Bean
+    RestClient.Builder restClientBuilder() {
+      return RestClient.builder();
+    }
   }
 }
