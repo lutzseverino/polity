@@ -198,29 +198,29 @@ describe("polity requests", () => {
     { field: "size", value: 0 },
     { field: "totalElements", value: 1.5 },
     { field: "totalPages", value: Number.MAX_SAFE_INTEGER + 1 },
-  ])("rejects invalid page metadata: $field=$value", async ({
-    field,
-    value,
-  }) => {
-    apiMockServer.use(
-      http.get("/api/v1/polities", () =>
-        HttpResponse.json({
-          content: [],
-          page: {
-            number: 0,
-            size: 50,
-            totalElements: 0,
-            totalPages: 0,
-            [field]: value,
-          },
-        }),
-      ),
-    );
+  ])(
+    "rejects invalid page metadata: $field=$value",
+    async ({ field, value }) => {
+      apiMockServer.use(
+        http.get("/api/v1/polities", () =>
+          HttpResponse.json({
+            content: [],
+            page: {
+              number: 0,
+              size: 50,
+              totalElements: 0,
+              totalPages: 0,
+              [field]: value,
+            },
+          }),
+        ),
+      );
 
-    await expect(listPolities({ acceptedLanguage: "en" })).rejects.toThrow(
-      "Invalid polity page response.",
-    );
-  });
+      await expect(listPolities({ acceptedLanguage: "en" })).rejects.toThrow(
+        "Invalid polity page response.",
+      );
+    },
+  );
 
   it.each([
     {
@@ -233,40 +233,40 @@ describe("polity requests", () => {
       id: "11111111-1111-4111-8111-111111111111",
       label: "impossible RFC 3339 date-time",
     },
-  ])("rejects an invalid $label before projection", async ({
-    createdAt,
-    id,
-  }) => {
-    apiMockServer.use(
-      http.get("/api/v1/polities", () =>
-        HttpResponse.json({
-          content: [
-            {
-              constitutionVersion: 1,
-              createdAt,
-              id,
-              institutionName: "Assembly",
-              jurisdictionName: "Example",
-              name: "Example",
-              slug: "example",
-              status: "active",
-              visibility: "public",
+  ])(
+    "rejects an invalid $label before projection",
+    async ({ createdAt, id }) => {
+      apiMockServer.use(
+        http.get("/api/v1/polities", () =>
+          HttpResponse.json({
+            content: [
+              {
+                constitutionVersion: 1,
+                createdAt,
+                id,
+                institutionName: "Assembly",
+                jurisdictionName: "Example",
+                name: "Example",
+                slug: "example",
+                status: "active",
+                visibility: "public",
+              },
+            ],
+            page: {
+              number: 0,
+              size: 50,
+              totalElements: 1,
+              totalPages: 1,
             },
-          ],
-          page: {
-            number: 0,
-            size: 50,
-            totalElements: 1,
-            totalPages: 1,
-          },
-        }),
-      ),
-    );
+          }),
+        ),
+      );
 
-    await expect(listPolities({ acceptedLanguage: "en" })).rejects.toThrow(
-      "Invalid polity response.",
-    );
-  });
+      await expect(listPolities({ acceptedLanguage: "en" })).rejects.toThrow(
+        "Invalid polity response.",
+      );
+    },
+  );
 
   it("loads every polity and motion page for aggregate consumers", async () => {
     const polityResponses = Array.from({ length: 101 }, (_, index) => ({

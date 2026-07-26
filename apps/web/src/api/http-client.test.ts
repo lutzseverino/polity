@@ -86,29 +86,27 @@ describe("HTTP client", () => {
     expect(requestSource).toBe("request");
   });
 
-  it.each([
-    "DELETE",
-    "PATCH",
-    "POST",
-    "PUT",
-  ])("echoes the local CSRF cookie for unsafe %s requests", async (method) => {
-    let csrfHeader: string | null = null;
-    mockDocumentCookie("cardo.csrf=local-token");
-    apiMockServer.use(
-      http.all(`${serviceBaseUrl}/resource`, ({ request }) => {
-        csrfHeader = request.headers.get("X-CSRF-TOKEN");
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
+  it.each(["DELETE", "PATCH", "POST", "PUT"])(
+    "echoes the local CSRF cookie for unsafe %s requests",
+    async (method) => {
+      let csrfHeader: string | null = null;
+      mockDocumentCookie("cardo.csrf=local-token");
+      apiMockServer.use(
+        http.all(`${serviceBaseUrl}/resource`, ({ request }) => {
+          csrfHeader = request.headers.get("X-CSRF-TOKEN");
+          return new HttpResponse(null, { status: 204 });
+        }),
+      );
 
-    await createHttpClient({ baseUrl: serviceBaseUrl }).request({
-      acceptedLanguage: "en",
-      method,
-      url: "/resource",
-    });
+      await createHttpClient({ baseUrl: serviceBaseUrl }).request({
+        acceptedLanguage: "en",
+        method,
+        url: "/resource",
+      });
 
-    expect(csrfHeader).toBe("local-token");
-  });
+      expect(csrfHeader).toBe("local-token");
+    },
+  );
 
   it("supports the production CSRF cookie name", async () => {
     let csrfHeader: string | null = null;
@@ -197,28 +195,29 @@ describe("HTTP client", () => {
     expect(csrfHeader).toBeNull();
   });
 
-  it.each([
-    401, 403,
-  ] as const)("normalizes %s responses without exposing Axios", async (status) => {
-    let unauthorizedCount = 0;
-    setTerminalUnauthorizedHandler(() => {
-      unauthorizedCount += 1;
-    });
-    apiMockServer.use(
-      http.get(`${serviceBaseUrl}/session`, () =>
-        HttpResponse.json({ error: { code: "failure" } }, { status }),
-      ),
-    );
+  it.each([401, 403] as const)(
+    "normalizes %s responses without exposing Axios",
+    async (status) => {
+      let unauthorizedCount = 0;
+      setTerminalUnauthorizedHandler(() => {
+        unauthorizedCount += 1;
+      });
+      apiMockServer.use(
+        http.get(`${serviceBaseUrl}/session`, () =>
+          HttpResponse.json({ error: { code: "failure" } }, { status }),
+        ),
+      );
 
-    const request = createHttpClient({ baseUrl: serviceBaseUrl }).request({
-      acceptedLanguage: "en",
-      method: "GET",
-      url: "/session",
-    });
+      const request = createHttpClient({ baseUrl: serviceBaseUrl }).request({
+        acceptedLanguage: "en",
+        method: "GET",
+        url: "/session",
+      });
 
-    await expect(request).rejects.toMatchObject({ status });
-    expect(unauthorizedCount).toBe(status === 401 ? 1 : 0);
-  });
+      await expect(request).rejects.toMatchObject({ status });
+      expect(unauthorizedCount).toBe(status === 401 ? 1 : 0);
+    },
+  );
 
   it("preserves the service error code through a normalized session rejection", async () => {
     setTerminalUnauthorizedHandler(() => {});

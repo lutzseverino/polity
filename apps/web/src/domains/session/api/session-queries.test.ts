@@ -143,28 +143,27 @@ describe("session restoration", () => {
     expect(reads).toBe(0);
   });
 
-  it.each([
-    "absolute-expired",
-    "idle-expired",
-    "revoked",
-  ] as const)("ends a %s session without attempting a refresh", async (initialSession) => {
-    let refreshes = 0;
-    setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
-    const queryClient = createQueryClient();
-    apiMockServer.use(
-      // The counting handler must precede the scenario's own so it is the one that matches.
-      http.post("/api/v1/identity/sessions/current/refresh", () => {
-        refreshes += 1;
-        return HttpResponse.json(renewedSessionPrincipalResponse);
-      }),
-      ...createSessionScenarioHandlers({ initialSession }),
-    );
+  it.each(["absolute-expired", "idle-expired", "revoked"] as const)(
+    "ends a %s session without attempting a refresh",
+    async (initialSession) => {
+      let refreshes = 0;
+      setTestCookie("cardo.csrf=mock-csrf-token; Path=/");
+      const queryClient = createQueryClient();
+      apiMockServer.use(
+        // The counting handler must precede the scenario's own so it is the one that matches.
+        http.post("/api/v1/identity/sessions/current/refresh", () => {
+          refreshes += 1;
+          return HttpResponse.json(renewedSessionPrincipalResponse);
+        }),
+        ...createSessionScenarioHandlers({ initialSession }),
+      );
 
-    await expect(
-      ensureRestoredSession(queryClient, { locale: "en" }),
-    ).rejects.toSatisfy(isSessionUnavailableError);
-    expect(refreshes).toBe(0);
-  });
+      await expect(
+        ensureRestoredSession(queryClient, { locale: "en" }),
+      ).rejects.toSatisfy(isSessionUnavailableError);
+      expect(refreshes).toBe(0);
+    },
+  );
 
   it("converges when another tab already owns the refresh", async () => {
     setTestCookie("cardo.csrf=mock-csrf-token; Path=/");

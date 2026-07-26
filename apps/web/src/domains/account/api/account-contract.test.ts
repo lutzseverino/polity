@@ -6,20 +6,20 @@ const receiptId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const userId = "99999999-9999-4999-8999-999999999999";
 
 describe("Polity account transport contract", () => {
-  it.each([
-    "pending",
-    "applied",
-  ] as const)("projects a valid %s convergence response", (status) => {
-    expect(
-      parsePolityAccount({
-        grants: { failureCode: null, receiptId, status },
+  it.each(["pending", "applied"] as const)(
+    "projects a valid %s convergence response",
+    (status) => {
+      expect(
+        parsePolityAccount({
+          grants: { failureCode: null, receiptId, status },
+          userId,
+        }),
+      ).toEqual({
+        grants: { receiptId, status },
         userId,
-      }),
-    ).toEqual({
-      grants: { receiptId, status },
-      userId,
-    });
-  });
+      });
+    },
+  );
 
   it("requires a stable failure code for failed convergence", () => {
     expect(

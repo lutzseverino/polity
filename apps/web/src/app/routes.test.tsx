@@ -527,24 +527,28 @@ describe("first governing journey", () => {
     });
   });
 
-  it.each(
-    rootDestinationPaths,
-  )("uses the compact shell title and wide content heading at %s", async (pathname) => {
-    const router = createTestRouter(pathname);
+  it.each(rootDestinationPaths)(
+    "uses the compact shell title and wide content heading at %s",
+    async (pathname) => {
+      const router = createTestRouter(pathname);
 
-    renderRouter(router);
+      renderRouter(router);
 
-    const heading = await screen.findByRole("heading", { level: 1 });
+      const heading = await screen.findByRole("heading", { level: 1 });
 
-    expect(heading.closest("header")).toHaveAttribute(
-      "data-slot",
-      "page-header",
-    );
-    expect(heading.closest("main")).toHaveAttribute("data-shell-level", "root");
-    expect(
-      screen.queryByRole("navigation", { name: "Current location" }),
-    ).not.toBeInTheDocument();
-  });
+      expect(heading.closest("header")).toHaveAttribute(
+        "data-slot",
+        "page-header",
+      );
+      expect(heading.closest("main")).toHaveAttribute(
+        "data-shell-level",
+        "root",
+      );
+      expect(
+        screen.queryByRole("navigation", { name: "Current location" }),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   it("lets an eligible member understand and record an official vote", async () => {
     const user = userEvent.setup();
