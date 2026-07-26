@@ -26,6 +26,8 @@ trap cleanup EXIT HUP INT TERM
 
 cd "$ROOT"
 
+./deploy/check-runtime-source-pins.mjs
+
 if ! find services/polity/target -maxdepth 1 -name 'polity-*.jar' -print -quit 2>/dev/null |
   grep -q .; then
   echo "Package the Polity service before running the runtime smoke test." >&2
@@ -184,6 +186,7 @@ curl --fail --silent --show-error \
   >"$RESULTS/spa.html"
 docker exec "$GATEWAY_CONTAINER" nginx -T >"$RESULTS/nginx.txt" 2>&1
 docker image inspect "$SERVICE_IMAGE" >"$RESULTS/service-image.json"
+docker image inspect "$GATEWAY_IMAGE" >"$RESULTS/gateway-image.json"
 
 node --input-type=module - "$RESULTS" "$MOCK_CONTAINER" <<'EOF'
 import { readFileSync } from "node:fs";
@@ -293,6 +296,17 @@ assert(serviceImage.Config.User === "polity", "Polity service image does not run
 assert(
   serviceImage.Config.Healthcheck?.Test?.join(" ").includes("/actuator/health/readiness"),
   "Polity service image does not probe service readiness",
+);
+
+const [gatewayImage] = readJson("gateway-image.json");
+const gatewayUser = gatewayImage.Config.User?.split(":", 1)[0];
+assert(
+  gatewayUser && gatewayUser !== "0" && gatewayUser !== "root",
+  "gateway image does not run as a non-root user",
+);
+assert(
+  gatewayImage.Config.Healthcheck?.Test?.join(" ").includes("/healthz"),
+  "gateway image does not probe gateway liveness",
 );
 EOF
 
