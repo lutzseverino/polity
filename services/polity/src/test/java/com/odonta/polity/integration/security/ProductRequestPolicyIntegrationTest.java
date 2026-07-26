@@ -9,6 +9,7 @@ import com.odonta.polity.PolityApplication;
 import io.github.lutzseverino.cardo.authorization.AuthorizationAdminClient;
 import io.github.lutzseverino.cardo.billing.client.BillingEntitlementsClient;
 import io.github.lutzseverino.cardo.identity.client.IdentityUsersClient;
+import io.github.lutzseverino.cardo.invite.client.InvitationsClient;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,10 @@ class ProductRequestPolicyIntegrationTest {
   @MockitoBean private AuthorizationAdminClient authorization;
   @MockitoBean private BillingEntitlementsClient entitlements;
   @MockitoBean private IdentityUsersClient identityUsers;
+
+  // Admitted public routes reach a controller. Stubbing the outbound clients keeps this test about
+  // the boundary decision rather than downstream availability.
+  @MockitoBean private InvitationsClient cardoInvitations;
 
   private MockMvc mockMvc;
 
