@@ -52,8 +52,8 @@ Browser mock ownership and extension conventions are recorded in
 - `src/domains/` owns reusable product nouns such as polities, motions, memberships, and inbox items.
 - `src/domains/session/` owns the validated current principal, restoration, and session query state.
 - `src/features/` owns reusable user actions such as launching an action, voting, or accepting an invitation.
-- `src/components/app/` owns owner-neutral product components and shadcn wrappers.
-- `src/components/ui/` is registry-managed shadcn source. It is strictly read-only.
+- `src/components/app/` owns owner-neutral product components and app-specific wrappers over `@polity/ui`.
+- `packages/ui/` owns the shared public React surface and canonical shadcn source.
 - `src/api/` is reserved for generated clients and transport adapters; `src/lib/` owns low-level helpers.
 - `src/mocks/` owns development-only HTTP scenarios and the browser MSW installation boundary.
 
@@ -114,22 +114,21 @@ The authoritative ownership and import rules are in
 - Add a new variant only after a repeated application text role exists; do not add one to reproduce a
   single screen-specific class list.
 
-Product, domain, feature, route, and shell code must consume shadcn primitives through
-`src/components/app/`. Update registry
-components only through the shadcn CLI so upstream replacements remain explicit and reviewable.
+Product, domain, feature, route, and shell code consume shared UI through
+`src/components/app/`. The package public surface is the only canonical primitive
+access boundary.
 
 ## Shadcn maintenance
 
-Run registry commands from this workspace:
+Run the pinned canonical workflow from the repository root:
 
 ```bash
-pnpm dlx shadcn@latest add --all --overwrite
-pnpm dlx shadcn@latest preset resolve
-pnpm dlx shadcn@latest apply <preset> --only theme
+pnpm --filter @polity/ui ui:add button
+pnpm --filter @polity/ui ui:update
 ```
 
-The registry source is intentionally excluded from repository formatting and ESLint rewrites. It is
-still type-checked and included in dependency architecture validation.
+The workflow refreshes generated-source provenance. Manual canonical edits fail
+`pnpm check`.
 
 ## Documentation
 

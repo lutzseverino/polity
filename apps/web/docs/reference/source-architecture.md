@@ -10,8 +10,8 @@ This reference is authoritative for source ownership, naming, and import directi
 | `src/routes/` | URL tree | file routes, params, search validation, loaders, and page composition |
 | `src/domains/<noun>/` | product noun | reusable domain types, validated transport projections, read operations/query options, and noun-oriented components |
 | `src/features/<verb>/` | user capability | reusable action UI, action state, validation, request operations, and mutation orchestration |
-| `src/components/app/` | design system | owner-neutral product components and shadcn wrappers |
-| `src/components/ui/` | shadcn registry | generated registry components and hooks; read-only |
+| `src/components/app/` | application UI | owner-neutral product components and app-specific wrappers over `@polity/ui` |
+| `packages/ui/` | shared React UI | public shared components and private canonical shadcn source |
 | `src/api/` | transport | shared HTTP mechanics, generated OpenAPI clients, and transport contracts |
 | `src/lib/` | infrastructure | small framework- and product-neutral helpers |
 | `src/mocks/` | development transport | browser MSW selection and installation, local scenario state, response data, and handlers |
@@ -39,9 +39,10 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
 - Route ownership is transitive: domains and features cannot hide concrete URLs behind router-aware app
   components such as `AppLinkButton` or `AppLinkSurface`. Reusable owners expose link/action render props or
   slots; routes and app composition supply the router-aware wrapper and destination.
-- Only `src/components/app/` may import `src/components/ui/`. Never manually edit files under
-  `src/components/ui/`. Follow the [app component wrapper rules](app-component-wrappers.md) when
-  exposing or extending a registry primitive.
+- Only `src/components/app/` may import public `@polity/ui` component entrypoints.
+  Never import or manually edit `packages/ui/src/components/ui/`. Follow the
+  [app component wrapper rules](app-component-wrappers.md) when extending a
+  shared primitive.
 - Package reusable components in `ComponentName/ComponentName.tsx` with a manually curated local `index.ts`.
   Consumers outside that component import its index rather than the implementation file.
 - Prefer a presentational component plus slots or a compound API when consumers need to vary content or
@@ -79,7 +80,7 @@ Create only the subfolders an owner needs. A domain or feature can start with `i
   this boundary or choose between mock and real implementations.
 
 `pnpm check:architecture` enforces the mechanically checkable part of this graph, including acyclic
-dependencies, shadcn isolation, upward-import bans, transitive domain and feature routing ownership, and
+dependencies, shared UI isolation, upward-import bans, transitive domain and feature routing ownership, and
 public entrypoints.
 
 ## Component Example

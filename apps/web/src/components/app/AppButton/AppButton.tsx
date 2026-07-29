@@ -1,1 +1,1 @@
-export { Button as AppButton } from "@/components/ui/button";
+export { Button as AppButton } from "@polity/ui/button";

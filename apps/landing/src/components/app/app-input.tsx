@@ -1,6 +1,5 @@
+import { Input } from "@polity/ui/input";
 import { type ComponentProps, useState } from "react";
-
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type AppInputProps = Readonly<

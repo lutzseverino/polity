@@ -1,6 +1,5 @@
+import { Button } from "@polity/ui/button";
 import type { ComponentProps } from "react";
-
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type AppButtonSize = "default" | "icon-xs" | "sm";

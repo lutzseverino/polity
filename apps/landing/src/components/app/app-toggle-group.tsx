@@ -1,24 +1,20 @@
+import { ToggleGroup, ToggleGroupItem } from "@polity/ui/toggle-group";
 import type { ComponentProps, ReactNode } from "react";
-
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
-type AppToggleGroupProps = Readonly<{
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  children: ReactNode;
-  className?: string;
-  onValueChange?: (value: string) => void;
-  spacing?: 0 | 2;
-  type: "single";
-  value: string;
-}>;
-type AppToggleGroupItemProps = Readonly<
-  ComponentProps<"button"> & {
-    size?: "default" | "sm";
-    treatment?: "default" | "choice";
+type AppToggleGroupProps = Readonly<
+  Omit<
+    ComponentProps<typeof ToggleGroup>,
+    "defaultValue" | "multiple" | "onValueChange" | "value"
+  > & {
+    onValueChange?: (value: string) => void;
+    type: "single";
     value: string;
-    variant?: "default" | "outline";
+  }
+>;
+type AppToggleGroupItemProps = Readonly<
+  ComponentProps<typeof ToggleGroupItem> & {
+    treatment?: "default" | "choice";
   }
 >;
 
@@ -27,8 +23,20 @@ type AppToggleChoiceContentProps = Readonly<{
   label: ReactNode;
 }>;
 
-export function AppToggleGroup(props: AppToggleGroupProps) {
-  return <ToggleGroup {...props} />;
+export function AppToggleGroup({
+  onValueChange,
+  type: _type,
+  value,
+  ...props
+}: AppToggleGroupProps) {
+  return (
+    <ToggleGroup
+      {...props}
+      multiple={false}
+      onValueChange={(values) => onValueChange?.(values[0] ?? "")}
+      value={[value]}
+    />
+  );
 }
 
 export function AppToggleGroupItem({

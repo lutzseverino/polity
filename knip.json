@@ -4,16 +4,15 @@
     "@fontsource-variable/big-shoulders-stencil-display",
     "@fontsource-variable/geist",
     "@fontsource-variable/geist-mono",
+    "@polity/design",
     "expo-font",
     "expo-updates",
-    "shadcn",
     "tailwindcss",
     "tw-animate-css"
   ],
   "ignoreBinaries": ["python3"],
   "ignoreIssues": {
     "apps/landing/src/components/app/**": ["exports", "types"],
-    "apps/landing/src/components/ui/**": ["exports", "types"],
     "apps/web/src/app/i18n/i18n.ts": ["exports"],
     "apps/web/src/app/i18n/supported-locales.ts": ["exports"],
     "apps/web/src/components/app/**": ["exports", "types"],
@@ -35,11 +34,7 @@
       "ignore": ["src/api/generated/**"]
     },
     "apps/web": {
-      "entry": [
-        "lingui.config.ts",
-        "src/components/ui/**/*.{ts,tsx}",
-        "src/**/*.test.{ts,tsx}"
-      ],
+      "entry": ["lingui.config.ts", "src/**/*.test.{ts,tsx}"],
       "project": ["src/**/*.{ts,tsx}"]
     },
     "apps/mobile": {
@@ -48,6 +43,11 @@
     },
     "packages/design": {
       "project": ["src/**/*.ts", "bin/**/*.mjs"]
+    },
+    "packages/ui": {
+      "entry": ["src/components/app/*.ts", "src/components/ui/**/*.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
+      "ignoreDependencies": ["shadcn"]
     }
   }
 }

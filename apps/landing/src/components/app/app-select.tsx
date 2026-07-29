@@ -1,46 +1,53 @@
-import type { ComponentProps } from "react";
-
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+} from "@polity/ui/select";
+import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 type AppSelectTreatment = "default" | "utility";
 
-type AppSelectProps = Readonly<ComponentProps<typeof Select>>;
-type AppSelectContentProps = Readonly<ComponentProps<typeof SelectContent>>;
-type AppSelectGroupProps = Readonly<ComponentProps<typeof SelectGroup>>;
+type AppSelectProps = Readonly<
+  Omit<ComponentProps<typeof Select<string>>, "onValueChange"> & {
+    onValueChange?: (value: string) => void;
+  }
+>;
+type AppSelectContentProps = Readonly<
+  ComponentProps<typeof SelectContent> & {
+    position?: "popper";
+  }
+>;
 type AppSelectItemProps = Readonly<
   ComponentProps<typeof SelectItem> & {
     treatment?: AppSelectTreatment;
   }
 >;
-type AppSelectLabelProps = Readonly<ComponentProps<typeof SelectLabel>>;
-type AppSelectSeparatorProps = Readonly<ComponentProps<typeof SelectSeparator>>;
 type AppSelectTriggerProps = Readonly<
   ComponentProps<typeof SelectTrigger> & {
     treatment?: AppSelectTreatment;
   }
 >;
-type AppSelectValueProps = Readonly<ComponentProps<typeof SelectValue>>;
 
-function AppSelect(props: AppSelectProps) {
-  return <Select {...props} />;
+function AppSelect({ onValueChange, ...props }: AppSelectProps) {
+  return (
+    <Select<string>
+      {...props}
+      onValueChange={(value) => {
+        if (value !== null) {
+          onValueChange?.(value);
+        }
+      }}
+    />
+  );
 }
 
-function AppSelectContent(props: AppSelectContentProps) {
+function AppSelectContent({
+  position: _position,
+  ...props
+}: AppSelectContentProps) {
   return <SelectContent {...props} />;
-}
-
-function AppSelectGroup(props: AppSelectGroupProps) {
-  return <SelectGroup {...props} />;
 }
 
 function AppSelectItem({
@@ -57,14 +64,6 @@ function AppSelectItem({
       {...props}
     />
   );
-}
-
-function AppSelectLabel(props: AppSelectLabelProps) {
-  return <SelectLabel {...props} />;
-}
-
-function AppSelectSeparator(props: AppSelectSeparatorProps) {
-  return <SelectSeparator {...props} />;
 }
 
 function AppSelectTrigger({
@@ -84,17 +83,10 @@ function AppSelectTrigger({
   );
 }
 
-function AppSelectValue(props: AppSelectValueProps) {
-  return <SelectValue {...props} />;
-}
-
 export {
-  AppSelect,
-  AppSelectContent,
-  AppSelectGroup,
-  AppSelectItem,
-  AppSelectLabel,
-  AppSelectSeparator,
-  AppSelectTrigger,
-  AppSelectValue,
-};
+  SelectGroup as AppSelectGroup,
+  SelectLabel as AppSelectLabel,
+  SelectSeparator as AppSelectSeparator,
+  SelectValue as AppSelectValue,
+} from "@polity/ui/select";
+export { AppSelect, AppSelectContent, AppSelectItem, AppSelectTrigger };

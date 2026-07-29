@@ -1,30 +1,19 @@
-import type { ComponentProps, ReactNode } from "react";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-type AppTooltipProviderProps = Readonly<ComponentProps<typeof TooltipProvider>>;
+import { Tooltip, TooltipContent, TooltipTrigger } from "@polity/ui/tooltip";
+import type { ReactElement } from "react";
 
 type AppTooltipProps = Readonly<{
-  children: ReactNode;
+  children: ReactElement;
   label: string;
 }>;
-
-function AppTooltipProvider(props: AppTooltipProviderProps) {
-  return <TooltipProvider {...props} />;
-}
 
 function AppTooltip({ children, label }: AppTooltipProps) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipTrigger render={children} />
       <TooltipContent side="bottom">{label}</TooltipContent>
     </Tooltip>
   );
 }
 
-export { AppTooltip, AppTooltipProvider };
+export { TooltipProvider as AppTooltipProvider } from "@polity/ui/tooltip";
+export { AppTooltip };

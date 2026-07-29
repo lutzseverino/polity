@@ -5,4 +5,4 @@ export {
   EmptyHeader as AppEmptyHeader,
   EmptyMedia as AppEmptyMedia,
   EmptyTitle as AppEmptyTitle,
-} from "@/components/ui/empty";
+} from "@polity/ui/empty";

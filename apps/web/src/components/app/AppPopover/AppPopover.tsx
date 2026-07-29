@@ -5,4 +5,4 @@ export {
   PopoverHeader as AppPopoverHeader,
   PopoverTitle as AppPopoverTitle,
   PopoverTrigger as AppPopoverTrigger,
-} from "@/components/ui/popover";
+} from "@polity/ui/popover";

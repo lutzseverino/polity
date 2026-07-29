@@ -41,3 +41,30 @@ test("allows self.fetch in the shared boundary, tests, and mocks", async (t) => 
     });
   }
 });
+
+const sharedUiSource = 'import { Button } from "@polity/ui/button";';
+
+test("rejects shared UI imports outside app-owned wrappers", async () => {
+  const [result] = await eslint.lintText(sharedUiSource, {
+    filePath: path.join(
+      repositoryRoot,
+      "apps/web/src/domains/membership/index.ts",
+    ),
+  });
+
+  assert.deepEqual(
+    result.messages.map(({ ruleId }) => ruleId),
+    ["no-restricted-imports"],
+  );
+});
+
+test("allows app-owned wrappers to consume shared UI", async () => {
+  const [result] = await eslint.lintText(sharedUiSource, {
+    filePath: path.join(
+      repositoryRoot,
+      "apps/web/src/components/app/AppButton/AppButton.tsx",
+    ),
+  });
+
+  assert.deepEqual(result.messages, []);
+});
