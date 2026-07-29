@@ -2,6 +2,9 @@
 
 Responsive, web-first product client for Polity.
 
+The product theme comes directly from `@polity/design/product.css`, while
+shared React primitives come from the public `@polity/ui` surface.
+
 ## Development
 
 Run from the repository root:

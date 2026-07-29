@@ -8,13 +8,16 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./brand.css": "./src/themes/brand.css",
+    "./product.css": "./src/themes/product.css",
     "./tokens": "./src/tokens.ts",
     "./tokens.json": "./src/tokens.json"
   },
   "types": "./src/index.ts",
   "scripts": {
     "check:architecture": "depcruise --config dependency-cruiser.cjs src bin",
-    "generate:shadcn-theme": "node bin/polity-design.mjs generate shadcn-theme",
+    "check:theme": "node bin/polity-design.mjs generate brand-theme --check",
+    "generate:theme": "node bin/polity-design.mjs generate brand-theme",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

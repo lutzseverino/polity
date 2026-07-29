@@ -4,7 +4,7 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 @import "@fontsource-variable/big-shoulders-stencil-display";
-@import "./design/tokens/shadcn-theme.css";
+@import "@polity/design/brand.css";
 
 /*
  * THE CONSTITUTIONAL MAINFRAME
@@ -12,7 +12,7 @@
  * The brand — the dark-first "government terminal" palette (near-black void,
  * state-red signal, warm bone printout) and the Big Shoulders Stencil display
  * face — lives in the shared design tokens (packages/design/tokens.json) and is
- * generated into ./design/tokens/shadcn-theme.css. This file only adds the
+ * consumed directly from @polity/design/brand.css. This file only adds the
  * typographic treatment and terminal textures on top; it no longer overrides
  * the palette.
  */

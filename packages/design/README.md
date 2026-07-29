@@ -11,10 +11,17 @@ pnpm --filter @polity/design typecheck
 pnpm check:ts:architecture:design
 ```
 
-Generate the shadcn theme consumed by product clients:
+Regenerate the package-owned brand theme from the framework-neutral tokens:
 
 ```bash
-pnpm --filter @polity/design generate:shadcn-theme
+pnpm --filter @polity/design generate:theme
+```
+
+Browser clients consume the checked-in outputs directly:
+
+```css
+@import "@polity/design/brand.css";
+@import "@polity/design/product.css";
 ```
 
 ## Structure
@@ -22,7 +29,8 @@ pnpm --filter @polity/design generate:shadcn-theme
 - `src/tokens.json` is the source of truth for portable design tokens.
 - `src/tokens.ts` exposes typed token data.
 - `src/index.ts` defines the package's public TypeScript surface.
-- `bin/polity-design.mjs` owns generated theme output.
+- `src/themes/` exposes directly consumable browser theme outputs.
+- `bin/polity-design.mjs` deterministically refreshes the brand output from tokens.
 
 ## Documentation
 
