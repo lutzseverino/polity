@@ -1,6 +1,5 @@
+import { Card } from "@polity/ui/card";
 import type { HTMLAttributes, ReactNode } from "react";
-
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type AppCardElement = "article" | "div";

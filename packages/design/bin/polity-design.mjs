@@ -9,14 +9,13 @@ const packageRoot = path.resolve(dirname, "..");
 const tokensPath = path.join(packageRoot, "src/tokens.json");
 
 function usage() {
-  return [
-    "Usage:",
-    "  polity-design generate shadcn-theme --out <path> [--check]",
-  ].join("\n");
+  return ["Usage:", "  polity-design generate brand-theme [--check]"].join(
+    "\n",
+  );
 }
 
 function parseOptions(args) {
-  const options = { check: false, out: undefined };
+  const options = { check: false };
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -31,22 +30,7 @@ function parseOptions(args) {
       continue;
     }
 
-    if (arg === "--out") {
-      const value = args[index + 1];
-      if (!value || value.startsWith("-")) {
-        throw new Error("Missing value for --out.");
-      }
-
-      options.out = value;
-      index += 1;
-      continue;
-    }
-
     throw new Error(`Unknown option: ${arg}`);
-  }
-
-  if (!options.help && !options.out) {
-    throw new Error("Missing required --out option.");
   }
 
   return options;
@@ -179,14 +163,14 @@ function buildShadcnTheme(tokens) {
   ].join("\n")}\n`;
 }
 
-function runGenerateShadcnTheme(args) {
+function runGenerateBrandTheme(args) {
   const options = parseOptions(args);
   if (options.help) {
     console.log(usage());
     return;
   }
 
-  const outputPath = path.resolve(process.cwd(), options.out);
+  const outputPath = path.join(packageRoot, "src/themes/brand.css");
   const tokens = JSON.parse(readFileSync(tokensPath, "utf8"));
   const next = buildShadcnTheme(tokens);
 
@@ -195,7 +179,7 @@ function runGenerateShadcnTheme(args) {
 
     if (current !== next) {
       console.error(
-        "Generated shadcn theme is out of date. Run the generator without --check.",
+        "Generated brand theme is out of date. Run pnpm --filter @polity/design generate:theme.",
       );
       process.exit(1);
     }
@@ -215,8 +199,8 @@ try {
     process.exit(0);
   }
 
-  if (command === "generate" && target === "shadcn-theme") {
-    runGenerateShadcnTheme(args);
+  if (command === "generate" && target === "brand-theme") {
+    runGenerateBrandTheme(args);
   } else {
     console.error(usage());
     process.exit(1);

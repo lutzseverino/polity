@@ -1,11 +1,10 @@
 import { Trans } from "@lingui/react/macro";
+import { Dialog, DialogClose, DialogContent } from "@polity/ui/dialog";
+import { Drawer, DrawerContent } from "@polity/ui/drawer";
+import { useIsMobile } from "@polity/ui/use-mobile";
 import { X } from "lucide-react";
 import { type ComponentProps, useEffect, useState } from "react";
-
 import { AppButton } from "@/components/app/AppButton";
-import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { useIsMobile } from "@/components/ui/hooks/use-mobile";
 
 type DialogOpenChangeDetails = Parameters<
   NonNullable<ComponentProps<typeof Dialog>["onOpenChange"]>
@@ -113,5 +112,5 @@ export {
   DialogHeader as AppDialogHeader,
   DialogTitle as AppDialogTitle,
   DialogTrigger as AppDialogTrigger,
-} from "@/components/ui/dialog";
+} from "@polity/ui/dialog";
 export { AppDialog, AppDialogContent };

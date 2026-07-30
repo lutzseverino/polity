@@ -1,18 +1,20 @@
 # App Component Wrappers
 
-This reference is authoritative for wrappers under `src/components/app/` and for access to the
-registry-managed primitives under `src/components/ui/`.
+This reference is authoritative for wrappers under `src/components/app/` and for
+access to shared components from `@polity/ui`.
 
 ## Ownership
 
 | Layer | Responsibility |
 | --- | --- |
-| `src/components/ui/` | Registry-managed primitive implementation; read-only application dependency |
+| `packages/ui/src/components/ui/` | Canonical registry implementation; generated and private to the package |
+| `packages/ui/src/components/app/` | Shared public React surface; direct re-exports or shared-invariant wrappers |
 | `src/components/app/` | Owner-neutral application behavior, semantics, styling conventions, and primitive access boundary |
 | `src/app/`, `src/routes/`, `src/domains/`, `src/features/` | Product composition using app components; no direct registry imports |
 
-Only `src/components/app/` may import from `src/components/ui/`. Updating a registry primitive is a
-registry operation, not an application-wrapper edit.
+Only `src/components/app/` may import public `@polity/ui` component entrypoints.
+Canonical source has no package export. Updating it is a pinned registry operation,
+not an application-wrapper edit.
 
 ## Wrapper Shape
 
@@ -94,7 +96,7 @@ export {
   DialogClose as AppDialogClose,
   DialogTitle as AppDialogTitle,
   DialogTrigger as AppDialogTrigger,
-} from "@/components/ui/dialog";
+} from "@polity/ui/dialog";
 ```
 
 The root adapts the differing dialog and drawer open-change event detail types while forwarding their
@@ -104,7 +106,9 @@ compose `AppDialogClose` directly when needed.
 
 ## Verification
 
-- `pnpm check:architecture` rejects direct registry imports outside `components/app` and
-  `components/ui`, including every product owner.
+- ESLint rejects direct `@polity/ui` imports outside app-owned wrappers.
+- Dependency Cruiser rejects app-to-app imports and upward package dependencies.
+- `pnpm --filter @polity/ui check:registry` rejects canonical source that does
+  not match pinned-CLI provenance.
 - Wrapper tests cover only the behavior added by the wrapper and confirm that the underlying
   composition remains usable.

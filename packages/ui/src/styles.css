@@ -1,0 +1,2 @@
+/* Let Tailwind discover classes owned by the shared UI package. */
+@source "./components/**/*.{ts,tsx}";

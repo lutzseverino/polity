@@ -47,22 +47,6 @@ module.exports = {
       to: { path: "node_modules/@tanstack/react-query/" },
     },
     {
-      name: "ui-components-stay-foundational",
-      severity: "error",
-      comment:
-        "Registry-managed shadcn components may only compose other registry components and low-level helpers.",
-      from: { path: "^src/components/ui/" },
-      to: { path: "^src/(?:app|components/app|domains|features|routes)/" },
-    },
-    {
-      name: "application-code-uses-app-component-wrappers",
-      severity: "error",
-      comment:
-        "Only app-owned component wrappers may import registry-managed shadcn components.",
-      from: { path: "^src/(?!components/(?:app|ui)/)" },
-      to: { path: "^src/components/ui/" },
-    },
-    {
       name: "app-components-stay-owner-neutral",
       severity: "error",
       comment:
@@ -196,6 +180,10 @@ module.exports = {
   ],
   options: {
     ...base.options,
+    doNotFollow: {
+      ...base.options.doNotFollow,
+      path: `${base.options.doNotFollow.path}|^../../packages/ui/`,
+    },
     tsConfig: {
       fileName: "tsconfig.depcruise.json",
     },

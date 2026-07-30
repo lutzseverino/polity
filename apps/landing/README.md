@@ -2,7 +2,9 @@
 
 The landing app is the public front door and onboarding surface for Polity.
 
-It is part of the root workspace and depends on the local `@polity/design` package.
+It is part of the root workspace and consumes the local `@polity/design` and
+`@polity/ui` packages. Its brand theme comes directly from
+`@polity/design/brand.css`; no application-owned generated copy is kept.
 
 ## Development
 

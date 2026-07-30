@@ -1,4 +1,4 @@
 export {
   Avatar as AppAvatar,
   AvatarFallback as AppAvatarFallback,
-} from "@/components/ui/avatar";
+} from "@polity/ui/avatar";

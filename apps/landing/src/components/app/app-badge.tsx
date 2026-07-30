@@ -1,6 +1,6 @@
+import { Badge } from "@polity/ui/badge";
 import { X } from "lucide-react";
 import type { ComponentProps } from "react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppButton } from "./app-button";
 

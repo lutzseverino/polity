@@ -1,1 +1,1 @@
-export { Badge as AppBadge } from "@/components/ui/badge";
+export { Badge as AppBadge } from "@polity/ui/badge";

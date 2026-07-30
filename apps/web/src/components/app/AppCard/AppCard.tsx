@@ -6,4 +6,4 @@ export {
   CardFooter as AppCardFooter,
   CardHeader as AppCardHeader,
   CardTitle as AppCardTitle,
-} from "@/components/ui/card";
+} from "@polity/ui/card";

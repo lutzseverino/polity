@@ -3,4 +3,4 @@ export {
   AlertAction as AppAlertAction,
   AlertDescription as AppAlertDescription,
   AlertTitle as AppAlertTitle,
-} from "@/components/ui/alert";
+} from "@polity/ui/alert";

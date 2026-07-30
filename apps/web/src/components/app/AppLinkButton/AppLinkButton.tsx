@@ -1,8 +1,7 @@
+import { buttonVariants } from "@polity/ui/button";
 import { createLink, type LinkComponent } from "@tanstack/react-router";
 import type { VariantProps } from "class-variance-authority";
 import { type AnchorHTMLAttributes, forwardRef } from "react";
-
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface AppLinkButtonBaseProps

@@ -5,12 +5,12 @@ module.exports = {
   forbidden: [
     ...base.forbidden,
     {
-      name: "landing-does-not-import-mobile",
+      name: "landing-does-not-import-other-apps",
       severity: "error",
       comment:
         "Apps may share code through packages, not by importing from each other.",
       from: { path: "^src/" },
-      to: { path: "^../mobile/" },
+      to: { path: "^../(?:mobile|web)/" },
     },
     {
       name: "landing-uses-design-public-entrypoints",
@@ -31,22 +31,6 @@ module.exports = {
       to: { path: "^src/(?:pages|features|app)/" },
     },
     {
-      name: "ui-components-stay-foundational",
-      severity: "error",
-      comment:
-        "Low-level UI components should stay below app-specific components.",
-      from: { path: "^src/components/ui/" },
-      to: { path: "^src/components/app/" },
-    },
-    {
-      name: "landing-pages-use-app-component-wrappers",
-      severity: "error",
-      comment:
-        "Page code should depend on app component wrappers instead of importing shadcn primitives directly.",
-      from: { path: "^src/(?!components/(?:app|ui)/)" },
-      to: { path: "^src/components/ui/" },
-    },
-    {
       name: "generated-api-stays-behind-api-boundary",
       severity: "error",
       comment:
@@ -59,7 +43,7 @@ module.exports = {
     ...base.options,
     doNotFollow: {
       ...base.options.doNotFollow,
-      path: `${base.options.doNotFollow.path}|^../../packages/design/`,
+      path: `${base.options.doNotFollow.path}|^../../packages/design/|^../../packages/ui/`,
     },
     tsConfig: {
       fileName: "tsconfig.depcruise.json",

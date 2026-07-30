@@ -8,6 +8,7 @@ const tsFiles = [
   "apps/landing/src/**/*.{ts,tsx}",
   "apps/mobile/src/**/*.{ts,tsx}",
   "packages/design/src/**/*.ts",
+  "packages/ui/src/**/*.{ts,tsx}",
 ];
 
 export default [
@@ -18,7 +19,7 @@ export default [
       "**/target/**",
       "apps/landing/src/api/generated/**",
       "apps/web/src/app/i18n/generated/**",
-      "apps/web/src/components/ui/**",
+      "packages/ui/src/components/ui/**",
       "apps/web/src/routeTree.gen.ts",
       "apps/web/public/mockServiceWorker.js",
       "apps/mobile/.expo/**",
@@ -89,6 +90,24 @@ export default [
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
+      ],
+    },
+  },
+  {
+    files: ["apps/{landing,web}/src/**/*.{ts,tsx}"],
+    ignores: ["apps/{landing,web}/src/components/app/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@polity/ui/*"],
+              message:
+                "Application code consumes shared UI through an app-local wrapper so owner-specific invariants stay local.",
+            },
+          ],
+        },
       ],
     },
   },

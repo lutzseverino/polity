@@ -17,7 +17,8 @@ authorization, and billing capabilities provided by [Cardo](https://github.com/l
 | `apps/landing` | Public product site |
 | `apps/web` | React product application |
 | `apps/mobile` | Expo mobile application |
-| `packages/design` | Shared product design system |
+| `packages/design` | Framework-neutral design tokens and browser theme outputs |
+| `packages/ui` | Shared React components and canonical shadcn registry source |
 | `services/polity` | Spring Boot product service and OpenAPI contract |
 | `deploy` | Environment-neutral runtime images and same-origin gateway |
 | `docs` | Repository-level durable documentation |

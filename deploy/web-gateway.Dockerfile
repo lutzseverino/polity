@@ -6,6 +6,8 @@ RUN corepack enable && corepack prepare pnpm@9.12.0 --activate
 WORKDIR /workspace
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
+COPY packages/design packages/design
+COPY packages/ui packages/ui
 RUN pnpm install --frozen-lockfile --filter @polity/web...
 
 COPY apps/web apps/web

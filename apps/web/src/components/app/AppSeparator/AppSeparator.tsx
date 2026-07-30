@@ -1,6 +1,5 @@
+import { Separator } from "@polity/ui/separator";
 import type { ComponentProps } from "react";
-
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type AppSeparatorProps = ComponentProps<typeof Separator> &

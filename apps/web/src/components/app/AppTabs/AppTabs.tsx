@@ -3,4 +3,4 @@ export {
   TabsContent as AppTabsContent,
   TabsList as AppTabsList,
   TabsTrigger as AppTabsTrigger,
-} from "@/components/ui/tabs";
+} from "@polity/ui/tabs";
