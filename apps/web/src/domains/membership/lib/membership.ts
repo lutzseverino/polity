@@ -13,10 +13,7 @@ export type MembershipInvitationTokenContext = Readonly<{
 }>;
 
 export type MembershipInvitationCompletionStatus =
-  | "requested"
-  | "awaiting_identity"
-  | "completed"
-  | "failed";
+  "requested" | "awaiting_identity" | "completed" | "failed";
 
 export type MembershipInvitationCompletion = Readonly<{
   status: MembershipInvitationCompletionStatus;

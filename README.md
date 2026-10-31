@@ -2,8 +2,8 @@
   <h1>Polity</h1>
   <p>Constitutional government software for small groups.</p>
   <p>
-    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178c6" alt="TypeScript 5.9" /></a>
-    <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24-5fa04e" alt="Node.js 24" /></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-7-3178c6" alt="TypeScript 7" /></a>
+    <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24%20%7C%2026-5fa04e" alt="Node.js 24 or 26" /></a>
     <a href="https://openjdk.org/projects/jdk/21/"><img src="https://img.shields.io/badge/Java-21-007396" alt="Java 21" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2f3437" alt="MIT License" /></a>
     <a href="https://github.com/lutzseverino/polity/actions/workflows/ci.yml"><img src="https://github.com/lutzseverino/polity/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>

@@ -20,13 +20,8 @@
   },
   "workspaces": {
     ".": {
-      "entry": [
-        "package.json",
-        "scripts/**/*.mjs",
-        "*.config.{js,cjs,mjs,ts}",
-        ".dependency-cruiser*.cjs"
-      ],
-      "project": ["*.{js,cjs,mjs}", "scripts/**/*.mjs"]
+      "entry": ["package.json", "scripts/**/*.mjs", ".dependency-cruiser*.cjs"],
+      "project": ["scripts/**/*.mjs"]
     },
     "apps/landing": {
       "entry": ["src/App.tsx"],
@@ -46,8 +41,7 @@
     },
     "packages/ui": {
       "entry": ["src/components/app/*.ts", "src/components/ui/**/*.{ts,tsx}"],
-      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
-      "ignoreDependencies": ["shadcn"]
+      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"]
     }
   }
 }

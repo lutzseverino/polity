@@ -1,6 +1,7 @@
 # Polity Landing
 
-The landing app is the public front door and onboarding surface for Polity.
+The landing site is the public front door and onboarding surface for Polity.
+It is built with Vite and belongs to no Repo Canon web stack.
 
 It is part of the root workspace and consumes the local `@polity/design` and
 `@polity/ui` packages. Its brand theme comes directly from

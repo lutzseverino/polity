@@ -27,15 +27,7 @@ const appTextVariants = cva("", {
 });
 
 type TextElement =
-  | "dd"
-  | "div"
-  | "dt"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "p"
-  | "small"
-  | "span";
+  "dd" | "div" | "dt" | "h1" | "h2" | "h3" | "p" | "small" | "span";
 
 type AppTextProps = HTMLAttributes<HTMLElement> &
   VariantProps<typeof appTextVariants> &

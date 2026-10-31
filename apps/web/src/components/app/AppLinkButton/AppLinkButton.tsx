@@ -5,7 +5,8 @@ import { type AnchorHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface AppLinkButtonBaseProps
-  extends AnchorHTMLAttributes<HTMLAnchorElement>,
+  extends
+    AnchorHTMLAttributes<HTMLAnchorElement>,
     VariantProps<typeof buttonVariants> {}
 
 const AppLinkButtonBase = forwardRef<HTMLAnchorElement, AppLinkButtonBaseProps>(

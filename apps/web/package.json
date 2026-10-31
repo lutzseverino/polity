@@ -7,15 +7,18 @@
     "build": "pnpm routes:generate && pnpm i18n:compile && tsc -b && vite build",
     "check:architecture": "depcruise --config dependency-cruiser.cjs src",
     "dev": "vite",
+    "format": "prettier --ignore-path ../../.gitignore --ignore-path ../../.prettierignore --write .",
+    "format:check": "prettier --ignore-path ../../.gitignore --ignore-path ../../.prettierignore --check .",
     "i18n:compile": "lingui compile --typescript",
     "i18n:extract": "lingui extract --clean",
     "i18n:sync": "pnpm i18n:extract && pnpm i18n:compile",
-    "lint": "node ../../scripts/run-package-script.mjs root lint:ts:web",
+    "lint": "oxlint --config ../../.oxlintrc.json --type-aware --deny-warnings .",
     "preview": "vite preview",
     "routes:generate": "tsr generate",
     "test": "vitest",
     "test:run": "vitest run",
-    "typecheck": "pnpm routes:generate && pnpm i18n:compile && tsc -b"
+    "typecheck": "pnpm routes:generate && pnpm i18n:compile && tsc -b",
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:run && pnpm check:architecture && pnpm build"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
@@ -54,8 +57,8 @@
     "babel-plugin-macros": "^3.1.0",
     "jsdom": "^29.1.1",
     "msw": "^2.15.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   },
   "msw": {
     "workerDirectory": [

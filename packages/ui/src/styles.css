@@ -1,2 +1,16 @@
 /* Let Tailwind discover classes owned by the shared UI package. */
 @source "./components/**/*.{ts,tsx}";
+
+/*
+ * Shared effects on generated components, applied through their data-slot
+ * below the utilities layer so application classNames still win.
+ */
+@layer components {
+  /* Used titles keep the theme's heading face. */
+  [data-slot="card-title"],
+  [data-slot="dialog-title"],
+  [data-slot="drawer-title"],
+  [data-slot="empty-title"] {
+    font-family: var(--font-heading);
+  }
+}

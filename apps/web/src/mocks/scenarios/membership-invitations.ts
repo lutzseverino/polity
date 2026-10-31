@@ -1,10 +1,7 @@
 import { HttpResponse, http, type RequestHandler } from "msw";
 
 type CompletionStatus =
-  | "requested"
-  | "awaiting_identity"
-  | "completed"
-  | "failed";
+  "requested" | "awaiting_identity" | "completed" | "failed";
 
 type CompletionState = {
   attemptCount: number;

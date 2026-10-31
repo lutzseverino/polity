@@ -24,11 +24,7 @@ export type PolityActionAvailability = Readonly<{
   readiness: Readonly<{
     diagnostics: readonly Readonly<{ code: string; message: string }>[];
     status:
-      | "blocked"
-      | "disbanded"
-      | "forming_offices"
-      | "provisional"
-      | "ready";
+      "blocked" | "disbanded" | "forming_offices" | "provisional" | "ready";
     statusMessage: string;
   }>;
   requestCertification: ActionAvailability;

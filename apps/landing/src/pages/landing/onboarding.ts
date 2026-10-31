@@ -10,11 +10,7 @@ type SetupPresetCopyKey = "standardConstitutionalCouncilRepublic";
 export type Pace = "fast" | "standard" | "deliberate";
 
 export type OnboardingStep =
-  | "invites"
-  | "pace"
-  | "preset"
-  | "ready"
-  | "visibility";
+  "invites" | "pace" | "preset" | "ready" | "visibility";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type NameError = "nameRequired";

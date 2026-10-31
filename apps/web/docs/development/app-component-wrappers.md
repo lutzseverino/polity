@@ -106,9 +106,9 @@ compose `AppDialogClose` directly when needed.
 
 ## Verification
 
-- ESLint rejects direct `@polity/ui` imports outside app-owned wrappers.
+- oxlint rejects direct `@polity/ui` imports outside app-owned wrappers.
 - Dependency Cruiser rejects app-to-app imports and upward package dependencies.
-- `pnpm --filter @polity/ui check:registry` rejects canonical source that does
-  not match pinned-CLI provenance.
+- `pnpm --filter @polity/ui ui:check` rejects generated source that does
+  not match the pinned-CLI provenance manifest.
 - Wrapper tests cover only the behavior added by the wrapper and confirm that the underlying
   composition remains usable.
