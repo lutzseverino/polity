@@ -3,7 +3,10 @@
 
 from __future__ import annotations
 
+import json
 import os
+from pathlib import Path
+import subprocess
 import re
 import sys
 
@@ -46,6 +49,25 @@ def validate(branch: str, title: str, body: str, author: str) -> list[str]:
 
 
 def main() -> int:
+    # The workflow checks out trusted main. Switch to its installed policy only
+    # after adoption lands; until then preserve the existing required check.
+    if Path(".github/scripts/validate-pr-metadata.mjs").is_file():
+        validator = (
+            'import { validatePullRequestMetadata } from '
+            '"./.github/scripts/validate-pr-metadata.mjs";'
+            'import { readFileSync } from "node:fs";'
+            'process.exitCode = validatePullRequestMetadata('
+            'JSON.parse(readFileSync(0, "utf8")));'
+        )
+        return subprocess.run(
+            ["node", "--input-type=module", "--eval", validator],
+            input=json.dumps({
+                "title": os.environ.get("PR_TITLE", ""),
+                "body": os.environ.get("PR_BODY", ""),
+            }),
+            text=True,
+            check=False,
+        ).returncode
     errors = validate(
         os.environ.get("PR_BRANCH", ""),
         os.environ.get("PR_TITLE", ""),
