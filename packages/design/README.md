@@ -35,3 +35,5 @@ Browser clients consume the checked-in outputs directly:
 ## Documentation
 
 Durable design package docs live in [docs](docs/README.md).
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).

@@ -1,0 +1,1071 @@
+{
+  "format": "repo-standards/lock/v1",
+  "selection": {
+    "cli": {
+      "package": "@lutzseverino/repo-standards",
+      "version": "10.0.0"
+    },
+    "standards": {
+      "repository": "https://github.com/lutzseverino/repo-canon",
+      "version": "v0.20.0",
+      "commit": "007563a66b449bbc150e90ed58b013e7eb89aeed"
+    },
+    "profile": "standard",
+    "platform": "github"
+  },
+  "inspection": "sha256:cb9e2ec45e863a4508692e8b5649448b3fe9a7de01cbbda75ac1d4e9e18ce639",
+  "files": {
+    "docs/agents/README.md": {
+      "sha256": "6d85984e4f6ae21c5d08f58bc37e260e11661beb7da481696483e635d5c9b502",
+      "executable": false
+    },
+    "AGENTS.md": {
+      "sha256": "ddc8a1fecde13610ba656ee98c9d2cb128b15b7fc20e9068beb0eef9eaf4ba1b",
+      "executable": false
+    },
+    ".github/ISSUE_TEMPLATE/bug-report.yml": {
+      "sha256": "5fca3bab67073fdb827cd5eb88d9c413ac1e1df2891a85c7938420dcb1e3dfed",
+      "executable": false
+    },
+    "CONTRIBUTING.md": {
+      "sha256": "aba9cc5949f5e78855ddde0b8fa7c9a07cd2da0b05b5b5a674e24e64d28638ed",
+      "executable": false
+    },
+    "docs/agents/domain.md": {
+      "sha256": "593a7042218689f1d24df89df14eaf0a20e19e0d0a7d479a01947ac78f0784b9",
+      "executable": false
+    },
+    ".github/ISSUE_TEMPLATE/feature-request.yml": {
+      "sha256": "d3df4f5c27dd7b7a22d0baec1a52a1dc3301c002549f8634392a3abd26566505",
+      "executable": false
+    },
+    ".github/scripts/validate.mjs": {
+      "sha256": "bab5f39ee6e1fdb423d90b19dec73b1226ed68ab90a804442a7503e9e9bd6bdc",
+      "executable": false
+    },
+    ".agents/skills/LICENSE.humanlayer-skills": {
+      "sha256": "5f13c18ea00ea5c1384f41745feeca774079164f7f59a92e4ac0899ad217b26f",
+      "executable": false
+    },
+    ".github/ISSUE_TEMPLATE/implementation-ticket.yml": {
+      "sha256": "d452da0ad9e39173f681b699d3848a00ab3466b55be508cc3f36d7731083bff6",
+      "executable": false
+    },
+    "scripts/validate-issue-contract.mjs": {
+      "sha256": "7d831d293ace7d00e43a11a1cdaafebcd866ce7d4b3d0c85e781e8f0d8d940f3",
+      "executable": false
+    },
+    ".github/workflows/issue-contracts.yml": {
+      "sha256": "1734fd905c48e75b80c7a4db7518799c4ae5dbd0eecfef73b6025b0b777ad4f6",
+      "executable": false
+    },
+    "docs/agents/issue-tracker.md": {
+      "sha256": "afd6852a80185217bd28aa5cbe456bef1e85be25be7bd1fba382d5b8ee428325",
+      "executable": false
+    },
+    "vendor/marked/LICENSE": {
+      "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c",
+      "executable": false
+    },
+    "vendor/marked/marked.esm.js": {
+      "sha256": "2e70fea3ee49f98ab67ee395e5af51cc6bee4fafed15910da9ccb7f650df8014",
+      "executable": false
+    },
+    "vendor/marked/README.md": {
+      "sha256": "c1f9e95c649e297b482a842c72814efa04b0277f1a3a3c181e637d949b5bedc7",
+      "executable": false
+    },
+    ".agents/skills/LICENSE.mattpocock-skills": {
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "executable": false
+    },
+    "vendor/parse5/LICENSE.entities": {
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164",
+      "executable": false
+    },
+    "vendor/parse5/LICENSE.parse5": {
+      "sha256": "8c535800331e1e4439835555b3f9edc7fe9dee2fab0d8bbbd5a982e8b8343d4d",
+      "executable": false
+    },
+    "vendor/parse5/parse5.esm.js": {
+      "sha256": "bdf861eb0bce411afe5fcc312c770c3fe18dac9b5296771d40217d52a6ae7a93",
+      "executable": false
+    },
+    "vendor/parse5/README.md": {
+      "sha256": "bb5904a74bace3cfbcf0f7f817f2a3f808a21f4d60c1b1b118e1464d6d096855",
+      "executable": false
+    },
+    "vendor/postern/postern.mjs": {
+      "sha256": "5203c7e825a065c33aaa02ea4b6dbe776704ccd55b220aee75eb82427a8b83d5",
+      "executable": false
+    },
+    "vendor/postern/LICENSE": {
+      "sha256": "a4b5f0efcfeb828c1b344150f3c93af8031174df6147219e00b6a0bd995db6ef",
+      "executable": false
+    },
+    "vendor/postern/README.md": {
+      "sha256": "08844d40cc709ee193871cefb2d92aed29c26f3e08654458ff6621f9b2715fe8",
+      "executable": false
+    },
+    ".github/scripts/validate-pr-metadata.mjs": {
+      "sha256": "386c3a830876da63e16d9e6591d2a0a4c56d57af10f4422c5240c0e3dde71f12",
+      "executable": false
+    },
+    ".github/workflows/pr-metadata.yml": {
+      "sha256": "4b39ef848f5aaf887d0fa2f4e154534b247318fe8b81b413baca2a58b0122dc1",
+      "executable": false
+    },
+    ".github/PULL_REQUEST_TEMPLATE.md": {
+      "sha256": "7dcc5881eef1c342a08519750b9beae700f4620d1fdf23c2eb0d9b2dfaec5fd0",
+      "executable": false
+    },
+    "operations/lib/rendered-markdown.mjs": {
+      "sha256": "b89f24c60f8ad3ad1ed45590629e87661337931e858b84acfac5296a057430c2",
+      "executable": false
+    },
+    ".agents/skills/babysit/SKILL.md": {
+      "sha256": "423fa02e5b9af190bead06d2875f53e4b33bce0ac331e7c48696d8d65132890e",
+      "executable": false
+    },
+    ".agents/skills/babysit/merge.mjs": {
+      "sha256": "5a85197626db69f130cc45d889b363e89cdd29c655ce9f2edcffd7d90c34f1da",
+      "executable": false
+    },
+    ".agents/skills/babysit/platform.mjs": {
+      "sha256": "fc6fdbf5129dea3335ea340882806d7e9ee908f8b4dc72d10873c7637efc1fe3",
+      "executable": false
+    },
+    ".agents/skills/babysit/pull-request-reviewer.mjs": {
+      "sha256": "2d9a9c62876ac00ef87ad820c5dbb2fbcd852aa6590273875d445d99fe21eb49",
+      "executable": false
+    },
+    ".agents/skills/babysit/request.mjs": {
+      "sha256": "54760df3ef658781331b776b141d3992315cc304b6fb4bbc5103b11cc7175ca6",
+      "executable": false
+    },
+    ".agents/skills/babysit/review-policy.mjs": {
+      "sha256": "71d74c31b19e16e066ce58106443b34a6de727c6aa46e171deb1e4069bc03f1c",
+      "executable": false
+    },
+    ".agents/skills/babysit/reviewer.mjs": {
+      "sha256": "580098ac88a2be873d271dd7107cfcb8b0ab1ab059ccb39236f73e4f4eec3508",
+      "executable": false
+    },
+    ".agents/skills/babysit/trusted-review-config.mjs": {
+      "sha256": "f79d0065bffff1a8f5308cc769a730ff1b875db4e66761161ee16aaf6d6a19d4",
+      "executable": false
+    },
+    ".agents/skills/babysit/wait.mjs": {
+      "sha256": "22d2988b5424888821cb54245a3cc7a8a8490dde655a6f756ac73e5d0e07ea93",
+      "executable": false
+    },
+    ".agents/skills/code-review/SKILL.md": {
+      "sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50",
+      "executable": false
+    },
+    ".agents/skills/code-review/agents/openai.yaml": {
+      "sha256": "8229ca854e11dc8e6aef2131ee03f31fb1561cf905fab9ccc325180cf3331352",
+      "executable": false
+    },
+    ".agents/skills/codebase-design/DEEPENING.md": {
+      "sha256": "f3dd099ce99289bd213914d8ee3e2429b78309c3957ca4583f7659551b1d53c1",
+      "executable": false
+    },
+    ".agents/skills/codebase-design/DESIGN-IT-TWICE.md": {
+      "sha256": "52b52e75655a27aea59c6966b410bac82448968ad46ef1ebb9f07c274e3ae010",
+      "executable": false
+    },
+    ".agents/skills/codebase-design/SKILL.md": {
+      "sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+      "executable": false
+    },
+    ".agents/skills/codebase-design/agents/openai.yaml": {
+      "sha256": "edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f",
+      "executable": false
+    },
+    ".agents/skills/diagnosing-bugs/SKILL.md": {
+      "sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+      "executable": false
+    },
+    ".agents/skills/diagnosing-bugs/agents/openai.yaml": {
+      "sha256": "3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b",
+      "executable": false
+    },
+    ".agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh": {
+      "sha256": "35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503",
+      "executable": false
+    },
+    ".agents/skills/domain-modeling/ADR-FORMAT.md": {
+      "sha256": "944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0",
+      "executable": false
+    },
+    ".agents/skills/domain-modeling/GLOSSARY-FORMAT.md": {
+      "sha256": "21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801",
+      "executable": false
+    },
+    ".agents/skills/domain-modeling/SKILL.md": {
+      "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3",
+      "executable": false
+    },
+    ".agents/skills/domain-modeling/agents/openai.yaml": {
+      "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b",
+      "executable": false
+    },
+    ".agents/skills/grill-with-docs/SKILL.md": {
+      "sha256": "7de372c13488f1ee96cc11cd8907b56b6809cc93eef776eeddd37de6b6cbe3fe",
+      "executable": false
+    },
+    ".agents/skills/grill-with-docs/agents/openai.yaml": {
+      "sha256": "94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9",
+      "executable": false
+    },
+    ".agents/skills/grilling/SKILL.md": {
+      "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2",
+      "executable": false
+    },
+    ".agents/skills/grilling/agents/openai.yaml": {
+      "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b",
+      "executable": false
+    },
+    ".agents/skills/implement/SKILL.md": {
+      "sha256": "6d3fd9e83b8f36e5213854779db49b256a457a7ebb4a503e53fa7dcff696adc3",
+      "executable": false
+    },
+    ".agents/skills/implement/agents/openai.yaml": {
+      "sha256": "8970a8596ade0c28ab427f41a4ea242d6bdf6186c59ebf55e1238dbecaab79dc",
+      "executable": false
+    },
+    ".agents/skills/improve-codebase-architecture/HTML-REPORT.md": {
+      "sha256": "581e8bb5a521e46bbda8ca7e19b15948bed882187108092ebb90c62513b77528",
+      "executable": false
+    },
+    ".agents/skills/improve-codebase-architecture/SKILL.md": {
+      "sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "executable": false
+    },
+    ".agents/skills/improve-codebase-architecture/agents/openai.yaml": {
+      "sha256": "c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1",
+      "executable": false
+    },
+    ".agents/skills/orchestrate/CREDITS.md": {
+      "sha256": "2761d0a558ac5fb535af4933b813a4deb40bc3849937deb01441a0e56a994dfd",
+      "executable": false
+    },
+    ".agents/skills/orchestrate/SKILL.md": {
+      "sha256": "6b1fd3940665674ce19352f256054641a1c663b412d88a45dafca3bcd51b1043",
+      "executable": false
+    },
+    ".agents/skills/orchestrate/agents/openai.yaml": {
+      "sha256": "8fa9f8f0710336e9e9a32915436647c3f5c3bfa9a2acdbdcaf613daba800bf6c",
+      "executable": false
+    },
+    ".agents/skills/orchestrate/wait.mjs": {
+      "sha256": "3dff1616c2b4ba3dd481584a71852732f9fadf52d31a58ed4223b611e7cf17e9",
+      "executable": false
+    },
+    ".agents/skills/pr/CREDITS.md": {
+      "sha256": "a7a087127665d7298a72280ef6e19c41ad8404523712a788c8dc3ab414bc2497",
+      "executable": false
+    },
+    ".agents/skills/pr/SKILL.md": {
+      "sha256": "ab63f1cf78647389edcd386c9427c5dfca27ed2836930c24773ffee834c19bcd",
+      "executable": false
+    },
+    ".agents/skills/pr/agents/openai.yaml": {
+      "sha256": "2295b586624db4ef546f3fd4695492f039d941a46d8a1593a702ce3ca511b8ad",
+      "executable": false
+    },
+    ".agents/skills/prototype/LOGIC.md": {
+      "sha256": "f61c7d249e786a79ef289018901c348271e1798dd0b0bc5607b5c6f4d4a01ab9",
+      "executable": false
+    },
+    ".agents/skills/prototype/SKILL.md": {
+      "sha256": "714de632d116bb73f65cdb5a882db15b9369a6713b9a47c0fad827848f0bfbe3",
+      "executable": false
+    },
+    ".agents/skills/prototype/UI.md": {
+      "sha256": "723211e878acbc7b6ff09755263f3295cde724ba902ff0064da41eed51d45ad3",
+      "executable": false
+    },
+    ".agents/skills/prototype/agents/openai.yaml": {
+      "sha256": "5af65e43ab41a350436697b81e27b7f848d36782043b73c322bb2c9fa9cc55dc",
+      "executable": false
+    },
+    ".agents/skills/research/SKILL.md": {
+      "sha256": "985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4",
+      "executable": false
+    },
+    ".agents/skills/research/agents/openai.yaml": {
+      "sha256": "9b4c470d63221c1f68f22df70b83e2f12401b317babe0d1b7b5f24a974474d0d",
+      "executable": false
+    },
+    ".agents/skills/tdd/SKILL.md": {
+      "sha256": "93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc",
+      "executable": false
+    },
+    ".agents/skills/tdd/agents/openai.yaml": {
+      "sha256": "ea6f01cf1b8c06a4b0f5b649d74b1b8ce8685e72af1b38d70d877693e092af0b",
+      "executable": false
+    },
+    ".agents/skills/tdd/mocking.md": {
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "executable": false
+    },
+    ".agents/skills/tdd/tests.md": {
+      "sha256": "859f9e592c188fda4fc7277dd180e4ce9c7a2e13f6efe1f6f29eccc9d28c106a",
+      "executable": false
+    },
+    ".agents/skills/to-spec/SKILL.md": {
+      "sha256": "43ad9cf318e5e7d3d1fa360253a37021796dc87a0c2e595ad262661a10f85088",
+      "executable": false
+    },
+    ".agents/skills/to-spec/agents/openai.yaml": {
+      "sha256": "1c5b4d1e3d8e52287ef19cc2742fdbbfae1914ac75d33af3e4c8174f08cc55bb",
+      "executable": false
+    },
+    ".agents/skills/to-tickets/SKILL.md": {
+      "sha256": "5c9fba69845c2519b9b35b9af42ae5142c21f8ca15ac2123dc2722002c8058ae",
+      "executable": false
+    },
+    ".agents/skills/to-tickets/agents/openai.yaml": {
+      "sha256": "21bc6215fffcd7614e9f772bb1760e87cc5fc7dcc707e7d282bc9414267a6090",
+      "executable": false
+    },
+    ".agents/skills/triage/AGENT-BRIEF.md": {
+      "sha256": "846e20148f152a7bba0b32e780bb01532fd88857a3556ce7f0e920b3d64c5349",
+      "executable": false
+    },
+    ".agents/skills/triage/CREDITS.md": {
+      "sha256": "b5c9d6514746fdfa842447874c09b9b49bf575b8e258f6d7b36280df76be1320",
+      "executable": false
+    },
+    ".agents/skills/triage/OUT-OF-SCOPE.md": {
+      "sha256": "1fbf9b432130c6380aa65813b55553cfda150309b27c595e183f8e335b8a190d",
+      "executable": false
+    },
+    ".agents/skills/triage/SKILL.md": {
+      "sha256": "2e12b157ddc6f2cdd2da182c2c7b7843e88d9942e0795fc010193c60f6bbc2a4",
+      "executable": false
+    },
+    ".agents/skills/triage/agents/openai.yaml": {
+      "sha256": "2e683717720cf456d165d0bb1a68bb600d0b6a8ccb61841c172e50d26f95351c",
+      "executable": false
+    },
+    ".agents/skills/triage/ready.mjs": {
+      "sha256": "a471017ec0a7cf3e5c44753a04f5886e14d22b23667a8b739fc3544ee690dafb",
+      "executable": false
+    },
+    ".agents/skills/wayfinder/SKILL.md": {
+      "sha256": "fee6e1d0c50f0e736b4ef8a599060c959afae904c9a97d82c97f049fcc3aa0f1",
+      "executable": false
+    },
+    ".agents/skills/wayfinder/agents/openai.yaml": {
+      "sha256": "88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073",
+      "executable": false
+    },
+    ".agents/skills/writing-for-agents/SKILL-MECHANICS.md": {
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+      "executable": false
+    },
+    ".agents/skills/writing-for-agents/SKILL.md": {
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "executable": false
+    },
+    ".agents/skills/writing-for-agents/agents/openai.yaml": {
+      "sha256": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+      "executable": false
+    },
+    ".github/ISSUE_TEMPLATE/specification.yml": {
+      "sha256": "77b6359750ff03695a1dc19ee121e664787f4a6954cd9847277ab40fb6b22dfd",
+      "executable": false
+    },
+    ".github/workflows/standards-update.yml": {
+      "sha256": "0a83bd932b528b37f817acfeae56cfc35728a95ecd373e868bc8dceecfbb1226",
+      "executable": false
+    },
+    "docs/agents/triage-labels.md": {
+      "sha256": "4f53c9b40ce2651e3611aa090eaedbd6dbc9b71ef8c5f7e65eac0d8263190d0d",
+      "executable": false
+    },
+    "scripts/validate.mjs": {
+      "sha256": "daeedb8713e64e0334ede3825297ec6338a85ee8051c0dc0385f5533373ecc32",
+      "executable": false
+    },
+    ".agents/skills/repository-standards/SKILL.md": {
+      "sha256": "4e331d32a27f003027cfbcfce376f49c8e0743142dc6cd653fe7e31052f61450",
+      "executable": false
+    },
+    ".agents/skills/repository-standards/agents/openai.yaml": {
+      "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/docs/agents/README.md": {
+      "sha256": "6d85984e4f6ae21c5d08f58bc37e260e11661beb7da481696483e635d5c9b502",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/AGENTS.md": {
+      "sha256": "ddc8a1fecde13610ba656ee98c9d2cb128b15b7fc20e9068beb0eef9eaf4ba1b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/ISSUE_TEMPLATE/bug-report.yml": {
+      "sha256": "5fca3bab67073fdb827cd5eb88d9c413ac1e1df2891a85c7938420dcb1e3dfed",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/CONTRIBUTING.md": {
+      "sha256": "aba9cc5949f5e78855ddde0b8fa7c9a07cd2da0b05b5b5a674e24e64d28638ed",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/documentation.md": {
+      "sha256": "ca2acd62c45a95040246c8b1926df9f31bf7abf40964a9d80b82c418fded91b9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/documentation.md": {
+      "sha256": "6ddffc023dfc46f7d11f292a245f8b9ffeffb77dff2f102baa20256af1dc8bfc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/documentation.md": {
+      "sha256": "33f5c3535f18ccf34e0222597fdee045ead0432c100e92ecaeef89c84b425a3b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-documentation.mjs": {
+      "sha256": "dd94d2363cbe9055ddaeea21912832493910c30fec77957bdab9747b13ac194b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/rendered-markdown.mjs": {
+      "sha256": "b89f24c60f8ad3ad1ed45590629e87661337931e858b84acfac5296a057430c2",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/local-markdown-links.mjs": {
+      "sha256": "e9b25e6a81c6f40ac8a18358e001619dcf50d7b61f4b9bb2c1f2fd3323539260",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/documentation-model.mjs": {
+      "sha256": "1ae87720d4d4f6f44937e16aa6dd09b32b79e4b0bd6decbab9c20ad268327cc8",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/entry-document.mjs": {
+      "sha256": "e6cc26f432c535a5fb8c221c71ed7f69d02ae4ff7a597d87542ec9db0f647a99",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/marked/LICENSE": {
+      "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/marked/README.md": {
+      "sha256": "c1f9e95c649e297b482a842c72814efa04b0277f1a3a3c181e637d949b5bedc7",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/marked/marked.esm.js": {
+      "sha256": "2e70fea3ee49f98ab67ee395e5af51cc6bee4fafed15910da9ccb7f650df8014",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/parse5/LICENSE.entities": {
+      "sha256": "cb992345949ccd6e8394b2cd6c465f7b897c864f845937dbf64e8997f389e164",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/parse5/LICENSE.parse5": {
+      "sha256": "8c535800331e1e4439835555b3f9edc7fe9dee2fab0d8bbbd5a982e8b8343d4d",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/parse5/README.md": {
+      "sha256": "bb5904a74bace3cfbcf0f7f817f2a3f808a21f4d60c1b1b118e1464d6d096855",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/parse5/parse5.esm.js": {
+      "sha256": "bdf861eb0bce411afe5fcc312c770c3fe18dac9b5296771d40217d52a6ae7a93",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/draft-documentation-scope.mjs": {
+      "sha256": "f7de66d06701c80b1cc84aef832bbca9f26bf44f3e12997c3bdf380ed2a99bf3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/standards.yaml": {
+      "sha256": "7651d1e381ac1631bfaafb61781c02ba583eee02ebc003963f44ee642a2589ae",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/domain.md": {
+      "sha256": "593a7042218689f1d24df89df14eaf0a20e19e0d0a7d479a01947ac78f0784b9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/ISSUE_TEMPLATE/feature-request.yml": {
+      "sha256": "d3df4f5c27dd7b7a22d0baec1a52a1dc3301c002549f8634392a3abd26566505",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/git-attributes.md": {
+      "sha256": "f8a1e086be79d51a857eed32f8a308eb5ae395559c5f459f7d6eac723da1d8ed",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/git-attributes.md": {
+      "sha256": "ce8397df1a7819e7d8af6b65f48686f6cc0d798c361734b00535fbd60f292dcd",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/github-repository-configuration.md": {
+      "sha256": "76ebea34ed679435d8d1d4c56f2c7f3dd0dd285a152e4d47203a9c03caa145eb",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/github-repository-configuration.md": {
+      "sha256": "05f27e38f22870239eac4f15f63d9ff758c87ff3c8c5098dc7b8cd66a5685616",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/github-repository-configuration.md": {
+      "sha256": "af92edb138cd5e7ff7b86263e07493675a931ee9c6f2ef7fcf90405c0e4b9a63",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/setup-github-labels.mjs": {
+      "sha256": "16ff393e6a8c3ebe63625b0aaaeae51978d8abe84c9f0d40eec30a77a860eeb5",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/github-operation.mjs": {
+      "sha256": "67bb3a2a267d1375e747f8d2646489a2579db6e5d68b8f1de62864d4c9c56d76",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/postern/postern.mjs": {
+      "sha256": "5203c7e825a065c33aaa02ea4b6dbe776704ccd55b220aee75eb82427a8b83d5",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/postern/LICENSE": {
+      "sha256": "a4b5f0efcfeb828c1b344150f3c93af8031174df6147219e00b6a0bd995db6ef",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/postern/README.md": {
+      "sha256": "08844d40cc709ee193871cefb2d92aed29c26f3e08654458ff6621f9b2715fe8",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/LICENSE": {
+      "sha256": "c5bc99cbf0340755fec02d57c955e76b591ce83e5b4cb323a54038f4cd4152b4",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/THIRD_PARTY_NOTICES.md": {
+      "sha256": "f89e88deaa03261a988d265884c8126adc93353dd1f483a9b5694c330d9f0f54",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/LICENSE": {
+      "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/humanlayer-skills/LICENSE": {
+      "sha256": "5f13c18ea00ea5c1384f41745feeca774079164f7f59a92e4ac0899ad217b26f",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/setup-github-pr-integration.mjs": {
+      "sha256": "64952c4ff79e6ca79044cd88dad71bf5ac3193b2e7c9b30051e83600e8aa7b79",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-pull-request-reviewer.mjs": {
+      "sha256": "5f7d063e56c1c3a3769bd6eabffc2c263eb624c8b56fa11e97ac4c806ef8842c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/pull-request-reviewer.mjs": {
+      "sha256": "2d9a9c62876ac00ef87ad820c5dbb2fbcd852aa6590273875d445d99fe21eb49",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-factory-review-policy.mjs": {
+      "sha256": "cb0515861be691db8fbd130661ab008e46b588e614ede31c19cac57ecf3b571f",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/review-policy.mjs": {
+      "sha256": "71d74c31b19e16e066ce58106443b34a6de727c6aa46e171deb1e4069bc03f1c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/probe-github-labels.mjs": {
+      "sha256": "74ac0c289163e63227a82c265db199a14d938af14842478937e6633375380d5d",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/probe-github-pr-integration.mjs": {
+      "sha256": "040f30b5e37a8e74d0c336fc45eab41bb1f6b9b730ec2558ffba1638bdea0021",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/scripts/validate.mjs": {
+      "sha256": "bab5f39ee6e1fdb423d90b19dec73b1226ed68ab90a804442a7503e9e9bd6bdc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/ISSUE_TEMPLATE/implementation-ticket.yml": {
+      "sha256": "d452da0ad9e39173f681b699d3848a00ab3466b55be508cc3f36d7731083bff6",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/scripts/validate-issue-contract.mjs": {
+      "sha256": "7d831d293ace7d00e43a11a1cdaafebcd866ce7d4b3d0c85e781e8f0d8d940f3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/workflows/issue-contracts.yml": {
+      "sha256": "1734fd905c48e75b80c7a4db7518799c4ae5dbd0eecfef73b6025b0b777ad4f6",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md": {
+      "sha256": "afd6852a80185217bd28aa5cbe456bef1e85be25be7bd1fba382d5b8ee428325",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/scripts/validate-pr-metadata.mjs": {
+      "sha256": "386c3a830876da63e16d9e6591d2a0a4c56d57af10f4422c5240c0e3dde71f12",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/workflows/pr-metadata.yml": {
+      "sha256": "4b39ef848f5aaf887d0fa2f4e154534b247318fe8b81b413baca2a58b0122dc1",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/project-agent-guidance.md": {
+      "sha256": "a9b5d6992502122dc0d07f803e3fc09cf67cc083266675224fd3596544d93523",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/project-agent-guidance.md": {
+      "sha256": "d28524380c291296b805f43440d09b437bc60edd390068bfbf552cdb8b982a25",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/project-readmes.md": {
+      "sha256": "e6c55b50d66da64ecf0c73ff3cc5d1b8aed203e6027e9f7be770f158121516a2",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/project-readmes.md": {
+      "sha256": "a2cf9e7206712b7b169ebcf901d40ded7fa655100b3afbcf825296e46291b47a",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/project-readmes.md": {
+      "sha256": "6cc1cbca7a629ab74c4e93b83f400cade77159aeb1bd2502463eafedb63a24fc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-project-readmes.mjs": {
+      "sha256": "8d5c36182e5fd10d480ae82e84f67c82503968f0c12878c7f89657ae3a525df3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/PULL_REQUEST_TEMPLATE.md": {
+      "sha256": "7dcc5881eef1c342a08519750b9beae700f4620d1fdf23c2eb0d9b2dfaec5fd0",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/repository-license.md": {
+      "sha256": "c75496d1c60799ed5a42c10edd021e869190bc5378d971f1af7c3698c8af3470",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/repository-license.md": {
+      "sha256": "0cae423be028b626f046212c2c7d6432a26ea454fa9917f8b37acdcf8601af2a",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/repository-readme.md": {
+      "sha256": "09b750528cfcc32169b560c991199e798f435535c1e33fb5bbd711a1cf1a01b7",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/repository-readme.md": {
+      "sha256": "2965277f0a8436f69dbeb1573dc2c905e519229ab38a26cda2599a0f11233952",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-repository-readme.mjs": {
+      "sha256": "b1573c921f01821b38269c6c1dc57eb8f427846ef0e0f4c3a5def7126df3a390",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/SKILL.md": {
+      "sha256": "423fa02e5b9af190bead06d2875f53e4b33bce0ac331e7c48696d8d65132890e",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/merge.mjs": {
+      "sha256": "5a85197626db69f130cc45d889b363e89cdd29c655ce9f2edcffd7d90c34f1da",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/platform.mjs": {
+      "sha256": "fc6fdbf5129dea3335ea340882806d7e9ee908f8b4dc72d10873c7637efc1fe3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/pull-request-reviewer.mjs": {
+      "sha256": "2d9a9c62876ac00ef87ad820c5dbb2fbcd852aa6590273875d445d99fe21eb49",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/request.mjs": {
+      "sha256": "54760df3ef658781331b776b141d3992315cc304b6fb4bbc5103b11cc7175ca6",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/review-policy.mjs": {
+      "sha256": "71d74c31b19e16e066ce58106443b34a6de727c6aa46e171deb1e4069bc03f1c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/reviewer.mjs": {
+      "sha256": "580098ac88a2be873d271dd7107cfcb8b0ab1ab059ccb39236f73e4f4eec3508",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/trusted-review-config.mjs": {
+      "sha256": "f79d0065bffff1a8f5308cc769a730ff1b875db4e66761161ee16aaf6d6a19d4",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/babysit/wait.mjs": {
+      "sha256": "22d2988b5424888821cb54245a3cc7a8a8490dde655a6f756ac73e5d0e07ea93",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/code-review/SKILL.md": {
+      "sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/code-review/agents/openai.yaml": {
+      "sha256": "8229ca854e11dc8e6aef2131ee03f31fb1561cf905fab9ccc325180cf3331352",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/codebase-design/DEEPENING.md": {
+      "sha256": "f3dd099ce99289bd213914d8ee3e2429b78309c3957ca4583f7659551b1d53c1",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/codebase-design/DESIGN-IT-TWICE.md": {
+      "sha256": "52b52e75655a27aea59c6966b410bac82448968ad46ef1ebb9f07c274e3ae010",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/codebase-design/SKILL.md": {
+      "sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/codebase-design/agents/openai.yaml": {
+      "sha256": "edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/diagnosing-bugs/SKILL.md": {
+      "sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/diagnosing-bugs/agents/openai.yaml": {
+      "sha256": "3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh": {
+      "sha256": "35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/domain-modeling/ADR-FORMAT.md": {
+      "sha256": "944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/domain-modeling/GLOSSARY-FORMAT.md": {
+      "sha256": "21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/domain-modeling/SKILL.md": {
+      "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/domain-modeling/agents/openai.yaml": {
+      "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/grill-with-docs/SKILL.md": {
+      "sha256": "7de372c13488f1ee96cc11cd8907b56b6809cc93eef776eeddd37de6b6cbe3fe",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/grill-with-docs/agents/openai.yaml": {
+      "sha256": "94cd0ab161fb468a836349f5ed482ba58ce8e709a05c57ce533d739dbd35cca9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/productivity/grilling/SKILL.md": {
+      "sha256": "10ff989e7498b23b5acb49d5048f11dcd906757d2f79c5cdf8a00001381296f2",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/productivity/grilling/agents/openai.yaml": {
+      "sha256": "1411d7df7d99b7e621a1ff8283c8133cc2464be63d064e52d8ce169c6800ee9b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/implement/SKILL.md": {
+      "sha256": "6d3fd9e83b8f36e5213854779db49b256a457a7ebb4a503e53fa7dcff696adc3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/implement/agents/openai.yaml": {
+      "sha256": "8970a8596ade0c28ab427f41a4ea242d6bdf6186c59ebf55e1238dbecaab79dc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/improve-codebase-architecture/HTML-REPORT.md": {
+      "sha256": "581e8bb5a521e46bbda8ca7e19b15948bed882187108092ebb90c62513b77528",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/improve-codebase-architecture/SKILL.md": {
+      "sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/improve-codebase-architecture/agents/openai.yaml": {
+      "sha256": "c8cb20f68ebf0edb4e497bc11ae5fcaa196004e661cd189015b04f4109ced7f1",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/orchestrate/CREDITS.md": {
+      "sha256": "2761d0a558ac5fb535af4933b813a4deb40bc3849937deb01441a0e56a994dfd",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/orchestrate/SKILL.md": {
+      "sha256": "6b1fd3940665674ce19352f256054641a1c663b412d88a45dafca3bcd51b1043",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/orchestrate/agents/openai.yaml": {
+      "sha256": "8fa9f8f0710336e9e9a32915436647c3f5c3bfa9a2acdbdcaf613daba800bf6c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/orchestrate/wait.mjs": {
+      "sha256": "3dff1616c2b4ba3dd481584a71852732f9fadf52d31a58ed4223b611e7cf17e9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/pr/CREDITS.md": {
+      "sha256": "a7a087127665d7298a72280ef6e19c41ad8404523712a788c8dc3ab414bc2497",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/pr/SKILL.md": {
+      "sha256": "ab63f1cf78647389edcd386c9427c5dfca27ed2836930c24773ffee834c19bcd",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/pr/agents/openai.yaml": {
+      "sha256": "2295b586624db4ef546f3fd4695492f039d941a46d8a1593a702ce3ca511b8ad",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/prototype/LOGIC.md": {
+      "sha256": "f61c7d249e786a79ef289018901c348271e1798dd0b0bc5607b5c6f4d4a01ab9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/prototype/SKILL.md": {
+      "sha256": "714de632d116bb73f65cdb5a882db15b9369a6713b9a47c0fad827848f0bfbe3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/prototype/UI.md": {
+      "sha256": "723211e878acbc7b6ff09755263f3295cde724ba902ff0064da41eed51d45ad3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/prototype/agents/openai.yaml": {
+      "sha256": "5af65e43ab41a350436697b81e27b7f848d36782043b73c322bb2c9fa9cc55dc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/research/SKILL.md": {
+      "sha256": "985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/research/agents/openai.yaml": {
+      "sha256": "9b4c470d63221c1f68f22df70b83e2f12401b317babe0d1b7b5f24a974474d0d",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/tdd/SKILL.md": {
+      "sha256": "93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/tdd/agents/openai.yaml": {
+      "sha256": "ea6f01cf1b8c06a4b0f5b649d74b1b8ce8685e72af1b38d70d877693e092af0b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/tdd/mocking.md": {
+      "sha256": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/tdd/tests.md": {
+      "sha256": "859f9e592c188fda4fc7277dd180e4ce9c7a2e13f6efe1f6f29eccc9d28c106a",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/to-spec/SKILL.md": {
+      "sha256": "43ad9cf318e5e7d3d1fa360253a37021796dc87a0c2e595ad262661a10f85088",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/to-spec/agents/openai.yaml": {
+      "sha256": "1c5b4d1e3d8e52287ef19cc2742fdbbfae1914ac75d33af3e4c8174f08cc55bb",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/to-tickets/SKILL.md": {
+      "sha256": "5c9fba69845c2519b9b35b9af42ae5142c21f8ca15ac2123dc2722002c8058ae",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/to-tickets/agents/openai.yaml": {
+      "sha256": "21bc6215fffcd7614e9f772bb1760e87cc5fc7dcc707e7d282bc9414267a6090",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/AGENT-BRIEF.md": {
+      "sha256": "846e20148f152a7bba0b32e780bb01532fd88857a3556ce7f0e920b3d64c5349",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/CREDITS.md": {
+      "sha256": "b5c9d6514746fdfa842447874c09b9b49bf575b8e258f6d7b36280df76be1320",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/OUT-OF-SCOPE.md": {
+      "sha256": "1fbf9b432130c6380aa65813b55553cfda150309b27c595e183f8e335b8a190d",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/SKILL.md": {
+      "sha256": "2e12b157ddc6f2cdd2da182c2c7b7843e88d9942e0795fc010193c60f6bbc2a4",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/agents/openai.yaml": {
+      "sha256": "2e683717720cf456d165d0bb1a68bb600d0b6a8ccb61841c172e50d26f95351c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.agents/skills/triage/ready.mjs": {
+      "sha256": "a471017ec0a7cf3e5c44753a04f5886e14d22b23667a8b739fc3544ee690dafb",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/wayfinder/SKILL.md": {
+      "sha256": "fee6e1d0c50f0e736b4ef8a599060c959afae904c9a97d82c97f049fcc3aa0f1",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/wayfinder/agents/openai.yaml": {
+      "sha256": "88bc81a11a6d52ac67aeaa76b8b619e387020d47c5133a4dd4927fd15c4ad073",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/productivity/writing-for-agents/SKILL-MECHANICS.md": {
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/productivity/writing-for-agents/SKILL.md": {
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/productivity/writing-for-agents/agents/openai.yaml": {
+      "sha256": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/ISSUE_TEMPLATE/specification.yml": {
+      "sha256": "77b6359750ff03695a1dc19ee121e664787f4a6954cd9847277ab40fb6b22dfd",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/.github/workflows/standards-update.yml": {
+      "sha256": "0a83bd932b528b37f817acfeae56cfc35728a95ecd373e868bc8dceecfbb1226",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/triage-labels.md": {
+      "sha256": "4f53c9b40ce2651e3611aa090eaedbd6dbc9b71ef8c5f7e65eac0d8263190d0d",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/typescript-astro-stack.md": {
+      "sha256": "ca192cf5081f79e58dfb24f965c4d65603091a1fa57e0c4a9da35d2f3a4e379e",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/typescript-astro-stack.md": {
+      "sha256": "2c41b18bc7757bc2f6b4f26cdebec67f8c9c70b25ac636562a27843d8ba4c615",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/typescript-web-stacks.md": {
+      "sha256": "ef7f2b9a05d59cb8dda6ca41e58a4b09c841f117f592c678473c83894fc0910f",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-typescript-astro-stack.mjs": {
+      "sha256": "b2681ce56e56b8dc7ef21546aecf3fb49fb8ee3744fc55e3b664e432bef228eb",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/typescript-node-stack.mjs": {
+      "sha256": "686e712336ca1ecb0828e23df7bc6ec7f7359c970ab016ded58908c5eabd6e83",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/stack-files.mjs": {
+      "sha256": "551c6321edc4dd6ae69b4576894aca255190c633e5e975ef7745a5340ab23e9a",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/typescript-web-stack.mjs": {
+      "sha256": "704b1b949dc40f4df0013fec2a5d80dc78160981cd49ea9feaea054c442a535e",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/stack-check.mjs": {
+      "sha256": "49f3cef11e29e96b21721f8366d40b4fb22eee386416b65641dd508f7340d2c3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/draft-typescript-astro-stack-scope.mjs": {
+      "sha256": "fdd888464dd448cc1432ba61fd304a710f7268c75ae31a71de4ea5185d698b28",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/lib/stack-scope.mjs": {
+      "sha256": "ff2e8afcc994c77f94dc16d6c28fbd37940544674c309bd6acc34d2715e00ad9",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/typescript-node-stack.md": {
+      "sha256": "dc4a56fc443bd9e76fc753de632e4318cee6294c71422cdfb79d208a2ecda25c",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/typescript-node-stack.md": {
+      "sha256": "d23ae9513f022862a8be9be8d8ca30ced7ed8febef21a27ab3b3e34cbfeba937",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/rules/typescript-node-stack.md": {
+      "sha256": "445cd0d96ebcd04d428d19498bf95c5a23447dbb5aade4cfbd61ac07fe2b6799",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-typescript-node-stack.mjs": {
+      "sha256": "53a0049adfcb3cc7ec45d7b1febbc272d5ccd2e350c8bbce076fa7a4b7617b73",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/draft-typescript-node-stack-scope.mjs": {
+      "sha256": "a159590061a902d47fe963c556f087898dd4ea10c19e821043383cba2acc8c96",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/guidance/typescript-vite-stack.md": {
+      "sha256": "84e12c0c69ef14ddf76fed73ff5693a1e66616673cce31d8e2992827684f9d70",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/typescript-vite-stack.md": {
+      "sha256": "d26c9725c371c74235feef40d4cfae4d6e5c5ad4d6da13e69603155cfe06d03b",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/operations/check-typescript-vite-stack.mjs": {
+      "sha256": "16553b4a4aa97ab72dd6ae0f67c5037b3025a6e3a399d053cee1d1158c4918a3",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/discovery/draft-typescript-vite-stack-scope.mjs": {
+      "sha256": "e03b87790e387896ba5fcff526f849a91cd8a79eb6f383fdaa5e4a0c4f3c8c92",
+      "executable": false
+    },
+    ".repo-standards/inputs/source/scripts/validate.mjs": {
+      "sha256": "daeedb8713e64e0334ede3825297ec6338a85ee8051c0dc0385f5533373ecc32",
+      "executable": false
+    },
+    ".repo-standards/inputs/standards.yaml": {
+      "sha256": "90f097a79e016efada18924aa1dc520b2d8592c41987dd6b0fdd498d2a191215",
+      "executable": false
+    },
+    ".repo-standards/inputs/metadata.json": {
+      "sha256": "f3f77341999124caeaae2729050b8608cea96907179ffbf9c363b89d62086a3b",
+      "executable": false
+    },
+    ".repo-standards/inputs/resolved.json": {
+      "sha256": "d53235f9c8a60f4bb1c9c62184625c8ae4e79e8302f996b083f43c3f2cf18db5",
+      "executable": false
+    },
+    ".repo-standards/inputs/scope-history.json": {
+      "sha256": "b7744baa8d3bec04ec181c3d011975bd1834de5838242ca809227f32b53fd758",
+      "executable": false
+    },
+    ".repo-standards/rules/documentation.md": {
+      "sha256": "33f5c3535f18ccf34e0222597fdee045ead0432c100e92ecaeef89c84b425a3b",
+      "executable": false
+    },
+    ".repo-standards/rules/git-attributes.md": {
+      "sha256": "ce8397df1a7819e7d8af6b65f48686f6cc0d798c361734b00535fbd60f292dcd",
+      "executable": false
+    },
+    ".repo-standards/rules/github-repository-configuration.md": {
+      "sha256": "af92edb138cd5e7ff7b86263e07493675a931ee9c6f2ef7fcf90405c0e4b9a63",
+      "executable": false
+    },
+    ".repo-standards/rules/project-agent-guidance.md": {
+      "sha256": "d28524380c291296b805f43440d09b437bc60edd390068bfbf552cdb8b982a25",
+      "executable": false
+    },
+    ".repo-standards/rules/project-readmes.md": {
+      "sha256": "6cc1cbca7a629ab74c4e93b83f400cade77159aeb1bd2502463eafedb63a24fc",
+      "executable": false
+    },
+    ".repo-standards/rules/repository-license.md": {
+      "sha256": "0cae423be028b626f046212c2c7d6432a26ea454fa9917f8b37acdcf8601af2a",
+      "executable": false
+    },
+    ".repo-standards/rules/repository-readme.md": {
+      "sha256": "2965277f0a8436f69dbeb1573dc2c905e519229ab38a26cda2599a0f11233952",
+      "executable": false
+    },
+    ".repo-standards/rules/README.md": {
+      "sha256": "82d007cf5850431be87973bda260dc9762c8697e29e007ab246607a027d108da",
+      "executable": false
+    },
+    ".repo-standards/selection.yaml": {
+      "sha256": "658caf7890e6a0826c26c6b49e87af55911bf18791d52ceabb9387eaecc1be6f",
+      "executable": false
+    },
+    ".repo-standards/.gitignore": {
+      "sha256": "c458b2b2b042dcd6ca054ac2da03c35671ea811e22cba717673689cbe5ad098d",
+      "executable": false
+    },
+    ".repo-standards/.gitattributes": {
+      "sha256": "8e9a2170d4a89adb95a036c4052b12a99a636d0f6effa15f9d05dca4b757499a",
+      "executable": false
+    },
+    ".repo-standards/runtime/package.json": {
+      "sha256": "48965433e8c5efd34d31170446eebc39429542c33b5d315a625dd7eb0ed099c9",
+      "executable": false
+    },
+    ".repo-standards/runtime/package-lock.json": {
+      "sha256": "5734c756ed66b766e231057cb2620a033e82d9132a3987443ab27252f16625e0",
+      "executable": false
+    }
+  },
+  "state": {
+    "sha256": "f46a24c00a3c048b3d1e22051317e914e5473305c35cd16f938429d61480802b",
+    "executable": false
+  }
+}

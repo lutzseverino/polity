@@ -30,3 +30,5 @@ pnpm web
 ## Documentation
 
 Durable mobile docs live in [docs](docs/README.md).
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).

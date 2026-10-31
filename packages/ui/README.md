@@ -34,3 +34,5 @@ pnpm --filter @polity/ui check:registry
 pnpm --filter @polity/ui typecheck
 pnpm --filter @polity/ui check:architecture
 ```
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).
