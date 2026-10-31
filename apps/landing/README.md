@@ -11,14 +11,12 @@ It is part of the root workspace and consumes the local `@polity/design` and
 From the repository root:
 
 ```bash
-pnpm install
 pnpm dev:landing
 pnpm build:landing
 ```
 
-The install unit is the workspace, even when you only work on this app. Run installs from the root so
-the local package link is resolved consistently.
-
 ## Documentation
 
 Durable landing docs live in [docs](docs/README.md).
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).

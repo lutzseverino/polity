@@ -43,7 +43,7 @@ The scenario keeps access and refresh credentials server-side and exposes only t
 cookie to application code.
 
 Browser mock ownership and extension conventions are recorded in
-[API mocking](docs/decisions/api-mocking-for-tests.md).
+[API mocking](docs/adr/api-mocking-for-tests.md).
 
 ## Structure
 
@@ -58,7 +58,7 @@ Browser mock ownership and extension conventions are recorded in
 - `src/mocks/` owns development-only HTTP scenarios and the browser MSW installation boundary.
 
 The authoritative ownership and import rules are in
-[Source architecture](docs/reference/source-architecture.md) and are checked with
+[Source architecture](docs/development/source-architecture.md) and are checked with
 `pnpm check:architecture`.
 
 ## Domain and feature convention
@@ -82,7 +82,7 @@ The authoritative ownership and import rules are in
 - Run `pnpm i18n:sync` after adding or moving source messages. English is the source locale; Spanish and the
   pseudo locale are already wired.
 - The accepted rationale and tradeoffs are recorded in
-  [Routing and localization](docs/decisions/routing-and-localization.md).
+  [Routing and localization](docs/adr/routing-and-localization.md).
 
 ## Data access
 
@@ -99,7 +99,7 @@ The authoritative ownership and import rules are in
   owner hook.
 - Localized server data includes locale in its query key, while the HTTP client applies `Accept-Language`.
 - The accepted rationale and migration boundary are recorded in
-  [Data access and server state](docs/decisions/data-access-and-server-state.md).
+  [Data access and server state](docs/adr/data-access-and-server-state.md).
 
 ## Typography convention
 
@@ -133,3 +133,5 @@ The workflow refreshes generated-source provenance. Manual canonical edits fail
 ## Documentation
 
 Durable web app docs live in [docs](docs/README.md).
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).

@@ -44,7 +44,7 @@ The service is configured entirely through runtime inputs:
   standard Keycloak model it receives `view-clients` and `manage-users`, not catalog protection or
   contract-materialization authority. Verify the three credentials cannot perform one another's
   operations as described in the
-  [membership invitation integration reference](docs/reference/membership-invitation-integration.md).
+  [membership invitation integration reference](docs/development/membership-invitation-integration.md).
 - Cardo product-authentication inputs configure issuer, Identity-session audience, Polity audience,
   session and CSRF cookie names, token exchange, and active-token validation once the corresponding
   published Cardo module is adopted.
@@ -58,3 +58,5 @@ Container packaging and routing requirements are documented in [Deployment](../.
 Start with the [documentation index](docs/README.md). Documentation is organized by reader intent
 so durable guidance has one predictable home. The [OpenAPI contract](openapi/polity.yaml) is owned
 beside the service.
+
+For shared prerequisites and validation, read the [development guide](../../docs/development/README.md) and [contribution guidelines](../../CONTRIBUTING.md).
