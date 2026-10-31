@@ -15,6 +15,8 @@ export default [
   {
     ignores: [
       "**/node_modules/**",
+      ".repo-standards/**",
+      "vendor/**",
       "**/dist/**",
       "**/target/**",
       "apps/landing/src/api/generated/**",
