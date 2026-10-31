@@ -1,0 +1,46 @@
+# Repo Canon-owned files (`.repo-standards/lock.json` `files`).
+/AGENTS.md
+/CONTRIBUTING.md
+/docs/agents/
+/.github/ISSUE_TEMPLATE/
+/.github/PULL_REQUEST_TEMPLATE.md
+/.github/scripts/validate*.mjs
+/.github/workflows/issue-contracts.yml
+/.github/workflows/pr-metadata.yml
+/.github/workflows/standards-update.yml
+/.agents/skills/
+/.repo-standards/
+/scripts/validate*.mjs
+/operations/lib/rendered-markdown.mjs
+/vendor/
+
+# Generated output.
+/apps/landing/src/api/generated/
+/apps/web/public/mockServiceWorker.js
+/apps/web/src/app/i18n/generated/
+/apps/web/src/routeTree.gen.ts
+/packages/design/src/themes/brand.css
+/packages/ui/registry-manifest.json
+/packages/ui/src/components/ui/
+
+# Outside the formatted scope, as under Biome: documentation, workflows,
+# deployment and Java service sources, agent skills and assets.
+*.md
+*.yml
+*.yaml
+!/pnpm-workspace.yaml
+/.github/
+/.mvn/
+/deploy/
+/docs/
+/operations/
+/services/
+/.claude/
+/apps/*/.agents/
+/apps/*/.claude/
+/apps/mobile/assets/
+/apps/mobile/.expo/
+skills-lock.json
+/.repository-standards.json
+/.repository-standards/
+pnpm-lock.yaml

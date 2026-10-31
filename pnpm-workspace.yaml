@@ -3,4 +3,9 @@ packages:
   - "packages/*"
   - "services/*"
 allowBuilds:
+  msw: false
   unrs-resolver: true
+packageExtensions:
+  dependency-cruiser:
+    peerDependencies:
+      typescript: "*"

@@ -1,0 +1,149 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react/set-state-in-effect": "off",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/require-array-sort-compare": "off"
+  },
+  "ignorePatterns": [
+    ".agents/skills/**",
+    ".claude/**",
+    ".github/scripts/validate*.mjs",
+    ".repo-standards/**",
+    "operations/lib/rendered-markdown.mjs",
+    "scripts/validate*.mjs",
+    "vendor/**",
+    "**/dist/**",
+    "**/target/**",
+    "apps/landing/src/api/generated/**",
+    "apps/mobile/.expo/**",
+    "apps/web/public/mockServiceWorker.js",
+    "apps/web/src/app/i18n/generated/**",
+    "apps/web/src/routeTree.gen.ts",
+    "packages/ui/src/components/ui/**"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "apps/web/src/**/*.{ts,tsx}",
+        "apps/landing/src/**/*.{ts,tsx}",
+        "apps/mobile/src/**/*.{ts,tsx}",
+        "packages/design/src/**/*.ts",
+        "packages/ui/src/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "typescript/await-thenable": "error",
+        "typescript/no-base-to-string": "error",
+        "typescript/no-confusing-void-expression": [
+          "error",
+          { "ignoreArrowShorthand": true }
+        ],
+        "typescript/no-floating-promises": "error",
+        "typescript/no-for-in-array": "error",
+        "typescript/no-implied-eval": "error",
+        "typescript/no-misused-promises": [
+          "error",
+          { "checksVoidReturn": { "attributes": false } }
+        ],
+        "typescript/no-unnecessary-type-assertion": "error",
+        "typescript/no-unsafe-argument": "error",
+        "typescript/no-unsafe-assignment": "error",
+        "typescript/no-unsafe-call": "error",
+        "typescript/no-unsafe-member-access": "error",
+        "typescript/no-unsafe-return": "error",
+        "typescript/prefer-promise-reject-errors": "error",
+        "typescript/require-array-sort-compare": "error",
+        "typescript/restrict-plus-operands": [
+          "error",
+          { "allowNumberAndString": false }
+        ],
+        "typescript/restrict-template-expressions": [
+          "error",
+          { "allowBoolean": true, "allowNullish": true, "allowNumber": true }
+        ],
+        "typescript/switch-exhaustiveness-check": "error",
+        "typescript/unbound-method": "error"
+      }
+    },
+    {
+      "files": ["apps/**/*.{ts,tsx}"],
+      "rules": {
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn"
+      }
+    },
+    {
+      "files": ["apps/landing/src/**/*.{ts,tsx}", "apps/web/src/**/*.{ts,tsx}"],
+      "rules": {
+        "react/only-export-components": [
+          "warn",
+          { "allowConstantExport": true }
+        ]
+      }
+    },
+    {
+      "files": ["apps/landing/src/**/*.{ts,tsx}", "apps/web/src/**/*.{ts,tsx}"],
+      "excludeFiles": ["apps/{landing,web}/src/components/app/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@polity/ui/*"],
+                "message": "Application code consumes shared UI through an app-local wrapper so owner-specific invariants stay local."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/src/**/*.{ts,tsx}"],
+      "excludeFiles": [
+        "apps/web/src/api/**",
+        "apps/web/src/mocks/**",
+        "apps/web/src/test/**",
+        "apps/web/src/**/*.test.{ts,tsx}",
+        "apps/web/src/**/*.spec.{ts,tsx}"
+      ],
+      "rules": {
+        "no-restricted-properties": [
+          "error",
+          {
+            "message": "Production web HTTP calls must use the shared src/api HTTP boundary.",
+            "object": "globalThis",
+            "property": "fetch"
+          },
+          {
+            "message": "Production web HTTP calls must use the shared src/api HTTP boundary.",
+            "object": "self",
+            "property": "fetch"
+          },
+          {
+            "message": "Production web HTTP calls must use the shared src/api HTTP boundary.",
+            "object": "window",
+            "property": "fetch"
+          }
+        ],
+        "no-restricted-globals": [
+          "error",
+          {
+            "message": "Production web HTTP calls must use the shared src/api HTTP boundary.",
+            "name": "fetch"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/src/routes/**/*.{ts,tsx}"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
+  ]
+}

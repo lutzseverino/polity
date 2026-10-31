@@ -100,8 +100,7 @@ function sessionFailure(status: number, code: string, message: string) {
 
 function sessionPrincipal(
   response:
-    | typeof sessionPrincipalResponse
-    | typeof renewedSessionPrincipalResponse,
+    typeof sessionPrincipalResponse | typeof renewedSessionPrincipalResponse,
 ) {
   return HttpResponse.json(response, {
     headers: { "Cache-Control": "no-store" },

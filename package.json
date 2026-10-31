@@ -2,14 +2,14 @@
   "name": "polity",
   "private": true,
   "version": "0.1.0",
-  "packageManager": "pnpm@9.12.0",
+  "packageManager": "pnpm@11.28.9",
   "scripts": {
     "build": "node scripts/run-package-script.mjs root build:web && node scripts/run-package-script.mjs root build:landing",
     "build:landing": "node scripts/run-package-script.mjs workspace apps/landing build",
     "build:web": "node scripts/run-package-script.mjs workspace apps/web build",
     "check": "node scripts/run-package-script.mjs root check:repository && node scripts/run-package-script.mjs root check:js && node scripts/run-package-script.mjs root check:service && node scripts/run-package-script.mjs root check:deps",
     "check:deps": "knip",
-    "check:js": "node scripts/run-package-script.mjs root lint && node scripts/run-package-script.mjs root test:eslint-config && node scripts/run-package-script.mjs workspace packages/design check:theme && node scripts/run-package-script.mjs workspace packages/ui check:registry && node scripts/run-package-script.mjs root typecheck && node scripts/run-package-script.mjs root check:ts:architecture && node scripts/run-package-script.mjs root test:web && node scripts/run-package-script.mjs root build",
+    "check:js": "node scripts/run-package-script.mjs root format:check && node scripts/run-package-script.mjs root lint && node scripts/run-package-script.mjs root test:tooling && node scripts/run-package-script.mjs workspace packages/design validate && node scripts/run-package-script.mjs workspace packages/ui validate && node scripts/run-package-script.mjs workspace apps/web validate && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck && node scripts/run-package-script.mjs root check:ts:architecture:landing && node scripts/run-package-script.mjs root check:ts:architecture:mobile && node scripts/run-package-script.mjs root build:landing",
     "check:repository": "python3 .github/scripts/check-workflows.py && ./deploy/test-runtime-source-pins.sh",
     "check:service": "./mvnw -f services/polity/pom.xml verify spotbugs:check",
     "check:service:architecture": "./mvnw -f services/polity/pom.xml -Dtest=PolityArchitectureTest,PolityRepositoryBoundaryTest,PolityApplicationBoundaryTest test",
@@ -25,29 +25,25 @@
     "dev:landing": "node scripts/run-package-script.mjs workspace apps/landing dev",
     "dev:mobile": "node scripts/run-package-script.mjs workspace apps/mobile start",
     "dev:web": "node scripts/run-package-script.mjs workspace apps/web dev",
-    "format": "biome check . --write",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "generate:api": "node scripts/run-package-script.mjs workspace apps/landing generate:api",
-    "lint": "biome check . && node scripts/run-package-script.mjs root lint:ts && node scripts/run-package-script.mjs root lint:mobile",
+    "lint": "oxlint --type-aware --deny-warnings . && node scripts/run-package-script.mjs root lint:mobile",
     "lint:mobile": "node scripts/run-package-script.mjs workspace apps/mobile lint",
-    "lint:ts": "eslint --config eslint.config.mjs --max-warnings 0 .",
-    "lint:ts:web": "eslint --config eslint.config.mjs --max-warnings 0 apps/web",
-    "test:eslint-config": "node --test eslint.config.test.mjs",
     "test:service": "./mvnw -f services/polity/pom.xml test",
+    "test:tooling": "node --test scripts/tooling.test.mjs scripts/registry.test.mjs",
     "test:web": "node scripts/run-package-script.mjs workspace apps/web test:run",
     "typecheck": "node scripts/run-package-script.mjs workspace packages/design typecheck && node scripts/run-package-script.mjs workspace packages/ui typecheck && node scripts/run-package-script.mjs workspace apps/web typecheck && node scripts/run-package-script.mjs workspace apps/landing typecheck && node scripts/run-package-script.mjs workspace apps/mobile typecheck"
   },
   "engines": {
-    "node": ">=24"
+    "node": "^24 || ^26"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.5",
-    "@typescript-eslint/eslint-plugin": "8.61.1",
-    "@typescript-eslint/parser": "8.61.1",
     "dependency-cruiser": "17.4.3",
-    "eslint": "9.39.1",
-    "eslint-plugin-react-hooks": "7.1.1",
-    "eslint-plugin-react-refresh": "0.5.3",
     "knip": "6.17.2",
+    "oxlint": "1.90.0",
+    "oxlint-tsgolint": "7.0.2005",
+    "prettier": "3.9.10",
     "typescript": "5.9.3"
   }
 }

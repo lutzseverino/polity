@@ -17,10 +17,14 @@
   "scripts": {
     "check:architecture": "depcruise --config dependency-cruiser.cjs src bin",
     "check:theme": "node bin/polity-design.mjs generate brand-theme --check",
+    "format": "prettier --ignore-path ../../.gitignore --ignore-path ../../.prettierignore --write .",
+    "format:check": "prettier --ignore-path ../../.gitignore --ignore-path ../../.prettierignore --check .",
     "generate:theme": "node bin/polity-design.mjs generate brand-theme",
-    "typecheck": "tsc --noEmit"
+    "lint": "oxlint --config ../../.oxlintrc.json --type-aware --deny-warnings .",
+    "typecheck": "tsc --noEmit",
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:architecture && pnpm check:theme"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }
