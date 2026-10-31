@@ -11,7 +11,7 @@ export it through that folder's `index.ts`, and keep canonical registry source i
 ## Dialog convention
 
 Product dialogs use the compound `AppDialog` components. See the authoritative
-[app component wrapper reference](../../../docs/reference/app-component-wrappers.md) for the minimal
+[web documentation index](../../../docs/README.md) for the minimal
 wrapper shape, draggable mobile-drawer behavior, composition rules, and registry import boundary.
 
 ## Link surface convention
