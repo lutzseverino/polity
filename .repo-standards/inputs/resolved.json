@@ -79,31 +79,11 @@
           "apps/web/docs/adr/page-layout-measures.md",
           "apps/web/docs/adr/routing-and-localization.md",
           "apps/web/docs/adr/shell-context-and-page-headings.md",
-          "apps/web/docs/decisions/README.md",
-          "apps/web/docs/decisions/api-mocking-for-tests.md",
-          "apps/web/docs/decisions/cardo-session-boundary.md",
-          "apps/web/docs/decisions/data-access-and-server-state.md",
-          "apps/web/docs/decisions/inbox-attention-model.md",
-          "apps/web/docs/decisions/page-layout-measures.md",
-          "apps/web/docs/decisions/routing-and-localization.md",
-          "apps/web/docs/decisions/shell-context-and-page-headings.md",
           "apps/web/docs/development/README.md",
           "apps/web/docs/development/app-component-wrappers.md",
           "apps/web/docs/development/source-architecture.md",
-          "apps/web/docs/reference/README.md",
-          "apps/web/docs/reference/app-component-wrappers.md",
-          "apps/web/docs/reference/source-architecture.md",
           "docs/README.md",
-          "docs/_templates/README.md",
-          "docs/_templates/decision.template.md",
-          "docs/_templates/explanation.template.md",
-          "docs/_templates/how-to.template.md",
-          "docs/_templates/index.template.md",
-          "docs/_templates/reference.template.md",
-          "docs/_templates/tutorial.template.md",
           "docs/development/README.md",
-          "docs/reference/README.md",
-          "docs/reference/readme-conventions.md",
           "packages/design/docs/README.md",
           "packages/design/docs/development/README.md",
           "services/polity/docs/README.md",
@@ -111,13 +91,7 @@
           "services/polity/docs/development/architecture.md",
           "services/polity/docs/development/backend-conventions.md",
           "services/polity/docs/development/membership-invitation-integration.md",
-          "services/polity/docs/development/product-authentication.md",
-          "services/polity/docs/explanation/README.md",
-          "services/polity/docs/explanation/architecture.md",
-          "services/polity/docs/reference/README.md",
-          "services/polity/docs/reference/backend-conventions.md",
-          "services/polity/docs/reference/membership-invitation-integration.md",
-          "services/polity/docs/reference/product-authentication.md"
+          "services/polity/docs/development/product-authentication.md"
         ],
         "directories": []
       }
@@ -751,15 +725,42 @@
     },
     {
       "id": "typescript-vite-stack",
-      "checks": [],
+      "checks": [
+        {
+          "id": "typescript-vite-stack-manifests",
+          "run": {
+            "executable": "node",
+            "script": "operations/check-typescript-vite-stack.mjs",
+            "resources": [
+              "operations/lib/typescript-node-stack.mjs",
+              "operations/lib/stack-files.mjs",
+              "operations/lib/typescript-web-stack.mjs",
+              "operations/lib/stack-check.mjs",
+              "operations/lib/local-markdown-links.mjs"
+            ],
+            "arguments": []
+          },
+          "prerequisite": {
+            "version-arguments": [
+              "--version"
+            ],
+            "version": ">=24.0.0 <25.0.0 || >=26.0.0 <27.0.0"
+          },
+          "timeout-seconds": 30
+        }
+      ],
       "fixes": [],
       "kind": "repository",
       "guidance": "guidance/typescript-vite-stack.md",
+      "rules": "rules/typescript-web-stacks.md",
       "targets": {
-        "paths": [],
+        "paths": [
+          "apps/web/package.json",
+          "packages/design/package.json",
+          "packages/ui/package.json"
+        ],
         "directories": []
-      },
-      "no-scope": true
+      }
     },
     {
       "id": "validator-command",
