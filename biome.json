@@ -14,6 +14,8 @@
       "eslint.config.mjs",
       "knip.json",
       "scripts/**/*.mjs",
+      "!scripts/validate.mjs",
+      "!scripts/validate-issue-contract.mjs",
       "apps/*/dependency-cruiser.cjs",
       "apps/*/tsconfig.depcruise.json",
       "apps/landing/components.json",
