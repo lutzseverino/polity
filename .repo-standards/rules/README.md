@@ -18,31 +18,11 @@ Run `repo-standards rules <path>` to print the rules that cover a path.
   - `apps/web/docs/adr/page-layout-measures.md`
   - `apps/web/docs/adr/routing-and-localization.md`
   - `apps/web/docs/adr/shell-context-and-page-headings.md`
-  - `apps/web/docs/decisions/README.md`
-  - `apps/web/docs/decisions/api-mocking-for-tests.md`
-  - `apps/web/docs/decisions/cardo-session-boundary.md`
-  - `apps/web/docs/decisions/data-access-and-server-state.md`
-  - `apps/web/docs/decisions/inbox-attention-model.md`
-  - `apps/web/docs/decisions/page-layout-measures.md`
-  - `apps/web/docs/decisions/routing-and-localization.md`
-  - `apps/web/docs/decisions/shell-context-and-page-headings.md`
   - `apps/web/docs/development/README.md`
   - `apps/web/docs/development/app-component-wrappers.md`
   - `apps/web/docs/development/source-architecture.md`
-  - `apps/web/docs/reference/README.md`
-  - `apps/web/docs/reference/app-component-wrappers.md`
-  - `apps/web/docs/reference/source-architecture.md`
   - `docs/README.md`
-  - `docs/_templates/README.md`
-  - `docs/_templates/decision.template.md`
-  - `docs/_templates/explanation.template.md`
-  - `docs/_templates/how-to.template.md`
-  - `docs/_templates/index.template.md`
-  - `docs/_templates/reference.template.md`
-  - `docs/_templates/tutorial.template.md`
   - `docs/development/README.md`
-  - `docs/reference/README.md`
-  - `docs/reference/readme-conventions.md`
   - `packages/design/docs/README.md`
   - `packages/design/docs/development/README.md`
   - `services/polity/docs/README.md`
@@ -51,12 +31,6 @@ Run `repo-standards rules <path>` to print the rules that cover a path.
   - `services/polity/docs/development/backend-conventions.md`
   - `services/polity/docs/development/membership-invitation-integration.md`
   - `services/polity/docs/development/product-authentication.md`
-  - `services/polity/docs/explanation/README.md`
-  - `services/polity/docs/explanation/architecture.md`
-  - `services/polity/docs/reference/README.md`
-  - `services/polity/docs/reference/backend-conventions.md`
-  - `services/polity/docs/reference/membership-invitation-integration.md`
-  - `services/polity/docs/reference/product-authentication.md`
 - [`git-attributes`](git-attributes.md) covers:
   - `.gitattributes`
 - [`github-repository-configuration`](github-repository-configuration.md) covers the whole repository.
@@ -73,3 +47,7 @@ Run `repo-standards rules <path>` to print the rules that cover a path.
   - `LICENSE`
 - [`repository-readme`](repository-readme.md) covers:
   - `README.md`
+- [`typescript-vite-stack`](typescript-vite-stack.md) covers:
+  - `apps/web/package.json`
+  - `packages/design/package.json`
+  - `packages/ui/package.json`
