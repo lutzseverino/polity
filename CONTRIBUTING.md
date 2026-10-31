@@ -51,3 +51,15 @@ the implementation.
 
 Run the canonical validation command documented by this repository. CI must
 pass before squash merge. Delete the branch after merge.
+
+
+### Adoption pull requests
+
+An initial Repo Canon adoption is exempt from the ordinary PR body sections.
+Start its body with the complete `repo-standards status --summary` output,
+byte for byte, headed `# Repository Standards adoption record`. Record the
+pinned runtime's ready-to-commit verdict before committing. Use the title
+`chore: adopt repo-canon <version> with CLI <version>`. Keep one completed
+adoption run per PR. Optionally append one `## Related issue` section with
+`Closes #N` or `Part of #N`; no other appended sections are needed. Preserve
+the complete PR body in the squash commit.

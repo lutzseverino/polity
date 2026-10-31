@@ -30,7 +30,16 @@ def validate(branch: str, title: str, body: str, author: str) -> list[str]:
         errors.append("pull-request title must be a Conventional Commit subject")
     if not ISSUE.search(body):
         errors.append("pull-request body must contain a line in the form: Closes #123")
-    for heading in HEADINGS:
+    # Adoption records carry their own structured validation and must remain
+    # byte-preserved instead of being rewritten into the ordinary PR template.
+    adoption = body.startswith("# Repository Standards adoption record\n")
+    headings = (
+        "Ready to commit", "Selection", "Operations", "Changed paths",
+        "Scope changes", "Identities",
+    ) if adoption else HEADINGS
+    if adoption and "Ready to commit: yes." not in body:
+        errors.append("adoption record must be ready to commit")
+    for heading in headings:
         if not re.search(rf"(?im)^## {re.escape(heading)}\s*$", body):
             errors.append(f"pull-request body is missing: ## {heading}")
     return errors
