@@ -1,7 +1,7 @@
 {
   "format": "repo-standards/scope-history/v6",
   "evidence": "historical",
-  "inspection": "sha256:af312e730d529c7510befa6b467d02a7017fb5bebad163d8c65a91449b4dad5a",
+  "inspection": "sha256:b39b0165dfc2557d98661c6c46ada6d61210148bee33186ed18719934d790423",
   "resolved": {
     "description": "The Repo Canon standards for every adopting repository",
     "declarations": [
@@ -106,7 +106,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/domain.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/domain.md"
+        "exact": "docs/agents/domain.md"
       },
       {
         "id": "feature-request-template",
@@ -314,7 +314,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/issue-tracker.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md"
+        "exact": "docs/agents/issue-tracker.md"
       },
       {
         "id": "marked-license",
@@ -541,7 +541,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "code-review",
-        "source": "vendor/mattpocock-skills/skills/engineering/code-review"
+        "source": ".agents/skills/code-review"
       },
       {
         "id": "skill-codebase-design",
@@ -549,7 +549,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "codebase-design",
-        "source": "vendor/mattpocock-skills/skills/engineering/codebase-design"
+        "source": ".agents/skills/codebase-design"
       },
       {
         "id": "skill-diagnosing-bugs",
@@ -557,7 +557,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "diagnosing-bugs",
-        "source": "vendor/mattpocock-skills/skills/engineering/diagnosing-bugs"
+        "source": ".agents/skills/diagnosing-bugs"
       },
       {
         "id": "skill-domain-modeling",
@@ -565,7 +565,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "domain-modeling",
-        "source": "vendor/mattpocock-skills/skills/engineering/domain-modeling"
+        "source": ".agents/skills/domain-modeling"
       },
       {
         "id": "skill-grill-with-docs",
@@ -573,7 +573,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "grill-with-docs",
-        "source": "vendor/mattpocock-skills/skills/engineering/grill-with-docs"
+        "source": ".agents/skills/grill-with-docs"
       },
       {
         "id": "skill-grilling",
@@ -581,7 +581,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "grilling",
-        "source": "vendor/mattpocock-skills/skills/productivity/grilling"
+        "source": ".agents/skills/grilling"
       },
       {
         "id": "skill-implement",
@@ -589,7 +589,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "implement",
-        "source": "vendor/mattpocock-skills/skills/engineering/implement"
+        "source": ".agents/skills/implement"
       },
       {
         "id": "skill-improve-codebase-architecture",
@@ -597,7 +597,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "improve-codebase-architecture",
-        "source": "vendor/mattpocock-skills/skills/engineering/improve-codebase-architecture"
+        "source": ".agents/skills/improve-codebase-architecture"
       },
       {
         "id": "skill-orchestrate",
@@ -613,7 +613,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "pr",
-        "source": "vendor/mattpocock-skills/skills/engineering/pr"
+        "source": ".agents/skills/pr"
       },
       {
         "id": "skill-prototype",
@@ -621,7 +621,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "prototype",
-        "source": "vendor/mattpocock-skills/skills/engineering/prototype"
+        "source": ".agents/skills/prototype"
       },
       {
         "id": "skill-research",
@@ -629,7 +629,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "research",
-        "source": "vendor/mattpocock-skills/skills/engineering/research"
+        "source": ".agents/skills/research"
       },
       {
         "id": "skill-tdd",
@@ -637,7 +637,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "tdd",
-        "source": "vendor/mattpocock-skills/skills/engineering/tdd"
+        "source": ".agents/skills/tdd"
       },
       {
         "id": "skill-to-spec",
@@ -645,7 +645,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "to-spec",
-        "source": "vendor/mattpocock-skills/skills/engineering/to-spec"
+        "source": ".agents/skills/to-spec"
       },
       {
         "id": "skill-to-tickets",
@@ -653,7 +653,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "to-tickets",
-        "source": "vendor/mattpocock-skills/skills/engineering/to-tickets"
+        "source": ".agents/skills/to-tickets"
       },
       {
         "id": "skill-triage",
@@ -669,7 +669,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "wayfinder",
-        "source": "vendor/mattpocock-skills/skills/engineering/wayfinder"
+        "source": ".agents/skills/wayfinder"
       },
       {
         "id": "skill-writing-for-agents",
@@ -677,7 +677,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "writing-for-agents",
-        "source": "vendor/mattpocock-skills/skills/productivity/writing-for-agents"
+        "source": ".agents/skills/writing-for-agents"
       },
       {
         "id": "specification-template",
@@ -701,7 +701,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/triage-labels.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/triage-labels.md"
+        "exact": "docs/agents/triage-labels.md"
       },
       {
         "id": "typescript-astro-stack",
@@ -873,7 +873,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/domain.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/domain.md"
+        "exact": "docs/agents/domain.md"
       },
       {
         "id": "feature-request-template",
@@ -1078,7 +1078,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/issue-tracker.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md"
+        "exact": "docs/agents/issue-tracker.md"
       },
       {
         "id": "marked-license",
@@ -1295,7 +1295,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "code-review",
-        "source": "vendor/mattpocock-skills/skills/engineering/code-review"
+        "source": ".agents/skills/code-review"
       },
       {
         "id": "skill-codebase-design",
@@ -1303,7 +1303,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "codebase-design",
-        "source": "vendor/mattpocock-skills/skills/engineering/codebase-design"
+        "source": ".agents/skills/codebase-design"
       },
       {
         "id": "skill-diagnosing-bugs",
@@ -1311,7 +1311,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "diagnosing-bugs",
-        "source": "vendor/mattpocock-skills/skills/engineering/diagnosing-bugs"
+        "source": ".agents/skills/diagnosing-bugs"
       },
       {
         "id": "skill-domain-modeling",
@@ -1319,7 +1319,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "domain-modeling",
-        "source": "vendor/mattpocock-skills/skills/engineering/domain-modeling"
+        "source": ".agents/skills/domain-modeling"
       },
       {
         "id": "skill-grill-with-docs",
@@ -1327,7 +1327,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "grill-with-docs",
-        "source": "vendor/mattpocock-skills/skills/engineering/grill-with-docs"
+        "source": ".agents/skills/grill-with-docs"
       },
       {
         "id": "skill-grilling",
@@ -1335,7 +1335,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "grilling",
-        "source": "vendor/mattpocock-skills/skills/productivity/grilling"
+        "source": ".agents/skills/grilling"
       },
       {
         "id": "skill-implement",
@@ -1343,7 +1343,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "implement",
-        "source": "vendor/mattpocock-skills/skills/engineering/implement"
+        "source": ".agents/skills/implement"
       },
       {
         "id": "skill-improve-codebase-architecture",
@@ -1351,7 +1351,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "improve-codebase-architecture",
-        "source": "vendor/mattpocock-skills/skills/engineering/improve-codebase-architecture"
+        "source": ".agents/skills/improve-codebase-architecture"
       },
       {
         "id": "skill-orchestrate",
@@ -1367,7 +1367,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "pr",
-        "source": "vendor/mattpocock-skills/skills/engineering/pr"
+        "source": ".agents/skills/pr"
       },
       {
         "id": "skill-prototype",
@@ -1375,7 +1375,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "prototype",
-        "source": "vendor/mattpocock-skills/skills/engineering/prototype"
+        "source": ".agents/skills/prototype"
       },
       {
         "id": "skill-research",
@@ -1383,7 +1383,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "research",
-        "source": "vendor/mattpocock-skills/skills/engineering/research"
+        "source": ".agents/skills/research"
       },
       {
         "id": "skill-tdd",
@@ -1391,7 +1391,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "tdd",
-        "source": "vendor/mattpocock-skills/skills/engineering/tdd"
+        "source": ".agents/skills/tdd"
       },
       {
         "id": "skill-to-spec",
@@ -1399,7 +1399,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "to-spec",
-        "source": "vendor/mattpocock-skills/skills/engineering/to-spec"
+        "source": ".agents/skills/to-spec"
       },
       {
         "id": "skill-to-tickets",
@@ -1407,7 +1407,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "to-tickets",
-        "source": "vendor/mattpocock-skills/skills/engineering/to-tickets"
+        "source": ".agents/skills/to-tickets"
       },
       {
         "id": "skill-triage",
@@ -1423,7 +1423,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "wayfinder",
-        "source": "vendor/mattpocock-skills/skills/engineering/wayfinder"
+        "source": ".agents/skills/wayfinder"
       },
       {
         "id": "skill-writing-for-agents",
@@ -1431,7 +1431,7 @@
         "fixes": [],
         "kind": "skill",
         "name": "writing-for-agents",
-        "source": "vendor/mattpocock-skills/skills/productivity/writing-for-agents"
+        "source": ".agents/skills/writing-for-agents"
       },
       {
         "id": "specification-template",
@@ -1455,7 +1455,7 @@
         "fixes": [],
         "kind": "file",
         "target": "docs/agents/triage-labels.md",
-        "exact": "vendor/mattpocock-skills/skills/engineering/setup-matt-pocock-skills/triage-labels.md"
+        "exact": "docs/agents/triage-labels.md"
       },
       {
         "id": "typescript-astro-stack",
@@ -1627,7 +1627,7 @@
     ]
   },
   "discovery": {
-    "identity": "sha256:68d67d0f87fc4b592fe9da83b17a39a2d9b2aca1b37f35b819ddb704677410cf",
+    "identity": "sha256:341daa1a1c571dd6c9197af3944a0cd8406a6d2cce5b5d7a5e220d80beab4c19",
     "proposal": {
       "format": "repo-standards/scope/v2",
       "declarations": [
@@ -16970,47 +16970,5 @@
       }
     }
   },
-  "scopeChanges": [
-    {
-      "id": "documentation",
-      "additions": [],
-      "removals": [
-        "apps/web/docs/decisions/README.md",
-        "apps/web/docs/decisions/api-mocking-for-tests.md",
-        "apps/web/docs/decisions/cardo-session-boundary.md",
-        "apps/web/docs/decisions/data-access-and-server-state.md",
-        "apps/web/docs/decisions/inbox-attention-model.md",
-        "apps/web/docs/decisions/page-layout-measures.md",
-        "apps/web/docs/decisions/routing-and-localization.md",
-        "apps/web/docs/decisions/shell-context-and-page-headings.md",
-        "apps/web/docs/reference/README.md",
-        "apps/web/docs/reference/app-component-wrappers.md",
-        "apps/web/docs/reference/source-architecture.md",
-        "docs/_templates/README.md",
-        "docs/_templates/decision.template.md",
-        "docs/_templates/explanation.template.md",
-        "docs/_templates/how-to.template.md",
-        "docs/_templates/index.template.md",
-        "docs/_templates/reference.template.md",
-        "docs/_templates/tutorial.template.md",
-        "docs/reference/README.md",
-        "docs/reference/readme-conventions.md",
-        "services/polity/docs/explanation/README.md",
-        "services/polity/docs/explanation/architecture.md",
-        "services/polity/docs/reference/README.md",
-        "services/polity/docs/reference/backend-conventions.md",
-        "services/polity/docs/reference/membership-invitation-integration.md",
-        "services/polity/docs/reference/product-authentication.md"
-      ]
-    },
-    {
-      "id": "typescript-vite-stack",
-      "additions": [
-        "apps/web/package.json",
-        "packages/design/package.json",
-        "packages/ui/package.json"
-      ],
-      "removals": []
-    }
-  ]
+  "scopeChanges": []
 }
